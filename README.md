@@ -1,4 +1,4 @@
-# 🌱 ESG-Score App
+no# 🌱 ESG-Score App
 
 > **Scan. Bewerte. Entscheide nachhaltig.**
 
@@ -135,7 +135,7 @@ Dieses Projekt basiert auf einer Management-Präsentation für den Lebensmittelh
 
 ## 👤 Über den Autor
 
-**Mustafa Demir** – Information Systems & Cloud Architecture Student
+**Mustafa Demir** – Digitale Transformation Consulting AI & Cloud Solution Architecture 
 
 Dieses Projekt dokumentiert meinen Weg vom Konzept zur fertigen App. Ich bin kein erfahrener Entwickler, aber ich glaube daran, dass mit den richtigen Tools (Flutter, Claude Code, Supabase) und einer klaren Planung jeder eine App bauen kann, die einen Unterschied macht.
 
