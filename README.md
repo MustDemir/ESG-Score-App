@@ -1,184 +1,242 @@
-# 🌱 ESG-Score App
+# ScanFair · ESG-Score App
 
-> **Scan. Bewerte. Entscheide nachhaltig.**
+> **Scan. Verstehen. Fairer entscheiden.**  
+> Eine mobile App für schnelle, transparente Nachhaltigkeitsentscheidungen direkt am Regal.
 
-Eine mobile App, die Konsumenten ermöglicht, den Barcode eines Produkts zu scannen und sofort eine verständliche Nachhaltigkeitsbewertung (Environmental, Social, Governance) zu erhalten.
-
-**ScanFair** ist der geplante Produkt- und App-Name innerhalb dieses Projekts. Das Repository dokumentiert weiterhin die fachliche ESG-Score-App, während ScanFair die nutzerseitige Marke, UI-Sprache und Prototypen bündelt.
-
----
-
-## 🎯 Projektziel
-
-Konsumenten treffen täglich Kaufentscheidungen – aber Nachhaltigkeitsinformationen sind fragmentiert, unverständlich oder schlicht nicht vorhanden. Die ESG-Score App löst dieses Problem: **Ein Scan, ein Score, eine Entscheidung.**
-
-### Das Problem
-- 85% der Konsumenten wollen nachhaltiger einkaufen ([McKinsey, 2023](https://www.mckinsey.com/capabilities/sustainability/our-insights/consumers-care-about-sustainability-and-back-it-up-with-their-wallets))
-- Aber: Siegel-Dschungel, Greenwashing, keine Vergleichbarkeit
-- Bestehende Apps zeigen Einzelaspekte (nur CO2, nur Bio) – nie das Gesamtbild
-
-### Die Lösung
-| Feature | Beschreibung |
-|---------|-------------|
-| 📱 Barcode scannen | EAN-13 Barcode mit der Handy-Kamera scannen |
-| 🔢 ESG-Score sehen | Gesamtscore 0-10 mit Ampelsystem (🟢🟡🔴) |
-| 📊 Details verstehen | Aufschlüsselung nach E, S, G mit Datenquellen |
-| 🔍 Transparent bleiben | Jeder Score zeigt seine Quellen. Fehlende Daten werden ehrlich angezeigt |
+**ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und später den Flutter-Code.
 
 ---
 
-## 📐 Architektur & Tech Stack
+## 00 · Strategischer Kontext
 
-| Komponente | Technologie | Warum |
-|-----------|------------|-------|
-| Frontend | Flutter (Dart) | Cross-platform, MVP nur iOS |
-| Backend | Supabase (EU) | DSGVO-konform, kostenloser Tier |
-| Produkt-API | Open Food Facts | Kostenlos, ~600.000 DE-Produkte |
-| Barcode Scanner | mobile_scanner | Bewährtes Flutter-Package |
-| State Management | Riverpod | Moderner Flutter-Standard |
-| Lokaler Cache | Hive | Offline-Fähigkeit |
+Nachhaltige Kaufentscheidungen scheitern selten am Willen, sondern an der Situation: wenig Zeit, viele Siegel, uneinheitliche Daten, Greenwashing-Verdacht. ScanFair übersetzt vorhandene Produkt- und ESG-Daten in eine Entscheidungshilfe, die am Point of Sale funktioniert.
 
-### System-Überblick
+| Kernfrage | ScanFair-Antwort |
+| --- | --- |
+| Was kaufe ich gerade? | Barcode scannen, Produkt erkennen, relevante Daten laden |
+| Ist das Produkt nachhaltig? | ESG-Score 0-10 mit Ampel-Logik anzeigen |
+| Warum ist der Score so? | E/S/G-Säulen, Quellen und Datenqualität offenlegen |
+| Gibt es eine bessere Wahl? | Alternative Produkte und künftige Personalisierung vorbereiten |
+
+**Produktprinzip:** Der Score soll Orientierung geben, aber keine Scheingenauigkeit erzeugen. Fehlende Daten werden sichtbar gemacht.
+
+---
+
+## 01 · Discovery-Fundament
+
+Die aktuelle Discovery verdichtet Personas, Customer Journey, Value Proposition, Feature-Priorisierung, Epics, Roadmap und Risiken.
+
+| Discovery-Signal | Erkenntnis für die App |
+| --- | --- |
+| Personas | Klaus braucht Einfachheit, Thomas Planbarkeit, Anna schnelle Orientierung trotz Budget- und Zeitdruck |
+| Customer Journey | Der wichtigste Moment ist der Einkauf am Regal: Scan → Score → Entscheidung |
+| Value Proposition | Transparenz in Sekunden, vertrauenswürdige Quellen, kein unnötiges Tracking |
+| Conjoint-Priorisierung | Echtzeit-ESG-Scores, Empfehlungen und Lieferketten-Transparenz sind die stärksten Nutzenversprechen |
+| Risiken | Datenqualität, Datenschutz und Greenwashing-Vorwurf müssen im Produkt sichtbar adressiert werden |
+
+→ Interaktive Discovery: [docs/00-discovery-scroll.html](docs/00-discovery-scroll.html)  
+→ Auswertung der neuen Artefakte: [docs/DESIGN-SYNTHESIS.md](docs/DESIGN-SYNTHESIS.md)
+
+---
+
+## 02 · MVP-Scope
+
+Der MVP bleibt bewusst fokussiert: **Lebensmittel zuerst**. Kleidung und Kosmetik sind in den Hi-Fi-Prototypen bereits vorgedacht, sollten aber als Phase-2-Ausbau oder Stretch Goal behandelt werden.
+
+| Im MVP | Später / Ausbau |
+| --- | --- |
+| iOS-first Flutter App | Android-Version |
+| Barcode-Scan für Lebensmittel | Kleidung und Kosmetik als eigene Kategorien |
+| Open Food Facts Integration | weitere Produktdatenquellen |
+| E-Score vollständig | vollständiger S-Score und G-Score |
+| S-Score über Labels/Siegel | CSRD-, Lieferketten- und Unternehmensdaten |
+| Score-Ergebnis und Detailansicht | Impact-Tracker, Personalisierung, Community |
+
+**Aktueller Leitsatz für die Umsetzung:** Erst die Kernschleife stabil bauen: `Öffnen → Scannen → Produkt finden → Score verstehen → Details prüfen`.
+
+---
+
+## 03 · Score-Modell
+
+ScanFair aggregiert bestehende, anerkannte Datenquellen. Die App erfindet keine eigenen Nachhaltigkeitsurteile, sondern macht verfügbare Signale verständlich.
+
+| Dimension | Gewicht | MVP-Status | Beispielquellen |
+| --- | ---: | --- | --- |
+| Environmental | 40% | vollständig geplant | Eco-Score, CO2, Verpackung, Herkunft, Bio-Siegel |
+| Social | 35% | vereinfacht | Fairtrade, Rainforest Alliance, soziale Labels |
+| Governance | 25% | Platzhalter | CSRD, B Corp, Transparenzdaten |
+
+```text
+Gesamt-Score = (E x 0.40) + (S x 0.35) + (G x 0.25)
 ```
-┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   iPhone     │────▶│  Flutter App      │────▶│ Open Food Facts │
-│   Kamera     │     │  (Dart)           │     │ API (REST)      │
-│   Barcode    │     │                   │     └─────────────────┘
-└─────────────┘     │  ESG-Scoring      │
-                     │  Engine            │     ┌─────────────────┐
-                     │  (regelbasiert)    │────▶│ Supabase (EU)   │
-                     │                   │     │ Cache & Auth     │
-                     └──────────────────┘     └─────────────────┘
+
+**Ampel-Logik**
+
+| Score | Bedeutung |
+| --- | --- |
+| 7.0-10.0 | gute bis sehr gute Wahl |
+| 4.0-6.9 | mit Bedacht kaufen |
+| 0.0-3.9 | kritisch prüfen oder vermeiden |
+
+**Two-Score-Modell aus den Prototypen:** ESG bleibt der Hauptscore. Gesundheit, Material oder Inhaltsstoffe werden als separater Begleithinweis angezeigt und nicht in den ESG-Score eingerechnet.
+
+→ Methodik: [docs/ESG-SCORING-MODELL-v1.md](docs/ESG-SCORING-MODELL-v1.md)
+
+---
+
+## 04 · Design-System & Prototypen
+
+Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidungsnah. Forest Green ist die Primärfarbe, warme Neutrals bilden den Hintergrund, E/S/G bekommen eigene Akzentfarben.
+
+| Design-Artefakt | Zweck |
+| --- | --- |
+| [Discovery Scroll](docs/00-discovery-scroll.html) | strategischer Kontext und Research-Synthese |
+| [Wireframes](docs/01-wireframes.html) | frühe Screen-Strukturen |
+| [Brand Identity](docs/02-brand-identity.html) | Farben, Typografie, Score-System, UI-Komponenten |
+| [Score-Varianten](docs/02-score-variants.html) | Ampel-Karte, Radial-Donut, Editorial-Score im Vergleich |
+| [Hi-Fi Screens](docs/04-screens.html) | finaler Screen-Flow mit Multi-Kategorie-Ausblick |
+
+**Design-Entscheidung für den MVP:** Ampel-Karte als schnelle Standardansicht, Editorial-/Detail-Elemente für Nutzer, die tiefer verstehen wollen.
+
+---
+
+## 05 · Architektur
+
+| Komponente | Technologie | Rolle |
+| --- | --- | --- |
+| Mobile App | Flutter / Dart | iOS-first App, später cross-platform |
+| State Management | Riverpod | klarer Datenfluss zwischen Scan, Produkt und Score |
+| Barcode Scanner | mobile_scanner | Kamera-Scan für EAN-Barcodes |
+| Produktdaten | Open Food Facts API | Produkt-, Label-, Eco-Score- und Verpackungsdaten |
+| Backend / Cache | Supabase EU | Auth, Cache, optionale Datenpersistenz |
+| Lokaler Cache | Hive | Offline-Grundmodus und letzte Scans |
+
+```text
+iPhone Kamera
+  -> Flutter App
+  -> Barcode Scan
+  -> Open Food Facts API
+  -> regelbasierte ESG-Scoring Engine
+  -> Score-Ergebnis + Details + Quellen
+  -> optionaler Supabase/Hive Cache
 ```
 
 ---
 
-## 🎨 Design & Prototyping
+## 06 · Repository-Struktur
 
-Die aktuellen Design-Artefakte konkretisieren die App als **ScanFair** und ergänzen den bisherigen Konzeptstand um Discovery, Wireframes, Brand Identity, Score-Visualisierung und Hi-Fi Screens.
-
-| Prototyp | Inhalt |
-|----------|--------|
-| [Discovery Scroll](docs/00-discovery-scroll.html) | Personas, Customer Journey, Value Proposition, Epics, Roadmap und Risiken |
-| [Wireframes](docs/01-wireframes.html) | frühe Screen-Strukturen für Scanner- und Score-Flows |
-| [Brand Identity](docs/02-brand-identity.html) | Farben, Typografie, Score-System und UI-Komponenten |
-| [Score-Varianten](docs/02-score-variants.html) | Vergleich von Ampel-Karte, Radial-Donut und Editorial-Score |
-| [Hi-Fi Screens](docs/04-screens.html) | Multi-Kategorie-Flow für Lebensmittel, Kleidung und Kosmetik |
-
-Die inhaltliche Auswertung der neuen Artefakte steht in [Design-Synthese](docs/DESIGN-SYNTHESIS.md). Wichtigste Entscheidung: **Lebensmittel bleiben der MVP-Kern; Kleidung und Kosmetik sind als validierter Ausbau sichtbar, aber noch als Scope-Entscheidung zu behandeln.**
-
----
-
-## 📂 Projektstruktur
-
-```
-esg-score-app/
-├── README.md                          ← Du bist hier
+```text
+ESG-Score-App/
+├── README.md
 ├── docs/
-│   ├── 00-discovery-scroll.html        ← ScanFair Discovery-Prototyp
-│   ├── 01-wireframes.html              ← Wireframes
-│   ├── 02-brand-identity.html          ← Brand Identity
-│   ├── 02-score-variants.html          ← Score-Visualisierungen
-│   ├── 04-screens.html                 ← Hi-Fi Screens
-│   ├── DESIGN-SYNTHESIS.md             ← Inhaltliche Auswertung der Design-Artefakte
-│   ├── MVP-REQUIREMENTS.md            ← Technischer Bauplan (Screens, API, Datenmodell)
-│   ├── ESG-SCORING-MODELL-v1.md       ← Scoring-Methodik (Gewichtungen, Formeln, Quellen)
-│   ├── PROJEKTTAGEBUCH.md             ← Wöchentliche Fortschritte & Learnings
-│   └── Design/prototypes/              ← React/CSS/Demo-Daten der HTML-Prototypen
-├── lib/                               ← Flutter App-Code (kommt in Phase: Entwicklung)
-│   ├── models/
-│   ├── screens/
-│   ├── services/
-│   └── widgets/
-├── test/                              ← Tests
-└── pubspec.yaml                       ← Flutter Dependencies
+│   ├── 00-discovery-scroll.html
+│   ├── 01-wireframes.html
+│   ├── 02-brand-identity.html
+│   ├── 02-score-variants.html
+│   ├── 04-screens.html
+│   ├── DESIGN-SYNTHESIS.md
+│   ├── ESG-SCORING-MODELL-v1.md
+│   ├── MVP-REQUIREMENTS.md
+│   ├── PITCH.md
+│   ├── PROJEKTTAGEBUCH.md
+│   └── Design/prototypes/
+│       ├── tokens.css
+│       ├── design-canvas.jsx
+│       └── ...
+├── lib/                 # Flutter-App-Code, sobald die Umsetzung startet
+├── test/                # Tests
+└── pubspec.yaml         # Flutter Dependencies
 ```
 
 ---
 
-## 🗺️ Roadmap
+## 07 · GitHub-Arbeitsweise
 
-### Phase 1: MVP (aktuell – 8 Wochen)
-- [x] Projektplanung & Requirements
-- [x] ESG-Scoring-Modell definiert
-- [x] MVP Requirements Document erstellt
-- [x] Discovery, Wireframes und Brand-Prototypen integriert
-- [x] Score-Visualisierung und Hi-Fi Screen-Flow ausgearbeitet
-- [ ] Entwicklungsumgebung aufsetzen (Flutter + Xcode)
-- [ ] Home Screen & Navigation
-- [ ] Barcode-Scanner Integration
-- [ ] Open Food Facts API Anbindung
-- [ ] E-Score Berechnungslogik
-- [ ] Score-Ergebnis & Detail Screens
-- [ ] S-Score (vereinfacht) & Fehlerbehandlung
-- [ ] Testing & Polish
+GitHub soll nicht nur Ablage sein, sondern unser Steuerungsinstrument für Produkt, Code und Entscheidungen.
 
-### Phase 2: Erweiterung (geplant)
-- [ ] Vollständiger S-Score (Herkunftsland-Risiko, LkSG)
-- [ ] G-Score (CSRD-Datenbank Anbindung)
-- [ ] User-Accounts & Personalisierung
-- [ ] KI-gestützte Score-Erklärungen (OpenAI API)
-- [ ] Alternative Produktvorschläge
+| Bereich | Best Practice für dieses Projekt |
+| --- | --- |
+| Branches | `main` bleibt stabil; Arbeit passiert auf Feature-Branches wie `codex/integrate-design-artifacts` |
+| Pull Requests | Jeder größere Schritt bekommt einen PR mit Ziel, Änderungen, offenen Entscheidungen und Screenshots/Links |
+| Issues | Anforderungen, Bugs, Design-Entscheidungen und Forschungsfragen als Issues erfassen |
+| Labels | `type:feature`, `type:bug`, `type:docs`, `type:design`, `area:scoring`, `area:flutter`, `area:research` |
+| Milestones | `MVP Foundation`, `Scanner Flow`, `Scoring Engine`, `Result Screens`, `Testing & Polish` |
+| Decisions | Wichtige Produktentscheidungen im PR oder als kurze Decision Note in `docs/` dokumentieren |
+| README | Einstiegspunkt für den aktuellen Projektstand, nicht Ablage für jedes Detail |
 
-### Phase 3: Skalierung (Vision)
-- [ ] Gamification & Community
-- [ ] AR-Overlays im Supermarkt
-- [ ] On-Device ML für Personalisierung
-- [ ] Android-Version
+Dieses Repo enthält dafür Vorlagen:
 
----
+- [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md)
+- [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md)
+- [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md)
+- [Design Decision Template](.github/ISSUE_TEMPLATE/design_decision.md)
 
-## 📊 ESG-Scoring auf einen Blick
+**Empfohlener Workflow**
 
-Das Scoring-Modell aggregiert bestehende, anerkannte Datenquellen – **wir erfinden keine eigenen Bewertungen**.
+1. Issue anlegen: Was soll gebaut oder entschieden werden?
+2. Branch erstellen: `codex/<kurzer-zweck>` oder `feature/<kurzer-zweck>`.
+3. Änderung klein halten: ein Thema pro Branch.
+4. PR öffnen: Kontext, Screenshots/Links, Testhinweise, offene Fragen.
+5. Review nutzen: fachlich, technisch und UX-seitig prüfen.
+6. Nach Merge: Projekttagebuch oder relevante Docs aktualisieren.
 
-| Dimension | Gewicht | Datenquellen | MVP-Status |
-|-----------|---------|-------------|------------|
-| 🌱 **E** (Environmental) | 40% | Eco-Score, CO2-Fußabdruck, Verpackung, Herkunft, Bio-Siegel | ✅ Voll |
-| 👥 **S** (Social) | 35% | Fairtrade, Rainforest Alliance, Herkunftsland-Risiko | ⚠️ Teilweise |
-| 🏛️ **G** (Governance) | 25% | CSRD-Berichte, B Corp, Transparenz-Index | ❌ Phase 2 |
+**Definition of Ready für App-Features**
 
-**Formel:** `Gesamt-Score = (E × 0.40) + (S × 0.35) + (G × 0.25)`
+- Nutzerproblem ist klar.
+- Screen oder Flow ist im Prototyp verlinkt.
+- Datenquelle und Fallback sind beschrieben.
+- Akzeptanzkriterien sind testbar.
 
-**Ampel-System:**
-- 🟢 **7.0 – 10.0**: Gut bis sehr gut
-- 🟡 **4.0 – 6.9**: Mittelmäßig
-- 🔴 **0.0 – 3.9**: Schlecht
+**Definition of Done für App-Features**
 
-→ Vollständige Methodik: [ESG-SCORING-MODELL-v1.md](docs/ESG-SCORING-MODELL-v1.md)
+- Flutter-Code ist implementiert.
+- Score-/Datenlogik ist getestet.
+- Fehlende Daten werden transparent angezeigt.
+- UI entspricht ScanFair-Designprinzipien.
+- README oder relevante Docs sind nachgezogen, wenn sich Produktverhalten geändert hat.
 
 ---
 
-## 🔬 Wissenschaftlicher Hintergrund
+## 08 · Roadmap
 
-Dieses Projekt basiert auf einer Management-Präsentation für den Lebensmittelhandel und verbindet etablierte Methoden:
-
-- **Lean Startup** (Ries, 2011) – iterative Produktentwicklung mit MVP-Ansatz
-- **User-Centered Design** (Norman, 2013) – Epics & User Stories nach Scrum (Schwaber & Sutherland, 2020)
-- **ESG-Frameworks** – Aggregation bestehender Indizes (ADEME Eco-Score, ITUC Global Rights Index, BAFA Risikolisten)
-- **DSGVO & CSRD** – Compliance by Design
-
----
-
-## 👤 Über den Autor
-
-**Mustafa Demir** – Information Systems & Cloud Architecture Student
-
-Dieses Projekt dokumentiert meinen Weg vom Konzept zur fertigen App. Ich bin kein erfahrener Entwickler, aber ich glaube daran, dass mit den richtigen Tools (Flutter, Claude Code, Supabase) und einer klaren Planung jeder eine App bauen kann, die einen Unterschied macht.
+| Phase | Fokus | Status |
+| --- | --- | --- |
+| Phase 0 | Discovery, Research, Design-System, Prototypen | abgeschlossen / integriert |
+| Phase 1 | Lebensmittel-MVP mit Scanner, Score und Details | nächster Umsetzungsschritt |
+| Phase 2 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
+| Phase 3 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
 
 ---
 
-## 📝 Lizenz
+## 09 · Wissenschaftlicher Rahmen
 
-Dieses Projekt ist aktuell in Entwicklung. Lizenzdetails folgen.
+Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-MVP:
+
+- Design Thinking für Problemverständnis und Lösungsideen
+- Customer Journey Mapping für Pain Points im Einkaufsprozess
+- Value Proposition Canvas für Product-Market-Fit
+- Requirements Engineering für Anforderungen und User Stories
+- Lean Startup für MVP, Validierung und Iteration
+- ESG-Frameworks für nachvollziehbare Bewertungslogik
+- DSGVO und CSRD als Rahmenbedingungen für Daten und Transparenz
 
 ---
 
-## 🔗 Weiterführende Dokumente
+## 10 · Wichtige Dokumente
 
 | Dokument | Beschreibung |
-|----------|-------------|
-| [MVP Requirements](docs/MVP-REQUIREMENTS.md) | Technischer Bauplan: Screens, API, Datenmodell, Zeitplan |
-| [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | Vollständige Scoring-Methodik mit Formeln und Beispielen |
-| [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Auswertung der neuen ScanFair-Prototypen und Unterschiede zum bisherigen Stand |
-| [Projekttagebuch](docs/PROJEKTTAGEBUCH.md) | Wöchentliche Fortschritte, Entscheidungen und Learnings |
+| --- | --- |
+| [MVP Requirements](docs/MVP-REQUIREMENTS.md) | technischer Bauplan für den ersten App-MVP |
+| [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | Gewichtungen, Formeln, Datenquellen und Beispiele |
+| [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
+| [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
+| [Projekttagebuch](docs/PROJEKTTAGEBUCH.md) | Fortschritte, Entscheidungen und Learnings |
+
+---
+
+## Autor
+
+**Mustafa Demir**  
+Information Systems & Cloud Architecture Student
+
+Dieses Projekt dokumentiert den Weg vom Konzept zur App: methodisch, transparent und mit dem Ziel, nachhaltige Kaufentscheidungen verständlicher zu machen.
