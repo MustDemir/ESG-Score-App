@@ -4,6 +4,8 @@
 
 Eine mobile App, die Konsumenten ermöglicht, den Barcode eines Produkts zu scannen und sofort eine verständliche Nachhaltigkeitsbewertung (Environmental, Social, Governance) zu erhalten.
 
+**ScanFair** ist der geplante Produkt- und App-Name innerhalb dieses Projekts. Das Repository dokumentiert weiterhin die fachliche ESG-Score-App, während ScanFair die nutzerseitige Marke, UI-Sprache und Prototypen bündelt.
+
 ---
 
 ## 🎯 Projektziel
@@ -51,15 +53,38 @@ Konsumenten treffen täglich Kaufentscheidungen – aber Nachhaltigkeitsinformat
 
 ---
 
+## 🎨 Design & Prototyping
+
+Die aktuellen Design-Artefakte konkretisieren die App als **ScanFair** und ergänzen den bisherigen Konzeptstand um Discovery, Wireframes, Brand Identity, Score-Visualisierung und Hi-Fi Screens.
+
+| Prototyp | Inhalt |
+|----------|--------|
+| [Discovery Scroll](docs/00-discovery-scroll.html) | Personas, Customer Journey, Value Proposition, Epics, Roadmap und Risiken |
+| [Wireframes](docs/01-wireframes.html) | frühe Screen-Strukturen für Scanner- und Score-Flows |
+| [Brand Identity](docs/02-brand-identity.html) | Farben, Typografie, Score-System und UI-Komponenten |
+| [Score-Varianten](docs/02-score-variants.html) | Vergleich von Ampel-Karte, Radial-Donut und Editorial-Score |
+| [Hi-Fi Screens](docs/04-screens.html) | Multi-Kategorie-Flow für Lebensmittel, Kleidung und Kosmetik |
+
+Die inhaltliche Auswertung der neuen Artefakte steht in [Design-Synthese](docs/DESIGN-SYNTHESIS.md). Wichtigste Entscheidung: **Lebensmittel bleiben der MVP-Kern; Kleidung und Kosmetik sind als validierter Ausbau sichtbar, aber noch als Scope-Entscheidung zu behandeln.**
+
+---
+
 ## 📂 Projektstruktur
 
 ```
 esg-score-app/
 ├── README.md                          ← Du bist hier
 ├── docs/
+│   ├── 00-discovery-scroll.html        ← ScanFair Discovery-Prototyp
+│   ├── 01-wireframes.html              ← Wireframes
+│   ├── 02-brand-identity.html          ← Brand Identity
+│   ├── 02-score-variants.html          ← Score-Visualisierungen
+│   ├── 04-screens.html                 ← Hi-Fi Screens
+│   ├── DESIGN-SYNTHESIS.md             ← Inhaltliche Auswertung der Design-Artefakte
 │   ├── MVP-REQUIREMENTS.md            ← Technischer Bauplan (Screens, API, Datenmodell)
 │   ├── ESG-SCORING-MODELL-v1.md       ← Scoring-Methodik (Gewichtungen, Formeln, Quellen)
-│   └── PROJEKTTAGEBUCH.md             ← Wöchentliche Fortschritte & Learnings
+│   ├── PROJEKTTAGEBUCH.md             ← Wöchentliche Fortschritte & Learnings
+│   └── Design/prototypes/              ← React/CSS/Demo-Daten der HTML-Prototypen
 ├── lib/                               ← Flutter App-Code (kommt in Phase: Entwicklung)
 │   ├── models/
 │   ├── screens/
@@ -77,6 +102,8 @@ esg-score-app/
 - [x] Projektplanung & Requirements
 - [x] ESG-Scoring-Modell definiert
 - [x] MVP Requirements Document erstellt
+- [x] Discovery, Wireframes und Brand-Prototypen integriert
+- [x] Score-Visualisierung und Hi-Fi Screen-Flow ausgearbeitet
 - [ ] Entwicklungsumgebung aufsetzen (Flutter + Xcode)
 - [ ] Home Screen & Navigation
 - [ ] Barcode-Scanner Integration
@@ -153,4 +180,5 @@ Dieses Projekt ist aktuell in Entwicklung. Lizenzdetails folgen.
 |----------|-------------|
 | [MVP Requirements](docs/MVP-REQUIREMENTS.md) | Technischer Bauplan: Screens, API, Datenmodell, Zeitplan |
 | [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | Vollständige Scoring-Methodik mit Formeln und Beispielen |
+| [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Auswertung der neuen ScanFair-Prototypen und Unterschiede zum bisherigen Stand |
 | [Projekttagebuch](docs/PROJEKTTAGEBUCH.md) | Wöchentliche Fortschritte, Entscheidungen und Learnings |
