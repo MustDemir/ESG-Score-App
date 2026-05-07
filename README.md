@@ -237,6 +237,6 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 ## Autor
 
 **Mustafa Demir**  
-Information Systems & Cloud Architecture Student
+Digitale Transformation Consulting AI & Cloud Solution Architecture
 
 Dieses Projekt dokumentiert den Weg vom Konzept zur App: methodisch, transparent und mit dem Ziel, nachhaltige Kaufentscheidungen verständlicher zu machen.
