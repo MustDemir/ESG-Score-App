@@ -1,0 +1,217 @@
+/* =============================================================
+   ScanFair — Brand Tokens (Phase 2)
+   Erweitert das Demir-Designsystem für Konsumenten-Use-Case
+   ============================================================= */
+
+/* Webfonts: Inter (UI) + Instrument Serif (Display) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
+
+:root {
+  /* ---------- Backgrounds (Light, default) ---------- */
+  --sf-bg:           #FBFAF6;   /* warm off-white — leicht crème, nicht steril */
+  --sf-bg-alt:       #F4F2EB;   /* sand — alternative Sektionen */
+  --sf-bg-card:      #FFFFFF;   /* Karten / Surfaces */
+  --sf-bg-deep:      #0E1B17;   /* dunkles Forest-Tinted-Slate für Hero/CTA-Bereiche */
+
+  /* ---------- Foreground / Text ---------- */
+  --sf-ink-1:        #1A2622;   /* primary text — dunkles Forest-Slate */
+  --sf-ink-2:        #4A5650;   /* secondary */
+  --sf-ink-3:        #7A857F;   /* tertiary / muted */
+  --sf-ink-on-dark:  #FBFAF6;
+  --sf-ink-on-green: #FFFFFF;
+
+  /* ---------- Borders ---------- */
+  --sf-border:       #E5E2D8;   /* warm gray border */
+  --sf-border-soft:  #EFEDE5;
+  --sf-border-strong:#C7C3B6;
+
+  /* ---------- Brand / Primary (Forest Green) ---------- */
+  --sf-green-50:     #E8F2EE;
+  --sf-green-100:    #C5DFD3;
+  --sf-green-200:    #8FC2A8;
+  --sf-green-400:    #3D9B76;
+  --sf-green-500:    #0F7B5C;   /* ⭐ PRIMARY */
+  --sf-green-600:    #0A6248;
+  --sf-green-700:    #074A36;
+  --sf-green-900:    #042A1E;
+
+  /* ---------- Secondary Accents ---------- */
+  --sf-teal-500:     #14B8A6;   /* aus Demir übernommen */
+  --sf-amber-500:    #D97706;   /* warning + S-Score Mid */
+  --sf-clay:         #C97B5C;   /* warm accent für Highlights */
+
+  /* ---------- E/S/G-Pillar-Farben (aus Hausarbeit-Folie) ---------- */
+  --sf-score-e:      #0F7B5C;   /* E = Forest Green */
+  --sf-score-s:      #C97B5C;   /* S = Clay/Terracotta */
+  --sf-score-g:      #4F46E5;   /* G = Indigo */
+
+  /* ---------- Ampel-Score (Hausarbeit: Grün/Gelb/Rot) ---------- */
+  /* Hybrid-System: Ampelfarbe + 0–10 Zahl */
+  --sf-traffic-green:  #0F7B5C; /* 7.0 – 10  · "Empfehlung" */
+  --sf-traffic-yellow: #D97706; /* 4.0 – 6.9 · "Mit Bedacht" */
+  --sf-traffic-red:    #C2410C; /* 0   – 3.9 · "Vermeiden" */
+
+  /* ---------- Status ---------- */
+  --sf-success-bg:   #DCFCE7;
+  --sf-success-fg:   #15803D;
+  --sf-warning-bg:   #FEF3C7;
+  --sf-warning-fg:   #B45309;
+  --sf-danger-bg:    #FEE2E2;
+  --sf-danger-fg:    #991B1B;
+  --sf-info-bg:      #DBEAFE;
+  --sf-info-fg:      #1E40AF;
+
+  /* ---------- Gradients ---------- */
+  --sf-grad-hero: linear-gradient(135deg, #0F7B5C 0%, #074A36 100%);
+  --sf-grad-soft: linear-gradient(135deg, rgba(15,123,92,0.04), rgba(20,184,166,0.04));
+  --sf-grad-warm: linear-gradient(135deg, #FBFAF6 0%, #F4F2EB 100%);
+
+  /* ---------- Shadows (sehr subtil, warm) ---------- */
+  --sf-shadow-xs:   0 1px 2px rgba(26,38,34,0.04);
+  --sf-shadow-sm:   0 2px 8px rgba(26,38,34,0.06);
+  --sf-shadow-md:   0 4px 16px rgba(26,38,34,0.08);
+  --sf-shadow-lg:   0 12px 32px rgba(26,38,34,0.10);
+  --sf-shadow-xl:   0 24px 48px rgba(26,38,34,0.14);
+  --sf-shadow-glow: 0 8px 24px rgba(15,123,92,0.20);
+
+  /* ---------- Radii ---------- */
+  --sf-radius-xs:   4px;
+  --sf-radius-sm:   8px;
+  --sf-radius-md:   12px;
+  --sf-radius-lg:   16px;
+  --sf-radius-xl:   20px;
+  --sf-radius-2xl:  28px;
+  --sf-radius-pill: 999px;
+
+  /* ---------- Spacing (gleich wie Demir) ---------- */
+  --sf-space-1: 0.25rem;
+  --sf-space-2: 0.5rem;
+  --sf-space-3: 0.75rem;
+  --sf-space-4: 1rem;
+  --sf-space-5: 1.5rem;
+  --sf-space-6: 2rem;
+  --sf-space-7: 2.5rem;
+  --sf-space-8: 4rem;
+
+  /* ---------- Type ---------- */
+  --sf-font-display: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --sf-font-sans:    'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sf-font-mono:    ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* iOS-Größen — kalibriert für 390px iPhone-Frame */
+  --sf-fs-xs:    11px;     /* caption */
+  --sf-fs-sm:    13px;     /* footnote */
+  --sf-fs-base:  15px;     /* body */
+  --sf-fs-md:    17px;     /* callout / button */
+  --sf-fs-lg:    20px;     /* title 3 */
+  --sf-fs-xl:    24px;     /* title 2 */
+  --sf-fs-2xl:   28px;     /* title 1 */
+  --sf-fs-3xl:   34px;     /* large title */
+  --sf-fs-display: 48px;   /* hero-display */
+  --sf-fs-score:   72px;   /* score-number */
+
+  --sf-lh-tight: 1.1;
+  --sf-lh-snug:  1.25;
+  --sf-lh-base:  1.45;
+  --sf-lh-loose: 1.6;
+
+  --sf-tracking-eyebrow: 0.08em;
+  --sf-tracking-display: -0.02em;
+
+  /* ---------- Motion ---------- */
+  --sf-ease:        cubic-bezier(0.4, 0, 0.2, 1);
+  --sf-ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --sf-dur-fast:    0.20s;
+  --sf-dur-base:    0.30s;
+  --sf-dur-slow:    0.45s;
+}
+
+/* =============================================================
+   Semantische Type-Klassen
+   ============================================================= */
+
+.sf-display {
+  font-family: var(--sf-font-display);
+  font-size: var(--sf-fs-display);
+  font-weight: 400;
+  line-height: var(--sf-lh-tight);
+  letter-spacing: var(--sf-tracking-display);
+  color: var(--sf-ink-1);
+}
+
+.sf-display-italic {
+  font-family: var(--sf-font-display);
+  font-style: italic;
+  font-weight: 400;
+}
+
+.sf-h1 {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-3xl);
+  font-weight: 700;
+  line-height: var(--sf-lh-tight);
+  letter-spacing: -0.01em;
+  color: var(--sf-ink-1);
+}
+
+.sf-h2 {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-2xl);
+  font-weight: 700;
+  line-height: var(--sf-lh-snug);
+  color: var(--sf-ink-1);
+}
+
+.sf-h3 {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-xl);
+  font-weight: 600;
+  line-height: var(--sf-lh-snug);
+  color: var(--sf-ink-1);
+}
+
+.sf-eyebrow {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-xs);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--sf-tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--sf-green-500);
+}
+
+.sf-body {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-base);
+  font-weight: 400;
+  line-height: var(--sf-lh-base);
+  color: var(--sf-ink-2);
+}
+
+.sf-body-md {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-md);
+  font-weight: 400;
+  line-height: var(--sf-lh-base);
+  color: var(--sf-ink-1);
+}
+
+.sf-meta {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-sm);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--sf-ink-3);
+}
+
+.sf-pill {
+  font-family: var(--sf-font-sans);
+  font-size: var(--sf-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.sf-mono {
+  font-family: var(--sf-font-mono);
+  font-size: var(--sf-fs-sm);
+}
