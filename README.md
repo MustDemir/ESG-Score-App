@@ -34,8 +34,9 @@ Die aktuelle Discovery verdichtet Personas, Customer Journey, Value Proposition,
 | Conjoint-Priorisierung | Echtzeit-ESG-Scores, Empfehlungen und Lieferketten-Transparenz sind die stärksten Nutzenversprechen |
 | Risiken | Datenqualität, Datenschutz und Greenwashing-Vorwurf müssen im Produkt sichtbar adressiert werden |
 
-→ Interaktive Discovery: [docs/00-discovery-scroll.html](docs/00-discovery-scroll.html)  
-→ Auswertung der neuen Artefakte: [docs/DESIGN-SYNTHESIS.md](docs/DESIGN-SYNTHESIS.md)
+→ Discovery Scroll: [docs/00-discovery-scroll.html](docs/00-discovery-scroll.html)  
+→ Discovery Canvas (alle Artefakte nebeneinander): [docs/00-discovery.html](docs/00-discovery.html)  
+→ Auswertung der Artefakte: [docs/DESIGN-SYNTHESIS.md](docs/DESIGN-SYNTHESIS.md)
 
 ---
 
@@ -88,13 +89,16 @@ Gesamt-Score = (E x 0.40) + (S x 0.35) + (G x 0.25)
 
 Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidungsnah. Forest Green ist die Primärfarbe, warme Neutrals bilden den Hintergrund, E/S/G bekommen eigene Akzentfarben.
 
-| Design-Artefakt | Zweck |
-| --- | --- |
-| [Discovery Scroll](docs/00-discovery-scroll.html) | strategischer Kontext und Research-Synthese |
-| [Wireframes](docs/01-wireframes.html) | frühe Screen-Strukturen |
-| [Brand Identity](docs/02-brand-identity.html) | Farben, Typografie, Score-System, UI-Komponenten |
-| [Score-Varianten](docs/02-score-variants.html) | Ampel-Karte, Radial-Donut, Editorial-Score im Vergleich |
-| [Hi-Fi Screens](docs/04-screens.html) | finaler Screen-Flow mit Multi-Kategorie-Ausblick |
+| Phase | Design-Artefakt | Zweck |
+| --- | --- | --- |
+| 0 | [Discovery Scroll](docs/00-discovery-scroll.html) · [Discovery Canvas](docs/00-discovery.html) | Strategischer Kontext und Research-Synthese |
+| 1 | [Wireframes](docs/01-wireframes.html) | Frühe Screen-Strukturen |
+| 2.1 | [Brand Identity](docs/02-brand-identity.html) | Farben, Typografie, Score-System, UI-Komponenten |
+| 2.2 | [Score-Varianten](docs/02-score-variants.html) | Ampel-Karte, Radial-Donut, Editorial-Score im Vergleich |
+| 2.3 | [Hi-Fi Hauptscreens](docs/02-screens.html) | S1 Home · S2 Scanner · S3 Result · S4 Detail · S5 Alternativen |
+| 2.4 | [Multi-Kategorie + Onboarding + Edge-States](docs/04-screens.html) | Multi-Kategorie-Screens, Onboarding O1–O3, Edge-States E0–E3 |
+| 3 | [Klickbarer Prototyp](docs/05-prototype.html) | Vollständiger Flow mit Hotspots, Scan-Animation, Tweaks-Panel |
+| 4 | [Developer-Handoff](design_handoff_scanfair/README.md) | Tokens, Daten-Schema, Komponenten, Screens für Claude Code |
 
 **Design-Entscheidung für den MVP:** Ampel-Karte als schnelle Standardansicht, Editorial-/Detail-Elemente für Nutzer, die tiefer verstehen wollen.
 
@@ -128,12 +132,16 @@ iPhone Kamera
 ```text
 ESG-Score-App/
 ├── README.md
+├── CLAUDE.md
 ├── docs/
-│   ├── 00-discovery-scroll.html
+│   ├── 00-discovery-scroll.html        # Research-Scroll
+│   ├── 00-discovery.html               # Discovery-Canvas (NEU)
 │   ├── 01-wireframes.html
 │   ├── 02-brand-identity.html
 │   ├── 02-score-variants.html
-│   ├── 04-screens.html
+│   ├── 02-screens.html                 # Hi-Fi S1–S5 (NEU)
+│   ├── 04-screens.html                 # Multi-Kategorie + Onboarding + Edge-States
+│   ├── 05-prototype.html               # Klickbarer Prototyp (NEU)
 │   ├── DESIGN-SYNTHESIS.md
 │   ├── ESG-SCORING-MODELL-v1.md
 │   ├── MVP-REQUIREMENTS.md
@@ -141,11 +149,25 @@ ESG-Score-App/
 │   ├── PROJEKTTAGEBUCH.md
 │   └── Design/prototypes/
 │       ├── tokens.css
+│       ├── products.js
 │       ├── design-canvas.jsx
-│       └── ...
-├── lib/                 # Flutter-App-Code, sobald die Umsetzung startet
-├── test/                # Tests
-└── pubspec.yaml         # Flutter Dependencies
+│       ├── ios-frame.jsx
+│       ├── tweaks-panel.jsx
+│       ├── 02-screens-components.jsx   # NEU
+│       ├── 02-screens-app.jsx          # NEU
+│       ├── 04-screens-shell.jsx
+│       ├── 04-screens-results.jsx
+│       ├── 04-screens-onboarding.jsx   # NEU
+│       ├── 04-screens-app.jsx
+│       └── 05-prototype-app.jsx        # NEU
+├── design_handoff_scanfair/            # Developer-Handoff (NEU)
+│   ├── README.md
+│   ├── tokens.css
+│   ├── products.js, brand/, data/
+│   └── screens, prototype, components, ios-frame…
+├── lib/                                # Flutter-App-Code, sobald die Umsetzung startet
+├── test/                               # Tests
+└── pubspec.yaml                        # Flutter Dependencies
 ```
 
 ---
@@ -201,10 +223,11 @@ Dieses Repo enthält dafür Vorlagen:
 
 | Phase | Fokus | Status |
 | --- | --- | --- |
-| Phase 0 | Discovery, Research, Design-System, Prototypen | abgeschlossen / integriert |
-| Phase 1 | Lebensmittel-MVP mit Scanner, Score und Details | nächster Umsetzungsschritt |
-| Phase 2 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
-| Phase 3 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
+| Phase 0 | Discovery, Research, Design-System, Prototypen | abgeschlossen |
+| Phase 1 | Hi-Fi-Designs, klickbarer Prototyp, Developer-Handoff | abgeschlossen |
+| Phase 2 | Lebensmittel-MVP mit Scanner, Score und Details (Flutter) | nächster Umsetzungsschritt |
+| Phase 3 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
+| Phase 4 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
 
 ---
 
@@ -229,6 +252,7 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [MVP Requirements](docs/MVP-REQUIREMENTS.md) | technischer Bauplan für den ersten App-MVP |
 | [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | Gewichtungen, Formeln, Datenquellen und Beispiele |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
+| [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
 | [Projekttagebuch](docs/PROJEKTTAGEBUCH.md) | Fortschritte, Entscheidungen und Learnings |
 
