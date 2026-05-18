@@ -37,3 +37,19 @@ supabase/.temp/
 # Misc
 *.log
 *.lock
+
+# Archives & Binaries
+*.zip
+*.tar
+*.tar.gz
+
+# Claude Code (lokal)
+.claude/settings.local.json
+.claude/worktrees/
+
+# Update-Pakete (manuell entpackt)
+repo_update/
+
+# Flutter env (esg_app/)
+esg_app/.env
+esg_app/.env.local
