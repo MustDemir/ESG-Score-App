@@ -1,0 +1,74 @@
+id: R-DSGVO-11
+title: Auftragsverarbeitungsvertrag (AVV) mit Supabase + ggf. weiteren Dienstleistern
+kontrollmechanismus: Manual (AVV-Unterzeichnung) + Conftest (Existenz-Check des AVV-PDFs im Evidence-Store)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+dsgvo_refs:
+  - "Art. 28"
+  - "Art. 29"
+
+apple_guideline_refs: []
+
+overlapping_with: []
+
+description: |
+  Jeder Dienstleister der personenbezogene Daten in unserem Auftrag verarbeitet,
+  braucht einen Auftragsverarbeitungsvertrag (AVV / DPA - Data Processing
+  Agreement) nach Art. 28 DSGVO.
+
+  Für ScanFair MVP:
+  - Supabase (Backend + Auth) → AVV PFLICHT (Supabase stellt Standard-AVV bereit)
+  - Open Food Facts → KEINE AVV nötig (wir senden keine personenbezogenen
+    Daten an OFF; OFF ist Produkt-Datenbank)
+  - Apple TestFlight → kein separater AVV (Apple Developer License regelt das)
+
+  Phase 2+ Add-Ons:
+  - Mistral / Claude / Aleph Alpha (KI-Provider) → AVV PFLICHT bei Prompts
+    mit User-Daten
+  - Sentry / Bugsnag (Crash-Reporting) → AVV PFLICHT
+  - RevenueCat (Subscription) → AVV PFLICHT
+  - Domain-Provider → meist kein AVV (kein PII-Verarbeiter)
+
+evidence_expected:
+  - Unterzeichneter Supabase-AVV (PDF) im Evidence-Store
+  - TOM-Katalog als Anlage zum AVV
+  - Liste aktiver Auftragsverarbeiter mit AVV-Status
+
+acceptance_criteria:
+  - Supabase-AVV vor erstem Production-Use unterzeichnet
+  - AVV erwähnt EU-Frankfurt-Region (Drittland-Klausel-frei)
+  - AVV-Liste aktuell + bei neuem Dienstleister Update
+  - Unteraufträge im AVV genehmigt (Supabase nutzt AWS — must be allowed)
+
+linked_gates:
+  - G-DSGVO-AVV   # primär manuell (Existenz-Check), aber YAML-File mit AVV-Liste prüfbar
+
+deployer_implication: |
+  - Supabase-AVV via Dashboard signieren BEVOR Production-Daten fließen
+  - AVV-Liste pflegen: docs/project/compliance/avv-liste.yaml
+  - Bei jedem neuen SDK/Service: AVV-Pflicht prüfen
+  - Bei AVV-Klausel-Konflikten: juristischer Review
+
+audit_trigger: "Vor erstem TestFlight-Production-Build + bei jedem neuen Auftragsverarbeiter"
+
+sources:
+  - DSGVO Art. 28
+  - Supabase DPA (https://supabase.com/legal/dpa)
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: []
+related_decisions: [0002]
+
+notes: |
+  Supabase stellt Standard-Vertrag (SCC-konform) bereit — Solo-Founder muss
+  „nur" akzeptieren. Trotzdem inhaltlich prüfen ob er zu unserer Architektur
+  passt (EU-Region-Bindung kritisch).
+
+  WARNUNG für Phase 2: jeder US-KI-Provider (Claude direkt, OpenAI) braucht
+  zusätzlich Standardvertragsklauseln (SCC) für Drittland-Transfer. Bei AWS
+  Bedrock EU-Region geht's einfacher. Aleph Alpha = DE → trivial.

@@ -101,6 +101,9 @@ decisions_made:
   - adr: 0012
     title: Apple Review Compliance Strategy
     date: 2026-05-19
+  - adr: 0013
+    title: Multi-Regulation-Strategy — Cross-Regulation-Mapping
+    date: 2026-05-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -144,6 +147,11 @@ weekly_log:
       - 5 R-AS-Anforderungen aktiv (R-AS-01, 03, 06, 08, 12)
       - 1 Beispiel-Gate (G-AS-NAME-LENGTH) mit Rego-Policy + 9 Tests
       - 10 weitere Apple-Compliance-TODOs (TODO-015 bis TODO-024) angelegt mit Aktivierungs-Triggern
+      - DSGVO-Relevanz-Mapping (compliance/dsgvo-relevance.md) — 13 Phase-1 + 4 Phase-2 R-DSGVO
+      - 5 R-DSGVO-YAMLs aktiv (R-DSGVO-01, 07, 09, 10, 11)
+      - Cross-Regulation-Map (compliance/cross-regulation-map.md) — Apple ⇄ DSGVO ⇄ OFF
+      - ADR 0013 — Multi-Regulation-Strategy mit overlapping_with-Pattern
+      - Methodisch wichtig: Framework als regulation-agnostic etabliert (Phase 2-7 wiederverwendbar)
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -164,7 +172,7 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 12
+  decisions_total: 13
   todos_open: 22
   todos_in_progress: 2
   todos_done: 1

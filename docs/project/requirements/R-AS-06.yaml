@@ -11,6 +11,12 @@ apple_guideline_refs:
   - "5.2"
   - "5.2.2"
 
+dsgvo_refs:
+  - "Art. 13(1)(e)"   # Empfänger/Kategorien
+
+overlapping_with:
+  - R-DSGVO-03   # Privacy Policy nach Art. 13 enthält OFF-Erwähnung
+
 description: |
   Apple-Richtlinie 5.1.1(viii) verbietet die Zusammenstellung personenbezogener
   Daten aus öffentlichen Datenbanken ohne explizite Einwilligung. OFF ist eine

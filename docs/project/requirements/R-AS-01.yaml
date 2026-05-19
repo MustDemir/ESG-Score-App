@@ -9,6 +9,13 @@ must_should: MUST
 apple_guideline_refs:
   - "5.1.1(i)"
 
+dsgvo_refs:
+  - "Art. 12"
+  - "Art. 13"
+
+overlapping_with:
+  - R-DSGVO-03   # Eine Privacy Policy erfüllt beides
+
 description: |
   Alle Apps müssen einen leicht zugänglichen Link zur Datenschutzrichtlinie
   enthalten — sowohl im App Store Connect Metadatenfeld als auch innerhalb der App.

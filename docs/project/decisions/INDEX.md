@@ -22,6 +22,7 @@ Letztes Update: 2026-05-19
 | [0010](0010-eco-score-fallback.yaml) | Eco-Score-Fallback-Logik bei unvollständigen Daten | accepted | 2026-05-19 | scoring, esg, data-quality, ux | 0003, 0011 |
 | [0011](0011-esg-score-formel.yaml) | ESG-Score-Formel — E/S/G aus OFF-Feldern | accepted | 2026-05-19 | scoring, esg, formel, mvp, methodology | 0003, 0010 |
 | [0012](0012-apple-review-compliance.yaml) | Apple Review Compliance Strategy | accepted | 2026-05-19 | compliance, apple, app-store, gates, policy-as-code | 0006, 0007, 0008, 0009 |
+| [0013](0013-multi-regulation-strategy.yaml) | Multi-Regulation-Strategy — Cross-Regulation-Mapping | accepted | 2026-05-19 | compliance, methodology, multi-regulation, dsgvo, apple, framework | 0007, 0008, 0009, 0012 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -35,7 +36,7 @@ Letztes Update: 2026-05-19
 
 | Status | Anzahl |
 |---|---|
-| accepted | 11 |
+| accepted | 12 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 0 |

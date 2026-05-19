@@ -7,12 +7,16 @@
 
 ## ID-Schema
 
-| Präfix | Quelle | Beispiel |
-|---|---|---|
-| `R-AS-NN` | **A**pple **S**tore Guidelines | R-AS-01, R-AS-12 |
-| `R-DSGVO-NN` | DSGVO (geplant) | R-DSGVO-01 |
-| `R-OFF-NN` | OFF CC-BY-SA Lizenz | R-OFF-01 |
-| `R-INT-NN` | Interne Anforderungen | R-INT-01 |
+| Präfix | Quelle | Beispiel | Status |
+|---|---|---|---|
+| `R-AS-NN` | **A**pple **S**tore Guidelines | R-AS-01, R-AS-12 | 5 aktiv |
+| `R-DSGVO-NN` | DSGVO (EU 2016/679) | R-DSGVO-01, R-DSGVO-07 | 5 aktiv |
+| `R-OFF-NN` | OFF CC-BY-SA Lizenz | R-OFF-01 | via R-AS-06 + R-DSGVO-03 abgedeckt |
+| `R-TMG-NN` | Telemediengesetz (DE Impressumspflicht) | R-TMG-01 | via R-AS-08 abgedeckt |
+| `R-INT-NN` | Interne Anforderungen | R-INT-01 | tbd |
+
+Siehe [ADR 0013 — Multi-Regulation-Strategy](../decisions/0013-multi-regulation-strategy.yaml)
+für die Logik wie Anforderungen über Regulierungen hinweg gestackt werden.
 
 ## Status (Phase 1 MVP, aus Apple-Mapping)
 
@@ -35,6 +39,24 @@
 | R-AS-15 (TODO) | Ortung nur mit Zweck-Erklärung | 2+ | G-AS-LOCATION-PURPOSE |
 | R-AS-16 (TODO) | OFF-CC-BY-SA-Attribution dokumentiert | 1 | G-AS-LICENSE-DOC (redundant zu R-AS-06) |
 
+## DSGVO Phase-1 (5 aktiv)
+
+| ID | Titel | Artikel | Gate(s) | Overlap |
+|---|---|---|---|---|
+| [R-DSGVO-01](R-DSGVO-01.yaml) | Rechtsgrundlage pro Zweck | 6 | G-DSGVO-LAWFUL-BASIS | — |
+| R-DSGVO-02 (TODO) | Consent-Mechanismus | 7 | G-DSGVO-CONSENT | R-AS-07 |
+| R-DSGVO-03 (TODO) | Privacy Policy nach Art. 13 | 12, 13 | G-DSGVO-POLICY | R-AS-01, R-AS-06 |
+| R-DSGVO-04 (TODO) | Auskunftsrecht erfüllen | 15 | G-DSGVO-EXPORT | — |
+| R-DSGVO-05 (TODO) | Datenminimierung + Zweckbindung | 5(1)(b,c) | G-DSGVO-MIN-DATA | R-AS-04 |
+| R-DSGVO-06 (TODO) | Aufbewahrungsfristen | 5(1)(e) | G-DSGVO-RETENTION | — |
+| [R-DSGVO-07](R-DSGVO-07.yaml) | Recht auf Löschung | 17 | G-DSGVO-DELETE | R-AS-05 |
+| R-DSGVO-08 (TODO) | Datenübertragbarkeit | 20 | G-DSGVO-EXPORT | — |
+| [R-DSGVO-09](R-DSGVO-09.yaml) | TOMs nach Art. 32 | 32 | G-DSGVO-TOMS | ADR 0008 |
+| [R-DSGVO-10](R-DSGVO-10.yaml) | Privacy by Design + Default | 25 | G-DSGVO-PRIVACY-DESIGN | R-AS-04, R-DSGVO-05 |
+| [R-DSGVO-11](R-DSGVO-11.yaml) | AVV mit Supabase | 28 | G-DSGVO-AVV | — |
+| R-DSGVO-12 (TODO) | VVT (Verzeichnis Verarbeitungstätigkeiten) | 30 | G-DSGVO-VVT | — |
+| R-DSGVO-13 (TODO) | Incident-Response 72h | 33, 34 | G-DSGVO-INCIDENT | — |
+
 ## Phase-2-Add-Ons (geplant)
 
 Werden aktiviert mit ScanFair+ Membership + KI-Chat:
@@ -51,6 +73,15 @@ Werden aktiviert mit ScanFair+ Membership + KI-Chat:
 | R-AS-24 | Chatbot-Altersbeschränkung | 4.7.5 |
 | R-AS-25 | Sign in with Apple wenn Social-Login | 4.8 |
 | R-AS-26 | Push-Notifications nur mit Consent | 4.5.3, 4.5.4 |
+
+### Phase 2 DSGVO-Add-Ons
+
+| ID | Titel | Artikel | Trigger |
+|---|---|---|---|
+| R-DSGVO-14 | Auto-Entscheidung-Recht-auf-Mensch | 22 | KI-Score-Layer |
+| R-DSGVO-15 | Drittland-Transfer-Klausel | 44-49 | US-KI-Provider |
+| R-DSGVO-16 | DSFA bei hohem Risiko | 35 | Falls Profiling |
+| R-DSGVO-17 | Einwilligungs-Widerruf KI | 7(3) | ScanFair+ |
 
 ## Wartung
 

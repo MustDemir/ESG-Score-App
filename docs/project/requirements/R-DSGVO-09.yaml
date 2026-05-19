@@ -1,0 +1,76 @@
+id: R-DSGVO-09
+title: Technische und organisatorische Maßnahmen (TOMs) nach Art. 32
+kontrollmechanismus: Hybrid (Conftest prüft Code/Config-Indikatoren; manueller TOM-Katalog)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+dsgvo_refs:
+  - "Art. 32"
+  - "Art. 5(1)(f) Integrität/Vertraulichkeit"
+
+apple_guideline_refs:
+  - "1.6 Datensicherheit"
+
+overlapping_with:
+  - ADR 0008 Security-Baseline (alle 7 SEC-Praktiken sind TOMs)
+
+description: |
+  Art. 32 verlangt unter Berücksichtigung von Stand der Technik, Kosten und
+  Risiko geeignete technische und organisatorische Maßnahmen:
+    (a) Verschlüsselung
+    (b) Vertraulichkeit, Integrität, Verfügbarkeit, Belastbarkeit
+    (c) Wiederherstellbarkeit nach Vorfall
+    (d) Regelmäßige Überprüfung der Maßnahmen
+
+  Bei ScanFair entsprechen das den 7 Praktiken aus ADR 0008:
+    SEC-1 Keine Secrets im Repo
+    SEC-2 Env-Stages getrennt
+    SEC-3 Supabase RLS für ALLE Tabellen
+    SEC-4 HTTPS-only
+    SEC-5 Dependency-Audit-Rhythmus
+    SEC-6 Datenminimierung (DSGVO)
+    SEC-7 Disaster Recovery
+
+evidence_expected:
+  - docs/project/decisions/0008-security-baseline.yaml
+  - TOM-Katalog als Markdown-Doku
+  - Test-Evidenz: RLS-Policies vorhanden, HTTPS-only-Config
+  - Backup-Strategie dokumentiert (Supabase Point-in-Time-Recovery)
+
+acceptance_criteria:
+  - Alle 7 SEC-Praktiken aus ADR 0008 implementiert ODER auf Backlog mit Trigger
+  - TOM-Katalog beschreibt Maßnahmen pro Schutzziel (CIA-Triade)
+  - Backup-Konzept dokumentiert
+  - Pre-Commit-Hook gegen Secret-Leak aktiv
+
+linked_gates:
+  - G-DSGVO-TOMS
+
+deployer_implication: |
+  - ADR 0008 vollständig umsetzen (großteils schon Sprint 0 done)
+  - TOM-Katalog schreiben (docs/project/compliance/tom-katalog.md) — kommt mit
+    Pre-TestFlight-Welle
+  - Backup-Strategie mit Supabase-Settings verifizieren
+  - Bei AVV mit Supabase: TOMs als Anlage prüfen
+
+audit_trigger: "Pre-TestFlight + bei jeder neuen TOM (z.B. Sentry-Integration)"
+
+sources:
+  - DSGVO Art. 32
+  - BSI IT-Grundschutz (Referenz für „Stand der Technik")
+  - Apple App Review 1.6
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: [FM-02, FM-12]
+related_decisions: [0008]
+
+notes: |
+  „Stand der Technik" ist gerichtsfest interpretierbar — wir orientieren uns
+  an BSI-Grundschutz Basic-Maßnahmen. Bei höherem Risiko (Phase 2 KI-Layer mit
+  personenbezogenen Embeddings) TOMs neu prüfen.
+
+  TOMs werden Teil des AVV mit Supabase (R-DSGVO-11).

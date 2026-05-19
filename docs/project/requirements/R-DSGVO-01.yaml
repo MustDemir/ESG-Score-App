@@ -1,0 +1,67 @@
+id: R-DSGVO-01
+title: Rechtsgrundlage pro Verarbeitungszweck definiert
+kontrollmechanismus: Hybrid (Conftest prüft VVT-File-Existenz; manueller Review der Rechtsgrundlage-Tauglichkeit)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+dsgvo_refs:
+  - "Art. 6(1)"
+
+apple_guideline_refs: []   # nicht überlappend mit Apple
+overlapping_with: []
+
+description: |
+  Jede Verarbeitung personenbezogener Daten muss eine Rechtsgrundlage nach
+  Art. 6(1) DSGVO haben:
+    (a) Einwilligung
+    (b) Vertragserfüllung
+    (c) Rechtliche Verpflichtung
+    (d) Lebenswichtige Interessen
+    (e) Öffentliche Aufgabe
+    (f) Berechtigtes Interesse
+
+  Für ScanFair MVP:
+    - Scan-Historie speichern → 6(1)(b) Vertragserfüllung (User wollte den Service)
+    - Account-Daten (Email, Auth) → 6(1)(b) Vertragserfüllung
+    - Crash-Reporting → 6(1)(f) Berechtigtes Interesse + ATT (Apple)
+    - Marketing-Mails → 6(1)(a) Einwilligung (Opt-in)
+    - KI-Cache (Phase 2) → 6(1)(f) Berechtigtes Interesse (Server-Cache)
+
+evidence_expected:
+  - VVT-Eintrag pro Verarbeitungszweck mit Rechtsgrundlage
+  - In Privacy Policy ist Rechtsgrundlage pro Verarbeitungszweck genannt
+
+acceptance_criteria:
+  - VVT-Datei (docs/project/compliance/vvt.md) existiert
+  - Jeder dort gelistete Zweck hat exactly eine Rechtsgrundlage aus Art. 6(1)(a-f)
+  - Privacy Policy nennt pro Zweck die Rechtsgrundlage explizit
+  - Bei (f) Berechtigtes Interesse: Interessenabwägung dokumentiert
+
+linked_gates:
+  - G-DSGVO-LAWFUL-BASIS
+
+deployer_implication: |
+  - VVT erstellen (R-DSGVO-12) — enthält pro Zweck die Rechtsgrundlage
+  - Privacy Policy beim Schreiben: pro Verarbeitungszweck Rechtsgrundlage nennen
+  - Bei jedem neuen Feature: neue Verarbeitungszwecke prüfen + VVT erweitern
+  - Bei berechtigtem Interesse: 3-Stufen-Test dokumentieren (Interesse, Erforderlichkeit, Abwägung)
+
+audit_trigger: "Pre-Deployment manueller Review; bei Aufsichtsbehörde-Anfrage Pflicht"
+
+sources:
+  - DSGVO Art. 6 (VO 2016/679)
+  - EDSA Leitlinien zu berechtigtem Interesse
+
+phase: phase-1-mvp
+
+related_todos: [TODO-008]
+related_failure_modes: [FM-06]
+related_decisions: [0002, 0008]
+
+notes: |
+  Bei Solo-Founder ist Mustafa = Verantwortlicher nach Art. 4(7).
+  Rechtsgrundlage-Bestimmung ist juristische Entscheidung — bei Unsicherheit
+  Datenschutz-Anwalt konsultieren. Für unsere Use Cases sind 6(1)(b) und
+  6(1)(f) die häufigsten Grundlagen.
