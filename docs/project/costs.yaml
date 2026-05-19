@@ -11,8 +11,11 @@ one_time:
     currency: USD
     eur_approx: 92
     when: einmalig pro Jahr (verlängert sich)
-    status: open  # noch nicht gezahlt — siehe TODO-003
-    notes: Pflicht für TestFlight + App Store
+    status: paid
+    paid_date: 2026-05-19
+    notes: |
+      Pflicht für TestFlight + App Store. Bezahlt am 2026-05-19,
+      Verifizierung läuft (24-48h erwartet).
 
   - item: Google Play Console
     amount: 25

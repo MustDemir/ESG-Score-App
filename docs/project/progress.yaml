@@ -44,6 +44,15 @@ milestones:
       .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
       Step S06 abgeschlossen.
 
+  - id: M08
+    title: Apple Developer Program gekauft — TODO-003 done
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Apple Developer Program-Mitgliedschaft ($99/Jahr) bezahlt. Verifizierung
+      läuft. RISK-002 von M auf L heruntergestuft. TestFlight-Pfad ist
+      damit unblocked sobald Verifizierung durch ist.
+
   - id: M07
     title: Theme-Foundation S11 — scanfair_theme aktiv
     date: 2026-05-19
@@ -187,11 +196,11 @@ weekly_log:
 # =============================================================================
 stats:
   decisions_total: 13
-  todos_open: 21
+  todos_open: 20
   todos_in_progress: 1
-  todos_done: 2
-  milestones_reached: 7
-  risks_open: 4
-  risks_mitigated: 1
+  todos_done: 3
+  milestones_reached: 8
+  risks_open: 3
+  risks_mitigated: 2
   risks_accepted: 1
   ideas_parked: 9

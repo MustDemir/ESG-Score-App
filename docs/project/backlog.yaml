@@ -169,7 +169,13 @@ todos:
     phase: phase-1-mvp
     priority: P0
     effort: XS
-    status: open
+    status: done
+    completed: 2026-05-19
+    completed_notes: |
+      Apple Developer Program-Mitgliedschaft gekauft. Verifizierung läuft.
+      Bundle-ID com.scanfair.esg_app schon im Projekt konfiguriert.
+      Bis Verifizierung durch: TestFlight + Provisioning Profiles offen,
+      Free-Sideload auf eigenes iPhone weiterhin möglich.
     related_risks: [RISK-002]
     created: 2026-05-19
 

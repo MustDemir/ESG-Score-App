@@ -44,18 +44,22 @@ risks:
 
   - id: RISK-002
     title: Apple Developer Account Verifizierung verzögert TestFlight
-    likelihood: M
+    likelihood: L
     impact: M
-    score: 4
+    score: 2
     description: |
       Apple-Verifizierung dauert 24-48h, bei Business-Accounts auch 1-2 Wochen.
       Verzögert TestFlight-Launch falls erst spät beantragt.
     mitigation: |
-      Sofort beantragen (TODO-003), parallel weiterbauen.
+      Account am 2026-05-19 gekauft. Verifizierung läuft. Restrisiko:
+      Verzögerung bis Verifizierung durch. Mitigation: Sprint 0/1 läuft
+      unabhängig vom Account weiter (Code, Tests, Theme). TestFlight wird
+      erst in Sprint 3 gebraucht.
     related_todos: [TODO-003]
-    status: open
+    status: mitigated
     owner: Mustafa
     created: 2026-05-19
+    updated: 2026-05-19
 
   - id: RISK-003
     title: ESG-Score-Formel nicht wissenschaftlich fundiert
