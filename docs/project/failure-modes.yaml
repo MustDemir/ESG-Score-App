@@ -1,0 +1,254 @@
+last_updated: 2026-05-19
+
+# =============================================================================
+# Failure-Modes-Register
+# =============================================================================
+# Top-Fehler die Solo-App-Entwickler typischerweise machen, mit unserer
+# spezifischen Gegenmaßnahme. Erweitert risks.yaml um operative / Prozess-
+# Risiken (nicht nur Projekt-Risiken).
+#
+# Format: jeder Eintrag ist ein dokumentierter Anti-Pattern mit Defense.
+# Quelle: OWASP MASVS, App-Store-Reject-Statistiken, Indie-Hacker-Post-Mortems,
+#         eigene Erfahrungen.
+# =============================================================================
+
+failure_modes:
+  - id: FM-01
+    category: testing
+    title: "Tests werden nie geschrieben (Wir tun's später)"
+    frequency: very_high   # ~90% Solo-Founder
+    severity: high
+    symptoms:
+      - PRs ohne Tests
+      - "test/" Ordner leer oder nur Boilerplate
+      - Refactor-Angst nach 3 Monaten
+    our_defense:
+      - Coverage-Gate in CI (siehe quality-strategy.md §2)
+      - PR-Reviews mit engineering:code-review verlangen Tests
+      - Test-Driven für Services & Models
+    related: [ADR-0007]
+
+  - id: FM-02
+    category: security
+    title: "API-Keys / Secrets ins Repository committet"
+    frequency: high       # ~70%
+    severity: critical
+    symptoms:
+      - .env oder Service-Keys in git log
+      - Supabase service_role-Key im Mobile-Client
+    our_defense:
+      - gitleaks Pre-Commit-Hook (SEC-1)
+      - GitHub Push Protection aktivieren
+      - .gitignore strikt
+      - Bei Versehen: ROTATE, don't just revert
+    related: [ADR-0008]
+
+  - id: FM-03
+    category: ci_cd
+    title: "Manuelle Builds, kein CI/CD — Build-Drift"
+    frequency: very_high
+    severity: medium
+    symptoms:
+      - "Works on my machine" Bugs
+      - Vergessene Dependencies in pubspec.yaml
+      - Build-Konfigurationen divergieren
+    our_defense:
+      - GitHub Actions ab Sprint 0
+      - Fastlane für TestFlight ab Sprint 3
+    related: [ADR-0007]
+
+  - id: FM-04
+    category: dependencies
+    title: "Outdated Packages mit bekannten CVEs"
+    frequency: very_high
+    severity: high
+    symptoms:
+      - flutter pub outdated zeigt >20 Pakete behind
+      - Pakete seit 12+ Monaten nicht aktualisiert
+    our_defense:
+      - Dependabot automatisch
+      - Wöchentlicher Audit-Action (Montags)
+      - 72h-Fix-SLA bei kritischen CVEs
+    related: [ADR-0008]
+
+  - id: FM-05
+    category: observability
+    title: "Kein Crash-Reporting — Bugs via 1-Sterne-Reviews entdecken"
+    frequency: high
+    severity: high
+    symptoms:
+      - Crashes erst beim Lesen von App-Store-Reviews bekannt
+      - Keine Reproduktionsschritte aus Wild
+    our_defense:
+      - Sentry oder Bugsnag ab erstem TestFlight-Build
+      - DSGVO-konformes Setup (EU-Region, IP-Anonymisierung)
+    related: []
+    phase_introduced: phase-1-mvp_end
+
+  - id: FM-06
+    category: compliance
+    title: "DSGVO erst nach Launch — Abmahnung 1.500-5.000 €"
+    frequency: medium
+    severity: high
+    symptoms:
+      - Privacy Policy generisch oder fehlt
+      - Tracking-SDKs ohne Consent
+      - Apple Privacy Manifest nicht ausgefüllt
+    our_defense:
+      - Privacy Policy vor erstem TestFlight (TODO-008)
+      - compliance-auditor Skill vor jedem App-Store-Submission
+      - Datenminimierung: nur was wirklich nötig
+      - Apple Privacy Manifest (ab 2024 Pflicht)
+    related: [ADR-0008]
+
+  - id: FM-07
+    category: app_store
+    title: "App Store Reject — Missing Disclosures"
+    frequency: medium     # ~50% beim ersten Submission
+    severity: medium
+    symptoms:
+      - Apple-Reject wegen "missing usage description"
+      - 1-2 Wochen Verzögerung
+    our_defense:
+      - Pre-Submission-Checklist (in quality-strategy.md §5)
+      - engineering:deploy-checklist Skill
+      - Privacy Manifest sauber befüllt
+      - Camera-Purpose-String präzise
+
+  - id: FM-08
+    category: versioning
+    title: "Kein Versionierungs-Plan — Welche Version hat User X?"
+    frequency: high
+    severity: low
+    symptoms:
+      - Bugreports ohne Versions-Angabe
+      - Keine Korrelation Crash ↔ Build
+    our_defense:
+      - SemVer ab v0.1.0 (siehe quality-strategy.md §7)
+      - Build-Number bei jedem Build hochzählen (Fastlane)
+      - Sentry/Bugsnag sendet Version mit
+
+  - id: FM-09
+    category: testing
+    title: "State-Lecks zwischen User-Sessions"
+    frequency: medium
+    severity: high
+    symptoms:
+      - User B sieht Daten von User A
+      - Logout löscht nicht alle Caches
+    our_defense:
+      - Integration-Tests für Logout-Flow
+      - Singleton-State minimal halten
+      - Bei KI-Layer (Phase 2): RAG-Context strikt user-isoliert
+    related: [ADR-0002]
+
+  - id: FM-10
+    category: performance
+    title: "Plötzlich: Scan dauert 8 Sekunden, keiner weiß warum"
+    frequency: high
+    severity: medium
+    symptoms:
+      - Performance-Regression unbemerkt
+      - Keine Baseline-Daten
+    our_defense:
+      - Smoke-Test mit Stoppuhr in Release-Gate
+      - Sentry Performance ab Phase 2
+      - Lighthouse-Mobile-Baseline 1× pro Phase
+    phase_introduced: phase-1-mvp_end
+
+  - id: FM-11
+    category: data
+    title: "OFF-API down — App crasht oder hängt"
+    frequency: medium
+    severity: medium
+    symptoms:
+      - User scannt, App spinnt unendlich
+      - Keine Offline-Fallback
+    our_defense:
+      - Timeout auf API-Calls (8 Sek max)
+      - Retry mit Backoff (max 3×)
+      - Letzten Score gecached zeigen
+      - Klare Error-UX "Verbindung verloren"
+    related: [ADR-0003, RISK-001]
+
+  - id: FM-12
+    category: data
+    title: "Supabase RLS-Policy vergessen → Datenleak"
+    frequency: medium     # bei Supabase-Anfängern hoch
+    severity: critical
+    symptoms:
+      - Anon-Key kann alle User-Scans lesen
+      - service_role-Key versehentlich im Client
+    our_defense:
+      - RLS-Default: enabled für ALLE Tabellen
+      - Migration-Test: Anon-User darf nichts
+      - Code-Review erzwingt Policy pro neue Tabelle
+    related: [ADR-0008]
+
+  - id: FM-13
+    category: scope
+    title: "Scope-Creep — MVP wird zum Endprodukt"
+    frequency: very_high
+    severity: high
+    symptoms:
+      - Phase 1 dauert 6 Monate statt 6 Wochen
+      - "Eine Feature noch" wiederholt sich
+    our_defense:
+      - Strikte out_of_scope-Liste in roadmap.yaml
+      - Wöchentlich progress.yaml mit ehrlichem Self-Check
+      - Backlog-Park: Ideen rein, Sprint-Scope unangetastet
+    related: [RISK-004]
+
+  - id: FM-14
+    category: ux
+    title: "Edge-Cases vergessen (No-Internet, No-Data, Permission denied)"
+    frequency: high
+    severity: medium
+    symptoms:
+      - White-Screen bei OFF-API-Fehler
+      - Crash wenn Kamera-Permission abgelehnt
+      - Leerer Score bei "Eco-Score unknown"
+    our_defense:
+      - Edge-State-Screens im Design-Handoff einplanen
+      - TODO-011 (Edge-Case-UX)
+      - TODO-012 (Eco-Score-Fallback)
+    related: [TODO-011, TODO-012]
+
+  - id: FM-15
+    category: ops
+    title: "Disaster Recovery: Schlüssel/Certs verloren = ausgesperrt"
+    frequency: medium
+    severity: critical
+    symptoms:
+      - Apple-Cert auf altem Mac, neuer Mac gekauft
+      - Supabase-Owner-Account-Lockout
+      - .p12 ohne Backup
+    our_defense:
+      - 1Password / iCloud Keychain Backup
+      - docs/project/disaster-recovery.md (anlegen vor TestFlight)
+      - 2FA-Backup-Codes ausgedruckt aufbewahren
+    related: [ADR-0008]
+
+  - id: FM-16
+    category: business
+    title: "Monetarisierungs-Switch zu spät — User fühlen sich verraten"
+    frequency: medium
+    severity: high
+    symptoms:
+      - Free-Features nachträglich in Paid gepackt
+      - 1-Sterne-Reviews
+    our_defense:
+      - Free-Tier von Anfang an eng definiert, später erweitert
+      - Klare Kommunikation bei Tier-Changes
+      - Bestehende User behalten alte Bedingungen ("Grandfathering")
+    related: [ADR-0006]
+
+# =============================================================================
+# REVIEW-RHYTHMUS
+# =============================================================================
+review:
+  cadence: bei jedem Phasen-Wechsel
+  questions:
+    - Sind neue Failure-Modes aufgetaucht die wir hier festhalten sollten?
+    - Welche unserer Defenses haben sich bewährt, welche waren zu schwach?
+    - Welche Modes können wir als "permanently mitigated" markieren?

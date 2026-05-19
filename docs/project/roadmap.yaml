@@ -44,7 +44,7 @@ phases:
       - Min. 20 reale DE-Barcodes liefern brauchbare Daten (>70% Coverage)
       - App startet, scannt, zeigt Score in <3 Sekunden
       - Keine kritischen Crashes auf iOS 17+
-    decisions: [0001, 0002, 0003, 0004, 0005]
+    decisions: [0001, 0002, 0003, 0004, 0005, 0007, 0008]
     risks: [RISK-001, RISK-002, RISK-003]
     out_of_scope:
       - KI-Layer (siehe ADR 0004)

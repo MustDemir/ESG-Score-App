@@ -1,0 +1,137 @@
+id: 0007
+title: CI/CD/CT-Strategie — minimal aber von Anfang an
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [ci-cd, testing, devops, quality, github-actions]
+
+context: |
+  Solo-Founder-Realität: nur ich pushe Code. Trotzdem brauchen wir
+  Automatisierung gegen die typischen Solo-Fehler: vergessene Tests,
+  inkonsistente Builds, manuelle Fehler vor Release. DevOps-Prinzip
+  CI/CD/CT (Continuous Integration / Continuous Delivery / Continuous
+  Testing) ist auch für Solo-Projekte wertvoll — wenn nicht über-
+  dimensioniert.
+
+  Anti-Pattern: 95%-Coverage-Ziel, Enterprise-Pipelines, Mutation-Testing.
+  Anti-Pattern: alles manuell „weil ich allein bin".
+
+options_considered:
+  - name: Kein CI/CD (manuell)
+    pros:
+      - Null Setup-Zeit
+    cons:
+      - Build-Drift (works on my machine)
+      - Vergessene Tests → fragile App
+      - Secret-Leaks unerkannt
+      - Solo-Founder-Killer
+
+  - name: Enterprise-Pipeline (Multi-Stage, viele Tools)
+    pros:
+      - Vollständig
+    cons:
+      - Wochen Setup-Aufwand
+      - Maintenance frisst Entwicklungszeit
+      - Overkill für 1 Person
+
+  - name: Minimal CI/CD/CT von Tag 1, ausbauend
+    pros:
+      - Zero-Effort am Anfang (~30 Min Setup)
+      - Wächst mit dem Projekt
+      - Catched 80% der Solo-Founder-Fehler
+      - Free Tier GitHub Actions reicht
+    cons:
+      - Erfordert Disziplin nicht zu over-engineeren
+
+decision: Minimal CI/CD/CT von Tag 1, phasenweise ausbauen.
+rationale: |
+  Drei Prinzipien für unsere CI/CD-Strategie:
+
+  1) **Catch fast, fail loud**: jeder PR läuft durch analyze+format+test.
+     Wenn rot → blockt Merge.
+  2) **Wachse mit Schmerz**: erst hinzufügen wenn echter Pain auftaucht
+     (z.B. Performance-Monitoring erst wenn Users da sind).
+  3) **Tooling > Manuell**: für alles was wiederholbar ist, ein Skript
+     oder eine Action.
+
+stages_defined:
+  - stage: sprint_0
+    title: Baseline-CI (vor erstem Flutter-Code)
+    pipeline:
+      - on: pull_request | push to main
+      - flutter analyze              # Lint-Errors → fail
+      - flutter format --set-exit-if-changed   # Format-Drift → fail
+      - flutter test                 # Unit-Tests → fail bei <60% Coverage in Sprint 1+
+    tools:
+      - GitHub Actions (free tier, 2000 min/Monat private)
+    file: .github/workflows/ci.yml
+
+  - stage: sprint_1
+    title: Coverage-Gate + Pre-Commit-Hooks
+    additions:
+      - codecov.io oder pure-Action für Coverage-Report
+      - pre-commit-hook (gitleaks für Secret-Scan, dart format)
+      - Branch-Protection-Regel auf main: PR + green CI required
+    coverage_target: ">=60% in Sprint 1, >=70% ab Sprint 2"
+
+  - stage: sprint_3
+    title: TestFlight-Auto-Deploy
+    additions:
+      - Fastlane für iOS-Build + Upload
+      - Secrets in GitHub Secrets (nicht im Repo!)
+      - On-tag-push: automatischer Build + TestFlight-Upload
+      - Manuelles GitHub-Release mit Changelog
+
+  - stage: post_mvp
+    title: Erweiterte Checks
+    additions:
+      - Dependabot für automatische Dependency-Updates
+      - CodeQL Security-Scan (GitHub native, free)
+      - Sentry Integration für Crash-Reporting
+      - Lighthouse-Mobile-Scores als Baseline-Tracking
+
+continuous_testing_pyramid:
+  - level: unit
+    target: "70%+ Coverage von Models und Services"
+    runs: bei jedem PR
+    tool: flutter test
+  - level: widget
+    target: "Wichtigste Widgets (ScoreHero, ScoreBars, ProductCard)"
+    runs: bei jedem PR
+    tool: flutter test
+  - level: integration
+    target: "1-2 Golden Paths (Scan→Score, Onboarding)"
+    runs: vor Release (nicht bei jedem PR — zu langsam)
+    tool: flutter integration_test
+  - level: manual
+    target: "Edge-Cases die maschinell zu teuer sind"
+    runs: vor TestFlight
+    tool: Checkliste in deploy-checklist Skill
+
+claude_code_integration:
+  manual_review:
+    - skill: engineering:code-review
+      when: vor jedem PR-Merge (lokal mit /review oder claude code im PR-Branch)
+    - skill: engineering:testing-strategy
+      when: beim Entwurf neuer Features
+    - skill: engineering:debug
+      when: bei Bugs (statt Stack-Trace-Roulette)
+    - skill: engineering:deploy-checklist
+      when: vor jedem TestFlight-Build
+  automation:
+    - hooks: .claude/settings.json mit pre-commit-hooks (Format, Secret-Scan)
+    - routines: optional — wöchentlicher Dependency-Audit via GitHub Action
+      (NICHT via Claude Code Schedules — tool-agnostisch besser)
+
+consequences:
+  - .github/workflows/ci.yml muss in Sprint 0 angelegt werden
+  - GitHub-Repo muss public oder private mit Actions-Budget bleiben
+  - Branch-Protection auf main: keine direkten Pushes, nur via PR
+  - Erste Wochen: Disziplin gegen "schnell direkt auf main" pushen
+  - Dependency-Updates müssen reviewt werden (kein blindes Mergen)
+  - quality-strategy.md ist Detail-Dokument zu dieser ADR
+  - Pre-Commit-Hooks via .claude/settings.json + native git-hooks
+
+supersedes: null
+superseded_by: null
+related: [0001, 0008]

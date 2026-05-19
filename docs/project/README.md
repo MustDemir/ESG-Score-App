@@ -24,7 +24,10 @@ docs/project/
 ├── glossary.yaml          # Domänen-Begriffe (ESG, Eco-Score, etc.)
 ├── stack.yaml             # Tech-Stack-Inventar mit Versionen
 ├── costs.yaml             # Kosten-Tracker (Subscriptions, API-Usage)
-└── monetization.yaml      # Geschäftsmodell, Tiers, Pricing
+├── monetization.yaml      # Geschäftsmodell, Tiers, Pricing
+├── quality-strategy.md    # CI/CD/CT-Methodik, Test-Pyramide, Release-Gates
+├── failure-modes.yaml     # Top-Solo-Founder-Fehler + unsere Gegenmaßnahmen
+└── spikes/                # Spike-Reports (z.B. OFF-API-Coverage)
 ```
 
 ## Goldene Regeln

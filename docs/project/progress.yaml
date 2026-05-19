@@ -56,6 +56,12 @@ decisions_made:
   - adr: 0006
     title: Monetarisierung via Membership (Freemium + ScanFair+)
     date: 2026-05-19
+  - adr: 0007
+    title: CI/CD/CT-Strategie — minimal aber von Anfang an
+    date: 2026-05-19
+  - adr: 0008
+    title: Security-Baseline — 7 nicht-verhandelbare Praktiken
+    date: 2026-05-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -72,6 +78,9 @@ weekly_log:
       - Roadmap, Backlog, Risks, Progress YAMLs erstellt
       - Monetarisierungs-Strategie definiert (ADR 0006 + monetization.yaml)
       - OFF-API-Spike durchgeführt: 20/20 Coverage, E-Säule 100%, S-Säule 95%
+      - CI/CD/CT-Strategie definiert (ADR 0007 + quality-strategy.md)
+      - Security-Baseline mit 7 Praktiken festgelegt (ADR 0008)
+      - Failure-Modes-Register mit 16 Top-Solo-Founder-Fehlern
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -92,7 +101,7 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 6
+  decisions_total: 8
   todos_open: 11
   todos_in_progress: 1
   todos_done: 1
