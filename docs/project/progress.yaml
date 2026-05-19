@@ -81,6 +81,9 @@ weekly_log:
       - CI/CD/CT-Strategie definiert (ADR 0007 + quality-strategy.md)
       - Security-Baseline mit 7 Praktiken festgelegt (ADR 0008)
       - Failure-Modes-Register mit 16 Top-Solo-Founder-Fehlern
+      - CLAUDE.md erweitert mit Session-Start-Protokoll (Pfad zu docs/project/)
+      - Definition of Done definiert (definition-of-done.yaml)
+      - Session-Start-Protokoll für Chat-Wechsel (session-start-protocol.md)
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung

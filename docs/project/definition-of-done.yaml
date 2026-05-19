@@ -1,0 +1,195 @@
+last_updated: 2026-05-19
+
+# =============================================================================
+# Definition of Done
+# =============================================================================
+# Verbindliche Checks pro Task-Typ. Ein Task ist NICHT fertig bevor die
+# entsprechende Liste komplett abgehakt ist. Gilt für Claude UND für Mustafa.
+#
+# Wenn ein Check übersprungen wird: das im progress.yaml dokumentieren mit
+# Begründung (warum bewusst übersprungen) — sonst gilt der Task als offen.
+# =============================================================================
+
+# Allgemeine Regeln, gelten IMMER (egal welcher Task-Typ):
+universal_checks:
+  - id: U-1
+    check: progress.yaml wurde aktualisiert (Milestones / weekly_log / stats)
+  - id: U-2
+    check: Falls neue Erkenntnis → backlog.yaml, risks.yaml, oder failure-modes.yaml aktualisiert
+  - id: U-3
+    check: Bei bedeutsamer Entscheidung → ADR im decisions/-Ordner geschrieben
+  - id: U-4
+    check: Commit-Message folgt Konvention (siehe methodology/conventions.md)
+  - id: U-5
+    check: Out-of-Scope der aktuellen Phase nicht verletzt
+
+# =============================================================================
+# TASK-TYPEN
+# =============================================================================
+task_types:
+
+  # ---------------------------------------------------------------------------
+  - id: feature_code
+    title: Neues Feature / Code-Änderung
+    description: Jede produktive Code-Änderung in lib/ oder esg_app/
+    checks:
+      - flutter analyze sauber (kein Warning, kein Error)
+      - flutter format --set-exit-if-changed grün
+      - flutter test grün (lokal)
+      - Unit-Tests für neue Logik geschrieben (Coverage-Gate erfüllt)
+      - Bei UI-Code Widget-Test für Hauptpfad
+      - try/catch um alle API-Calls + Timeout konfiguriert
+      - Edge-Cases bedacht (no-internet, no-data, permission-denied)
+      - Keine Secrets im Diff (manuell + gitleaks)
+      - Bei neuer Dependency in pubspec.yaml: Lizenz geprüft
+      - CI grün auf PR
+      - /review (engineering:code-review Skill) ausgeführt
+    references:
+      - quality-strategy.md
+      - failure-modes.yaml [FM-01, FM-02, FM-03, FM-09, FM-14]
+
+  # ---------------------------------------------------------------------------
+  - id: api_integration
+    title: API-Integration (z.B. OFF, Supabase, LLM-Provider)
+    description: Anbindung externer Dienste
+    checks:
+      - HTTPS-only, kein Cleartext (SEC-4)
+      - API-Key via env-var, nicht hardcoded (SEC-1)
+      - Timeout gesetzt (max 8s default)
+      - Retry-Logik mit exponential backoff (max 3 Versuche)
+      - Rate-Limit beachtet / dokumentiert
+      - Response-Parsing in eigenem Mapper, mit Null-Safety
+      - Error-States in UI definiert
+      - Test mit mock-Response geschrieben
+      - Bei Personendaten: DSGVO-Datenfluss dokumentiert
+    references:
+      - decisions/0008-security-baseline.yaml [SEC-1, SEC-4]
+      - failure-modes.yaml [FM-02, FM-11]
+
+  # ---------------------------------------------------------------------------
+  - id: supabase_change
+    title: Supabase-Schema- oder Policy-Änderung
+    description: Migration, neue Tabelle, neue RLS-Policy
+    checks:
+      - Migration-Skript im supabase/migrations/ Ordner
+      - ALTER TABLE ... ENABLE ROW LEVEL SECURITY für neue Tabellen
+      - RLS-Policies explizit pro Operation (SELECT/INSERT/UPDATE/DELETE)
+      - Test: Anon-Role darf NICHT was nicht erlaubt ist
+      - Default-Werte und NOT-NULL-Constraints bewusst gewählt
+      - Indizes für häufige Queries
+      - Rollback-Strategie dokumentiert (kann ich die Migration zurücknehmen?)
+    references:
+      - decisions/0008-security-baseline.yaml [SEC-3]
+      - failure-modes.yaml [FM-12]
+
+  # ---------------------------------------------------------------------------
+  - id: architecture_decision
+    title: Architektur-Entscheidung treffen
+    description: Tech-Stack, Pattern, Provider-Wahl
+    checks:
+      - ADR im decisions/ geschrieben (NNNN-titel.yaml)
+      - Mindestens 2 Alternativen verglichen mit pros/cons
+      - Rationale klar formuliert
+      - Consequences aufgelistet
+      - related-ADRs verlinkt
+      - Falls ältere ADR betroffen: supersedes-Beziehung gesetzt
+      - In progress.yaml unter decisions_made eingetragen
+    references:
+      - methodology/adr-process.md
+
+  # ---------------------------------------------------------------------------
+  - id: release_testflight
+    title: TestFlight-Release / App-Store-Submission
+    description: Build auf physische Test-Devices oder Store
+    checks:
+      - Vollständige Release-Gate-Checklist (quality-strategy.md §5)
+      - Coverage >= aktuelles Sprint-Ziel
+      - /security-review Slash-Command durchgelaufen
+      - compliance-auditor Skill durchgelaufen
+      - Privacy Policy aktuell und versioniert
+      - Apple Privacy Manifest gepflegt
+      - Changelog geschrieben
+      - Version-Bump in pubspec.yaml (SemVer)
+      - Git-Tag gesetzt
+      - Smoke-Test auf physischem iPhone
+      - Fastlane-Build erfolgreich
+      - Rollback-Plan im Kopf (welche Version war's vorher?)
+    references:
+      - quality-strategy.md
+      - failure-modes.yaml [FM-06, FM-07, FM-08, FM-15]
+
+  # ---------------------------------------------------------------------------
+  - id: spike
+    title: Spike / Recherche / Validierung
+    description: Erkenntnisgewinn ohne produktiven Code
+    checks:
+      - Spike-Report in docs/project/spikes/ angelegt (Markdown)
+      - Methodik dokumentiert (was wurde wie getestet)
+      - Ergebnisse mit Zahlen / Belegen
+      - Interpretation: GO / NO-GO / GO-mit-Bedingungen
+      - Nächste Schritte abgeleitet (neue TODOs in backlog.yaml)
+      - Verlinkt mit relevanter RISK oder ADR
+      - Spike-Code (falls vorhanden) committet UND als Experiment markiert
+        (nicht in produktiven Pfaden gelandet)
+
+  # ---------------------------------------------------------------------------
+  - id: documentation
+    title: Dokumentation / ADR / YAML-Update
+    description: Pure Doku-Änderungen ohne Code
+    checks:
+      - Markdown / YAML syntaktisch valide (yamllint / lint-runs)
+      - Cross-Links funktionieren (relativ-Pfade korrekt)
+      - last_updated-Feld aktualisiert
+      - Falls Inhalt Entscheidung impliziert: ist auch ADR nötig?
+
+  # ---------------------------------------------------------------------------
+  - id: dependency_update
+    title: Dependency Update / Upgrade
+    description: pubspec.yaml-Änderung, neue Library oder Version
+    checks:
+      - Changelog der Library gelesen — Breaking Changes verstanden
+      - Lizenz geprüft (kein GPL ohne Bedacht)
+      - flutter test grün nach Update
+      - flutter analyze sauber nach Update
+      - Bundle-Size-Auswirkung beachtet (besonders große Libs)
+      - Pubspec-Lock committed
+      - Bei Security-Update: in progress.yaml unter weekly_log notiert
+    references:
+      - decisions/0008-security-baseline.yaml [SEC-5]
+      - failure-modes.yaml [FM-04]
+
+  # ---------------------------------------------------------------------------
+  - id: bug_fix
+    title: Bug-Fix
+    description: Korrektur eines fehlerhaften Verhaltens
+    checks:
+      - Bug reproduzierbar gemacht (lokal oder via Test)
+      - Test geschrieben der den Bug nachstellt (Regression-Test)
+      - Test schlägt VOR Fix fehl, NACH Fix grün
+      - Root Cause verstanden — nicht nur Symptom behoben
+      - Falls Bug auf größeres Problem deutet: in failure-modes.yaml dokumentieren
+      - Bei Security-Bug: in risks.yaml als RISK eintragen + Mitigation
+    references:
+      - failure-modes.yaml
+
+# =============================================================================
+# Eskalations-Regel
+# =============================================================================
+escalation:
+  rule: |
+    Wenn ein Check nicht erfüllt werden kann (technisch oder zeitlich), gilt:
+    1. NICHT als "fertig" markieren
+    2. Im progress.yaml den Grund dokumentieren
+    3. Als TODO mit P1 oder P0 in backlog.yaml anlegen
+    4. Falls Security/Compliance-Check betroffen: Eskalation an User (Mustafa)
+       BEVOR weitergemacht wird
+
+# =============================================================================
+# Wartung
+# =============================================================================
+maintenance:
+  cadence: 1× pro Phasenwechsel
+  questions:
+    - Sind alle Task-Typen abgedeckt die in der neuen Phase auftauchen?
+    - Welche Checks haben sich als zu lasch / zu streng erwiesen?
+    - Gibt es neue Skills / Tools die wir hier einbinden sollten?

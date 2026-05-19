@@ -27,6 +27,8 @@ docs/project/
 ├── monetization.yaml      # Geschäftsmodell, Tiers, Pricing
 ├── quality-strategy.md    # CI/CD/CT-Methodik, Test-Pyramide, Release-Gates
 ├── failure-modes.yaml     # Top-Solo-Founder-Fehler + unsere Gegenmaßnahmen
+├── definition-of-done.yaml # Verbindliche Checks pro Task-Typ
+├── session-start-protocol.md # Wiedereinstieg in neue Claude-Sessions
 └── spikes/                # Spike-Reports (z.B. OFF-API-Coverage)
 ```
 
