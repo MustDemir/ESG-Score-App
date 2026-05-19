@@ -35,7 +35,12 @@ docs/project/
 │   ├── session-start.md
 │   ├── pre-coding-check.md
 │   └── post-feature.md
-├── requirements/          # Compliance-Anforderungen (kommt mit Sprint 0)
+├── features/              # Per-Feature-State (analog chapter_state.yaml)
+│   ├── README.md
+│   ├── scanner/state.yaml
+│   ├── scoring/state.yaml
+│   └── results/state.yaml
+├── requirements/          # Compliance-Anforderungen (kommt mit S10)
 └── spikes/                # Spike-Reports (z.B. OFF-API-Coverage)
 ```
 

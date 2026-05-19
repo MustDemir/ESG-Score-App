@@ -1,0 +1,94 @@
+# Feature-State Template
+# ============================================================================
+# Pro Feature-Modul liegt eine state.yaml im docs/project/features/<feature>/.
+# Übernommen aus ai-context-vault chapter_state.yaml (ADR 0009 ACV-1).
+# Wird gelesen von Workflows (session-start, pre-coding-check, post-feature).
+# ============================================================================
+
+feature: "<feature-id>"              # z.B. "scanner", "scoring", "results"
+title: "<beschreibender Titel>"
+status: planned                       # planned | in_progress | draft | review | done | parked | dropped
+progress: 0                           # 0-100
+current_focus: ""                    # 1-Zeiler: was steht als nächstes an
+last_sync: "YYYY-MM-DD"              # ISO-Datum
+
+# ----------------------------------------------------------------------------
+# lade_manifest: Dependency-Management für fokussierte Kontext-Ladung
+# (Token-Effizienz für Claude-Sessions, siehe ADR 0009 ACV-3)
+# ----------------------------------------------------------------------------
+lade_manifest:
+  pflicht:                            # Als Volltext lesen (hohe Priorität)
+    # - relevante ADR(s)
+    # - failure-modes.yaml (relevante FMs)
+    # - betroffene Code-Files
+  kontext:                            # Nur als Metadata lesen (chapter_state)
+    # - andere Features die mit diesem interagieren
+
+# ----------------------------------------------------------------------------
+# Phase / Sprint-Zuordnung
+# ----------------------------------------------------------------------------
+phase: "phase-1-mvp"
+sprint: 1
+implementation_steps:                 # Refs in implementation-plan.yaml
+  # - S14
+  # - S15
+
+# ----------------------------------------------------------------------------
+# Code-Standort
+# ----------------------------------------------------------------------------
+code_locations:
+  # - esg_app/lib/screens/scanner_screen.dart
+  # - esg_app/lib/services/scanner_service.dart
+test_locations:
+  # - esg_app/test/screens/scanner_screen_test.dart
+
+# ----------------------------------------------------------------------------
+# Erledigt
+# ----------------------------------------------------------------------------
+done:
+  # - "Mini-Meilenstein X erledigt am YYYY-MM-DD"
+
+# ----------------------------------------------------------------------------
+# Entscheidungen die nur dieses Feature betreffen
+# ----------------------------------------------------------------------------
+decisions:
+  # - id: "FD-01"
+  #   decision: "Wir nutzen mobile_scanner statt qr_code_scanner"
+  #   date: "YYYY-MM-DD"
+  #   rationale: "..."
+  #   adr_ref: null   # falls aus zentraler ADR
+
+# ----------------------------------------------------------------------------
+# Offene Punkte / Blocker
+# ----------------------------------------------------------------------------
+open_items:
+  # - "Wartet auf TODO-XXX"
+  # - "Edge-Case Y noch nicht geklärt"
+
+# ----------------------------------------------------------------------------
+# Geplante nächste Schritte
+# ----------------------------------------------------------------------------
+next_steps:
+  # - "Konkreter nächster Schritt"
+
+# ----------------------------------------------------------------------------
+# Cross-Feature-Abhängigkeiten
+# ----------------------------------------------------------------------------
+cross_feature_dependencies:
+  # - from: "scanner"
+  #   to: "scoring"
+  #   type: "data_flow"     # data_flow | event | shared_state | navigation
+  #   description: "Scanner liefert EAN an Scoring-Service"
+
+# ----------------------------------------------------------------------------
+# Wichtigste Anforderungen (aus requirements/, falls schon vorhanden)
+# ----------------------------------------------------------------------------
+requirements:
+  # - R001 (Privacy Manifest)
+  # - R002 (Supabase RLS)
+
+# ----------------------------------------------------------------------------
+# Risiken die dieses Feature betreffen
+# ----------------------------------------------------------------------------
+related_risks:
+  # - RISK-XXX

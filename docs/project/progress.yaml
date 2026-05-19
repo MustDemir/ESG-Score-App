@@ -44,6 +44,23 @@ milestones:
       .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
       Step S06 abgeschlossen.
 
+  - id: M06
+    title: CI/CD-Pipeline + Pre-Commit-Hooks aktiv
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Steps S07 + S08 + S09 abgeschlossen.
+      - .github/workflows/ci.yml: flutter analyze + format + test + gitleaks-Job
+      - Native Git-Hook (scripts/hooks/pre-commit) installiert
+        gitleaks (Secret-Scan) + dart format + Private-Key-Check
+        + Merge-Conflict-Check + .env-Schutz
+      - Feature-State-Pattern aktiv (docs/project/features/{scanner,scoring,results}/)
+      - Feature-State-Template in methodology/
+
+      Hinweis: pre-commit-Framework (Python) wegen Python 3.14 + macOS Tahoe
+      pyexpat-Bug nicht nutzbar. Native Bash-Hook stattdessen — gleiche
+      Funktionalität.
+
 # =============================================================================
 # DECISIONS_MADE — Verweise auf ADRs, append-only
 # =============================================================================
@@ -115,6 +132,10 @@ weekly_log:
         * lade_manifest pro Task-Typ in definition-of-done.yaml
       - 3 Workflow-Markdowns aus Vault-Skill-Patterns (session-start, pre-coding-check, post-feature)
       - CLAUDE.md erweitert mit Trigger-Phrasen → Workflow-Mapping
+      - S06: Flutter-Projekt erstellt (esg_app/, ios+android, analyze clean, test grün)
+      - S07: GitHub Actions CI-Workflow (.github/workflows/ci.yml)
+      - S08: Pre-Commit-Hooks (scripts/hooks/pre-commit, native Bash)
+      - S09: Feature-State-Pattern (3 initiale states.yaml + Template + README)
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -139,7 +160,7 @@ stats:
   todos_open: 12
   todos_in_progress: 2
   todos_done: 1
-  milestones_reached: 5
+  milestones_reached: 6
   risks_open: 4
   risks_mitigated: 1
   risks_accepted: 1

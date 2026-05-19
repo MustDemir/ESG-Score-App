@@ -1,0 +1,61 @@
+feature: scanner
+title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
+status: planned
+progress: 0
+current_focus: "noch nicht gestartet — wartet auf S13 (Models) und State-Management-Entscheidung"
+last_sync: "2026-05-19"
+
+lade_manifest:
+  pflicht:
+    - docs/project/decisions/0001-flutter-frontend.yaml
+    - docs/project/decisions/0003-open-food-facts.yaml
+    - docs/project/failure-modes.yaml  # FM-11, FM-14
+  kontext:
+    - docs/project/features/scoring/state.yaml
+    - docs/project/features/results/state.yaml
+
+phase: phase-1-mvp
+sprint: 2
+implementation_steps:
+  - S16  # S1 Scanner + S2 Loading + S4 Alternativen + Onboarding
+
+code_locations:
+  - esg_app/lib/screens/scanner_screen.dart    # geplant
+  - esg_app/lib/services/scanner_service.dart  # geplant
+test_locations:
+  - esg_app/test/screens/scanner_screen_test.dart  # geplant
+
+done: []
+
+decisions:
+  - id: FD-SC-01
+    decision: mobile_scanner als Flutter-Plugin
+    date: "2026-05-19"
+    rationale: "Battle-tested, native Performance, im Original-Plan benannt"
+    adr_ref: null
+
+open_items:
+  - State-Management-Entscheidung steht aus (Provider vs Riverpod) — wird ADR 0012
+  - Permission-Handling iOS + Android Strategie definieren
+  - Performance-Budget: <500ms von Tap auf Scanner bis erkannter EAN
+
+next_steps:
+  - Mit Theme + Models (S11, S13) warten bis abgeschlossen
+  - State-Management-ADR vor Implementation
+
+cross_feature_dependencies:
+  - from: scanner
+    to: scoring
+    type: data_flow
+    description: Scanner liefert EAN-String an scoring-Service
+  - from: scanner
+    to: results
+    type: navigation
+    description: Bei Erfolg Navigation zu Result-Screen
+
+requirements:
+  # Sprint 0 noch nicht angelegt, später:
+  # - R-CAM-01 (Camera Permission Purpose String)
+
+related_risks:
+  - FM-14  # Edge-Cases (no-internet, no-data, permission-denied)

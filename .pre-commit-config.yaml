@@ -1,0 +1,42 @@
+# ============================================================================
+# Pre-Commit-Hooks für ScanFair
+# ============================================================================
+# Wir nutzen NICHT das pre-commit-Framework (Python 3.14 + macOS Tahoe Bug
+# mit pyexpat). Stattdessen native Git-Hooks unter scripts/hooks/.
+#
+# Installation der Hooks:
+#   bash scripts/hooks/install.sh
+#
+# Die Hooks rufen lokal installierte Binaries:
+#   - gitleaks  (brew install gitleaks)
+#   - dart      (kommt mit Flutter)
+#
+# Referenz: ADR 0008 SEC-1, quality-strategy.md §4
+# ============================================================================
+# Diese Datei dient als Dokumentation und Sammlung der Anforderungen.
+# Wenn der pyexpat-Bug behoben ist, kann pre-commit-Framework reaktiviert
+# werden — die Hook-Definitionen unten sind ready.
+
+# Pseudo-Konfig (nur zur Doku):
+hooks_planned:
+  - id: gitleaks
+    description: "Secret-Scan auf staged Files"
+    binary: gitleaks
+    command: gitleaks protect --staged --redact
+
+  - id: dart-format-check
+    description: "Format-Drift in Dart-Files erkennen"
+    binary: dart (via Flutter SDK)
+    files: 'esg_app/.*\.dart$'
+
+  - id: detect-private-key
+    description: "Private-Key-Marker im Diff"
+    grep_pattern: '-----BEGIN.*PRIVATE KEY-----'
+
+  - id: check-merge-conflict
+    description: "<<<<<<< / ======= / >>>>>>> Marker"
+    grep_pattern: '^(<<<<<<<|=======|>>>>>>>)'
+
+reactivation_when_python_fixed:
+  date_to_check: 2026-08-01
+  command: brew upgrade python@3.14 && pre-commit install
