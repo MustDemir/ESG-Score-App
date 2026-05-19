@@ -1,0 +1,146 @@
+id: 0012
+title: Apple Review Compliance Strategy — Anforderungen + Gates aus App Review Guidelines
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [compliance, apple, app-store, gates, policy-as-code]
+
+context: |
+  Apple App Review Guidelines (Februar 2026, 40 Seiten) systematisch
+  analysiert auf Relevanz für ScanFair. Frage: wie übernehmen wir die
+  Pflicht-Anforderungen in unser Gate-System (übernommen aus der
+  Master-Thesis-Repo genaiops-compliance-gates)?
+
+  Vollständige Analyse in:
+  docs/project/compliance/apple-review-relevance.md
+
+  Aus 40 Seiten extrahiert: 16 ScanFair-MVP-Anforderungen (R-AS-01 bis R-AS-16)
+  + 10 Phase-2-Add-Ons (R-AS-17 bis R-AS-26).
+
+options_considered:
+  - name: A — Alle 26 R-AS sofort implementieren
+    pros: [Volle Apple-Compliance vor erstem Code]
+    cons: [Premature — viele R-AS prüfen Code-Stellen die noch nicht existieren]
+
+  - name: B — Minimal-Start (5 R-AS-YAMLs + 1 Beispiel-Gate + Plan-Doku)
+    pros:
+      - Pattern etabliert
+      - Erweitert sich mit App-Logik-Implementation
+      - Methodisch konsistent mit Master-Thesis-Repo
+    cons: [Mehrere R-AS bleiben TODO bis App reift]
+
+  - name: C — Erst nach App-Store-Reject lernen (Reactive)
+    pros: [Null Vorlauf-Aufwand]
+    cons: [Klassischer Solo-Founder-Fehler, 1-2 Wochen Verzögerung pro Reject]
+
+decision: Option B — Minimal-Start mit erweiterbarem Pattern
+rationale: |
+  Mit Option B installieren wir Pattern + Disziplin OHNE Premature-Optimierung.
+  Konkretes Vorgehen:
+
+  1) Komplette Apple-Analyse als Markdown-Doku (apple-review-relevance.md)
+  2) 5 wichtigste R-AS als vollständige YAMLs (R-AS-01, 03, 06, 08, 12)
+  3) 1 Beispiel-Gate (G-AS-NAME-LENGTH) mit kompletter Rego-Implementation
+     + Tests — als Vorlage für später
+  4) Restliche R-AS als TODO-Liste mit klarem Aktivierungs-Trigger
+  5) ADR dokumentiert Plan für Phase-2-Add-Ons (R-AS-17 bis R-AS-26)
+
+  Aktivierungs-Trigger pro R-AS:
+  - „CI lebt + Code existiert" → R-AS-12 (Name-Längen-Gate kann sofort laufen)
+  - „App-Settings-Screen gebaut" → R-AS-01, R-AS-06, R-AS-08 (Privacy-URL, OFF-Disclose, Support)
+  - „Scanner-Code implementiert" → R-AS-03 (Camera-Purpose-String)
+  - „Auth implementiert (Supabase)" → R-AS-05 (Account-Delete)
+  - „Vor TestFlight" → R-AS-09, R-AS-10, R-AS-11 (Demo, Screenshots, Age-Rating)
+
+apple_pdf_extracted_anforderungen_phase1:
+  count: 16
+  active_yamls_now:
+    - R-AS-01 (Privacy Policy URL)
+    - R-AS-03 (Camera Purpose String)
+    - R-AS-06 (OFF-Datenquelle-Disclose)
+    - R-AS-08 (Support-URL)
+    - R-AS-12 (App-Name-Länge + Plattform-Namen)
+  todo_yamls_phase1:
+    - R-AS-02 (Consent — wird mit Supabase Auth zusammen aktiviert)
+    - R-AS-04 (Datensparsamkeit — Default-Check)
+    - R-AS-05 (Account-Löschung — mit Auth)
+    - R-AS-07 (ATT-Prompt — wenn Analytics)
+    - R-AS-09 (Demo-Account — vor TestFlight)
+    - R-AS-10 (Screenshots — vor Submission)
+    - R-AS-11 (Age-Rating — vor Submission)
+    - R-AS-13 (No Background-Mining — trivial, kein eigener Gate)
+    - R-AS-14 (Review-API — wenn Bewertungs-Prompt eingebaut)
+    - R-AS-15 (Ortung — deferred Phase 2+, falls regionaler Score)
+    - R-AS-16 (CC-BY-SA-Doku — redundant zu R-AS-06)
+
+apple_pdf_extracted_anforderungen_phase2:
+  count: 10
+  trigger: "Phase 2 (ScanFair+ Membership + KI-Chat)"
+  list:
+    - R-AS-17 (IAP-Pflicht — 3.1.1)
+    - R-AS-18 (Subscription ≥ 7 Tage — 3.1.2.a)
+    - R-AS-19 (Subscription-Info — 3.1.2.c)
+    - R-AS-20 (Chatbot-Inhaltsfilter — 4.7.1)
+    - R-AS-21 (Chatbot-Reporting — 4.7.1)
+    - R-AS-22 (Chatbot-Sperr-Mechanismus — 4.7.1)
+    - R-AS-23 (Chatbot-Software-Index — 4.7.4)
+    - R-AS-24 (Chatbot-Altersbeschränkung — 4.7.5)
+    - R-AS-25 (Sign in with Apple wenn Social-Login — 4.8)
+    - R-AS-26 (Push-Consent — 4.5.3, 4.5.4)
+  notes: |
+    4.7 Chatbot-Regeln sind besonders heikel: wenn unser KI-Chat in Phase 2
+    fehlt-konfiguriert ist (z.B. kein Reporting), wird die App rejected.
+    Vor Phase-2-Launch eigene Compliance-Welle.
+
+gate_strategy:
+  pattern_adopted: |
+    Übernommen aus genaiops-compliance-gates:
+      - Requirement-YAML (acceptance_criteria, evidence_expected)
+      - Gate-Definition-YAML (7-Attribute-Template)
+      - Rego-Policy (deny-Rules)
+      - Tests (separate _test.rego)
+      - Evidence-Log (jsonl mit SHA-256)
+  cdv_pattern: "Contract → Validation → Severity → Decision"
+  severity:
+    - BLOCK: Apple-Pflicht-Regel
+    - WARN: Apple-Empfehlung oder ScanFair-interne Disziplin
+  example_implemented:
+    - Gate: G-AS-NAME-LENGTH
+    - Policy: policies/apple/policy_app_name_length.rego (105 Zeilen)
+    - Tests: policies/apple/policy_app_name_length_test.rego (9 Test-Fälle)
+    - Demonstration: implementiert 8 Deny-Rules (Länge, Cross-Platform, Plattform-Namen, Apple-Imitation)
+
+ci_integration:
+  status: "Nicht jetzt aktivieren — erst wenn ≥3 Gates implementiert sind"
+  trigger: "wenn 3 R-AS aktiv sind und Rego-Policies existieren"
+  command: "conftest verify --policy docs/project/policies/apple/ docs/project/policies/apple/*_test.rego"
+  ci_workflow_target: ".github/workflows/compliance.yml (kommt mit Sprint 1/2)"
+  evidence_log_target: "evidence-store/evidence-log.jsonl"
+
+what_we_explicitly_dont_automate:
+  - "Privacy-Policy-Inhalt korrekt formuliert" → manueller Review
+  - "Screenshots zeigen App in Use" → manueller Review
+  - "Demo-Account funktioniert" → manueller Test vor Submission
+  - "Age-Rating korrekt beantwortet" → manueller Submission-Schritt
+
+consequences:
+  - docs/project/compliance/ Ordner als neue Quelle für Compliance-Patterns
+  - docs/project/requirements/ Ordner mit R-AS-NN.yaml + Template
+  - docs/project/gate-definitions/apple/ mit Gate-YAMLs
+  - docs/project/policies/apple/ mit Rego-Policies + Tests
+  - Restliche 11 R-AS als TODOs in backlog.yaml mit Aktivierungs-Trigger
+  - failure-modes.yaml erweitert um Apple-Specifics (FM-AS-NN, später)
+  - Vor jedem App-Store-Submission: Apple-Compliance-Check (Hybrid + Auto)
+
+dependencies:
+  - ADR 0008 (Security-Baseline): SEC-6 Datenminimierung deckt R-AS-04
+  - ADR 0009 (Methodik-Übernahme): Gate-Pattern aus Master-Thesis-Repo
+  - ADR 0007 (CI/CD): Conftest-Pipeline kommt mit Sprint 1/2
+  - ADR 0006 (Monetarisierung): Phase 2 IAP-Anforderungen (R-AS-17 bis 19)
+
+supersedes: null
+superseded_by: null
+related: [0006, 0007, 0008, 0009]
+references:
+  - /Users/mustafademir/Downloads/App-Review-Guidelines-German.pdf (40 Seiten, Februar 2026)
+  - /Users/mustafademir/Projects/genaiops-compliance-gates (Methodik-Vorlage)

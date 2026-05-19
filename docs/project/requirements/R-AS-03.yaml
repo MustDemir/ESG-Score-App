@@ -1,0 +1,59 @@
+id: R-AS-03
+title: Kamera-Purpose-String präzise und spezifisch
+kontrollmechanismus: Policy-as-Code (Conftest prüft Info.plist NSCameraUsageDescription)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+apple_guideline_refs:
+  - "2.5.14"
+  - "5.1.1(iii)"
+
+description: |
+  Apps müssen bei jeder Kamera-/Mikrofon-/Bildschirmaufnahme die ausdrückliche
+  Zustimmung der Nutzer einholen und visuell/akustisch darauf hinweisen.
+  Der Purpose String (NSCameraUsageDescription in Info.plist) muss präzise
+  erklären WARUM wir die Kamera brauchen — nicht generisch.
+
+  Beispiele:
+  ❌ "Kamerazugriff für die App"
+  ❌ "Diese App nutzt die Kamera"
+  ✅ "ScanFair scannt mit der Kamera Barcodes auf Produkten, um den ESG-Score
+     anzuzeigen. Es werden keine Bilder gespeichert."
+
+evidence_expected:
+  - esg_app/ios/Runner/Info.plist enthält NSCameraUsageDescription
+  - String ist mind. 50 Zeichen lang
+  - String erwähnt explizit "Barcode" oder "Scanner"
+  - String erklärt was MIT den Daten geschieht (oder nicht geschieht)
+
+acceptance_criteria:
+  - NSCameraUsageDescription vorhanden
+  - Länge ≥ 50 Zeichen (Apple lehnt zu kurze Strings tendenziell ab)
+  - Enthält Domain-Keyword (barcode|scan|produkt)
+  - KEIN generischer Text (Blacklist: "Kamerazugriff", "Camera access")
+
+linked_gates:
+  - G-AS-CAMERA-PURPOSE
+
+deployer_implication: |
+  - Beim ersten Build: Info.plist NSCameraUsageDescription setzen
+  - Bei Code-Review: String prüfen auf Spezifität
+  - Bei Localization: pro Sprache eigener Purpose String
+
+audit_trigger: "Pre-Deployment CI/CD (Conftest); manueller Re-Review bei UX-Änderungen am Scanner"
+
+sources:
+  - App-Review-Guidelines-German.pdf, Sektion 2.5.14 und 5.1.1(iii)
+  - https://developer.apple.com/documentation/bundleresources/information_property_list/nscamerausagedescription
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: [FM-07]
+related_decisions: [0008]
+
+notes: |
+  Analog für NSMicrophoneUsageDescription, NSPhotoLibraryUsageDescription,
+  NSLocationWhenInUseUsageDescription falls je relevant. Für MVP nur Kamera.

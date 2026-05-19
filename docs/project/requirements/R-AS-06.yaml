@@ -1,0 +1,63 @@
+id: R-AS-06
+title: Open Food Facts als externe Datenquelle in Privacy Policy offenlegen
+kontrollmechanismus: Hybrid (Conftest prüft App-Config-Flag; manueller Inhaltsprüfung Privacy Policy)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+apple_guideline_refs:
+  - "5.1.1(viii)"
+  - "5.2"
+  - "5.2.2"
+
+description: |
+  Apple-Richtlinie 5.1.1(viii) verbietet die Zusammenstellung personenbezogener
+  Daten aus öffentlichen Datenbanken ohne explizite Einwilligung. OFF ist eine
+  öffentliche, crowdsourced Datenbank (CC BY-SA).
+
+  Wir sammeln KEINE personenbezogenen Daten aus OFF (OFF enthält Produktdaten,
+  keine Personendaten), aber wir nutzen die Datenbank intensiv. Apple erwartet
+  Transparenz dazu.
+
+  Zusätzlich Apple-Richtlinie 5.2.2: bei Nutzung von Drittanbieter-Diensten muss
+  Erlaubnis dokumentiert sein. OFF CC-BY-SA-Lizenz dokumentieren in:
+  - Privacy Policy
+  - In-App-Settings ("Datenquellen" Sektion)
+  - App Store Beschreibung (optional aber empfohlen)
+
+evidence_expected:
+  - Privacy Policy enthält Abschnitt "Datenquellen" der OFF erwähnt
+  - In-App-Settings hat "Open Source Lizenzen"-Seite mit OFF CC-BY-SA-Eintrag
+  - Methodik-Seite in App erwähnt OFF
+  - Footer in Result-Screen: "Powered by Open Food Facts"
+
+acceptance_criteria:
+  - Privacy Policy enthält String "Open Food Facts" mindestens 1x
+  - Privacy Policy enthält "CC BY-SA" Erwähnung
+  - In-App-Attribution sichtbar (nicht versteckt im Settings-3-Ebenen-Untermenu)
+
+linked_gates:
+  - G-AS-DATA-SOURCE-DISCLOSE
+
+deployer_implication: |
+  - Privacy Policy schreiben (TODO-008) muss OFF-Sektion enthalten
+  - App-UI: "Powered by Open Food Facts" im Result-Screen-Footer
+  - Settings-Screen: "Datenquellen" Eintrag mit Link zu openfoodfacts.org
+  - Methodik-Seite erwähnt OFF als primäre Datenquelle
+
+audit_trigger: "Pre-Deployment manueller Review; Conftest prüft App-Config-Flags"
+
+sources:
+  - App-Review-Guidelines-German.pdf, Sektion 5.1.1(viii), 5.2, 5.2.2
+  - Open Food Facts CC BY-SA Attribution-Pflicht (https://world.openfoodfacts.org/files-and-tools)
+
+phase: phase-1-mvp
+
+related_todos: [TODO-008]
+related_failure_modes: []
+related_decisions: [0003]
+
+notes: |
+  Doppelt motiviert: Apple Compliance + CC-BY-SA-Lizenz-Anforderung. Beide
+  fordern Attribution. Eine einzige Implementation deckt beide ab.

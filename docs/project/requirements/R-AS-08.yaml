@@ -1,0 +1,57 @@
+id: R-AS-08
+title: Support-URL erreichbar + Kontakt-Infos aktuell
+kontrollmechanismus: Hybrid (Conftest prüft URL-Feld + HTTP-Smoke-Test in CI)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+apple_guideline_refs:
+  - "1.5"
+
+description: |
+  Apple-Richtlinie 1.5: Nutzer:innen müssen wissen, wie sie bei Fragen Kontakt
+  aufnehmen können. Die App und die Support-URL müssen eine einfache Möglichkeit
+  bieten, mit dem Entwickler in Kontakt zu treten.
+
+  Fehlende oder veraltete Kontaktdaten können zur Ablehnung führen und
+  verstoßen unter Umständen gegen Gesetze (DE: Impressumspflicht TMG §5).
+
+evidence_expected:
+  - support_url im pubspec.yaml oder app-config
+  - Support-Email in App Store Connect Hinterlegt
+  - In-App-Settings: "Kontakt" oder "Support"-Eintrag
+  - Impressum-Seite (DE: Pflicht via TMG §5)
+
+acceptance_criteria:
+  - Support-URL ist HTTPS
+  - Support-URL liefert HTTP 200 OK in CI-Smoke-Test
+  - Support-Email ist eine echte erreichbare Adresse (nicht no-reply@)
+  - In-App-Kontakt-Mechanismus vorhanden (Mailto-Link oder eingebettetes Form)
+
+linked_gates:
+  - G-AS-SUPPORT-URL
+
+deployer_implication: |
+  - Domain reservieren (scanfair.de oder .app)
+  - Support-Email aufsetzen (support@scanfair.de)
+  - Impressum-Seite + Support-Seite live
+  - In App: Settings → "Kontakt" → mailto-Link oder Browser-Link
+
+audit_trigger: "Pre-Deployment CI/CD (HTTP-Check); manueller Test vor Submission"
+
+sources:
+  - App-Review-Guidelines-German.pdf, Sektion 1.5
+  - TMG §5 (Impressumspflicht DE)
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: []
+related_decisions: []
+related_costs:
+  - costs.yaml one_time.domain (15 €/Jahr)
+
+notes: |
+  Domain ist ohnehin geplant (siehe costs.yaml). Support-Email Setup ist
+  trivial (Mail-Forward zur business.demir@gmail.com Adresse erstmal).

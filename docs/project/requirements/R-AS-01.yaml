@@ -1,0 +1,59 @@
+id: R-AS-01
+title: Privacy Policy Link in App + App Store Connect Pflicht
+kontrollmechanismus: Hybrid (Conftest prüft URL-Feld vorhanden + Smoke-Test in CI; manueller Inhaltsprüfung vor Submission)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+apple_guideline_refs:
+  - "5.1.1(i)"
+
+description: |
+  Alle Apps müssen einen leicht zugänglichen Link zur Datenschutzrichtlinie
+  enthalten — sowohl im App Store Connect Metadatenfeld als auch innerhalb der App.
+  Die Datenschutzrichtlinie muss klar darlegen:
+  (a) welche Daten erfasst werden, wie und warum
+  (b) welche Dritten Zugriff haben (SDKs, Analytics, Server)
+  (c) Datenaufbewahrung + Lösch-Vorgang
+  Zusätzlich gilt DSGVO Art. 13 / 14 — siehe ADR 0008 SEC-6.
+
+evidence_expected:
+  - privacy_policy_url im pubspec.yaml oder config
+  - privacy_policy_url im App Store Connect ausgefüllt
+  - Link aus App-Settings erreichbar
+  - HTTP-200-Smoke-Test der URL in CI
+
+acceptance_criteria:
+  - URL ist HTTPS (kein HTTP)
+  - URL liefert HTTP 200 OK
+  - URL-Inhalt ist auf Deutsch (Primärsprache) + Englisch (Fallback)
+  - Inhalt erwähnt OFF-Datenquelle (siehe R-AS-06)
+  - Inhalt erwähnt Supabase als Backend (DSGVO Art. 28)
+  - Inhalt erwähnt Datenaufbewahrungs-Dauer
+
+linked_gates:
+  - G-AS-PRIVACY-URL
+
+deployer_implication: |
+  - Privacy Policy schreiben (DSGVO + Apple-Compliant) → TODO-008
+  - URL in pubspec.yaml / app-config eintragen
+  - App-Settings-Screen mit Link
+  - URL in App Store Connect Metadaten beim ersten Submission
+
+audit_trigger: "Pre-Deployment CI/CD (Conftest); Re-Audit bei jedem Release"
+
+sources:
+  - App-Review-Guidelines-German.pdf, Sektion 5.1.1(i)
+  - DSGVO Art. 13
+  - Apple Privacy Manifest Spec (ab 2024)
+
+phase: phase-1-mvp
+
+related_todos: [TODO-008]
+related_failure_modes: [FM-06]
+
+notes: |
+  Die URL allein reicht nicht — der Inhalt muss korrekt sein. Apple Reviewer
+  prüfen stichprobenartig. Wir nutzen TermsFeed/iubenda oder schreiben selbst
+  + juristische Review.

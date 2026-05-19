@@ -1,0 +1,65 @@
+id: R-AS-12
+title: App-Name ≤ 30 Zeichen + saubere Metadaten ohne fremde Plattform-Namen
+kontrollmechanismus: Policy-as-Code (Conftest prüft pubspec.yaml + Info.plist + Android-Manifest)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+apple_guideline_refs:
+  - "2.3.7"
+  - "2.3.10"
+  - "5.2.5"
+
+description: |
+  Apple-Richtlinie 2.3.7: App-Namen dürfen maximal 30 Zeichen lang sein.
+  Markenrechtlich geschützte Begriffe sind verboten.
+  App-Namen, beliebte Preisinformationen, Anpreisungen sind verboten.
+
+  Apple-Richtlinie 2.3.10: Keine fremden Plattform-Namen oder -Symbole.
+  Beispiele die NICHT in iOS-Metadaten dürfen:
+  - "Android", "Google Play", "Samsung Galaxy"
+  - "Windows", "Microsoft Store"
+  - Logos/Symbole anderer Plattformen
+
+  Apple-Richtlinie 5.2.5: Keine App-Namen die Apple-Produkte imitieren
+  (Finder, App Store, Nachrichten, etc.).
+
+evidence_expected:
+  - pubspec.yaml.name field
+  - esg_app/ios/Runner/Info.plist CFBundleDisplayName
+  - esg_app/android/app/src/main/AndroidManifest.xml application.label
+  - App Store Connect Listing-Name
+
+acceptance_criteria:
+  - App-Name "ScanFair" oder Varianten ≤ 30 Zeichen
+  - Untertitel (subtitle) ebenfalls ≤ 30 Zeichen
+  - Kein Vorkommen verbotener Strings:
+    - Plattform-Namen: ["android", "google play", "samsung", "windows phone", "microsoft store"]
+    - Apple-Produkt-Imitation: ["app store", "iphone", "ipad", "macos", "finder", "imessage"]
+    - Anpreisungen: ["best", "#1", "free", "kostenlos"] (als Teil des Namens)
+  - Markenname konsistent über iOS + Android + App Store
+
+linked_gates:
+  - G-AS-NAME-LENGTH
+  - G-AS-PLATFORM-NAMES
+
+deployer_implication: |
+  - Beim Konfigurieren der App-Metadaten: Namen ≤ 30 Zeichen halten
+  - Vor App-Store-Submission: Blacklist-Check manuell verifizieren
+  - Bei Marketing-Texten / Untertitel: Plattform-Namen ausschließen
+
+audit_trigger: "Pre-Deployment CI/CD (Conftest); Re-Audit vor App-Store-Submission"
+
+sources:
+  - App-Review-Guidelines-German.pdf, Sektion 2.3.7, 2.3.10, 5.2.5
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: [FM-07]
+related_decisions: []
+
+notes: |
+  "ScanFair" ist 8 Zeichen — easy unter 30. Aber: "ScanFair — ESG für deinen
+  Einkauf" wären 38 Zeichen → zu lang. Naming-Disziplin im Marketing nötig.

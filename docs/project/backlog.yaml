@@ -304,10 +304,147 @@ todos:
       Requirements/R001-R003 + 3 Rego-Policies + Conftest in GitHub Action
       + evidence-log.jsonl + CDV-Pattern dokumentieren
       (siehe ADR 0009 Sektion genaiops_compliance_gates_adoption.solo_variant).
+
+      Erweitert durch Apple-Compliance (ADR 0012):
+      Aus 40 Seiten Apple App Review Guidelines extrahiert: 16 Phase-1 +
+      10 Phase-2 Anforderungen. 5 R-AS aktiv (R-AS-01, 03, 06, 08, 12),
+      11 als TODOs unten (TODO-015 bis TODO-024).
     phase: phase-1-mvp
     priority: P1
     effort: M
-    status: open
+    status: in_progress
+    completed_parts:
+      - apple-review-relevance.md (40 Seiten gemappt)
+      - 5 R-AS-YAMLs aktiv
+      - 1 Beispiel-Gate (G-AS-NAME-LENGTH) + Rego + Tests
+      - ADR 0012 Apple Review Compliance Strategy
     implementation_step: S10
     related: [IDEA-009]
+    created: 2026-05-19
+    updated: 2026-05-19
+
+  # =========================================================================
+  # APPLE-COMPLIANCE-TODOs (Phase 1 — Aktivierung gestaffelt)
+  # Aus ADR 0012 und apple-review-relevance.md
+  # =========================================================================
+  - id: TODO-015
+    title: R-AS-02 (Consent für Datenerfassung) YAML schreiben + Gate
+    description: Aktivierungs-Trigger Supabase Auth implementiert
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Supabase Auth implementiert (Sprint 1/2)"
+    related: [TODO-014]
+    apple_ref: "5.1.1(ii)"
+    created: 2026-05-19
+
+  - id: TODO-016
+    title: R-AS-04 (Datensparsamkeit) YAML schreiben + Default-Check
+    description: Permission-Audit beim ersten Build
+    phase: phase-1-mvp
+    priority: P2
+    effort: XS
+    status: planned
+    activation_trigger: "Vor erstem TestFlight-Build"
+    apple_ref: "5.1.1(iii)"
+    created: 2026-05-19
+
+  - id: TODO-017
+    title: R-AS-05 (Account-Löschung) YAML + Implementation
+    description: Mit Supabase Auth zusammen — Apple verlangt "Delete Account"-Option in der App
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "Supabase Auth implementiert"
+    apple_ref: "5.1.1(v)"
+    created: 2026-05-19
+
+  - id: TODO-018
+    title: R-AS-07 (ATT-Prompt) YAML — wenn Analytics-SDK kommt
+    description: Falls Sentry/Bugsnag/Analytics mit Tracking-Funktion eingebunden wird
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Erste Analytics/Crash-Reporting-SDK-Integration"
+    apple_ref: "5.1.2(i)"
+    created: 2026-05-19
+
+  - id: TODO-019
+    title: R-AS-09 + R-AS-10 + R-AS-11 (Pre-Submission-Trio) YAMLs
+    description: |
+      Demo-Account + Screenshots + Age-Rating — alle drei zu schreiben
+      vor App-Store-Submission. Als Hybrid-Gates (auto + manuell).
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: planned
+    activation_trigger: "Vor TestFlight-Submission"
+    apple_ref: "2.1(a), 2.3.3, 2.3.6"
+    created: 2026-05-19
+
+  - id: TODO-020
+    title: R-AS-14 (Standard Review-API für Bewertungs-Prompt)
+    description: Falls SKStoreReviewController in App eingebaut wird
+    phase: phase-1-mvp
+    priority: P3
+    effort: XS
+    status: planned
+    activation_trigger: "Bei Implementation von In-App-Review-Prompt"
+    apple_ref: "3.2.2(x), 5.6.1"
+    created: 2026-05-19
+
+  - id: TODO-021
+    title: Restliche 4 Rego-Policies + Gates (G-AS-PRIVACY-URL, G-AS-CAMERA-PURPOSE, G-AS-SUPPORT-URL, G-AS-DATA-SOURCE-DISCLOSE)
+    description: |
+      Für aktive R-AS-01, R-AS-03, R-AS-06, R-AS-08 die jeweiligen Rego-Policies
+      + Tests + Gate-Definitions schreiben. Aktivierung wenn App-Settings-Screen
+      existiert (Sprint 2).
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "App-Settings-Screen implementiert"
+    apple_refs: ["1.5", "2.5.14", "5.1.1(i)", "5.1.1(viii)"]
+    created: 2026-05-19
+
+  - id: TODO-022
+    title: Conftest CI-Workflow .github/workflows/compliance.yml
+    description: |
+      GitHub Actions-Workflow der Conftest mit allen Apple-Policies ausführt,
+      Output in evidence-log.jsonl schreibt mit SHA-256-Hash. Übernommen aus
+      genaiops-compliance-gates/.github/workflows/gate-pipeline.yml.
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "≥ 3 aktive Rego-Policies"
+    created: 2026-05-19
+
+  - id: TODO-023
+    title: evidence-store/evidence-log.jsonl Initial-Setup + SHA-256-Hash-Logik
+    description: |
+      Solo-Variante aus genaiops-compliance-gates (siehe ADR 0009 GCG-3):
+      jsonl-File pro CI-Run, jeder Eintrag mit SHA-256-Hash des vorherigen Eintrags.
+      Audit-Trail-tauglich, kein Postgres nötig.
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Mit TODO-022 Conftest-Workflow"
+    created: 2026-05-19
+
+  - id: TODO-024
+    title: Phase-2-Apple-Compliance Welle (R-AS-17 bis R-AS-26)
+    description: |
+      Mit ScanFair+ Membership + KI-Chat: IAP-Pflicht, Chatbot-Regeln
+      (4.7.1-4.7.5), Sign-in-with-Apple, Push-Consent.
+    phase: phase-2-ki-layer
+    priority: P1
+    effort: L
+    status: parked
+    activation_trigger: "Phase 2 Start (KI-Layer + Membership)"
+    apple_refs: ["3.1.1", "3.1.2", "4.7", "4.8", "4.5.3"]
     created: 2026-05-19

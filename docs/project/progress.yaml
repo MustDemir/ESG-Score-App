@@ -98,6 +98,9 @@ decisions_made:
   - adr: 0011
     title: ESG-Score-Formel — E/S/G aus OFF-Feldern
     date: 2026-05-19
+  - adr: 0012
+    title: Apple Review Compliance Strategy
+    date: 2026-05-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -136,6 +139,11 @@ weekly_log:
       - S07: GitHub Actions CI-Workflow (.github/workflows/ci.yml)
       - S08: Pre-Commit-Hooks (scripts/hooks/pre-commit, native Bash)
       - S09: Feature-State-Pattern (3 initiale states.yaml + Template + README)
+      - Apple App Review Guidelines (40 Seiten) systematisch analysiert
+      - ADR 0012 — Apple Review Compliance Strategy
+      - 5 R-AS-Anforderungen aktiv (R-AS-01, 03, 06, 08, 12)
+      - 1 Beispiel-Gate (G-AS-NAME-LENGTH) mit Rego-Policy + 9 Tests
+      - 10 weitere Apple-Compliance-TODOs (TODO-015 bis TODO-024) angelegt mit Aktivierungs-Triggern
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -156,8 +164,8 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 11
-  todos_open: 12
+  decisions_total: 12
+  todos_open: 22
   todos_in_progress: 2
   todos_done: 1
   milestones_reached: 6
