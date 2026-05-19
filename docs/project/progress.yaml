@@ -25,6 +25,15 @@ milestones:
     phase: phase-1-mvp
     notes: Flutter 3.44.0 via Homebrew, Android Studio + CocoaPods installiert
 
+  - id: M04
+    title: OFF-API-Spike erfolgreich — RISK-001 mitigated
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      20/20 EANs in OFF, E-Säule 100%, S-Säule 95% berechenbar.
+      Aber: Selection Bias muss durch Edge-Case-UX adressiert werden
+      (TODO-011, TODO-012).
+
 # =============================================================================
 # DECISIONS_MADE — Verweise auf ADRs, append-only
 # =============================================================================
@@ -62,6 +71,7 @@ weekly_log:
       - 6 initiale ADRs geschrieben (0001-0006)
       - Roadmap, Backlog, Risks, Progress YAMLs erstellt
       - Monetarisierungs-Strategie definiert (ADR 0006 + monetization.yaml)
+      - OFF-API-Spike durchgeführt: 20/20 Coverage, E-Säule 100%, S-Säule 95%
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -83,11 +93,11 @@ weekly_log:
 # =============================================================================
 stats:
   decisions_total: 6
-  todos_open: 10
+  todos_open: 11
   todos_in_progress: 1
-  todos_done: 0
-  risks_open: 5
-  risks_mitigated: 0
+  todos_done: 1
+  risks_open: 4
+  risks_mitigated: 1
   risks_accepted: 1
   ideas_parked: 8
-  milestones_reached: 3
+  milestones_reached: 4

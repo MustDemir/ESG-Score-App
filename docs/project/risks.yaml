@@ -13,22 +13,34 @@ last_updated: 2026-05-19
 risks:
   - id: RISK-001
     title: Open Food Facts Datenqualität unzureichend für DE-Produkte
-    likelihood: H
+    likelihood: M
     impact: H
-    score: 9
+    score: 6
     description: |
       Wenn 30%+ der DE-Eigenmarken (Rewe, Edeka, Aldi) keine ESG-relevanten
-      Felder haben, kippt das MVP-Versprechen. Crowdsourced-Daten haben in
-      DE schlechtere Coverage als z.B. in Frankreich.
+      Felder haben, kippt das MVP-Versprechen.
     mitigation: |
-      API-Spike mit 20 echten DE-Barcodes VOR Flutter-Code (TODO-001).
-      Plan B: Edge-Case-UX "Keine Daten verfügbar" + Hinweis User-Beitrag.
-      Fallback: GS1-Daten oder manuell gepflegter Top-100-Produkte-Set.
+      API-Spike durchgeführt am 2026-05-19 (siehe spikes/off-api-2026-05-19.md):
+      - 20/20 kuratierte EANs in OFF gefunden
+      - E-Säule 100% berechenbar (Eco-Score 70%, Fallback via Packaging/Agribalyse)
+      - S-Säule 95% berechenbar (via labels_tags + origins)
+      - WARNUNG: Spike-EANs wurden VIA OFF-SEARCH gefunden — Selection Bias!
+        Zufällig gescannte DE-Produkte haben vermutlich schlechtere Coverage.
+      - Original-EAN-Liste (Alnatura/GEPA/Hipp/Rewe-Bio) war zu 90% NICHT
+        in OFF — das ist das echte Risiko.
+
+      Restmaßnahmen offen:
+      - Edge-Case-UX "Keine Daten verfügbar" + Hinweis User-Beitrag
+      - Top-100-DE-Produkte selbst manuell pflegen (Hybrid-Strategie)
+      - Eco-Score-Fallback: bei "unknown" nicht 0 zeigen sondern transparenter
+        Hinweis "Daten unvollständig"
     related_todos: [TODO-001]
     related_decisions: [0003]
-    status: open
+    related_spikes: [off-api-2026-05-19.md]
+    status: mitigated
     owner: Mustafa
     created: 2026-05-19
+    updated: 2026-05-19
 
   - id: RISK-002
     title: Apple Developer Account Verifizierung verzögert TestFlight

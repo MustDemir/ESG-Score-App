@@ -107,13 +107,19 @@ todos:
   - id: TODO-001
     title: Open Food Facts API-Spike mit 20 DE-Barcodes
     description: |
-      20 reale Barcodes (Mix aus Marken + DE-Eigenmarken Rewe/Edeka/Aldi)
-      durch OFF-API jagen. Dokumentieren welche ESG-relevanten Felder
-      verfügbar sind, welche fehlen. Plan B definieren falls <70% Coverage.
+      20 reale Barcodes (Mix aus Marken + DE-Eigenmarken) durch OFF-API jagen.
+      Coverage der ESG-relevanten Felder dokumentieren.
     phase: phase-1-mvp
     priority: P0
     effort: S
-    status: open
+    status: done
+    completed: 2026-05-19
+    result: |
+      20/20 in OFF gefunden, E-Säule 100%, S-Säule 95% berechenbar.
+      Report: docs/project/spikes/off-api-2026-05-19.md
+      Script: scripts/spikes/off_api_esg_spike.sh
+      WARNUNG: Selection Bias — EANs via Search gesucht. Random-Scans
+      brauchen Edge-Case-UX siehe TODO-011.
     blocks: [TODO-002, TODO-005]
     related_risks: [RISK-001]
     created: 2026-05-19
@@ -222,4 +228,32 @@ todos:
     priority: P1
     effort: XS
     status: open
+    created: 2026-05-19
+
+  - id: TODO-011
+    title: Edge-Case "Produkt nicht in OFF" UX-Design
+    description: |
+      Folgefrage aus OFF-Spike: Selection Bias zeigt dass random gescannte
+      DE-Eigenmarken eventuell nicht in OFF sind. UI braucht klaren
+      Fallback-Zustand mit User-Beitrag-Option ("Daten ergänzen").
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    related_risks: [RISK-001]
+    created: 2026-05-19
+
+  - id: TODO-012
+    title: Eco-Score-Fallback-Logik definieren
+    description: |
+      Wenn ecoscore_grade = "unknown" oder "not-applicable" (30% der Spike-
+      Produkte): Wie bewerten wir das E? Optionen: (a) "Daten unvollständig"
+      transparent zeigen, (b) Heuristik aus Packaging + Origins + NOVA-Group,
+      (c) niedrigste Stufe annehmen (konservativ).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    depends_on: [TODO-001]
+    blocks: [TODO-002]
     created: 2026-05-19
