@@ -1,30 +1,55 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// =============================================================================
+// ScanFairApp — Smoke-Tests
+// =============================================================================
 
+import 'package:esg_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:esg_app/main.dart';
-
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('App rendert ohne Crash + Theme-Smoke-Screen sichtbar', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // AppBar-Titel sichtbar
+    expect(find.text('ScanFair — Theme Smoke'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // ESG-Pillar-Demo gerendert (E/S/G-Chips)
+    expect(find.text('E'), findsOneWidget);
+    expect(find.text('S'), findsOneWidget);
+    expect(find.text('G'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Score-Hero-Mock zeigt Score
+    expect(find.text('82'), findsOneWidget);
+    expect(find.text('GEPA Bio Kaffee'), findsOneWidget);
+  });
+
+  testWidgets('Theme: MaterialApp nutzt ScanFairTheme.light', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ScanFairApp());
+
+    final BuildContext context = tester.element(
+      find.text('ScanFair — Theme Smoke'),
+    );
+    final ColorScheme scheme = Theme.of(context).colorScheme;
+
+    // Primary muss Forest Green sein (#0F7B5C)
+    expect(scheme.primary, const Color(0xFF0F7B5C));
+    // Surface muss bg sein (#FBFAF6)
+    expect(scheme.surface, const Color(0xFFFBFAF6));
+  });
+
+  testWidgets('Buttons existieren (Primary/Secondary/Tertiary)', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(ElevatedButton, 'Primary'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Secondary'), findsOneWidget);
+    expect(find.widgetWithText(TextButton, 'Tertiary'), findsOneWidget);
   });
 }

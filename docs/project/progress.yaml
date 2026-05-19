@@ -44,6 +44,20 @@ milestones:
       .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
       Step S06 abgeschlossen.
 
+  - id: M07
+    title: Theme-Foundation S11 — scanfair_theme aktiv
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Step S11 abgeschlossen. 4 Theme-Files in esg_app/lib/theme/:
+      - scanfair_tokens.dart (Brand-Tokens als Dart-Konstanten)
+      - scanfair_colors.dart (Material 3 ColorScheme + Ampel-Mapping)
+      - scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
+      - scanfair_theme.dart (komplettes ThemeData)
+      Plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen).
+      google_fonts ^6.2.1 dependency installiert.
+      3 Widget-Tests grün. flutter analyze clean.
+
   - id: M06
     title: CI/CD-Pipeline + Pre-Commit-Hooks aktiv
     date: 2026-05-19
@@ -173,10 +187,10 @@ weekly_log:
 # =============================================================================
 stats:
   decisions_total: 13
-  todos_open: 22
-  todos_in_progress: 2
-  todos_done: 1
-  milestones_reached: 6
+  todos_open: 21
+  todos_in_progress: 1
+  todos_done: 2
+  milestones_reached: 7
   risks_open: 4
   risks_mitigated: 1
   risks_accepted: 1

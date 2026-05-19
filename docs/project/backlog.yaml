@@ -192,11 +192,17 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: in_progress
+    status: done
+    completed: 2026-05-19
     completed_parts:
       - Step S06 (flutter create) am 2026-05-19 abgeschlossen
-    remaining:
-      - S11 — Theme aus tokens.css generieren (separater Step)
+      - Step S11 (Theme aus tokens.css) am 2026-05-19 abgeschlossen:
+        * scanfair_tokens.dart (Tokens)
+        * scanfair_colors.dart (Material 3 ColorScheme)
+        * scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
+        * scanfair_theme.dart (ThemeData mit Buttons/Cards/Inputs)
+        * Smoke-Screen mit Score-Hero-Mock
+        * 3 Widget-Tests grün (Theme-Smoke + ColorScheme-Match + Buttons)
     depends_on: [TODO-002]
     notes: Step S06 fertig. Theme-Generierung als S11 verbleibend.
     created: 2026-05-19

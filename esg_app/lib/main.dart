@@ -1,121 +1,163 @@
+// =============================================================================
+// ScanFair — App-Einstiegspunkt
+// =============================================================================
+// Phase 1 MVP: noch keine echten Screens — Theme-Smoke-Screen zeigt dass
+// Theme korrekt geladen ist und Fonts/Farben/Spacings funktionieren.
+//
+// Naechste Steps (siehe implementation-plan.yaml):
+//   S13: Datenmodelle (Freezed)
+//   S14: OFF-Service + ESGScoreCalculator
+//   S15: S3 Result-Screen
+//   S16: S1 Scanner + S2 Loading + S4 Alternativen
+// =============================================================================
+
 import 'package:flutter/material.dart';
+import 'theme/scanfair_colors.dart';
+import 'theme/scanfair_theme.dart';
+import 'theme/scanfair_tokens.dart';
+import 'theme/scanfair_typography.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ScanFairApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ScanFairApp extends StatelessWidget {
+  const ScanFairApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'ScanFair',
+      debugShowCheckedModeBanner: false,
+      theme: ScanFairTheme.light,
+      home: const ThemeSmokeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+/// Smoke-Screen — zeigt visuelle Theme-Bausteine fuer manuellen Sichtcheck.
+/// Wird in Sprint 1 durch echte Screens (Scanner/Result) ersetzt.
+class ThemeSmokeScreen extends StatelessWidget {
+  const ThemeSmokeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final textTheme = Theme.of(context).textTheme;
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      appBar: AppBar(title: const Text('ScanFair — Theme Smoke')),
+      backgroundColor: colors.surface,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(ScanFairTokens.space4),
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('You have pushed the button this many times:'),
+            Text('Eyebrow', style: ScanFairTypography.eyebrow),
+            const SizedBox(height: ScanFairTokens.space2),
+            Text('Display Heading', style: textTheme.displayMedium),
+            const SizedBox(height: ScanFairTokens.space2),
+            Text('Headline Medium', style: textTheme.headlineMedium),
+            const SizedBox(height: ScanFairTokens.space2),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Body Large — Inter Regular, fuer laengere Texte.',
+              style: textTheme.bodyLarge,
             ),
+            Text(
+              'Body Medium — Inter Regular, fuer Secondary-Text.',
+              style: textTheme.bodyMedium,
+            ),
+            Text('Meta-Footnote', style: ScanFairTypography.meta),
+            const SizedBox(height: ScanFairTokens.space5),
+
+            // ESG-Pillar-Demo
+            Text('ESG-Pillar-Farben', style: textTheme.titleLarge),
+            const SizedBox(height: ScanFairTokens.space3),
+            const Row(
+              children: [
+                _ColorChip(label: 'E', color: ScanFairColors.pillarE),
+                SizedBox(width: ScanFairTokens.space2),
+                _ColorChip(label: 'S', color: ScanFairColors.pillarS),
+                SizedBox(width: ScanFairTokens.space2),
+                _ColorChip(label: 'G', color: ScanFairColors.pillarG),
+              ],
+            ),
+            const SizedBox(height: ScanFairTokens.space5),
+
+            // Score-Hero-Demo
+            Text('Score-Hero (Mock)', style: textTheme.titleLarge),
+            const SizedBox(height: ScanFairTokens.space3),
+            Container(
+              padding: const EdgeInsets.all(ScanFairTokens.space5),
+              decoration: BoxDecoration(
+                color: ScanFairTokens.bgCard,
+                borderRadius: BorderRadius.circular(ScanFairTokens.radiusXl),
+                border: Border.all(color: ScanFairTokens.border),
+                boxShadow: ScanFairTokens.shadowSm,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('GEPA Bio Kaffee', style: textTheme.titleMedium),
+                  const SizedBox(height: ScanFairTokens.space1),
+                  Text('Beispiel-Produkt', style: ScanFairTypography.meta),
+                  const SizedBox(height: ScanFairTokens.space3),
+                  Text(
+                    '82',
+                    style: ScanFairTypography.scoreNumber.copyWith(
+                      color: ScanFairColors.forScoreValue(82),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: ScanFairTokens.space5),
+
+            // Buttons-Demo
+            Text('Buttons', style: textTheme.titleLarge),
+            const SizedBox(height: ScanFairTokens.space3),
+            Wrap(
+              spacing: ScanFairTokens.space2,
+              children: [
+                ElevatedButton(onPressed: () {}, child: const Text('Primary')),
+                OutlinedButton(
+                  onPressed: () {},
+                  child: const Text('Secondary'),
+                ),
+                TextButton(onPressed: () {}, child: const Text('Tertiary')),
+              ],
+            ),
+            const SizedBox(height: ScanFairTokens.space8),
+            Text('Powered by Open Food Facts', style: ScanFairTypography.meta),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+    );
+  }
+}
+
+class _ColorChip extends StatelessWidget {
+  const _ColorChip({required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(ScanFairTokens.radiusMd),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: ScanFairTypography.textTheme.titleLarge?.copyWith(
+          color: ScanFairTokens.inkOnGreen,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

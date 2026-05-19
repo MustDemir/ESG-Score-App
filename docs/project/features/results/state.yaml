@@ -1,8 +1,8 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
 status: planned
-progress: 0
-current_focus: "blockiert durch Theme (S11), Models (S13), Scoring (S14)"
+progress: 5
+current_focus: "Theme verfuegbar (S11 done) — wartet auf Models (S13) und Scoring (S14)"
 last_sync: "2026-05-19"
 
 lade_manifest:
@@ -34,7 +34,9 @@ test_locations:
   - esg_app/test/screens/result_screen_test.dart           # geplant
   - esg_app/test/widgets/score_hero_test.dart              # geplant
 
-done: []
+done:
+  - 2026-05-19 — Theme-Foundation (S11): scanfair_tokens/colors/typography/theme.dart
+    plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen)
 
 decisions:
   - id: FD-R-01
