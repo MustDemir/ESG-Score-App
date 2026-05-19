@@ -1,0 +1,146 @@
+last_updated: 2026-05-19
+
+# Monetarisierungs-Strategie — lebendiges Dokument.
+# Pricing und Tier-Details werden hier laufend angepasst.
+# Die GRUNDSATZ-Entscheidung (Freemium + Membership) steht in ADR 0006.
+
+model: freemium_with_subscription
+status: planned  # MVP launcht erst free, Membership ab Phase 2
+
+# =============================================================================
+# TIERS
+# =============================================================================
+tiers:
+  - id: free
+    name: ScanFair
+    price_monthly_eur: 0
+    price_yearly_eur: 0
+    features:
+      - barcode_scan
+      - esg_score_display              # Ampel + numerischer Score
+      - score_components_e_s_g         # Auf-/Zuklappen E/S/G
+      - simple_alternatives             # Kategorie-basiert, regel-basiert (kein LLM)
+      - scan_history                   # eigene Scans speichern
+      - basic_user_profile             # Login, Sprache, Region
+    target_user: Gelegenheitsnutzer, Discovery-Phase
+    purpose: Reach maximieren, Mission erfüllen, Funnel füllen
+    cost_per_user_per_month_eur: ~0.01  # nur Supabase-Anteil
+    notes: |
+      Komplett werbefrei. Kein Tracking über Pflicht-Analytics hinaus.
+
+  - id: pro
+    name: ScanFair+
+    price_monthly_eur: 3.99           # Annahme — A/B testen
+    price_yearly_eur: 29.99           # ~37% Rabatt vs monatlich
+    price_lifetime_eur: 79.99         # optional, später überlegen
+    trial_days: 7
+    features_inherited: [free]
+    features_additional:
+      - ai_score_explanation          # LLM erklärt warum dieser Score
+      - semantic_alternatives         # pgvector-basierte Alternativen
+      - esg_chat                      # RAG-Chat zu ESG-Fragen
+      - trend_insights                # "Du scannst viel Palmöl"
+      - product_watchlist             # Lieblings-/Watch-Produkte
+      - export_data                   # eigene Daten als CSV exportieren
+      - early_access_features         # neue Features zuerst
+    target_user: Engagierte Nutzer, ESG-Interessierte, Familien
+    purpose: Refinanziert KI-Kosten + generiert Profit
+    conversion_target_pct: 3-7        # Industrie-Benchmark Freemium
+    notes: |
+      Preis bewusst unter 5 € — psychologische Schwelle.
+      Jahres-Plan stark rabattiert → höhere LTV.
+
+# =============================================================================
+# FEATURE-GATING-LOGIK
+# =============================================================================
+feature_gates:
+  approach: zentrale Feature-Flag-Funktion in Flutter
+  example_pattern: |
+    if (user.tier == Tier.pro) {
+      showAiExplanation();
+    } else {
+      showUpgradeNudge();
+    }
+  upgrade_touchpoints:
+    - result_screen_ai_section        # "KI-Erklärung freischalten → upgrade"
+    - alternative_section             # "Bessere Alternativen mit ScanFair+"
+    - settings_page                   # generischer Upgrade-Button
+    - 3rd_scan_per_session            # weicher Nudge nach 3 Scans
+  anti_patterns_to_avoid:
+    - dark_patterns                   # keine schwer kündbaren Subs
+    - confusing_paywalls              # immer transparent
+    - bait_and_switch                 # Features nicht nachträglich aus Free entfernen
+
+# =============================================================================
+# PROVIDER FÜR SUBSCRIPTIONS
+# =============================================================================
+subscription_infrastructure:
+  recommended: RevenueCat
+  rationale: |
+    Cross-Platform (iOS + Android + Web später), eine API.
+    Kostenlos bis $2.5k/Monat Revenue, danach 1% des Revenues.
+    Spart Wochen an StoreKit/Play-Billing-Integration.
+    Webhooks → Supabase = einfache User-Tier-Sync.
+  alternatives:
+    - native_storekit_play_billing    # mehr Kontrolle, mehr Aufwand
+    - stripe                          # nur Web, nicht Mobile
+
+# =============================================================================
+# REVENUE-PROJEKTIONEN (Annahmen — laufend updaten)
+# =============================================================================
+projections:
+  assumptions:
+    avg_revenue_per_paying_user_monthly_eur: 3.50  # Mix Monat/Jahr
+    apple_google_cut_pct: 15  # 15% nach Jahr 1 (Apple Small Business)
+    payment_processor_eur_per_user: 0  # via Apple/Google enthalten
+  scenarios:
+    - name: pessimistisch
+      mau_after_12m: 1000
+      paid_conversion_pct: 2
+      monthly_revenue_eur: 70           # 1000 * 0.02 * 3.50
+      net_after_cuts_eur: 60
+    - name: realistisch
+      mau_after_12m: 10000
+      paid_conversion_pct: 4
+      monthly_revenue_eur: 1400
+      net_after_cuts_eur: 1190
+    - name: optimistisch
+      mau_after_12m: 50000
+      paid_conversion_pct: 6
+      monthly_revenue_eur: 10500
+      net_after_cuts_eur: 8925
+
+# =============================================================================
+# ZUKÜNFTIGE MONETARISIERUNGS-OPTIONEN
+# =============================================================================
+future_options:
+  - id: b2b_api
+    title: B2B-API für Krankenkassen / Schulen / Kantinen
+    phase: phase-4-monetization
+    notes: |
+      Höhere Margen, weniger User-Acquisition-Aufwand.
+      Verbindet sich mit IDEA-007.
+
+  - id: white_label
+    title: Whitelabel-Version für Bio-Supermärkte / NGOs
+    phase: phase-4-monetization
+    notes: Marken-Coopereration, möglicherweise mit Alnatura, denn's, etc.
+
+  - id: affiliate_links
+    title: Affiliate für nachhaltige Marken (NICHT klassische Werbung)
+    phase: phase-3-growth
+    risk: H
+    notes: |
+      Sehr vorsichtig — sobald wir bezahlt für Empfehlungen werden,
+      ist Glaubwürdigkeit in Gefahr. Nur mit klarer Kennzeichnung
+      und nur für streng kuratierte Marken.
+
+# =============================================================================
+# WICHTIGE OFFENE FRAGEN
+# =============================================================================
+open_questions:
+  - Welche Conversion-Rate erreichen wir tatsächlich? (validieren in Phase 2)
+  - Funktioniert 3,99 € als Preis-Punkt für DE-Markt? (A/B Test)
+  - Brauchen wir einen Family-Plan? (häufig bei nachhaltigen Apps)
+  - Lifetime-Plan ja/nein? (Cash-Vorteil vs. LTV-Verlust)
+  - Studenten-/Sozialtarif? (Mission-fit, aber Mehraufwand)

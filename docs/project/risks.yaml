@@ -1,0 +1,117 @@
+last_updated: 2026-05-19
+
+# Bewertung:
+#   likelihood: L (low) | M (medium) | H (high)
+#   impact:     L | M | H
+#   score:      grobe Multiplikation (L=1, M=2, H=3) → 1-9
+# Status:
+#   open       — aktiv, noch nicht entschärft
+#   mitigated  — Maßnahme läuft, Restrisiko vertretbar
+#   accepted   — Risiko bewusst akzeptiert
+#   closed     — nicht mehr relevant
+
+risks:
+  - id: RISK-001
+    title: Open Food Facts Datenqualität unzureichend für DE-Produkte
+    likelihood: H
+    impact: H
+    score: 9
+    description: |
+      Wenn 30%+ der DE-Eigenmarken (Rewe, Edeka, Aldi) keine ESG-relevanten
+      Felder haben, kippt das MVP-Versprechen. Crowdsourced-Daten haben in
+      DE schlechtere Coverage als z.B. in Frankreich.
+    mitigation: |
+      API-Spike mit 20 echten DE-Barcodes VOR Flutter-Code (TODO-001).
+      Plan B: Edge-Case-UX "Keine Daten verfügbar" + Hinweis User-Beitrag.
+      Fallback: GS1-Daten oder manuell gepflegter Top-100-Produkte-Set.
+    related_todos: [TODO-001]
+    related_decisions: [0003]
+    status: open
+    owner: Mustafa
+    created: 2026-05-19
+
+  - id: RISK-002
+    title: Apple Developer Account Verifizierung verzögert TestFlight
+    likelihood: M
+    impact: M
+    score: 4
+    description: |
+      Apple-Verifizierung dauert 24-48h, bei Business-Accounts auch 1-2 Wochen.
+      Verzögert TestFlight-Launch falls erst spät beantragt.
+    mitigation: |
+      Sofort beantragen (TODO-003), parallel weiterbauen.
+    related_todos: [TODO-003]
+    status: open
+    owner: Mustafa
+    created: 2026-05-19
+
+  - id: RISK-003
+    title: ESG-Score-Formel nicht wissenschaftlich fundiert
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Eigene ESG-Formel kann als willkürlich oder unseriös wahrgenommen
+      werden — Glaubwürdigkeitsproblem, mögliche rechtliche Risiken
+      (irreführende Werbung).
+    mitigation: |
+      Eco-Score von OFF als wissenschaftliche Basis nutzen (peer-reviewed).
+      Methodik transparent dokumentieren (im App-Footer + Webseite).
+      Disclaimers richtig formulieren ("Schätzung", nicht "Bewertung").
+    related_todos: [TODO-002]
+    status: open
+    owner: Mustafa
+    created: 2026-05-19
+
+  - id: RISK-004
+    title: Solo-Founder-Burnout / Time-to-MVP überschritten
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Klassisches Solo-Founder-Risiko: Scope-Creep, Perfektionismus,
+      Demotivation nach Hype-Phase. Wenn MVP nicht bis Juli steht,
+      sinkt die Wahrscheinlichkeit dass es überhaupt fertig wird stark.
+    mitigation: |
+      Strikte Phase-1-Scope (out_of_scope-Liste in roadmap.yaml).
+      Wöchentliches Progress-Tracking (progress.yaml).
+      Bei Blockern: Lieber simpler Hack als perfekte Lösung.
+    status: open
+    owner: Mustafa
+    created: 2026-05-19
+
+  - id: RISK-005
+    title: DSGVO / Privacy-Setup unvollständig
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Ohne saubere Privacy Policy, Cookie-Banner-Äquivalent,
+      Auftragsverarbeitungsverträge mit Supabase → Abmahnrisiko,
+      App-Store-Ablehnung.
+    mitigation: |
+      Privacy Policy schreiben (TODO-008).
+      Supabase-AVV unterzeichnen (kostenlos verfügbar).
+      Datenminimierung: nur speichern was wirklich nötig ist.
+      Tracking auf null reduzieren in MVP.
+    related_todos: [TODO-008]
+    status: open
+    owner: Mustafa
+    created: 2026-05-19
+
+  - id: RISK-006
+    title: Open Food Facts Lizenz (CC BY-SA) limitiert kommerzielle Nutzung
+    likelihood: L
+    impact: M
+    score: 2
+    description: |
+      CC BY-SA fordert dass abgeleitete Daten ebenfalls CC BY-SA lizenziert
+      werden. Bei späterem B2B-Vertrieb (IDEA-007) könnte das Problem werden.
+    mitigation: |
+      In MVP unkritisch — wir nutzen Daten nur, geben keine raus.
+      Bei Phase 4 (B2B): juristische Beratung, evtl. Datenquelle wechseln
+      oder Hybrid-Modell.
+    related_decisions: [0003]
+    status: accepted
+    owner: Mustafa
+    created: 2026-05-19

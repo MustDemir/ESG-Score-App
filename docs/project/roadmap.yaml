@@ -1,0 +1,93 @@
+project: ESG-Score-App
+vision: |
+  Konsumenten beim Supermarkt-Einkauf in Echtzeit dabei unterstützen,
+  nachhaltigere Entscheidungen zu treffen — via Barcode-Scan + ESG-Score
+  + Alternativ-Vorschlag.
+
+mission: |
+  Mache ESG-Daten für Endkonsumenten so einfach wie eine Ampel.
+
+target_audience:
+  primary: Umweltbewusste DE-Konsumenten 25-45, urban, smartphone-affin
+  secondary: Familien mit Kindern, die nachhaltig einkaufen wollen
+
+current_phase: phase-1-mvp
+last_updated: 2026-05-19
+
+phases:
+  - id: phase-0-design
+    title: Design & Discovery
+    timeframe: vor 2026-05
+    status: done
+    goals:
+      - Wireframes (S1-S4)
+      - Brand Identity (ScanFair)
+      - Hi-Fi Mockups
+      - Handoff-Paket
+    deliverables:
+      - docs/01-wireframes.html
+      - docs/02-brand-identity.html
+      - docs/04-screens.html
+      - design_handoff_scanfair/
+
+  - id: phase-1-mvp
+    title: MVP — Scan, Score, Alternativen
+    timeframe: 2026-05-19 bis 2026-06-30
+    status: current
+    goals:
+      - Flutter-Projekt aufgesetzt und buildbar
+      - Barcode-Scan → OFF-Lookup → ESG-Score-Anzeige funktioniert
+      - 1 Beispielprodukt (GEPA) end-to-end durchspielbar
+      - TestFlight Build verfügbar
+      - Privacy Policy live
+    success_criteria:
+      - Min. 20 reale DE-Barcodes liefern brauchbare Daten (>70% Coverage)
+      - App startet, scannt, zeigt Score in <3 Sekunden
+      - Keine kritischen Crashes auf iOS 17+
+    decisions: [0001, 0002, 0003, 0004, 0005]
+    risks: [RISK-001, RISK-002, RISK-003]
+    out_of_scope:
+      - KI-Layer (siehe ADR 0004)
+      - AR-Overlay
+      - Kassenbon-Scan
+      - Community-Features
+      - Gamification
+      - Android-Release (iOS first via TestFlight)
+
+  - id: phase-2-ki-layer
+    title: KI-Layer — Erklärungen + semantische Alternativen
+    timeframe: 2026-07 bis 2026-08
+    status: planned
+    depends_on: [phase-1-mvp]
+    goals:
+      - LLM-basierte Score-Erklärung im Result-Screen
+      - pgvector-basierte semantische Produktsuche für Alternativen
+      - Provider-Entscheidung (Mistral/Claude/Aleph Alpha) treffen
+    decisions: []
+    notes: |
+      Vorbereitung in Phase 1: Supabase-Schema soll pgvector-Extension
+      bereits einplanen (Tabelle product_embeddings).
+
+  - id: phase-3-growth
+    title: Growth — Android, Community, Web
+    timeframe: 2026-09 bis 2026-12
+    status: planned
+    goals:
+      - Android-Release
+      - Optional: Web-Version (Flutter Web)
+      - Community-Features (Reviews, geteilte Listen)
+      - Gamification (Impact-Tracker)
+    decisions: []
+
+  - id: phase-4-monetization
+    title: Monetarisierung
+    timeframe: 2027+
+    status: planned
+    goals:
+      - Membership-Tier "ScanFair+" ausrollen (siehe monetization.yaml)
+      - B2B-API für Krankenkassen / Schulen / Kantinen (IDEA-007)
+      - Optional: Whitelabel-Lösung
+    decisions: [0006]
+    notes: |
+      Grundsatz-Entscheidung Monetarisierung steht bereits (ADR 0006).
+      Pricing/Tiers werden lebend in monetization.yaml gepflegt.

@@ -1,0 +1,49 @@
+id: 0005
+title: ArgonOS (ChapsVision) als KI-/Datenplattform abgelehnt
+date: 2026-05-19
+status: rejected
+deciders: [Mustafa]
+tags: [ai, evaluation, enterprise]
+
+context: |
+  Frage aufgekommen ob ArgonOS (französische Enterprise-Datenplattform von
+  ChapsVision) als KI-Layer für die ESG-Score-App nutzbar wäre.
+  Quelle: https://www.chapsvision.com/de/plattform/argonos/
+
+options_considered:
+  - name: ArgonOS einsetzen
+    pros:
+      - EU-Anbieter (Frankreich), echte Souveränität
+      - On-Premises / Air-Gapped möglich
+      - Datenfusion über heterogene Quellen
+      - GenAI-Assistant mit RAG eingebaut
+    cons:
+      - Zielgruppe: Defense, Banking, Großkonzerne — nicht Solo-Founder
+      - Kein public Pricing → erfahrungsgemäß 5- bis 6-stelliger Jahresvertrag
+      - Sales-Cycle, NDA, PoC → Wochen Verzögerung
+      - Massive Über-Dimensionierung für „Barcode → ESG-Score"
+      - Vendor-Lock-in zu Enterprise-Plattform
+  - name: Stattdessen: Supabase + pgvector + Mistral/Claude/Aleph Alpha
+    pros:
+      - Solo-Founder-kompatible Kosten (~50 €/Monat)
+      - Self-built = volle Kontrolle
+      - Provider austauschbar (kein Lock-in)
+      - Pay-per-use statt Jahresvertrag
+
+decision: ArgonOS abgelehnt
+rationale: |
+  ArgonOS ist beeindruckendes Produkt, aber für Solo-Founder-MVP wie ein
+  Containerschiff für den Wocheneinkauf. Kosten, Sales-Cycle und Komplexität
+  sind 2-3 Größenordnungen zu groß. Eigene Pipeline (Supabase + pgvector +
+  LLM-API) liefert für unseren Use Case identische Ergebnisse zu Bruchteil
+  der Kosten und ohne Vendor-Bindung.
+
+consequences:
+  - KI-Layer in Phase 2 wird selbst gebaut (siehe ADR 0004)
+  - Provider-Wahl in Phase 2 dokumentiert in separater ADR
+  - ArgonOS kann später für Enterprise-Pivot reevaluiert werden
+    (z.B. wenn Krankenkasse/Behörde als Kunde anfragt)
+
+supersedes: null
+superseded_by: null
+related: [0004]

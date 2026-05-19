@@ -1,0 +1,225 @@
+last_updated: 2026-05-19
+
+# =============================================================================
+# IDEAS — langfristige Konzepte, nicht für aktuelle Phase
+# =============================================================================
+ideas:
+  - id: IDEA-001
+    title: AR-Overlay für Scanner
+    description: |
+      Live-ESG-Ampel als AR-Overlay über Kamerabild — Produkte im Regal
+      werden mit grünem/gelbem/rotem Rahmen markiert.
+    phase: phase-3-growth
+    effort: XL
+    value: H
+    risk: H
+    status: parked
+    notes: Erfordert ARKit/ARCore, viele Produkte gleichzeitig erkennen ist nicht-trivial
+    created: 2026-05-19
+
+  - id: IDEA-002
+    title: Kassenbon-Scan
+    description: |
+      Ganzen Einkauf nachträglich via Foto vom Kassenbon analysieren —
+      Gesamt-ESG-Impact des Einkaufs zeigen.
+    phase: phase-3-growth
+    effort: L
+    value: H
+    risk: M
+    status: parked
+    notes: OCR + Produkt-Matching, evtl. via OpenAI Vision oder Tesseract
+    created: 2026-05-19
+
+  - id: IDEA-003
+    title: Impact-Tracker / Gamification
+    description: |
+      "Du hast diese Woche 12 nachhaltige Entscheidungen getroffen" —
+      Streaks, Badges, persönliche CO2-Bilanz.
+    phase: phase-3-growth
+    effort: M
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-004
+    title: Community-Features
+    description: |
+      User können Produkte reviewen, Listen teilen, Empfehlungen geben.
+    phase: phase-3-growth
+    effort: L
+    value: M
+    risk: M
+    status: parked
+    notes: Moderations-Overhead nicht unterschätzen
+    created: 2026-05-19
+
+  - id: IDEA-005
+    title: On-Device ML für Offline-Scan
+    description: |
+      Häufig gescannte Produkte lokal cachen, Offline-Funktionalität
+      via TensorFlow Lite.
+    phase: phase-4-monetization
+    effort: L
+    value: M
+    risk: M
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-006
+    title: Meal-Prep-Funktion
+    description: |
+      Rezepte mit ESG-Score, Einkaufsliste generieren.
+    phase: phase-4-monetization
+    effort: L
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-007
+    title: B2B-API / Whitelabel
+    description: |
+      ESG-Score-API für Krankenkassen, Schulen, Kantinen.
+    phase: phase-4-monetization
+    effort: XL
+    value: H
+    risk: M
+    status: parked
+    notes: Hier könnte später ArgonOS wieder relevant werden (siehe ADR 0005)
+    created: 2026-05-19
+
+  - id: IDEA-008
+    title: Web-Version via Flutter Web
+    description: |
+      Browser-Variante für Desktop-Nutzung — z.B. Wocheneinkauf planen.
+    phase: phase-3-growth
+    effort: M
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+# =============================================================================
+# TODOS — aktive nächste Schritte (Phase 1)
+# =============================================================================
+todos:
+  - id: TODO-001
+    title: Open Food Facts API-Spike mit 20 DE-Barcodes
+    description: |
+      20 reale Barcodes (Mix aus Marken + DE-Eigenmarken Rewe/Edeka/Aldi)
+      durch OFF-API jagen. Dokumentieren welche ESG-relevanten Felder
+      verfügbar sind, welche fehlen. Plan B definieren falls <70% Coverage.
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: open
+    blocks: [TODO-002, TODO-005]
+    related_risks: [RISK-001]
+    created: 2026-05-19
+
+  - id: TODO-002
+    title: ESG-Score-Formel definieren (E/S/G aus OFF-Feldern)
+    description: |
+      Mapping festlegen: welche OFF-Felder fließen in E, S, G?
+      Gewichtung definieren. Schwellwerte für Ampel (grün/gelb/rot).
+      Als ADR 0006 dokumentieren.
+    phase: phase-1-mvp
+    priority: P0
+    effort: M
+    status: open
+    blocks: [TODO-005]
+    depends_on: [TODO-001]
+    related_risks: [RISK-003]
+    created: 2026-05-19
+
+  - id: TODO-003
+    title: Apple Developer Account anlegen
+    description: |
+      $99/Jahr. Wegen Verifizierungs-Wartezeit (24-48h, manchmal länger)
+      jetzt anlegen.
+    phase: phase-1-mvp
+    priority: P0
+    effort: XS
+    status: open
+    related_risks: [RISK-002]
+    created: 2026-05-19
+
+  - id: TODO-004
+    title: Supabase-Projekt in EU-Frankfurt anlegen + Schema definieren
+    description: |
+      Tabellen: cached_products, users, scans, product_embeddings (für Phase 2).
+      RLS-Policies einrichten. Auth provider konfigurieren (Email + Apple).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    created: 2026-05-19
+
+  - id: TODO-005
+    title: Flutter-Projekt erstellen + Theme aus Tokens
+    description: |
+      flutter create esg_app --org com.scanfair --platforms=ios,android
+      Dann Theme aus design_handoff_scanfair/tokens.css generieren.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    depends_on: [TODO-002]
+    notes: Original-Plan hatte nur --platforms=ios — Android aber im CLAUDE.md angekündigt
+    created: 2026-05-19
+
+  - id: TODO-006
+    title: Dart-Datenmodelle generieren (Freezed)
+    description: |
+      Models: Product, ESGScore, SecondaryInfo, ChecklistItem.
+      Mit Freezed + JsonSerializable für API-Mapping.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    depends_on: [TODO-005]
+    created: 2026-05-19
+
+  - id: TODO-007
+    title: S3 Result-Screen bauen
+    description: |
+      ProductCard → ScoreHero → ScoreBars → SecondaryBar → ScoreCTAs → MethodFootnote
+      Mit echtem GEPA-EAN durch OFF-API, nicht hardcoded.
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: open
+    depends_on: [TODO-006]
+    created: 2026-05-19
+
+  - id: TODO-008
+    title: Privacy Policy schreiben (DSGVO + OFF-Attribution)
+    description: |
+      Pflicht für TestFlight. OFF CC BY-SA Lizenz erwähnen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    created: 2026-05-19
+
+  - id: TODO-009
+    title: Xcode-Installation abschließen
+    description: |
+      App Store Download fertigstellen, dann xcode-select switch +
+      runFirstLaunch + license accept.
+    phase: phase-1-mvp
+    priority: P0
+    effort: XS
+    status: in_progress
+    created: 2026-05-19
+
+  - id: TODO-010
+    title: Android Studio Setup-Wizard durchlaufen
+    description: |
+      Erste Öffnung von Android Studio, SDK + Emulator installieren.
+    phase: phase-1-mvp
+    priority: P1
+    effort: XS
+    status: open
+    created: 2026-05-19

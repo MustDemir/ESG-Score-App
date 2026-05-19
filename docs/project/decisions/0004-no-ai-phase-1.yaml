@@ -1,0 +1,50 @@
+id: 0004
+title: Kein KI-/LLM-Layer in Phase 1 (MVP)
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [ai, scope, mvp]
+
+context: |
+  Versuchung ist groß, früh einen LLM-Layer zu integrieren (Score-Erklärung,
+  Chat, Recommendations). Frage: lohnt sich das schon im MVP?
+
+options_considered:
+  - name: KI ab Tag 1 integrieren
+    pros:
+      - Wow-Effekt für Demos
+      - Personalisierte Erklärungen
+    cons:
+      - Komplexität explodiert (Provider-Wahl, Kosten, Latenz)
+      - Lenkt vom Kern-Use-Case ab (Scan → Score)
+      - Kosten + DSGVO-Aufwand vor Validierung
+      - YAGNI-Falle: vielleicht brauchen User es gar nicht
+  - name: KI in Phase 2, MVP rein regel-basiert
+    pros:
+      - Fokus auf Kern-Funktionalität
+      - ESG-Formel bleibt transparent und prüfbar
+      - Kein Cost-Risk in Validierungsphase
+      - Klare Trennung: MVP funktioniert auch ohne KI
+    cons:
+      - "Weniger spannend" für frühe Demos
+
+decision: Kein LLM/KI-Layer in Phase 1. KI ab Phase 2 (Use Cases A + B)
+rationale: |
+  Solo-Founder-Disziplin: MVP muss ohne KI funktionieren. Regelbasierte
+  ESG-Formel ist deterministisch, prüfbar, kostenfrei und reproduzierbar.
+  LLM-Integration ist additive Verbesserung, kein Kernfeature.
+
+  Geplante KI-Use-Cases für Phase 2:
+    A) Score-Erklärung in Klartext (LLM, gecached pro Produkt)
+    B) Semantische Alternativen (pgvector + Embedding)
+    C) ESG-Wissens-Chat (RAG) — nur falls User es nachfragen
+
+consequences:
+  - ESG-Score-Formel muss in Phase 1 finalisiert werden (TODO-002)
+  - Supabase-Schema soll pgvector-Extension berücksichtigen (Vorbereitung Phase 2)
+  - Provider-Wahl (Mistral / Claude / Aleph Alpha) wird in Phase 2 entschieden
+  - ArgonOS abgelehnt als zu schwergewichtig (siehe ADR 0005)
+
+supersedes: null
+superseded_by: null
+related: [0002, 0005]
