@@ -34,6 +34,16 @@ milestones:
       Aber: Selection Bias muss durch Edge-Case-UX adressiert werden
       (TODO-011, TODO-012).
 
+  - id: M05
+    title: Flutter-Projekt initialisiert (esg_app)
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      flutter create esg_app --org com.scanfair --platforms=ios,android
+      75 Files erstellt. flutter analyze clean, flutter test grün.
+      .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
+      Step S06 abgeschlossen.
+
 # =============================================================================
 # DECISIONS_MADE — Verweise auf ADRs, append-only
 # =============================================================================
@@ -126,11 +136,11 @@ weekly_log:
 # =============================================================================
 stats:
   decisions_total: 11
-  todos_open: 13
-  todos_in_progress: 1
+  todos_open: 12
+  todos_in_progress: 2
   todos_done: 1
+  milestones_reached: 5
   risks_open: 4
   risks_mitigated: 1
   risks_accepted: 1
-  ideas_parked: 8
-  milestones_reached: 4
+  ideas_parked: 9

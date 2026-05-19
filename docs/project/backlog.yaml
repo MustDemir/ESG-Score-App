@@ -192,10 +192,15 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: in_progress
+    completed_parts:
+      - Step S06 (flutter create) am 2026-05-19 abgeschlossen
+    remaining:
+      - S11 — Theme aus tokens.css generieren (separater Step)
     depends_on: [TODO-002]
-    notes: Original-Plan hatte nur --platforms=ios — Android aber im CLAUDE.md angekündigt
+    notes: Step S06 fertig. Theme-Generierung als S11 verbleibend.
     created: 2026-05-19
+    updated: 2026-05-19
 
   - id: TODO-006
     title: Dart-Datenmodelle generieren (Freezed)
