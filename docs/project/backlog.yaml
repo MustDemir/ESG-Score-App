@@ -100,6 +100,28 @@ ideas:
     status: parked
     created: 2026-05-19
 
+  - id: IDEA-009
+    title: Compliance-as-Code mit Rego-Policies (genaiops-compliance-gates)
+    description: |
+      Übernahme/Integration des in Mustafas Master-Thesis entwickelten Frameworks:
+      regulatorische Anforderungen (DSGVO, EU AI Act, Apple Guidelines) als YAML
+      strukturieren, in Rego-Policies kompilieren, durch CI/CD-Pipeline laufen
+      lassen → automatisierte Compliance-Prüfung statt nachgelagertem Audit.
+      Quelle: /Users/mustafademir/Projects/genaiops-compliance-gates
+      Repo: https://github.com/MustDemir/genaiops-compliance-gates
+    phase: phase-2-ki-layer
+    effort: L
+    value: H
+    risk: M
+    status: parked
+    notes: |
+      Besonders relevant für Phase 2 wegen EU-AI-Act-Anwendbarkeit ab 2026/2027.
+      Akademischer Differentiator + B2B-Verkaufsargument (IDEA-007).
+      Bewertung: Solo-Founder = Szenario B (Minimal jetzt, Ausbau Phase 2)
+                 Enterprise = Voll-Integration ab Tag 1
+    related: [IDEA-007]
+    created: 2026-05-19
+
 # =============================================================================
 # TODOS — aktive nächste Schritte (Phase 1)
 # =============================================================================
@@ -256,4 +278,31 @@ todos:
     status: open
     depends_on: [TODO-001]
     blocks: [TODO-002]
+    implementation_step: S01
+    created: 2026-05-19
+
+  - id: TODO-013
+    title: Methodik-Übernahme HIGH-ROI aus ai-context-vault
+    description: |
+      Status-Enum, Feature-State-Pattern, lade_manifest, decisions/INDEX.md
+      (siehe ADR 0009 Sektion ai_context_vault_adoption.high_roi_adopted_now).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    implementation_step: S03, S04, S05, S09
+    created: 2026-05-19
+
+  - id: TODO-014
+    title: Solo-Variante Compliance-Gates aus Master-Thesis-Repo
+    description: |
+      Requirements/R001-R003 + 3 Rego-Policies + Conftest in GitHub Action
+      + evidence-log.jsonl + CDV-Pattern dokumentieren
+      (siehe ADR 0009 Sektion genaiops_compliance_gates_adoption.solo_variant).
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: open
+    implementation_step: S10
+    related: [IDEA-009]
     created: 2026-05-19

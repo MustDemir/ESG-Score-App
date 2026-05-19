@@ -62,6 +62,9 @@ decisions_made:
   - adr: 0008
     title: Security-Baseline — 7 nicht-verhandelbare Praktiken
     date: 2026-05-19
+  - adr: 0009
+    title: Methodik-Übernahme aus ai-context-vault und genaiops-compliance-gates
+    date: 2026-05-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -84,6 +87,10 @@ weekly_log:
       - CLAUDE.md erweitert mit Session-Start-Protokoll (Pfad zu docs/project/)
       - Definition of Done definiert (definition-of-done.yaml)
       - Session-Start-Protokoll für Chat-Wechsel (session-start-protocol.md)
+      - Mustafa-eigene Repos analysiert: ai-context-vault + genaiops-compliance-gates
+      - ADR 0009 — Methodik-Übernahme-Entscheidungen pro Quelle dokumentiert
+      - 22-Schritte-Implementation-Plan persistiert (implementation-plan.yaml)
+      - TODO-013 (ai-context-vault HIGH-ROI) + TODO-014 (Master-Thesis Solo-Variante) angelegt
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -104,8 +111,8 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 8
-  todos_open: 11
+  decisions_total: 9
+  todos_open: 13
   todos_in_progress: 1
   todos_done: 1
   risks_open: 4

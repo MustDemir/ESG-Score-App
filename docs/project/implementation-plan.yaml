@@ -1,0 +1,328 @@
+last_updated: 2026-05-19
+source: Session 2026-05-19 — konsolidierte Empfehlungen aus 3 Themen
+       (Konsistenz-Strategie + ai-context-vault + genaiops-compliance-gates)
+
+# =============================================================================
+# 22-Schritte-Plan in 5 Blöcken
+# =============================================================================
+# Jeder Schritt referenziert die ursprüngliche Quelle (Topic 1/2/3 oder
+# Foundation) und das ADR / TODO das ihn auslöst.
+#
+# Bedeutung der Spalten:
+#   block:       Logische Gruppierung (jetzt / Sprint 0 / Sprint 1-3 / Phase 1 Ende / Phase 2)
+#   topic_ref:   Welches Session-Thema das ausgelöst hat
+#   blocked_by:  Vorbedingungen
+#   adr_ref:     Welches ADR diesen Schritt rechtfertigt
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# BLOCK 1 — JETZT / vor Sprint 0 (~1-2 Std Arbeit)
+# Ziel: alle Vor-Code-Entscheidungen + Methodik-Foundation komplett
+# -----------------------------------------------------------------------------
+block_1_now:
+  goal: Vor-Code-Entscheidungen + Methodik-Foundation komplett
+  effort_total: 1-2 Stunden
+  steps:
+    - id: S01
+      title: ADR 0010 — Eco-Score-Fallback-Logik
+      topic_ref: Foundation (Z8)
+      effort: 15 Min
+      blocked_by: []
+      blocks: [S02, Sprint-1-Coding]
+      target: docs/project/decisions/0010-eco-score-fallback.yaml
+      description: |
+        Was tun wenn ecoscore_grade = "unknown" oder "not-applicable"?
+        3 Optionen mit Pro/Contra evaluieren, eine wählen.
+
+    - id: S02
+      title: ADR 0011 — ESG-Score-Formel (E/S/G aus OFF-Feldern)
+      topic_ref: Foundation (Z8)
+      effort: 20 Min
+      blocked_by: [S01]
+      blocks: [Sprint-1-Coding]
+      target: docs/project/decisions/0011-esg-score-formel.yaml
+      description: |
+        Mapping definieren: welche OFF-Felder fließen in E, S, G?
+        Gewichtung. Schwellwerte für Ampel.
+
+    - id: S03
+      title: Status-Enum standardisieren in conventions.md
+      topic_ref: ai-context-vault (ACV-2)
+      effort: 15 Min
+      blocked_by: []
+      blocks: [S05]
+      target: docs/project/methodology/conventions.md erweitert
+      description: |
+        Verbindlich: planned → in_progress → draft → review → done
+        für alle YAML-Items. Aktuell Wildwuchs beheben.
+
+    - id: S04
+      title: decisions/INDEX.md anlegen (flache ADR-Tabelle)
+      topic_ref: ai-context-vault (ACV-4)
+      effort: 10 Min
+      blocked_by: []
+      target: docs/project/decisions/INDEX.md
+      description: |
+        Markdown-Tabelle aller ADRs mit ID / Titel / Status / Datum /
+        Tags / Related — schneller Überblick.
+
+    - id: S05
+      title: definition-of-done.yaml erweitern um lade_manifest
+      topic_ref: ai-context-vault (ACV-3)
+      effort: 20 Min
+      blocked_by: [S03]
+      target: docs/project/definition-of-done.yaml
+      description: |
+        Pro Task-Typ deklarieren: pflicht (Volltext-Read) vs kontext
+        (Metadata-Read). Token-Effizienz für Claude-Sessions.
+
+# -----------------------------------------------------------------------------
+# BLOCK 2 — SPRINT 0 (Flutter-Setup-Tag, ca. 1 Arbeitstag)
+# Ziel: Flutter-Projekt lebt + CI/CD + Mini-Compliance-Gates + Feature-State
+# -----------------------------------------------------------------------------
+block_2_sprint_0:
+  goal: Flutter-Projekt lebt + CI/CD + Mini-Compliance-Gates + Feature-State
+  effort_total: 1 Arbeitstag (~8 Std)
+  steps:
+    - id: S06
+      title: Flutter-Projekt erstellen
+      topic_ref: Foundation (TODO-005)
+      effort: 30 Min
+      command: flutter create esg_app --org com.scanfair --platforms=ios,android
+      adr_ref: 0001
+      blocked_by: [S02]
+      target: esg_app/
+
+    - id: S07
+      title: GitHub Actions CI/CD-Workflow anlegen
+      topic_ref: Topic 1 (CI/CD-Strategie)
+      effort: 1 Std
+      blocked_by: [S06]
+      target: .github/workflows/ci.yml
+      adr_ref: 0007
+      description: |
+        flutter analyze + format --set-exit-if-changed + test --coverage.
+        Branch-Protection auf main aktivieren.
+
+    - id: S08
+      title: .claude/settings.json mit Pre-Commit-Hooks
+      topic_ref: Topic 1 (Konsistenz-Schicht 4)
+      effort: 30 Min
+      blocked_by: [S06]
+      target: .claude/settings.json + .git/hooks/pre-commit
+      adr_ref: 0008
+      description: |
+        gitleaks (Secret-Scan) + dart format als Pre-Commit-Hook.
+        Verhindert teuersten Fehler (Secret-Leak).
+
+    - id: S09
+      title: Feature-State-Pattern aufsetzen
+      topic_ref: ai-context-vault (ACV-1)
+      effort: 30 Min
+      blocked_by: [S03, S06]
+      target: features/scanner/state.yaml, features/scoring/state.yaml, features/results/state.yaml
+      adr_ref: 0009
+      description: |
+        Pro Feature-Modul ein state.yaml mit Status, Progress, Decisions,
+        Open-Items, Next-Steps. Granulares Tracking vs nur Global.
+
+    - id: S10
+      title: Mini-Compliance-Gates implementieren (Solo-Variante Master-Thesis)
+      topic_ref: genaiops-compliance-gates (GCG-1, GCG-2, GCG-3, GCG-4, GCG-5)
+      effort: 1-2 Tage (kann split werden)
+      blocked_by: [S06, S07]
+      target: |
+        - docs/project/requirements/R001-R003.yaml
+        - policies/gate-privacy-manifest.rego
+        - policies/gate-rls-required.rego
+        - policies/gate-secrets-free.rego
+        - .github/workflows/compliance.yml
+        - evidence-store/evidence-log.jsonl
+      adr_ref: 0009
+      description: |
+        Anforderungs-YAMLs für 3 MVP-Pflichten. Conftest in GitHub Action.
+        SHA-256-Eintrag pro CI-Run in jsonl. CDV-Pattern angewendet.
+
+    - id: S11
+      title: Theme aus design_handoff_scanfair/tokens.css generieren
+      topic_ref: Foundation (Original-Plan)
+      effort: 1 Std
+      blocked_by: [S06]
+      target: esg_app/lib/theme/scanfair_theme.dart
+      description: |
+        Prompt 1 aus dem Original-Handoff-Plan ausführen.
+        Inter + Instrument Serif via google_fonts.
+
+    - id: S12
+      title: Apple Developer Account anlegen (parallel, User-Aktion)
+      topic_ref: Foundation (TODO-003)
+      effort: 10 Min User + 24-48h Wartezeit
+      blocked_by: []
+      adr_ref: null
+      description: |
+        $99/Jahr. JETZT anlegen wegen Verifizierungs-Wartezeit.
+
+# -----------------------------------------------------------------------------
+# BLOCK 3 — SPRINT 1-3 (Coding, ca. 3-5 Wochen)
+# Ziel: MVP-Funktionalität end-to-end
+# -----------------------------------------------------------------------------
+block_3_coding:
+  goal: MVP-Funktionalität end-to-end mit Tests
+  effort_total: 3-5 Wochen
+  steps:
+    - id: S13
+      title: Dart-Datenmodelle generieren (Freezed + JsonSerializable)
+      topic_ref: Foundation (TODO-006)
+      effort: 0.5 Tag
+      blocked_by: [S06]
+      target: esg_app/lib/models/
+      description: |
+        Product, ESGScore, SecondaryInfo, ChecklistItem mit Freezed.
+
+    - id: S14
+      title: OpenFoodFactsService + ESGScoreCalculator
+      topic_ref: Foundation + ADR 0010 + 0011
+      effort: 1-2 Tage
+      blocked_by: [S13, S02]
+      target: esg_app/lib/services/
+      description: |
+        HTTP-Client mit Timeout + Retry. ESG-Calculator nach Formel
+        aus ADR 0011. Fallback-Logik aus ADR 0010.
+
+    - id: S15
+      title: S3 Result-Screen
+      topic_ref: Foundation (TODO-007)
+      effort: 1-2 Tage
+      blocked_by: [S13, S14]
+      target: esg_app/lib/screens/result_screen.dart
+      description: |
+        ProductCard → ScoreHero → ScoreBars → SecondaryBar → CTAs →
+        MethodFootnote. Mit echtem GEPA-EAN end-to-end.
+
+    - id: S16
+      title: S1 Scanner + S2 Loading + S4 Alternativen + Onboarding
+      topic_ref: Foundation
+      effort: 1 Woche
+      blocked_by: [S15]
+      target: esg_app/lib/screens/
+      description: |
+        mobile_scanner-Plugin. State-Management-Entscheidung
+        (Provider vs Riverpod) als ADR 0012.
+
+    - id: S17
+      title: Edge-States + Eco-Score-Fallback-UI
+      topic_ref: Foundation (TODO-011, TODO-012)
+      effort: 2-3 Tage
+      blocked_by: [S15, S01]
+      target: esg_app/lib/widgets/edge_states/
+      description: |
+        No-Internet, No-Data, Permission-Denied, Eco-Score-Unknown.
+
+    - id: S18
+      title: Test-Coverage hochziehen (50% Sprint 1, 60% Sprint 2, 70% Sprint 3)
+      topic_ref: Topic 1 (quality-strategy.md)
+      effort: laufend
+      blocked_by: [S14]
+      target: esg_app/test/
+      adr_ref: 0007
+      description: |
+        Unit-Tests für Services + Models. Widget-Tests für Hauptpfade.
+        Coverage-Gate in CI hochziehen.
+
+# -----------------------------------------------------------------------------
+# BLOCK 4 — PHASE 1 ENDE (TestFlight-Vorbereitung, ca. 1 Woche)
+# Ziel: Erste reale Tester können App nutzen
+# -----------------------------------------------------------------------------
+block_4_testflight:
+  goal: TestFlight-Build verfügbar für Tester
+  effort_total: 1 Woche
+  steps:
+    - id: S19
+      title: Privacy Policy + Apple Privacy Manifest
+      topic_ref: Foundation (TODO-008) + Topic 1 (SEC-6)
+      effort: 0.5-1 Tag
+      blocked_by: []
+      target: docs/privacy.md + esg_app/ios/Runner/PrivacyInfo.xcprivacy
+      adr_ref: 0008
+      description: |
+        DSGVO-konform. OFF CC BY-SA Attribution. Apple Privacy Manifest
+        ist seit 2024 Pflicht.
+
+    - id: S20
+      title: compliance-auditor Skill + security-review Slash-Command durchlaufen
+      topic_ref: Topic 1 (Claude-Code-Integration)
+      effort: 0.5 Tag
+      blocked_by: [S18, S19]
+      target: Audit-Report in docs/project/audits/
+      adr_ref: 0007, 0008
+      description: |
+        DSGVO-Check + Security-Review vor Release.
+        Findings als TODOs anlegen falls vorhanden.
+
+    - id: S21
+      title: Fastlane + TestFlight-Auto-Deploy
+      topic_ref: Topic 1 (CI/CD Sprint 3)
+      effort: 1 Tag
+      blocked_by: [S12, S20]
+      target: esg_app/fastlane/ + .github/workflows/release.yml
+      adr_ref: 0007
+      description: |
+        Bei git-tag-push: automatischer Build + TestFlight-Upload.
+
+    - id: S22
+      title: Sentry oder Bugsnag für Crash-Reporting
+      topic_ref: failure-modes.yaml (FM-05)
+      effort: 0.5 Tag
+      blocked_by: [S20]
+      target: esg_app/lib/utils/error_reporting.dart
+      description: |
+        Crash-Reporting ab erstem TestFlight-Build.
+        EU-Region, IP-Anonymisierung.
+
+# -----------------------------------------------------------------------------
+# PHASE 2 (KI-Layer + Membership + Voll-Compliance, separat geplant)
+# -----------------------------------------------------------------------------
+phase_2_outlook:
+  goal: KI-Layer + Membership-Tier + EU-AI-Act-Compliance-Erweiterung
+  effort_estimate: 1-2 Monate
+  major_steps:
+    - ADR 0013 — RevenueCat als Subscription-Infrastruktur
+    - ADR 0014 — KI-Provider final (Mistral / Claude / Aleph Alpha)
+    - pgvector-Extension + Embedding-Pipeline
+    - LLM-API-Integration für Score-Erklärungen (Use Case A)
+    - Semantische Alternativen via pgvector (Use Case B)
+    - Membership-Implementation (ScanFair+)
+    - Voll-Framework-Integration aus genaiops-compliance-gates (GCG-6, GCG-7)
+    - Drift-Detection für LLM-Output
+
+# =============================================================================
+# DEPENDENCY-DIAGRAMM (textuell)
+# =============================================================================
+dependency_graph: |
+  Block 1 (S01-S05) ──┐
+                      │
+                      ▼
+  Block 2 (S06-S12) ──┐
+                      │
+                      ▼
+  Block 3 (S13-S18) ──┐
+                      │
+                      ▼
+  Block 4 (S19-S22) ──┐
+                      │
+                      ▼
+                  Phase 2
+
+  Apple Dev Account (S12) läuft parallel, blockt nur S21.
+  Mini-Gates (S10) sind unabhängig von Coding-Steps S13-S18.
+
+# =============================================================================
+# WARTUNG
+# =============================================================================
+maintenance:
+  cadence: bei jedem Block-Abschluss
+  questions:
+    - Welche Steps sind tatsächlich gelaufen wie geplant?
+    - Welche Steps müssen umgeplant werden?
+    - Sind neue Steps dazugekommen die wir hier festhalten sollten?
+    - Sind Block-Übergänge sauber? Coverage-Gates erfüllt?
