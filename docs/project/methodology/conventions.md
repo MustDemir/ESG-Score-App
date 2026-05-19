@@ -49,14 +49,46 @@ tags: ["frontend","architecture"]   # Inline ist schlechter lesbar
 context: "Einzeiliger Text mit \n drin"   # Newline-Escapes hässlich
 ```
 
-## Status-Werte (Vokabular)
+## Status-Werte (Vokabular) — VERBINDLICH
+
+Übernommen aus ai-context-vault (ADR 0009, ACV-2). Erweitert mit App-Spezifika.
+
+### Lifecycle-Status (für Features, Tasks, Tickets)
+
+**Verbindliche Reihenfolge:**
+
+```
+planned → in_progress → draft → review → done
+```
+
+| Status | Bedeutung | Übergang erlaubt zu |
+|---|---|---|
+| `planned` | Bekannt, noch nicht angefangen | → `in_progress` |
+| `in_progress` | Arbeit läuft aktiv | → `draft`, `parked` |
+| `draft` | Erste Fassung steht, noch nicht reviewt | → `review`, `in_progress` |
+| `review` | Wartet auf Review (Code-Review, Test, etc.) | → `done`, `in_progress` |
+| `done` | Abgeschlossen + Review bestanden | terminal |
+| `parked` | Pausiert, bewusst zur Seite gelegt | → `in_progress`, `dropped` |
+| `dropped` | Verworfen, wird nicht umgesetzt | terminal |
+
+**Gilt für:** `feature_state.yaml` (kommt mit Sprint 0), TODOs, Sprint-Items.
+
+### Status pro Artefakt-Typ
 
 | Kontext | Erlaubte Werte |
 |---|---|
-| ADR | `proposed`, `accepted`, `superseded`, `deprecated`, `rejected` |
-| Idee/TODO | `open`, `in_progress`, `done`, `parked`, `dropped` |
-| Risiko | `open`, `mitigated`, `accepted`, `closed` |
-| Phase | `planned`, `current`, `done`, `paused` |
+| **Lifecycle** (Features, Tasks) | `planned`, `in_progress`, `draft`, `review`, `done`, `parked`, `dropped` |
+| **ADR** | `proposed`, `accepted`, `superseded`, `deprecated`, `rejected` |
+| **Idee** (Backlog) | `open`, `parked`, `dropped` (nicht `in_progress` — wird erst TODO) |
+| **Risiko** | `open`, `mitigated`, `accepted`, `closed` |
+| **Phase** | `planned`, `current`, `done`, `paused` |
+
+### Hinweis: Bestehende Wildwuchs-Korrektur
+
+Aktuell stehen in `backlog.yaml` TODOs auf `open` statt `planned`. Bei
+nächstem Backlog-Update normalisieren (S03-Folgearbeit, niedrige Prio).
+Bestehende ADRs bleiben unverändert (append-only-Regel, ADR-Vokabular
+ist eigener Enum).
 
 ## Bewertungs-Skalen
 

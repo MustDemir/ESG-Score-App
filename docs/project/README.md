@@ -30,6 +30,12 @@ docs/project/
 ├── definition-of-done.yaml # Verbindliche Checks pro Task-Typ
 ├── session-start-protocol.md # Wiedereinstieg in neue Claude-Sessions
 ├── implementation-plan.yaml # 22-Schritte-Plan in 5 Blöcken (Sprint 0 → Phase 2)
+├── workflows/             # Strukturierte Arbeits-Rituale (Trigger-Phrasen-basiert)
+│   ├── README.md
+│   ├── session-start.md
+│   ├── pre-coding-check.md
+│   └── post-feature.md
+├── requirements/          # Compliance-Anforderungen (kommt mit Sprint 0)
 └── spikes/                # Spike-Reports (z.B. OFF-API-Coverage)
 ```
 

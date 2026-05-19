@@ -8,6 +8,11 @@ last_updated: 2026-05-19
 #
 # Wenn ein Check übersprungen wird: das im progress.yaml dokumentieren mit
 # Begründung (warum bewusst übersprungen) — sonst gilt der Task als offen.
+#
+# lade_manifest-Pattern (übernommen aus ai-context-vault, ADR 0009 ACV-3):
+# Pro Task-Typ wird deklariert WELCHE Dateien Claude lesen muss (`pflicht`)
+# vs. nur als Metadata lesen muss (`kontext`). Spart Tokens und fokussiert
+# den Lese-Kontext auf das Relevante.
 # =============================================================================
 
 # Allgemeine Regeln, gelten IMMER (egal welcher Task-Typ):
@@ -32,6 +37,15 @@ task_types:
   - id: feature_code
     title: Neues Feature / Code-Änderung
     description: Jede produktive Code-Änderung in lib/ oder esg_app/
+    lade_manifest:
+      pflicht:
+        - feature_state.yaml des betroffenen Features
+        - quality-strategy.md
+        - relevante ADRs (siehe decisions/INDEX.md, gefiltert nach Feature-Tag)
+        - failure-modes.yaml (mindestens FM-01, FM-02, FM-09, FM-14)
+      kontext:
+        - roadmap.yaml (Out-of-Scope-Check)
+        - backlog.yaml (offene TODOs)
     checks:
       - flutter analyze sauber (kein Warning, kein Error)
       - flutter format --set-exit-if-changed grün
@@ -52,6 +66,13 @@ task_types:
   - id: api_integration
     title: API-Integration (z.B. OFF, Supabase, LLM-Provider)
     description: Anbindung externer Dienste
+    lade_manifest:
+      pflicht:
+        - decisions/0003-open-food-facts.yaml (für OFF)
+        - decisions/0008-security-baseline.yaml (SEC-1, SEC-4)
+        - spikes/off-api-2026-05-19.md (für OFF-Spezifika)
+      kontext:
+        - stack.yaml (Provider-Versionen)
     checks:
       - HTTPS-only, kein Cleartext (SEC-4)
       - API-Key via env-var, nicht hardcoded (SEC-1)
@@ -70,6 +91,13 @@ task_types:
   - id: supabase_change
     title: Supabase-Schema- oder Policy-Änderung
     description: Migration, neue Tabelle, neue RLS-Policy
+    lade_manifest:
+      pflicht:
+        - decisions/0002-supabase-backend.yaml
+        - decisions/0008-security-baseline.yaml (SEC-3)
+        - failure-modes.yaml FM-12
+      kontext:
+        - stack.yaml
     checks:
       - Migration-Skript im supabase/migrations/ Ordner
       - ALTER TABLE ... ENABLE ROW LEVEL SECURITY für neue Tabellen
@@ -86,6 +114,13 @@ task_types:
   - id: architecture_decision
     title: Architektur-Entscheidung treffen
     description: Tech-Stack, Pattern, Provider-Wahl
+    lade_manifest:
+      pflicht:
+        - methodology/adr-process.md
+        - decisions/INDEX.md (verwandte ADRs prüfen)
+        - methodology/conventions.md
+      kontext:
+        - roadmap.yaml
     checks:
       - ADR im decisions/ geschrieben (NNNN-titel.yaml)
       - Mindestens 2 Alternativen verglichen mit pros/cons
@@ -101,6 +136,15 @@ task_types:
   - id: release_testflight
     title: TestFlight-Release / App-Store-Submission
     description: Build auf physische Test-Devices oder Store
+    lade_manifest:
+      pflicht:
+        - quality-strategy.md (§5 Release-Gate-Checkliste)
+        - decisions/0007-cicd-ct-strategy.yaml
+        - decisions/0008-security-baseline.yaml
+        - failure-modes.yaml FM-06, FM-07, FM-08, FM-15
+      kontext:
+        - costs.yaml
+        - stack.yaml
     checks:
       - Vollständige Release-Gate-Checklist (quality-strategy.md §5)
       - Coverage >= aktuelles Sprint-Ziel
@@ -122,6 +166,12 @@ task_types:
   - id: spike
     title: Spike / Recherche / Validierung
     description: Erkenntnisgewinn ohne produktiven Code
+    lade_manifest:
+      pflicht:
+        - relevante RISK aus risks.yaml
+        - relevante ADR(s)
+      kontext:
+        - frühere spikes/*.md
     checks:
       - Spike-Report in docs/project/spikes/ angelegt (Markdown)
       - Methodik dokumentiert (was wurde wie getestet)
@@ -162,6 +212,12 @@ task_types:
   - id: bug_fix
     title: Bug-Fix
     description: Korrektur eines fehlerhaften Verhaltens
+    lade_manifest:
+      pflicht:
+        - betroffene Code-Datei + Test-Datei
+        - failure-modes.yaml (passender FM falls bekannt)
+      kontext:
+        - feature_state.yaml des Features
     checks:
       - Bug reproduzierbar gemacht (lokal oder via Test)
       - Test geschrieben der den Bug nachstellt (Regression-Test)

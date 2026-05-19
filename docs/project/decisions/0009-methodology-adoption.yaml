@@ -104,6 +104,99 @@ ai_context_vault_adoption:
         ist ergänzendes Konzept — schauen wir an wenn DoD nicht reicht.
       when: Phase 1 Ende oder Phase 2
 
+  # ---------------------------------------------------------------------------
+  # SKILL-PATTERN-ÜBERNAHMEN (Update 2026-05-19, nach Deep-Dive in 7 Skills)
+  # ---------------------------------------------------------------------------
+  skill_patterns_adopted:
+    - id: ACV-13
+      pattern: Session-Start-Workflow (analog thesis-session-manager S1-S5)
+      original: |
+        S1 Kontext-Laden via resume.py, S2 Dashboard, S3 Nächster Schritt,
+        S4 Definition of Ready, S5 Preflight-Trigger
+      esg_translation: |
+        Markdown-Workflow in docs/project/workflows/session-start.md.
+        Trigger-Phrasen in CLAUDE.md. Kein eigener Skill — Claude führt
+        Workflow direkt aus.
+      target_location: docs/project/workflows/session-start.md
+      when: Sofort
+      effort: 30 Min
+
+    - id: ACV-14
+      pattern: Pre-Coding-Check (analog thesis-preflight P0-P6)
+      original: 6 Prüfinstanzen vor Schreib-Block
+      esg_translation: |
+        6 Prüfinstanzen vor Coding-Block (Roadmap-Scope, ADRs, Failure-Modes,
+        Risks, Test-Plan, Negativ-Checklist). Output: Pre-Coding-Protokoll
+        im Conversation-Kontext.
+      target_location: docs/project/workflows/pre-coding-check.md
+      when: Sofort — pflicht bei allen Feature-Coding-Tasks ab Sprint 1
+      effort: 30 Min
+
+    - id: ACV-15
+      pattern: Post-Feature-Workflow (analog thesis-post-session A-F)
+      original: 6 Prüfpunkte nach Schreib-Session
+      esg_translation: |
+        6 Phasen A-F: Code & Tests / Feature-State / Entscheidungs-Register /
+        progress.yaml / Konsistenz-Diff / Commit. Ergänzt bestehende DoD um
+        klare Phasen-Struktur.
+      target_location: docs/project/workflows/post-feature.md
+      when: Sofort — pflicht am Ende jedes Coding-Blocks
+      effort: 30 Min
+
+    - id: ACV-16
+      pattern: Trigger-Phrasen-Mapping
+      original: Skills triggern per Phrase
+      esg_translation: |
+        Mapping-Tabelle in CLAUDE.md die User-Phrasen auf Workflows mappt.
+        Statt 7 Skills: 3 Workflows + standard Anthropic-Skills.
+      target_location: CLAUDE.md (Sektion „TRIGGER-PHRASEN → WORKFLOWS")
+      when: Sofort
+      effort: 15 Min
+
+  skill_patterns_deferred:
+    - id: ACV-17
+      pattern: Cross-Feature-Consistency-Workflow (analog thesis-consistency K1-K7)
+      reason_for_defer: |
+        Aktuell zu wenig Features für Cross-Feature-Drift. failure-modes +
+        quality-strategy decken Top-Risiken ab. Aktivieren wenn ≥5 Features
+        existieren.
+      when: Phase 1.5 oder Phase 2
+
+    - id: ACV-18
+      pattern: Akademischer Reviewer-Workflow (analog thesis-reviewer R1-R6)
+      reason_for_defer: |
+        engineering:code-review von Anthropic deckt 80% ab. Eigener Workflow
+        nur sinnvoll bei spezifischen Compliance-Audit-Anforderungen
+        (Phase 2 mit EU AI Act).
+      when: Phase 2
+
+    - id: ACV-19
+      pattern: Decision-Lookup-Chain (analog Quellen-Lookup-Kette)
+      reason_for_defer: |
+        Bei Unsicherheit: erst ADRs → dann backlog → dann risks → dann externe
+        Recherche. Aktuell genug klar. Bei Pain dokumentieren.
+      when: Bei Bedarf
+
+  skill_patterns_not_adopted:
+    - id: ACV-20
+      pattern: thesis-writer Absatz-für-Absatz mit BELEG/CLAIM/MATCH
+      reason: |
+        Code ≠ akademisches Schreiben. Test-Coverage + Code-Review erfüllen
+        äquivalenten Zweck (Belegbarkeit von Verhalten statt Belegbarkeit von
+        Aussagen).
+
+    - id: ACV-21
+      pattern: evidence-matrix-builder
+      reason: |
+        Quellen-Mapping ist akademisch. Im App-Kontext entspricht das einem
+        Dependency-Audit (kommt ab Sprint 2 in CI via Dependabot).
+
+    - id: ACV-22
+      pattern: Eigene Cowork-Skills als .skill-Bundles bauen
+      reason: |
+        ADR 0009 ACV-9 bereits: kein eigener Skill-Bau. Markdown-Workflows
+        + Anthropic-Skills genügen. Skill-Bau lohnt erst bei Multi-User-Team.
+
   not_adopted:
     - id: ACV-8
       pattern: Azure Cloud Hub (Blob + AI Search)

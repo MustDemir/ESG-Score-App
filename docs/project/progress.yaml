@@ -65,6 +65,12 @@ decisions_made:
   - adr: 0009
     title: Methodik-Übernahme aus ai-context-vault und genaiops-compliance-gates
     date: 2026-05-19
+  - adr: 0010
+    title: Eco-Score-Fallback-Logik bei unvollständigen OFF-Daten
+    date: 2026-05-19
+  - adr: 0011
+    title: ESG-Score-Formel — E/S/G aus OFF-Feldern
+    date: 2026-05-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -91,6 +97,14 @@ weekly_log:
       - ADR 0009 — Methodik-Übernahme-Entscheidungen pro Quelle dokumentiert
       - 22-Schritte-Implementation-Plan persistiert (implementation-plan.yaml)
       - TODO-013 (ai-context-vault HIGH-ROI) + TODO-014 (Master-Thesis Solo-Variante) angelegt
+      - Block 1 (S01-S05) komplett umgesetzt
+        * ADR 0010 (Eco-Score-Fallback) — Transparenz-First-Strategie
+        * ADR 0011 (ESG-Score-Formel) — gewichtete E/S/G mit Methodik v1.0
+        * Status-Enum verbindlich in conventions.md
+        * decisions/INDEX.md flache ADR-Tabelle
+        * lade_manifest pro Task-Typ in definition-of-done.yaml
+      - 3 Workflow-Markdowns aus Vault-Skill-Patterns (session-start, pre-coding-check, post-feature)
+      - CLAUDE.md erweitert mit Trigger-Phrasen → Workflow-Mapping
     learnings:
       - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
       - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
@@ -111,7 +125,7 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 9
+  decisions_total: 11
   todos_open: 13
   todos_in_progress: 1
   todos_done: 1

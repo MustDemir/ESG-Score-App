@@ -24,6 +24,27 @@
 
 ---
 
+## TRIGGER-PHRASEN → WORKFLOWS
+
+Wenn User eine dieser Phrasen verwendet, führe den verlinkten Workflow aus
+[docs/project/workflows/](docs/project/workflows/):
+
+| User sagt | Du tust |
+|---|---|
+| „Status?" / „Wo waren wir?" / „Wo stehen wir?" / „Starten wir" / „Guten Morgen" | [session-start.md](docs/project/workflows/session-start.md) ausführen → Dashboard rendern |
+| „los" / „GO" (nach Status) | Wenn Coding-Task: [pre-coding-check.md](docs/project/workflows/pre-coding-check.md) ausführen. Wenn Doku/Setup-Task: direkt starten |
+| „Pre-Coding-Check für X" / „bevor wir X bauen" / „prüf erstmal" | [pre-coding-check.md](docs/project/workflows/pre-coding-check.md) ausführen für X |
+| „ja, los" (nach Pre-Coding-Check) | Code-Implementierung starten gemäß Plan |
+| „fertig für heute" / „Session Ende" / „Post-Check" / „Repo aktualisieren" | [post-feature.md](docs/project/workflows/post-feature.md) ausführen — A-F Prüfpunkte |
+| „Review" / „review meinen Code" | `engineering:code-review` Skill triggern (NICHT Workflow) |
+| „Konsistenz prüfen" (Phase 2+) | Cross-Feature-Konsistenz — Workflow folgt mit Phase 2 |
+
+**Wichtig:** wenn User nicht explizit eine Phrase nennt, aber den Kontext
+schafft (z.B. fragt nach Übersicht), Workflow **proaktiv anbieten** statt
+einfach Freitext-Antwort zu geben.
+
+---
+
 ## Was ist dieses Projekt?
 
 Eine mobile App (iOS + Android) die Supermarkt-Produkte per Barcode scannt
