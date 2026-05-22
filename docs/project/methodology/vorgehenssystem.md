@@ -26,7 +26,73 @@ und den Eingangspunkt **`CLAUDE.md`**.
 
 ---
 
-## Skizze — Das Vorgehenssystem
+## Skizze — Das Vorgehenssystem (Mermaid, GitHub-gerendert)
+
+```mermaid
+graph TD
+    subgraph Q1["1 · DevOps / GitHub — Automatisierung"]
+        Q1a["GitHub Actions CI"]
+        Q1b["Pre-Commit-Hooks"]
+        Q1c["Test-Pyramide + Coverage-Gates"]
+        Q1d["Secret-Scan (gitleaks)"]
+    end
+    subgraph Q2["2 · ai-context-vault — Gedaechtnis"]
+        Q2a["Feature-States"]
+        Q2b["Status-Enum"]
+        Q2c["lade_manifest"]
+        Q2d["decisions/INDEX"]
+    end
+    subgraph Q3["3 · thesis-workflow Skills — Ritual"]
+        Q3a["session-start"]
+        Q3b["pre-coding-check"]
+        Q3c["post-feature"]
+    end
+    subgraph Q4["4 · genaiops-compliance-gates — Regelkonformitaet"]
+        Q4a["Requirements (R-AS / R-DSGVO)"]
+        Q4b["Gate-Definitions"]
+        Q4c["Rego-Policies + Tests"]
+        Q4d["Cross-Regulation-Map"]
+    end
+
+    Q1 --> SSOT
+    Q2 --> SSOT
+    Q3 --> SSOT
+    Q4 --> SSOT
+
+    SSOT["docs/project/<br/>SINGLE SOURCE OF TRUTH<br/>(alles im Git, versioniert)"]
+    SSOT --> CLAUDE["CLAUDE.md<br/>Eingangspunkt: Session-Protokoll + Trigger-Phrasen"]
+
+    CLAUDE --> DEV["Entwicklung<br/>(Mensch + Claude Code)"]
+    CLAUDE --> CI["CI<br/>(GitHub Actions)"]
+    DEV -->|git push| CI
+    DEV --> APP["esg_app/<br/>Flutter-App: lib · test · Theme"]
+    CI --> APP
+
+    classDef source fill:#E8F2EE,stroke:#0F7B5C,stroke-width:1px;
+    classDef core fill:#0F7B5C,color:#fff,stroke:#074A36,stroke-width:2px;
+    classDef app fill:#F4F2EB,stroke:#C7C3B6,stroke-width:1px;
+    class Q1,Q2,Q3,Q4 source;
+    class SSOT,CLAUDE core;
+    class DEV,CI,APP app;
+```
+
+## Feature-Lifecycle (Mermaid)
+
+```mermaid
+flowchart LR
+    A["Session-Start<br/>User: Status?"] --> B["Pre-Coding-Check<br/>User: GO (P1-P6)"]
+    B --> C["Implementation<br/>Code + Tests + Feature-State"]
+    C --> D["Pre-Commit<br/>gitleaks + dart format"]
+    D --> E["CI<br/>analyze + test + Secret-Scan"]
+    E --> F["Post-Feature<br/>User: fertig (A-F)"]
+    F --> G["Evidence<br/>Commit + evidence-log"]
+    B -.->|Architektur-Entscheidung| H["neue ADR"]
+    H -.-> C
+```
+
+---
+
+## Skizze — Das Vorgehenssystem (ASCII-Fallback)
 
 ```
                         SCANFAIR ENTWICKLUNGS-METHODIK
