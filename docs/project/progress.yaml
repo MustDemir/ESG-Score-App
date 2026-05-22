@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W21
-last_updated: 2026-05-19
+last_updated: 2026-05-22
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -148,6 +148,35 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W21-session2
+    summary: |
+      Methodik-Vertiefung + Sprint 0 Abschluss + Compliance-Mechanik bewiesen
+    done:
+      - Mustafa-Repos analysiert + Methodik übernommen (ai-context-vault + genaiops-compliance-gates)
+      - ADR 0009-0013 (Methodik, Eco-Score-Fallback, ESG-Formel, Apple, Multi-Regulation)
+      - Workflows aus thesis-skills (session-start, pre-coding-check, post-feature)
+      - Flutter-Projekt + Theme-Foundation (S06, S11)
+      - CI/CD + Pre-Commit-Hooks + Feature-States (S07, S08, S09)
+      - Apple Review Guidelines (40 S.) + DSGVO komplett gemappt
+      - Compliance-Gate-Pipeline end-to-end bewiesen (Finding → Fix → PASS)
+      - Apple Dev Account gekauft
+      - Vorgehenssystem-Doku mit Mermaid-Diagrammen
+      - dev → main gemergt (PR #4), codex-Branches aufgeräumt
+      - Bug gefixt: Info.plist war via *.plist gitignored (iOS-Build-Breaker)
+    learnings:
+      - Master-Thesis-Framework ist regulation-agnostic (Apple + DSGVO mit gleicher Methodik)
+      - Python 3.14 auf diesem Mac defekt (pyexpat) → Bash+jq statt Python für Tooling
+      - Compliance-Gates fangen echte Fehler (Branding-Mismatch, gitignored Info.plist)
+      - Solo-Founder-Compliance-Aufwand kann nahe null sein wenn Extraktion automatisiert
+    blockers:
+      - Xcode-Installation Status unklar (für lokalen iOS-Build/Simulator)
+      - Apple-Verifizierung läuft noch
+    next_week:
+      - ADR 0014: State-Management (Provider vs Riverpod) entscheiden
+      - S13: Datenmodelle mit Freezed (Product, ESGScore, etc.)
+      - S14: OpenFoodFactsService + ESGScoreCalculator (nach ADR 0010/0011)
+      - Optional: weitere R-DSGVO-TODOs wenn App-Settings-Screen kommt
+
   - week: 2026-W21
     summary: Setup-Phase — Tooling installiert, Projekt-Doku aufgesetzt
     done:
