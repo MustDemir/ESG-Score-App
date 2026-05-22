@@ -1,0 +1,36 @@
+{
+  "_comment": "Kategorie-B-Deklarationen fuer Compliance-Gates. Hand-gepflegt. Siehe evidence-model.md. Felder mit null sind noch nicht festgelegt (TBD) — Gates melden das als Finding.",
+  "_schema_version": "1.0",
+  "_last_updated": "2026-05-19",
+
+  "app_name_pubspec": "ScanFair",
+  "subtitle": "ESG-Score beim Einkauf",
+
+  "privacy_policy_url": null,
+  "support_url": null,
+
+  "off_data_source_disclosed": false,
+  "supabase_region": "eu-central-1 (Frankfurt)",
+
+  "data_retention_days": 365,
+  "account_deletion_implemented": false,
+
+  "tracking_enabled": false,
+  "att_prompt_implemented": false,
+
+  "manual_review": {
+    "reviewed_by": null,
+    "review_date": null,
+    "scope": null
+  },
+
+  "_field_docs": {
+    "app_name_pubspec": "Kanonischer Markenname (Soll). Gate vergleicht ios/android Display-Names damit.",
+    "privacy_policy_url": "R-AS-01 / R-DSGVO-03. Setzen wenn Policy live (TODO-008).",
+    "support_url": "R-AS-08. Setzen wenn Domain steht.",
+    "off_data_source_disclosed": "R-AS-06. Auf true wenn 'Powered by Open Food Facts' + Privacy-Policy-Erwaehnung implementiert.",
+    "account_deletion_implemented": "R-AS-05 / R-DSGVO-07. Auf true wenn Loesch-Funktion in App (mit Supabase Auth).",
+    "att_prompt_implemented": "R-AS-07 / R-DSGVO-02. Auf true wenn Tracking-SDK + ATT-Prompt.",
+    "manual_review": "Kategorie C. Pro Release ausfuellen fuer HYBRID-Gates."
+  }
+}

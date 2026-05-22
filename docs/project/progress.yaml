@@ -44,6 +44,22 @@ milestones:
       .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
       Step S06 abgeschlossen.
 
+  - id: M09
+    title: Compliance-Gate-Mechanik end-to-end funktionsfähig
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Evidence-Modell + Extraction-Pipeline gebaut und end-to-end getestet:
+      - evidence-model.md (3 Artefakt-Kategorien: auto/deklariert/manuell)
+      - compliance-manifest.json (Kategorie-B-Deklarationen)
+      - scripts/compliance/extract_app_metadata.sh (Kategorie A via plutil)
+      - scripts/compliance/build_compliance_input.sh (jq-Merge A+B)
+      - scripts/compliance/run_gates.sh (conftest + SHA-256 Evidence-Log)
+      Beweis: G-AS-NAME-LENGTH lief, fand Finding (Display-Name "Esg App"
+      != "ScanFair"), nach Fix (Info.plist + AndroidManifest auf ScanFair)
+      8/8 Tests PASS. Hash-Chain GENESIS->7d5b->cd1e->5162 verifiziert.
+      R-AS-12 (App-Name-Branding) damit erfüllt. TODO-023 done.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -196,10 +212,10 @@ weekly_log:
 # =============================================================================
 stats:
   decisions_total: 13
-  todos_open: 20
+  todos_open: 19
   todos_in_progress: 1
-  todos_done: 3
-  milestones_reached: 8
+  todos_done: 4
+  milestones_reached: 9
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

@@ -413,7 +413,9 @@ todos:
     description: |
       Für aktive R-AS-01, R-AS-03, R-AS-06, R-AS-08 die jeweiligen Rego-Policies
       + Tests + Gate-Definitions schreiben. Aktivierung wenn App-Settings-Screen
-      existiert (Sprint 2).
+      existiert (Sprint 2). Input-Felder sind im compliance-manifest.json bereits
+      vorbereitet (privacy_policy_url, support_url, off_data_source_disclosed,
+      camera_purpose_string aus Extraktion).
     phase: phase-1-mvp
     priority: P1
     effort: M
@@ -425,27 +427,29 @@ todos:
   - id: TODO-022
     title: Conftest CI-Workflow .github/workflows/compliance.yml
     description: |
-      GitHub Actions-Workflow der Conftest mit allen Apple-Policies ausführt,
-      Output in evidence-log.jsonl schreibt mit SHA-256-Hash. Übernommen aus
-      genaiops-compliance-gates/.github/workflows/gate-pipeline.yml.
+      GitHub Actions-Workflow der run_gates.sh ausführt + Evidence als
+      CI-Artefakt hochlädt. Lokale Scripts (extract/build/run_gates) existieren
+      bereits und sind getestet — nur noch in GitHub Actions verdrahten.
     phase: phase-1-mvp
     priority: P1
-    effort: M
+    effort: S
     status: planned
-    activation_trigger: "≥ 3 aktive Rego-Policies"
+    activation_trigger: "≥ 3 aktive Rego-Policies (aktuell 1)"
     created: 2026-05-19
 
   - id: TODO-023
     title: evidence-store/evidence-log.jsonl Initial-Setup + SHA-256-Hash-Logik
     description: |
-      Solo-Variante aus genaiops-compliance-gates (siehe ADR 0009 GCG-3):
-      jsonl-File pro CI-Run, jeder Eintrag mit SHA-256-Hash des vorherigen Eintrags.
-      Audit-Trail-tauglich, kein Postgres nötig.
+      Solo-Variante aus genaiops-compliance-gates (siehe ADR 0009 GCG-3).
     phase: phase-1-mvp
     priority: P2
     effort: S
-    status: planned
-    activation_trigger: "Mit TODO-022 Conftest-Workflow"
+    status: done
+    completed: 2026-05-19
+    completed_notes: |
+      run_gates.sh schreibt evidence-log.jsonl mit SHA-256-Chain
+      (prev_entry_hash → entry_hash). End-to-end getestet:
+      FAIL → Fix → PASS, Chain GENESIS→7d5b→cd1e→5162 verifiziert.
     created: 2026-05-19
 
   - id: TODO-024
