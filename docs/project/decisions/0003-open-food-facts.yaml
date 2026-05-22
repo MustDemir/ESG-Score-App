@@ -1,0 +1,58 @@
+id: 0003
+title: Open Food Facts als primäre Produktdatenquelle
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [data, api, dsgvo, licensing]
+
+context: |
+  Brauchen Produktdaten (Name, Marke, Inhaltsstoffe, Labels, Herkunft,
+  Eco-Score) zu Millionen von Barcodes — primär für DE-Markt.
+
+options_considered:
+  - name: Open Food Facts API
+    pros:
+      - Kostenlos, offene Daten
+      - Millionen Produkte, viele DE-Einträge
+      - Eco-Score bereits integriert → Basis für eigenen ESG-Score
+      - Labels-Tags (Bio, Fair-Trade) als strukturierte Felder
+      - Community-Dateneingabe (auch wir können beitragen)
+      - CC BY-SA Lizenz — kostenlos kommerziell nutzbar
+    cons:
+      - Datenqualität variiert (Crowdsourced)
+      - DE-Eigenmarken (Rewe Bio, Edeka Gut & Günstig) eventuell lückenhaft
+      - CC BY-SA fordert Attribution + Share-Alike (relevant für eigene Daten)
+  - name: GS1 (offizielle Barcode-Datenbank)
+    pros:
+      - Höchste Datenqualität
+      - Vollständige Marken-Daten
+    cons:
+      - Sehr teuer (B2B-Pricing)
+      - Keine ESG-relevanten Felder
+  - name: Eigene Datenbank aufbauen
+    pros:
+      - Volle Kontrolle, Qualität steuerbar
+    cons:
+      - Killer für MVP — Tausende Produkte manuell erfassen
+  - name: Multi-Source (OFF + andere)
+    pros:
+      - Beste Coverage
+    cons:
+      - Komplexer, später möglich
+
+decision: Open Food Facts als primäre Quelle für MVP
+rationale: |
+  Einzige realistische Option für Solo-Founder. Kostenlos, große Coverage,
+  Eco-Score als ESG-Vorarbeit. Datenqualitäts-Risiko muss VOR Code-Start
+  validiert werden (siehe RISK-001 und TODO-001).
+
+consequences:
+  - Attribution-Pflicht: "Powered by Open Food Facts" im App-Footer
+  - CC BY-SA: eigene Daten-Beiträge müssen gleich lizenziert sein
+  - Edge-Case "Produkt nicht in OFF" muss UX-mäßig sauber gelöst werden
+  - OFF-API-Spike vor Flutter-Code-Start zwingend (TODO-001)
+  - Plan B definieren falls DE-Coverage <70%
+
+supersedes: null
+superseded_by: null
+related: [0002]

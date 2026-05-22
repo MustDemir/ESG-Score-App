@@ -1,0 +1,77 @@
+feature: results
+title: "S3 Result-Screen + Edge-States"
+status: planned
+progress: 5
+current_focus: "Theme verfuegbar (S11 done) — wartet auf Models (S13) und Scoring (S14)"
+last_sync: "2026-05-19"
+
+lade_manifest:
+  pflicht:
+    - design_handoff_scanfair/04-screens-results.jsx
+    - design_handoff_scanfair/02-screens-components.jsx
+    - design_handoff_scanfair/tokens.css
+    - docs/project/decisions/0010-eco-score-fallback.yaml
+    - docs/project/decisions/0011-esg-score-formel.yaml
+  kontext:
+    - docs/project/features/scoring/state.yaml
+    - docs/project/features/scanner/state.yaml
+
+phase: phase-1-mvp
+sprint: 2
+implementation_steps:
+  - S15  # S3 Result-Screen
+  - S17  # Edge-States + Eco-Score-Fallback-UI
+
+code_locations:
+  - esg_app/lib/screens/result_screen.dart                 # geplant
+  - esg_app/lib/widgets/score_hero.dart                    # geplant
+  - esg_app/lib/widgets/score_bars.dart                    # geplant
+  - esg_app/lib/widgets/product_card.dart                  # geplant
+  - esg_app/lib/widgets/method_footnote.dart               # geplant
+  - esg_app/lib/widgets/edge_states/data_incomplete.dart   # geplant
+  - esg_app/lib/widgets/edge_states/not_found.dart         # geplant
+test_locations:
+  - esg_app/test/screens/result_screen_test.dart           # geplant
+  - esg_app/test/widgets/score_hero_test.dart              # geplant
+
+done:
+  - 2026-05-19 — Theme-Foundation (S11): scanfair_tokens/colors/typography/theme.dart
+    plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen)
+
+decisions:
+  - id: FD-R-01
+    decision: 3 UI-States Pflicht (full_score / data_incomplete / not_found)
+    date: "2026-05-19"
+    rationale: "ADR 0010 — Transparenz-First erfordert klar getrennte States"
+    adr_ref: "0010"
+
+open_items:
+  - Widget-Reihenfolge wie im Design-Handoff:
+    ProductCard → ScoreHero → ScoreBars → SecondaryBar → ScoreCTAs → MethodFootnote
+  - GEPA-Test-EAN als initiales Hardcode-Beispiel definieren (aus OFF-Spike)
+  - Accessibility-Pass nach erster Implementation (Screen-Reader-Labels)
+
+next_steps:
+  - Theme (S11) muss zuerst stehen
+  - Models (S13) brauchen wir für Type-Safety
+  - Erste Implementation mit Hardcode-Daten, dann mit echtem Service
+
+cross_feature_dependencies:
+  - from: scoring
+    to: results
+    type: data_flow
+    description: ESGScore-Objekt wird gerendert
+  - from: scanner
+    to: results
+    type: navigation
+    description: Nach erfolgreichem Scan: navigate to ResultScreen
+  - from: results
+    to: alternatives
+    type: navigation
+    description: "Bessere Alternative anzeigen" CTA navigiert weiter (Phase 1.5)
+
+requirements: []
+
+related_risks:
+  - FM-14  # Edge-Cases UI
+  - RISK-001  # 30% data_incomplete erwartet bei realen Scans

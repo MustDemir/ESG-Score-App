@@ -1,0 +1,92 @@
+last_updated: 2026-05-19
+
+# Kostenübersicht. Wichtig für Solo-Founder: Cash-Flow im Blick behalten.
+# Trennung in: einmalig, monatlich-fix, variabel.
+
+currency: EUR
+
+one_time:
+  - item: Apple Developer Program
+    amount: 99
+    currency: USD
+    eur_approx: 92
+    when: einmalig pro Jahr (verlängert sich)
+    status: paid
+    paid_date: 2026-05-19
+    notes: |
+      Pflicht für TestFlight + App Store. Bezahlt am 2026-05-19,
+      Verifizierung läuft (24-48h erwartet).
+
+  - item: Google Play Console
+    amount: 25
+    currency: USD
+    eur_approx: 23
+    when: einmalig (lifetime)
+    status: planned
+    notes: Erst in Phase 3 (Android-Release)
+
+  - item: Domain (scanfair.de oder .app)
+    amount: 15
+    currency: EUR
+    when: jährlich
+    status: planned
+    notes: Für Landing-Page + Privacy Policy URL
+
+monthly_recurring:
+  - item: Supabase Free Tier
+    amount: 0
+    when: monatlich
+    status: planned
+    notes: |
+      Free Tier: 500 MB DB, 1 GB Storage, 2 GB Bandbreite, 50k MAU.
+      Reicht für MVP + Soft-Launch. Pro-Tier (25$/Monat) erst bei Skalierung.
+
+  - item: Open Food Facts API
+    amount: 0
+    when: monatlich
+    status: active
+    notes: Kostenlos, CC BY-SA — Attribution-Pflicht
+
+# Phase 2+: Kosten kommen hinzu
+phase_2_estimated:
+  - item: LLM-API-Kosten (Score-Erklärungen, gecached)
+    estimate_eur_per_month: 5-20
+    notes: |
+      Bei 1000 unique Produkten gecached: ~1€ einmalig (Mistral Small).
+      Bei viel Traffic + Re-Generierung: bis ~20€/Monat.
+
+  - item: Embedding-Kosten (semantische Alternativen)
+    estimate_eur_per_month: 2-10
+    notes: |
+      Embedding-API ist sehr günstig (<0.0001€ pro Produkt).
+      Hauptkosten beim initialen Aufbau des Produkt-Index.
+
+  - item: Supabase Pro (falls nötig)
+    estimate_eur_per_month: 25
+    notes: Erst wenn Free Tier gesprengt wird (>50k MAU oder >500 MB DB)
+
+phase_3_estimated:
+  - item: Sentry oder ähnliches Monitoring
+    estimate_eur_per_month: 0-26
+    notes: Free Tier reicht meist anfangs
+
+  - item: CI/CD Minutes (über Free Tier hinaus)
+    estimate_eur_per_month: 0-20
+
+# Zeit ist auch eine Ressource (Solo-Founder!)
+time_budget:
+  weekly_hours_committed: TBD  # ehrlich tracken
+  notes: |
+    Time-to-MVP-Schätzung: 80-120h Entwicklung (4-6 Wochen bei 20h/Woche).
+    Bei <10h/Woche → Plan B (MVP-Scope weiter reduzieren).
+
+# Gesamt-Budget
+budget_phase_1: |
+  Phase 1 (MVP, 6 Wochen):
+    - Apple Dev Account:     92 €
+    - Domain (optional):     15 €
+    - Hosting/APIs:           0 €
+    -------------------------------
+    Total cash out:        107 €
+
+    Plus: 80-120h Entwicklungszeit

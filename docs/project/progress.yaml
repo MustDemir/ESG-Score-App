@@ -1,0 +1,206 @@
+project: ESG-Score-App
+current_phase: phase-1-mvp
+current_week: 2026-W21
+last_updated: 2026-05-19
+
+# =============================================================================
+# MILESTONES — append-only, große Meilensteine
+# =============================================================================
+milestones:
+  - id: M01
+    title: Design-Phase abgeschlossen (Phase 0)
+    date: 2026-05-15
+    phase: phase-0-design
+    notes: Wireframes + Brand + Hi-Fi-Mockups + Handoff-Paket fertig
+
+  - id: M02
+    title: Projekt-Dokumentations-System aufgesetzt
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: docs/project/ mit ADRs, Roadmap, Backlog, Risks, Methodik
+
+  - id: M03
+    title: Flutter SDK lokal installiert
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: Flutter 3.44.0 via Homebrew, Android Studio + CocoaPods installiert
+
+  - id: M04
+    title: OFF-API-Spike erfolgreich — RISK-001 mitigated
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      20/20 EANs in OFF, E-Säule 100%, S-Säule 95% berechenbar.
+      Aber: Selection Bias muss durch Edge-Case-UX adressiert werden
+      (TODO-011, TODO-012).
+
+  - id: M05
+    title: Flutter-Projekt initialisiert (esg_app)
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      flutter create esg_app --org com.scanfair --platforms=ios,android
+      75 Files erstellt. flutter analyze clean, flutter test grün.
+      .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
+      Step S06 abgeschlossen.
+
+  - id: M08
+    title: Apple Developer Program gekauft — TODO-003 done
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Apple Developer Program-Mitgliedschaft ($99/Jahr) bezahlt. Verifizierung
+      läuft. RISK-002 von M auf L heruntergestuft. TestFlight-Pfad ist
+      damit unblocked sobald Verifizierung durch ist.
+
+  - id: M07
+    title: Theme-Foundation S11 — scanfair_theme aktiv
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Step S11 abgeschlossen. 4 Theme-Files in esg_app/lib/theme/:
+      - scanfair_tokens.dart (Brand-Tokens als Dart-Konstanten)
+      - scanfair_colors.dart (Material 3 ColorScheme + Ampel-Mapping)
+      - scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
+      - scanfair_theme.dart (komplettes ThemeData)
+      Plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen).
+      google_fonts ^6.2.1 dependency installiert.
+      3 Widget-Tests grün. flutter analyze clean.
+
+  - id: M06
+    title: CI/CD-Pipeline + Pre-Commit-Hooks aktiv
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Steps S07 + S08 + S09 abgeschlossen.
+      - .github/workflows/ci.yml: flutter analyze + format + test + gitleaks-Job
+      - Native Git-Hook (scripts/hooks/pre-commit) installiert
+        gitleaks (Secret-Scan) + dart format + Private-Key-Check
+        + Merge-Conflict-Check + .env-Schutz
+      - Feature-State-Pattern aktiv (docs/project/features/{scanner,scoring,results}/)
+      - Feature-State-Template in methodology/
+
+      Hinweis: pre-commit-Framework (Python) wegen Python 3.14 + macOS Tahoe
+      pyexpat-Bug nicht nutzbar. Native Bash-Hook stattdessen — gleiche
+      Funktionalität.
+
+# =============================================================================
+# DECISIONS_MADE — Verweise auf ADRs, append-only
+# =============================================================================
+decisions_made:
+  - adr: 0001
+    title: Flutter als Frontend-Framework
+    date: 2026-05-19
+  - adr: 0002
+    title: Supabase (EU-Frankfurt) als Backend
+    date: 2026-05-19
+  - adr: 0003
+    title: Open Food Facts als primäre Produktdatenquelle
+    date: 2026-05-19
+  - adr: 0004
+    title: Kein KI-/LLM-Layer in Phase 1 (MVP)
+    date: 2026-05-19
+  - adr: 0005
+    title: ArgonOS als KI-Plattform abgelehnt
+    date: 2026-05-19
+  - adr: 0006
+    title: Monetarisierung via Membership (Freemium + ScanFair+)
+    date: 2026-05-19
+  - adr: 0007
+    title: CI/CD/CT-Strategie — minimal aber von Anfang an
+    date: 2026-05-19
+  - adr: 0008
+    title: Security-Baseline — 7 nicht-verhandelbare Praktiken
+    date: 2026-05-19
+  - adr: 0009
+    title: Methodik-Übernahme aus ai-context-vault und genaiops-compliance-gates
+    date: 2026-05-19
+  - adr: 0010
+    title: Eco-Score-Fallback-Logik bei unvollständigen OFF-Daten
+    date: 2026-05-19
+  - adr: 0011
+    title: ESG-Score-Formel — E/S/G aus OFF-Feldern
+    date: 2026-05-19
+  - adr: 0012
+    title: Apple Review Compliance Strategy
+    date: 2026-05-19
+  - adr: 0013
+    title: Multi-Regulation-Strategy — Cross-Regulation-Mapping
+    date: 2026-05-19
+
+# =============================================================================
+# WEEKLY_LOG — neueste Woche oben
+# =============================================================================
+weekly_log:
+  - week: 2026-W21
+    summary: Setup-Phase — Tooling installiert, Projekt-Doku aufgesetzt
+    done:
+      - Flutter 3.44.0 via Homebrew installiert
+      - Android Studio + CocoaPods installiert
+      - ArgonOS evaluiert und verworfen (ADR 0005)
+      - Projekt-Dokumentations-System angelegt (docs/project/)
+      - 6 initiale ADRs geschrieben (0001-0006)
+      - Roadmap, Backlog, Risks, Progress YAMLs erstellt
+      - Monetarisierungs-Strategie definiert (ADR 0006 + monetization.yaml)
+      - OFF-API-Spike durchgeführt: 20/20 Coverage, E-Säule 100%, S-Säule 95%
+      - CI/CD/CT-Strategie definiert (ADR 0007 + quality-strategy.md)
+      - Security-Baseline mit 7 Praktiken festgelegt (ADR 0008)
+      - Failure-Modes-Register mit 16 Top-Solo-Founder-Fehlern
+      - CLAUDE.md erweitert mit Session-Start-Protokoll (Pfad zu docs/project/)
+      - Definition of Done definiert (definition-of-done.yaml)
+      - Session-Start-Protokoll für Chat-Wechsel (session-start-protocol.md)
+      - Mustafa-eigene Repos analysiert: ai-context-vault + genaiops-compliance-gates
+      - ADR 0009 — Methodik-Übernahme-Entscheidungen pro Quelle dokumentiert
+      - 22-Schritte-Implementation-Plan persistiert (implementation-plan.yaml)
+      - TODO-013 (ai-context-vault HIGH-ROI) + TODO-014 (Master-Thesis Solo-Variante) angelegt
+      - Block 1 (S01-S05) komplett umgesetzt
+        * ADR 0010 (Eco-Score-Fallback) — Transparenz-First-Strategie
+        * ADR 0011 (ESG-Score-Formel) — gewichtete E/S/G mit Methodik v1.0
+        * Status-Enum verbindlich in conventions.md
+        * decisions/INDEX.md flache ADR-Tabelle
+        * lade_manifest pro Task-Typ in definition-of-done.yaml
+      - 3 Workflow-Markdowns aus Vault-Skill-Patterns (session-start, pre-coding-check, post-feature)
+      - CLAUDE.md erweitert mit Trigger-Phrasen → Workflow-Mapping
+      - S06: Flutter-Projekt erstellt (esg_app/, ios+android, analyze clean, test grün)
+      - S07: GitHub Actions CI-Workflow (.github/workflows/ci.yml)
+      - S08: Pre-Commit-Hooks (scripts/hooks/pre-commit, native Bash)
+      - S09: Feature-State-Pattern (3 initiale states.yaml + Template + README)
+      - Apple App Review Guidelines (40 Seiten) systematisch analysiert
+      - ADR 0012 — Apple Review Compliance Strategy
+      - 5 R-AS-Anforderungen aktiv (R-AS-01, 03, 06, 08, 12)
+      - 1 Beispiel-Gate (G-AS-NAME-LENGTH) mit Rego-Policy + 9 Tests
+      - 10 weitere Apple-Compliance-TODOs (TODO-015 bis TODO-024) angelegt mit Aktivierungs-Triggern
+      - DSGVO-Relevanz-Mapping (compliance/dsgvo-relevance.md) — 13 Phase-1 + 4 Phase-2 R-DSGVO
+      - 5 R-DSGVO-YAMLs aktiv (R-DSGVO-01, 07, 09, 10, 11)
+      - Cross-Regulation-Map (compliance/cross-regulation-map.md) — Apple ⇄ DSGVO ⇄ OFF
+      - ADR 0013 — Multi-Regulation-Strategy mit overlapping_with-Pattern
+      - Methodisch wichtig: Framework als regulation-agnostic etabliert (Phase 2-7 wiederverwendbar)
+    learnings:
+      - OFF-API-Datenqualität ist das kritische Risiko Nr. 1 für MVP
+      - ArgonOS ist Enterprise-Tool, völlig falsche Größenordnung
+      - YAML-basiertes ADR-System ist für Solo-Founder + Claude Code ideal
+      - Solo-Founder-Disziplin = strikte Phase-Scope, keine KI in MVP
+    blockers:
+      - Xcode-Install noch ausstehend (App Store Download läuft)
+      - Apple Developer Account noch nicht angelegt
+      - OFF-API-Spike noch ausstehend
+    next_week:
+      - TODO-001: OFF-API-Spike mit 20 DE-Barcodes durchführen
+      - TODO-002: ESG-Score-Formel definieren (ADR 0006)
+      - TODO-003: Apple Developer Account anlegen
+      - TODO-009: Xcode-Installation abschließen
+      - TODO-010: Android Studio Setup-Wizard
+
+# =============================================================================
+# STATS — automatisch aktualisierbar
+# =============================================================================
+stats:
+  decisions_total: 13
+  todos_open: 20
+  todos_in_progress: 1
+  todos_done: 3
+  milestones_reached: 8
+  risks_open: 3
+  risks_mitigated: 2
+  risks_accepted: 1
+  ideas_parked: 9

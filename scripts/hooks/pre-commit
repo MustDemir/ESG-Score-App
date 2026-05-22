@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# ============================================================================
+# Git pre-commit hook für ScanFair
+# ============================================================================
+# Wird automatisch ausgeführt bei `git commit`.
+# Bei Fehler: Commit wird abgebrochen.
+#
+# Referenz: ADR 0008 (Security-Baseline), quality-strategy.md §4
+# Installation: bash scripts/hooks/install.sh
+# ============================================================================
+
+set -e
+
+red()    { printf "\033[0;31m%s\033[0m\n" "$1"; }
+green()  { printf "\033[0;32m%s\033[0m\n" "$1"; }
+yellow() { printf "\033[0;33m%s\033[0m\n" "$1"; }
+
+# ----------------------------------------------------------------------------
+# 1) Secret-Scan via gitleaks (ADR 0008 SEC-1)
+# ----------------------------------------------------------------------------
+if command -v gitleaks &>/dev/null; then
+  if ! gitleaks protect --staged --redact --no-banner 2>&1; then
+    red "❌ gitleaks fand Secrets im staged Diff — Commit abgebrochen."
+    red "   Fix: Secret rotieren (NICHT nur Commit zurücksetzen!) und neu stagen."
+    exit 1
+  fi
+  green "✅ gitleaks: keine Secrets im Diff"
+else
+  yellow "⚠️  gitleaks nicht installiert — Secret-Scan übersprungen."
+  yellow "   Install: brew install gitleaks"
+fi
+
+# ----------------------------------------------------------------------------
+# 2) Private-Key-Marker + Merge-Conflict-Marker (nur in geänderten Files)
+# Exclude self (scripts/hooks/*) und .pre-commit-config.yaml (Doku-Patterns)
+# ----------------------------------------------------------------------------
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -vE '^(scripts/hooks/|\.pre-commit-config\.yaml$)' || true)
+if [ -n "$staged_files" ]; then
+  # Private-Key: echte 5-Dash-PEM-Header
+  if echo "$staged_files" | xargs -I{} sh -c '[ -f "{}" ] && grep -lE "^-----BEGIN [A-Z ]*PRIVATE KEY-----" "{}" 2>/dev/null' | grep -q .; then
+    red "❌ Privater Schlüssel im Diff — Commit abgebrochen."
+    exit 1
+  fi
+  # Merge-Conflict-Marker
+  if echo "$staged_files" | xargs -I{} sh -c '[ -f "{}" ] && grep -lE "^(<<<<<<<|=======|>>>>>>>)" "{}" 2>/dev/null' | grep -q .; then
+    red "❌ Merge-Conflict-Marker im Diff — Commit abgebrochen."
+    exit 1
+  fi
+fi
+
+# ----------------------------------------------------------------------------
+# 4) Dart-Format-Check (nur wenn Dart-Files geändert)
+# ----------------------------------------------------------------------------
+dart_files=$(git diff --cached --name-only --diff-filter=ACM | grep '^esg_app/.*\.dart$' || true)
+if [ -n "$dart_files" ]; then
+  if command -v dart &>/dev/null; then
+    # Format-Check ohne Änderungen anzuwenden
+    if ! (cd esg_app && dart format --output=none --set-exit-if-changed lib test 2>/dev/null); then
+      red "❌ dart format zeigt Drift — Commit abgebrochen."
+      red "   Fix: 'cd esg_app && dart format lib test' und neu stagen."
+      exit 1
+    fi
+    green "✅ dart format: keine Drift"
+  else
+    yellow "⚠️  dart nicht im PATH — Format-Check übersprungen."
+  fi
+fi
+
+# ----------------------------------------------------------------------------
+# 5) Schnell-Check: keine .env-Files committet
+# ----------------------------------------------------------------------------
+if git diff --cached --name-only | grep -E '^\.env(\..*)?$|\.p12$|\.mobileprovision$' >/dev/null 2>&1; then
+  red "❌ .env / Zertifikats-Datei im Diff — Commit abgebrochen (ADR 0008 SEC-1)."
+  red "   Diese Files sollten in .gitignore stehen."
+  exit 1
+fi
+
+green "✅ Pre-Commit-Hooks alle grün"
+exit 0

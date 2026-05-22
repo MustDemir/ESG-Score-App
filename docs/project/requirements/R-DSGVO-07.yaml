@@ -1,0 +1,80 @@
+id: R-DSGVO-07
+title: Recht auf Löschung implementiert ("Recht auf Vergessenwerden")
+kontrollmechanismus: Hybrid (Conftest prüft Code-Vorhandensein der Delete-Funktion; manueller Test vor TestFlight)
+
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+
+dsgvo_refs:
+  - "Art. 17"
+  - "Art. 5(1)(e) Speicherbegrenzung"
+
+apple_guideline_refs:
+  - "5.1.1(v) Account-Löschung wenn Auth"
+
+overlapping_with:
+  - R-AS-05   # gleiche Implementation deckt beide ab
+
+description: |
+  Nutzer haben Anspruch auf Löschung ihrer personenbezogenen Daten unter
+  bestimmten Voraussetzungen (Art. 17). Konkret:
+  - Daten für Erhebungszweck nicht mehr nötig
+  - Widerruf der Einwilligung (wenn Grundlage)
+  - Widerspruch nach Art. 21
+  - Unrechtmäßig verarbeitet
+
+  Apple-Richtlinie 5.1.1(v) verstärkt das: bei Account-Anmeldungs-Funktion
+  MUSS die App eine "Löschen-Account"-Option bieten — nicht nur via Email.
+
+  Implementation:
+  - Settings → "Account löschen" Button
+  - Bestätigungsdialog
+  - Server-seitig: User-Row + alle FK-Daten löschen (Supabase Cascade)
+  - Bestätigungs-Email
+  - 30-Tage-Grace-Period optional (Soft-Delete dann Hard-Delete)
+
+evidence_expected:
+  - esg_app/lib/screens/settings/account_deletion_screen.dart vorhanden
+  - Supabase-Migration mit ON DELETE CASCADE für User-FKs
+  - Integration-Test: Account-Löschung führt zu vollständiger Daten-Entfernung
+  - VVT-Eintrag: Aufbewahrungsdauer "bis Löschungsanforderung"
+
+acceptance_criteria:
+  - Lösch-Funktion in App-UI erreichbar (max. 2 Klicks von Settings)
+  - Lösch-Funktion entfernt: Auth-User + scans + preferences
+  - Lösch-Funktion ist nicht reversibel (Hard-Delete oder 30-Tage-Grace)
+  - User bekommt Bestätigung
+  - Cron-Job oder Trigger für 30-Tage-Cleanup (falls Soft-Delete)
+
+linked_gates:
+  - G-DSGVO-DELETE
+  - G-AS-ACCOUNT-DELETE   # via overlapping_with
+
+deployer_implication: |
+  - Settings-Screen mit "Account löschen" implementieren
+  - Supabase: ON DELETE CASCADE auf FK-Spalten
+  - Optional: scheduled-function für Soft-to-Hard-Delete-Übergang
+  - Privacy Policy: Löschungs-Prozess erklären
+  - Bei DSGVO-Anfrage per Email: manueller Prozess dokumentiert
+
+audit_trigger: "Pre-TestFlight Smoke-Test; bei jeder Auth-Code-Änderung CI-Test"
+
+sources:
+  - DSGVO Art. 17
+  - App Review Guidelines 5.1.1(v)
+  - Apple Account Deletion Guidance (https://developer.apple.com/support/offering-account-deletion-in-your-app/)
+
+phase: phase-1-mvp
+
+related_todos: [TODO-017]
+related_failure_modes: []
+related_decisions: [0002, 0008]
+
+notes: |
+  Doppelt motiviert (DSGVO + Apple). Eine einzige Implementation erfüllt
+  beide. Test-Case: User-Account anlegen → Daten erzeugen → Account löschen →
+  prüfen dass keine Reste in DB.
+
+  Wichtig: auch Backups beachten (Supabase Point-in-Time-Recovery enthält
+  gelöschte Daten für 7-30 Tage — in Privacy Policy erwähnen).

@@ -1,0 +1,174 @@
+id: 0011
+title: ESG-Score-Formel — E/S/G aus OFF-Feldern
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [scoring, esg, formel, mvp, methodology]
+
+context: |
+  Die App muss aus OFF-Feldern einen ESG-Score berechnen. Bisher war
+  unklar wie. Spike hat folgende Felder als nutzbar identifiziert:
+
+  E (Environment):
+    - ecoscore_grade (a-plus / a / b / c / d / e / f / unknown)  — 70% Coverage
+    - ecoscore_score (0-100 numerisch) — wenn vorhanden
+    - packaging_tags (Plastik / Glas / Karton) — 85% Coverage
+    - agribalyse-Daten — wenn vorhanden (selten)
+
+  S (Social):
+    - labels_tags (en:organic, en:fair-trade, en:vegan, etc.) — 25% Coverage explizit
+    - origins / origins_tags — 35% Coverage (regional?)
+    - manufacturing_places — selten gefüllt
+
+  G (Governance):
+    - data_quality_tags (Vollständigkeit der OFF-Daten)
+    - brands (Marke bekannt? Multi-Brand?)
+
+  Wir sind KEIN wissenschaftliches Bewertungs-Institut. Unsere Formel ist
+  pragmatisch + transparent + erweiterbar. Disclaimer im App-Footer ist
+  Pflicht.
+
+options_considered:
+  - name: A — Eco-Score 1:1 als Gesamt-Score
+    pros:
+      - Wissenschaftlich validiert (Agribalyse-basiert)
+      - Null Eigenarbeit
+    cons:
+      - Reduziert ESG auf E (kein S, kein G)
+      - Unser Mehrwert vs. OFF-App ist null
+
+  - name: B — Eigene Formel mit Gewichtung E/S/G
+    pros:
+      - Eigener Wert: drei Säulen sichtbar
+      - Differenziert von Eco-Score
+      - Erweiterbar (KI-Layer Phase 2 kann Säulen verfeinern)
+    cons:
+      - Methodisch eigene Verantwortung
+      - Disclaimers nötig
+
+  - name: C — Komplexes Multi-Faktor-Modell mit ML
+    pros:
+      - Akademisch interessant
+    cons:
+      - Phase-1-MVP-Killer
+      - Validierung würde Monate dauern
+
+decision: Option B — Eigene gewichtete Formel mit E/S/G-Säulen
+rationale: |
+  Differenzierung von reiner Eco-Score-Anzeige. ESG als 3-Säulen-System
+  ist intuitiv (passt zu ESG-Investing-Mainstream). Eco-Score wird als
+  E-Baseline genutzt (wissenschaftlich solide), S und G ergänzen.
+
+formula_v1:
+  # Gewichtung
+  weights:
+    e: 0.50     # 50% — Environment dominiert (Hauptthema der App)
+    s: 0.30     # 30% — Social ist sekundär aber wichtig
+    g: 0.20     # 20% — Governance kleinste Säule (Daten dünn)
+
+  # E-Säule (0-100)
+  e_pillar:
+    primary_input: ecoscore_score
+    calculation: |
+      Wenn ecoscore_score vorhanden (0-100): direkt nutzen
+      Wenn nur ecoscore_grade vorhanden: Mapping
+        a-plus → 95
+        a      → 85
+        b      → 70
+        c      → 55
+        d      → 40
+        e      → 25
+        f      → 10
+      Wenn unknown / not-applicable:
+        e_pillar = null (siehe ADR 0010 — Transparenz-First)
+
+  # S-Säule (0-100)
+  s_pillar:
+    base: 50    # neutral starting point
+    bonuses:
+      - condition: "fair-trade" in labels_tags
+        points: +25
+      - condition: "organic" / "bio" / "eu-organic" in labels_tags
+        points: +20
+      - condition: "vegan" / "vegetarian" in labels_tags
+        points: +10
+      - condition: "regional" oder Origins in {DE, AT, CH, EU}
+        points: +15
+      - condition: "rainforest-alliance" / "utz" / "fairtrade-deutschland"
+        points: +20
+    penalties:
+      - condition: "palm-oil" in ingredients_text und kein "rspo-certified" label
+        points: -15
+    cap: [0, 100]   # clamp auf 0-100
+    fallback_if_no_data: null
+
+  # G-Säule (0-100)
+  g_pillar:
+    base: 50
+    bonuses:
+      - condition: data_quality_tags enthält "complete" oder "ecoscore_complete"
+        points: +20
+      - condition: brands enthält genau 1 Marke (nicht "Brand X, Brand Y, Brand Z")
+        points: +10
+      - condition: ingredients_text vorhanden und nicht leer
+        points: +10
+    penalties:
+      - condition: data_quality_warnings enthält "missing"
+        points: -10
+    cap: [0, 100]
+    rationale: |
+      Governance bedeutet hier: wie transparent ist der Produzent?
+      Vollständige Daten = höhere Transparenz = höhere G-Bewertung.
+
+  # Gesamt-Score
+  total_score:
+    formula: |
+      Wenn alle drei Säulen null: kein Score (data_incomplete UI)
+      Sonst: weighted_average der vorhandenen Säulen, fehlende ignoriert
+      Beispiel: nur S vorhanden → Total = s_pillar (mit Hinweis "nur S verfügbar")
+
+  # Ampel-Schwellen
+  ampel:
+    grün: ">= 70"
+    gelb: "40-69"
+    rot:  "< 40"
+    grau: "data_incomplete"
+
+versionierung_und_disclaimer:
+  formula_version: "1.0"   # bei Änderung hochzählen, alte Scans nicht neu berechnen
+  disclaimer_app_footer: |
+    "ESG-Score nach ScanFair-Methodik v1.0 (siehe Methodik-Seite).
+    Daten: Open Food Facts (CC BY-SA). Score ist Hinweis, keine
+    finale Bewertung. Wir übernehmen keine Gewähr."
+  methodology_page_required: ja  # Pflicht im Onboarding + Settings
+
+what_we_explicitly_dont_do:
+  - Eigene CO2-Berechnung (machen wir nicht — zu fehleranfällig)
+  - Marken-Reputations-Lookup (z.B. NGO-Reports) — Phase 2 möglich
+  - Lieferketten-Tiefe (Supplier-of-Supplier) — irreal mit OFF-Daten
+  - Carbon-Compensation-Berücksichtigung — nicht in MVP
+
+implementation_target:
+  file: esg_app/lib/services/esg_score_calculator.dart
+  test_file: esg_app/test/services/esg_score_calculator_test.dart
+  test_cases_minimum:
+    - Voll-Score (alle drei Säulen vorhanden)
+    - Nur-E (S und G null)
+    - Nur-S (Edge-Case wenn Eco-Score fehlt — siehe ADR 0010)
+    - Komplett-data_incomplete (alle null)
+    - Bio-Label gibt korrekte S-Boost
+    - Fair-Trade-Label gibt korrekten S-Boost
+    - Palmöl-Penalty greift wenn nicht RSPO
+
+consequences:
+  - ESGScoreCalculator wird zentrale Business-Logik der App
+  - Methodik-Seite in App + auf Webseite muss geschrieben werden
+  - Tests müssen Formel-Änderungen explizit dokumentieren (Snapshot-Style)
+  - Bei Formel-Update: Versions-Hochzählung + Migration-Plan
+  - User-Feedback (Phase 1.5): evtl. Gewichts-Justierung nötig
+
+supersedes: null
+superseded_by: null
+related: [0003, 0010]
+related_risks: [RISK-001, RISK-003]
+related_todos: [TODO-002]

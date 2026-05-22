@@ -17,17 +17,21 @@ build/
 .DS_Store
 *.plist
 
-# iOS
-ios/Pods/
-ios/.symlinks/
-ios/Flutter/flutter_export_environment.sh
+# iOS (Flutter unter esg_app/)
+esg_app/ios/Pods/
+esg_app/ios/.symlinks/
+esg_app/ios/Flutter/flutter_export_environment.sh
+esg_app/ios/Flutter/Generated.xcconfig
+esg_app/ios/Runner/GeneratedPluginRegistrant.*
 
-# Android
-android/.gradle/
-android/local.properties
-android/app/debug/
-android/app/profile/
-android/app/release/
+# Android (Flutter unter esg_app/)
+esg_app/android/.gradle/
+esg_app/android/local.properties
+esg_app/android/app/debug/
+esg_app/android/app/profile/
+esg_app/android/app/release/
+esg_app/android/key.properties
+esg_app/android/app/google-services.json
 
 # Supabase
 .env
@@ -36,7 +40,7 @@ supabase/.temp/
 
 # Misc
 *.log
-*.lock
+# Achtung: pubspec.lock soll committet werden (Reproducibility) — daher kein generelles *.lock
 
 # Archives & Binaries
 *.zip

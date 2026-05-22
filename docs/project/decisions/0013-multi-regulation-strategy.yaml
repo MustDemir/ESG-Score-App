@@ -1,0 +1,182 @@
+id: 0013
+title: Multi-Regulation-Strategy — Framework-Generalisierung über mehrere Compliance-Quellen
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [compliance, methodology, multi-regulation, dsgvo, apple, framework]
+
+context: |
+  Der Apple-Compliance-Block (ADR 0012) hat gezeigt: die Methodik aus der
+  Master-Thesis-Repo (genaiops-compliance-gates) ist regulation-agnostic.
+
+  Schaubild "Prozessmodell: Von der Regulierung zum automatisierten Quality
+  Gate" der Master-Thesis zeigt 7 Phasen, von denen nur Phase 1
+  (Regulatorische Analyse) regulation-specific ist. Phasen 2-7 sind generisch.
+
+  Frage: Wie strukturieren wir mehrere Regulierungs-Quellen (EU AI Act in
+  Thesis, Apple Guidelines, DSGVO, OFF-Lizenz, später ggf. mehr) ohne
+  Anforderungs-Duplikate und ohne Inkonsistenz?
+
+problem_statement: |
+  Eine ScanFair-Implementation wie "Account löschen können" muss erfüllen:
+    - Apple Review Guideline 5.1.1(v)
+    - DSGVO Art. 17
+  Wenn wir das als zwei getrennte Anforderungen führen (R-AS-05 UND R-DSGVO-07),
+  riskieren wir Drift: eine wird gepflegt, die andere veraltet.
+
+options_considered:
+  - name: A — Separate Silos pro Regulierung
+    structure: |
+      requirements/apple/R-AS-*.yaml
+      requirements/dsgvo/R-DSGVO-*.yaml
+      requirements/off/R-OFF-*.yaml
+    pros: [Klar getrennt nach Quelle]
+    cons:
+      - Anforderungs-Duplikate
+      - Drift-Risiko zwischen identischen Implementations
+      - Bei Reviewer-Anfrage 2x dokumentieren
+
+  - name: B — Eine flache requirements/-Struktur mit Cross-Refs
+    structure: |
+      requirements/R-AS-NN.yaml      # Apple
+      requirements/R-DSGVO-NN.yaml   # DSGVO
+      requirements/R-OFF-NN.yaml     # OFF
+      + Cross-Refs in jeder YAML (overlapping_with, apple_guideline_refs, dsgvo_refs)
+      + cross-regulation-map.md als Übersicht
+    pros:
+      - Eine Implementation wird in ALLEN betroffenen R-NN.yaml referenziert
+      - "overlapping_with" macht Duplikate explizit
+      - Klare Audit-Spur
+    cons:
+      - Mehr Pflege-Aufwand bei Refs
+      - Map-Datei muss aktuell gehalten werden
+
+  - name: C — Implementation-Centric (eine Datei pro Implementation, alle Regs als Refs)
+    structure: |
+      implementations/account-deletion.yaml
+        regulation_refs:
+          - apple: 5.1.1(v)
+          - dsgvo: Art. 17
+    pros: [Eine Quelle der Wahrheit pro Feature]
+    cons:
+      - Bricht das Master-Thesis-Pattern (das R-NN-Format ist Standard)
+      - Schwerer auf akademisches Framework zurückzuführen
+
+decision: Option B — flache requirements/-Struktur mit Cross-Refs + Map
+rationale: |
+  Beste Balance aus:
+  - Konsistenz mit Master-Thesis-Framework (R-NN-Format unverändert)
+  - Audit-Tauglichkeit (jede Regulierung hat eigene Spur)
+  - Duplikat-Vermeidung via `overlapping_with` Feld
+  - Übersicht via `cross-regulation-map.md`
+
+  Konkrete Regeln:
+
+  1) **Eine R-Anforderung pro Verpflichtung pro Regulierung.**
+     Apple 5.1.1(v) → R-AS-05
+     DSGVO Art. 17 → R-DSGVO-07
+     Beide bleiben bestehen.
+
+  2) **`overlapping_with` Feld verlinkt redundante Anforderungen.**
+     R-AS-05.yaml:
+       overlapping_with: [R-DSGVO-07]
+     R-DSGVO-07.yaml:
+       overlapping_with: [R-AS-05]
+     Symmetrisch — beide Seiten gepflegt.
+
+  3) **`linked_gates` kann dasselbe Gate referenzieren.**
+     R-AS-05.linked_gates: [G-DSGVO-DELETE]
+     R-DSGVO-07.linked_gates: [G-DSGVO-DELETE]
+     → Ein Gate erfüllt beide Anforderungen.
+
+  4) **Gate-Naming-Konvention.** Wenn Gate cross-regulatory ist, wird das
+     Gate nach der "stärkeren" Regulierung benannt:
+     - DSGVO (Bußgeld bis 4% Umsatz) > Apple (Reject, dann wieder einreichen)
+     - Beispiel: G-DSGVO-DELETE (nicht G-AS-DELETE), referenziert in beiden R-NN.
+
+  5) **`cross-regulation-map.md` ist Single-Source-of-Truth** für
+     Implementation→Regulation-Mapping.
+
+framework_generalization_note: |
+  Diese Entscheidung ist auch ein **akademisches Statement**:
+  Das Master-Thesis-Framework ist regulation-agnostic, und Multi-Regulation-
+  Stacking ist eine natürliche Erweiterung. Künftige Thesis-Diskussion oder
+  Future-Work könnte das herausarbeiten.
+
+current_regulations_in_scope:
+  - id: APPLE
+    full_name: Apple App Review Guidelines
+    primary_doc: /Users/mustafademir/Downloads/App-Review-Guidelines-German.pdf
+    version: Februar 2026
+    requirements_prefix: R-AS-
+    status: aktiv
+    related_adr: 0012
+
+  - id: DSGVO
+    full_name: Datenschutz-Grundverordnung (EU 2016/679)
+    primary_doc: VO (EU) 2016/679
+    version: anwendbar seit 25.05.2018
+    requirements_prefix: R-DSGVO-
+    status: aktiv (5 R aktiv, 8 als TODOs)
+
+  - id: OFF-LIC
+    full_name: Open Food Facts CC BY-SA Lizenz
+    requirements_prefix: R-OFF-
+    status: minimal (deckt via R-AS-06 / R-DSGVO-03)
+    notes: Attribution + ShareAlike — bei Phase 3 (User-Daten-Beitrag) relevant
+
+  - id: TMG-DE
+    full_name: Telemediengesetz §5 (Impressumspflicht)
+    requirements_prefix: R-TMG-
+    status: future (mit Domain-Setup)
+    notes: Triviale Anforderung — wird über Support-URL-Setup erfüllt
+
+future_regulations_to_consider:
+  - id: EU-AI-ACT
+    when: Phase 2 (mit KI-Layer)
+    notes: |
+      Eigentliche Master-Thesis-Domain. KI-Layer in Phase 2 fällt unter
+      EU AI Act Art. 50 (Transparenz-Pflicht für GenAI-Outputs).
+      ScanFair-KI-Erklärungen müssen als "AI-generated" markiert sein.
+  - id: DMA
+    full_name: Digital Markets Act
+    when: bei Membership (Phase 2)
+    notes: |
+      Apple muss in EU alternative Zahlungsmethoden zulassen. Für uns
+      neutral — wir nutzen IAP, das ist EU-konform.
+  - id: DSA
+    full_name: Digital Services Act
+    when: Phase 3 (Community-Features)
+    notes: User-generated-Content-Moderation-Pflichten
+
+cross_regulation_principles:
+  - principle: |
+      Implementations werden geteilt, Anforderungen nicht.
+      Eine Login-Implementation kann Apple-Sign-In + DSGVO-Anforderung 6(1)(a)
+      + TMG erfüllen — aber jede Regulierung hat ihre eigene R-NN.
+
+  - principle: |
+      Bei Konflikt zwischen Regulierungen: strengere gewinnt + dokumentieren.
+      Beispiel: DSGVO sagt löschen, deutsches Steuerrecht sagt 10 Jahre
+      aufbewahren → Hybrid-Lösung (anonymisierte Rechnungs-Daten) + Doku.
+
+  - principle: |
+      Cross-Regulation-Map ist Source of Truth für Reviewer-Antworten.
+      Bei Apple-Review-Anfrage: Map zeigt was DSGVO + Apple parallel erfüllt.
+      Bei Aufsichtsbehörde: dasselbe in andere Richtung.
+
+consequences:
+  - docs/project/compliance/cross-regulation-map.md ist neuer SSOT
+  - requirements/-YAMLs bekommen `overlapping_with` Feld
+  - Gate-Naming: nach strengster Regulierung
+  - Bei neuer Regulierung: ADR mit Aufnahme-Begründung schreiben
+  - VVT (R-DSGVO-12) referenziert Cross-Regulation-Map
+
+supersedes: null
+superseded_by: null
+related: [0007, 0008, 0009, 0012]
+references:
+  - /Users/mustafademir/Projects/genaiops-compliance-gates (Master-Thesis-Framework)
+  - docs/project/compliance/apple-review-relevance.md
+  - docs/project/compliance/dsgvo-relevance.md
+  - docs/project/compliance/cross-regulation-map.md

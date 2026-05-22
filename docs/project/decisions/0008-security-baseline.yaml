@@ -1,0 +1,140 @@
+id: 0008
+title: Security-Baseline — 7 nicht-verhandelbare Praktiken
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [security, dsgvo, secrets, supabase, owasp-masvs]
+
+context: |
+  Solo-Mobile-App mit User-Auth, externer API, später KI-Layer.
+  Angriffsflächen: Repo-Secrets, Supabase RLS-Lücken, OWASP-Mobile-Top-10,
+  DSGVO-Verstöße. Standard-Solo-Founder-Fehler: "Sicherheit später".
+
+  Referenz-Standards:
+  - OWASP MASVS (Mobile Application Security Verification Standard)
+  - OWASP Mobile Top 10
+  - DSGVO Art. 32 (Sicherheit der Verarbeitung)
+  - Apple App Store Review Guidelines 5.1 (Privacy)
+
+options_considered:
+  - name: Ad-hoc Security (Reagieren bei Problemen)
+    pros: [Null Vorlauf-Aufwand]
+    cons: [Häufigster Solo-Founder-Fehler, Reputationsschaden bei Leak teuer]
+
+  - name: Vollständige MASVS L2 Compliance
+    pros: [Sehr sicher]
+    cons: [Monate Aufwand, Overkill für MVP]
+
+  - name: Definierte Baseline + iteratives Härten
+    pros:
+      - Catched Top-Risiken (Secrets, RLS, Crypto, DSGVO)
+      - Skaliert mit Projekt
+      - Auditierbar
+    cons: [Erfordert Disziplin]
+
+decision: Definierte Baseline mit 7 nicht-verhandelbaren Praktiken
+rationale: |
+  Wir definieren eine kleine Liste an Praktiken die IMMER gelten — keine
+  Ausnahmen. Was darüber hinausgeht (z.B. Code-Obfuscation, Pinning)
+  kommt als Phase-2/3-Verbesserung.
+
+baseline_practices:
+  - id: SEC-1
+    title: Keine Secrets im Repository
+    rule: |
+      Niemals API-Keys, Supabase-Service-Keys, Apple-Zertifikate oder
+      .env-Inhalte committen. NIE.
+    enforcement:
+      - gitleaks als Pre-Commit-Hook
+      - GitHub Push Protection aktivieren
+      - .gitignore mit .env, *.p12, *.mobileprovision, secrets/
+      - Bei Versehen: Schlüssel SOFORT rotieren, nicht nur Commit entfernen
+    consequences_if_violated:
+      - Supabase-Schlüssel im Public-Repo → Rechnungs-Explosion möglich
+      - Apple-Cert geleakt → fremde Apps können in deinem Namen signieren
+
+  - id: SEC-2
+    title: Environment-Variables strikt getrennt nach Stage
+    rule: |
+      dev / staging / prod haben separate Supabase-Projekte und Schlüssel.
+      Niemals Prod-Daten in Dev nutzen.
+    enforcement:
+      - flutter_dotenv oder --dart-define-from-file
+      - .env.example committed (ohne Werte), .env nie
+
+  - id: SEC-3
+    title: Supabase Row-Level Security (RLS) — ON für ALLE Tabellen
+    rule: |
+      JEDE Tabelle hat RLS aktiviert. Default-Deny. Explizite Policies
+      pro Operation (SELECT/INSERT/UPDATE/DELETE).
+    enforcement:
+      - Migration-Skripts erzwingen "ALTER TABLE ... ENABLE ROW LEVEL SECURITY"
+      - Test: Anon-User darf nichts ohne Policy lesen
+      - Code-Review: jede neue Tabelle braucht Policy in selbem PR
+    common_pitfalls:
+      - "Anon Public Read" für vermeintlich "öffentliche" Daten — gefährlich
+      - service_role-Key versehentlich im Client
+
+  - id: SEC-4
+    title: HTTPS-only, kein Cleartext
+    rule: |
+      Alle Netzwerk-Calls über HTTPS. Cleartext-Traffic im Manifest
+      explizit verbieten.
+    enforcement:
+      - iOS Info.plist: NSAllowsArbitraryLoads = false
+      - Android: cleartextTrafficPermitted = false
+      - OFF-API ist HTTPS — kein Workaround nötig
+
+  - id: SEC-5
+    title: Dependency-Audit-Rhythmus
+    rule: |
+      Wöchentlich: flutter pub outdated + dart pub audit (sobald verfügbar).
+      Bei kritischer CVE: innerhalb 72h patchen oder Workaround.
+    enforcement:
+      - GitHub Action: jeden Montag automatisch + Issue erstellen
+      - Dependabot für GitHub-eigene Updates
+      - CodeQL Security-Scan bei PRs (Free Tier)
+
+  - id: SEC-6
+    title: Minimale Permissions / Datenminimierung (DSGVO)
+    rule: |
+      Camera-Permission nur für Scanner. Keine Tracking-IDs. Keine
+      Analytics-SDKs mit unbekanntem Datenfluss (kein Firebase Analytics
+      ohne explizite Notwendigkeit).
+    enforcement:
+      - iOS Info.plist Purpose Strings klar formuliert
+      - Privacy Manifest (Apple Pflicht ab 2024) korrekt befüllt
+      - Compliance-Check vor jedem App-Store-Submission
+      - Pre-TestFlight: claude-code skill compliance-auditor
+
+  - id: SEC-7
+    title: Secrets-Rotation + Disaster Recovery
+    rule: |
+      Supabase-Keys, Apple-Certs, Provisioning-Profiles dokumentieren
+      WO sie liegen. Bei Verlust: Recovery-Plan auf 1 Seite.
+    enforcement:
+      - 1Password oder iCloud Keychain für Backup
+      - docs/project/disaster-recovery.md (kommt mit ADR 0009)
+      - Schlüssel-Rotation alle 6 Monate (Kalender-Erinnerung)
+
+claude_code_integration:
+  - skill: security-review (slash command)
+    when: vor TestFlight-Build + nach KI-Layer-Integration in Phase 2
+  - skill: security-engineer (Agent)
+    when: bei größeren Architektur-Änderungen
+  - skill: compliance-auditor
+    when: vor App-Store-Submission (DSGVO-Check)
+  - hooks: .claude/settings.json blockt Bash-Befehle die Secrets exposeren
+
+consequences:
+  - .gitignore strikt: .env, *.p12, *.mobileprovision, secrets/, *.jks
+  - GitHub Secret-Scanning + Push Protection aktivieren
+  - Erste Aktion: gitleaks als Pre-Commit-Hook
+  - Supabase RLS-Policy-Template als Snippet
+  - Compliance-Checkpoint im Release-Process
+  - failure-modes.yaml dokumentiert verwandte Fehlermuster
+  - quality-strategy.md beschreibt Test-Approach für Security
+
+supersedes: null
+superseded_by: null
+related: [0002, 0007]

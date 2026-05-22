@@ -1,0 +1,62 @@
+id: 0001
+title: Flutter als Frontend-Framework
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [frontend, architecture, mobile]
+
+context: |
+  ESG-Score-App braucht iOS + Android aus einer Codebase. Entwickler ist
+  Solo-Founder mit Python-Vorkenntnissen, kein nativer Mobile-Background.
+  Budget knapp, Time-to-MVP ist kritisch.
+
+options_considered:
+  - name: Flutter (Dart)
+    pros:
+      - Eine Codebase für iOS + Android
+      - Hot Reload sehr schnell
+      - mobile_scanner ist battle-tested für Barcodes
+      - Große Community, viele Tutorials
+      - Performance nahe nativ
+    cons:
+      - Dart muss gelernt werden
+      - Bundle-Größe ~15 MB
+      - Auf iOS Look-and-Feel manchmal subtle off
+  - name: React Native
+    pros:
+      - JS/TS evtl. bekannter
+      - Größere Community
+    cons:
+      - Native Bridges fragiler
+      - Scanner-Libs weniger zuverlässig
+      - Performance-Tuning komplexer
+  - name: Native iOS + Android (Swift + Kotlin)
+    pros:
+      - Beste Performance und Plattform-Integration
+      - Volle API-Verfügbarkeit
+    cons:
+      - Doppelter Entwicklungsaufwand → killer für Solo-Founder
+      - Zwei Sprachen lernen statt einer
+  - name: Capacitor / Ionic (Web-View)
+    pros:
+      - Web-Stack wiederverwendbar
+    cons:
+      - Schlechtere Performance
+      - Kamera/Scanner-Integration mühsam
+
+decision: Flutter
+rationale: |
+  Solo-Founder-Realität dominiert: doppelter Aufwand killt das Projekt.
+  Flutter mobile_scanner-Plugin ist der Goldstandard für Barcode-Scanning,
+  und genau das ist der Kern-Use-Case der App. Dart ist lernbar, besonders
+  mit Python-Hintergrund.
+
+consequences:
+  - Dart muss gelernt werden (~2 Wochen für solide Basis)
+  - Flutter SDK + Android Studio + Xcode lokal nötig
+  - State-Management-Entscheidung steht noch aus (Provider vs Riverpod, ADR später)
+  - Bei späterer Web-Version: gleiche Codebase nutzbar via Flutter Web
+
+supersedes: null
+superseded_by: null
+related: []

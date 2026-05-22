@@ -1,0 +1,78 @@
+id: R-DSGVO-10
+title: Privacy by Design + Privacy by Default
+kontrollmechanismus: Hybrid (Code-Pattern-Checks + manueller Architektur-Review)
+
+lifecycle_phase: pre-deployment
+governance_dimension: technisch
+must_should: MUST
+
+dsgvo_refs:
+  - "Art. 25"
+
+apple_guideline_refs:
+  - "5.1.1(iii) Datensparsamkeit"
+
+overlapping_with:
+  - R-AS-04 (Datensparsamkeit)
+  - R-DSGVO-05 (Datenminimierung)
+
+description: |
+  Art. 25 DSGVO verlangt Datenschutz schon BEI der Konzeption ("by Design")
+  und durch datenschutzfreundliche Voreinstellungen ("by Default").
+
+  Konkrete Anwendung in ScanFair:
+
+  By Design:
+  - Scan-Service speichert KEIN Bild, nur den dekodierten EAN-String
+  - ESG-Score-Berechnung lokal in der App (kein Server-Roundtrip nötig im MVP)
+  - Cache von Produkt-Daten ist NICHT user-spezifisch (anonym)
+  - User-Tracking-IDs erst nach Opt-in (ATT-Prompt)
+
+  By Default:
+  - Crash-Reporting (Phase 1 Ende) standardmäßig AUS
+  - Telemetrie standardmäßig AUS
+  - Personalisierung-Features (Phase 2) standardmäßig nicht aktiv
+  - Public-Sharing von Scan-Listen standardmäßig nicht aktiv (Phase 3)
+
+evidence_expected:
+  - Architektur-Doku mit Datenfluss-Diagramm
+  - Code-Pattern: keine User-IDs in Logs
+  - Default-Werte in App-Settings: Tracking/Analytics = false
+  - Permission-Audit: nur Camera + (später) Notifications
+
+acceptance_criteria:
+  - Datenfluss-Diagramm zeigt: kein User-Bild verlässt Gerät
+  - Settings-Defaults: alle „Privacy-affecting" Features OFF
+  - Code-Review-Disziplin: keine PII in Logs
+  - Permission-Liste minimal (Phase 1: nur Camera)
+
+linked_gates:
+  - G-DSGVO-PRIVACY-DESIGN
+
+deployer_implication: |
+  - Bei Architektur-Entscheidungen Privacy als Filter:
+    "Brauchen wir diese Daten WIRKLICH server-seitig?"
+  - Default-Settings-Audit vor TestFlight
+  - Logging-Standard: keine PII (Email, Name) in Logs schreiben
+  - Pre-Coding-Check (workflows/pre-coding-check.md) explizit nach Privacy-Aspekt fragen
+
+audit_trigger: "Pre-Coding-Check vor jedem User-Daten-Feature; Pre-TestFlight Settings-Audit"
+
+sources:
+  - DSGVO Art. 25
+  - EDSA Leitlinien zu Privacy by Design (Guidelines 4/2019)
+  - Apple App Review 5.1.1(iii)
+
+phase: phase-1-mvp
+
+related_todos: []
+related_failure_modes: []
+related_decisions: [0002, 0008]
+
+notes: |
+  Privacy by Design ist PRINZIPIELL, nicht punkthaft. Tritt in jedem
+  Architektur-Schritt zutage. Bester Indikator: wenn die App ohne Tracking-
+  Features genauso gut funktioniert wie mit (sollte sie).
+
+  Anti-Pattern für uns: "Wir loggen einfach mal alles, vielleicht brauchen
+  wir's später." → NEIN. Nur loggen was wir explizit auswerten.

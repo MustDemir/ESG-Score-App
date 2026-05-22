@@ -1,0 +1,462 @@
+last_updated: 2026-05-19
+
+# =============================================================================
+# IDEAS — langfristige Konzepte, nicht für aktuelle Phase
+# =============================================================================
+ideas:
+  - id: IDEA-001
+    title: AR-Overlay für Scanner
+    description: |
+      Live-ESG-Ampel als AR-Overlay über Kamerabild — Produkte im Regal
+      werden mit grünem/gelbem/rotem Rahmen markiert.
+    phase: phase-3-growth
+    effort: XL
+    value: H
+    risk: H
+    status: parked
+    notes: Erfordert ARKit/ARCore, viele Produkte gleichzeitig erkennen ist nicht-trivial
+    created: 2026-05-19
+
+  - id: IDEA-002
+    title: Kassenbon-Scan
+    description: |
+      Ganzen Einkauf nachträglich via Foto vom Kassenbon analysieren —
+      Gesamt-ESG-Impact des Einkaufs zeigen.
+    phase: phase-3-growth
+    effort: L
+    value: H
+    risk: M
+    status: parked
+    notes: OCR + Produkt-Matching, evtl. via OpenAI Vision oder Tesseract
+    created: 2026-05-19
+
+  - id: IDEA-003
+    title: Impact-Tracker / Gamification
+    description: |
+      "Du hast diese Woche 12 nachhaltige Entscheidungen getroffen" —
+      Streaks, Badges, persönliche CO2-Bilanz.
+    phase: phase-3-growth
+    effort: M
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-004
+    title: Community-Features
+    description: |
+      User können Produkte reviewen, Listen teilen, Empfehlungen geben.
+    phase: phase-3-growth
+    effort: L
+    value: M
+    risk: M
+    status: parked
+    notes: Moderations-Overhead nicht unterschätzen
+    created: 2026-05-19
+
+  - id: IDEA-005
+    title: On-Device ML für Offline-Scan
+    description: |
+      Häufig gescannte Produkte lokal cachen, Offline-Funktionalität
+      via TensorFlow Lite.
+    phase: phase-4-monetization
+    effort: L
+    value: M
+    risk: M
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-006
+    title: Meal-Prep-Funktion
+    description: |
+      Rezepte mit ESG-Score, Einkaufsliste generieren.
+    phase: phase-4-monetization
+    effort: L
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-007
+    title: B2B-API / Whitelabel
+    description: |
+      ESG-Score-API für Krankenkassen, Schulen, Kantinen.
+    phase: phase-4-monetization
+    effort: XL
+    value: H
+    risk: M
+    status: parked
+    notes: Hier könnte später ArgonOS wieder relevant werden (siehe ADR 0005)
+    created: 2026-05-19
+
+  - id: IDEA-008
+    title: Web-Version via Flutter Web
+    description: |
+      Browser-Variante für Desktop-Nutzung — z.B. Wocheneinkauf planen.
+    phase: phase-3-growth
+    effort: M
+    value: M
+    risk: L
+    status: parked
+    created: 2026-05-19
+
+  - id: IDEA-009
+    title: Compliance-as-Code mit Rego-Policies (genaiops-compliance-gates)
+    description: |
+      Übernahme/Integration des in Mustafas Master-Thesis entwickelten Frameworks:
+      regulatorische Anforderungen (DSGVO, EU AI Act, Apple Guidelines) als YAML
+      strukturieren, in Rego-Policies kompilieren, durch CI/CD-Pipeline laufen
+      lassen → automatisierte Compliance-Prüfung statt nachgelagertem Audit.
+      Quelle: /Users/mustafademir/Projects/genaiops-compliance-gates
+      Repo: https://github.com/MustDemir/genaiops-compliance-gates
+    phase: phase-2-ki-layer
+    effort: L
+    value: H
+    risk: M
+    status: parked
+    notes: |
+      Besonders relevant für Phase 2 wegen EU-AI-Act-Anwendbarkeit ab 2026/2027.
+      Akademischer Differentiator + B2B-Verkaufsargument (IDEA-007).
+      Bewertung: Solo-Founder = Szenario B (Minimal jetzt, Ausbau Phase 2)
+                 Enterprise = Voll-Integration ab Tag 1
+    related: [IDEA-007]
+    created: 2026-05-19
+
+# =============================================================================
+# TODOS — aktive nächste Schritte (Phase 1)
+# =============================================================================
+todos:
+  - id: TODO-001
+    title: Open Food Facts API-Spike mit 20 DE-Barcodes
+    description: |
+      20 reale Barcodes (Mix aus Marken + DE-Eigenmarken) durch OFF-API jagen.
+      Coverage der ESG-relevanten Felder dokumentieren.
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: done
+    completed: 2026-05-19
+    result: |
+      20/20 in OFF gefunden, E-Säule 100%, S-Säule 95% berechenbar.
+      Report: docs/project/spikes/off-api-2026-05-19.md
+      Script: scripts/spikes/off_api_esg_spike.sh
+      WARNUNG: Selection Bias — EANs via Search gesucht. Random-Scans
+      brauchen Edge-Case-UX siehe TODO-011.
+    blocks: [TODO-002, TODO-005]
+    related_risks: [RISK-001]
+    created: 2026-05-19
+
+  - id: TODO-002
+    title: ESG-Score-Formel definieren (E/S/G aus OFF-Feldern)
+    description: |
+      Mapping festlegen: welche OFF-Felder fließen in E, S, G?
+      Gewichtung definieren. Schwellwerte für Ampel (grün/gelb/rot).
+      Als ADR 0006 dokumentieren.
+    phase: phase-1-mvp
+    priority: P0
+    effort: M
+    status: open
+    blocks: [TODO-005]
+    depends_on: [TODO-001]
+    related_risks: [RISK-003]
+    created: 2026-05-19
+
+  - id: TODO-003
+    title: Apple Developer Account anlegen
+    description: |
+      $99/Jahr. Wegen Verifizierungs-Wartezeit (24-48h, manchmal länger)
+      jetzt anlegen.
+    phase: phase-1-mvp
+    priority: P0
+    effort: XS
+    status: done
+    completed: 2026-05-19
+    completed_notes: |
+      Apple Developer Program-Mitgliedschaft gekauft. Verifizierung läuft.
+      Bundle-ID com.scanfair.esg_app schon im Projekt konfiguriert.
+      Bis Verifizierung durch: TestFlight + Provisioning Profiles offen,
+      Free-Sideload auf eigenes iPhone weiterhin möglich.
+    related_risks: [RISK-002]
+    created: 2026-05-19
+
+  - id: TODO-004
+    title: Supabase-Projekt in EU-Frankfurt anlegen + Schema definieren
+    description: |
+      Tabellen: cached_products, users, scans, product_embeddings (für Phase 2).
+      RLS-Policies einrichten. Auth provider konfigurieren (Email + Apple).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    created: 2026-05-19
+
+  - id: TODO-005
+    title: Flutter-Projekt erstellen + Theme aus Tokens
+    description: |
+      flutter create esg_app --org com.scanfair --platforms=ios,android
+      Dann Theme aus design_handoff_scanfair/tokens.css generieren.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: done
+    completed: 2026-05-19
+    completed_parts:
+      - Step S06 (flutter create) am 2026-05-19 abgeschlossen
+      - Step S11 (Theme aus tokens.css) am 2026-05-19 abgeschlossen:
+        * scanfair_tokens.dart (Tokens)
+        * scanfair_colors.dart (Material 3 ColorScheme)
+        * scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
+        * scanfair_theme.dart (ThemeData mit Buttons/Cards/Inputs)
+        * Smoke-Screen mit Score-Hero-Mock
+        * 3 Widget-Tests grün (Theme-Smoke + ColorScheme-Match + Buttons)
+    depends_on: [TODO-002]
+    notes: Step S06 fertig. Theme-Generierung als S11 verbleibend.
+    created: 2026-05-19
+    updated: 2026-05-19
+
+  - id: TODO-006
+    title: Dart-Datenmodelle generieren (Freezed)
+    description: |
+      Models: Product, ESGScore, SecondaryInfo, ChecklistItem.
+      Mit Freezed + JsonSerializable für API-Mapping.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    depends_on: [TODO-005]
+    created: 2026-05-19
+
+  - id: TODO-007
+    title: S3 Result-Screen bauen
+    description: |
+      ProductCard → ScoreHero → ScoreBars → SecondaryBar → ScoreCTAs → MethodFootnote
+      Mit echtem GEPA-EAN durch OFF-API, nicht hardcoded.
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: open
+    depends_on: [TODO-006]
+    created: 2026-05-19
+
+  - id: TODO-008
+    title: Privacy Policy schreiben (DSGVO + OFF-Attribution)
+    description: |
+      Pflicht für TestFlight. OFF CC BY-SA Lizenz erwähnen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    created: 2026-05-19
+
+  - id: TODO-009
+    title: Xcode-Installation abschließen
+    description: |
+      App Store Download fertigstellen, dann xcode-select switch +
+      runFirstLaunch + license accept.
+    phase: phase-1-mvp
+    priority: P0
+    effort: XS
+    status: in_progress
+    created: 2026-05-19
+
+  - id: TODO-010
+    title: Android Studio Setup-Wizard durchlaufen
+    description: |
+      Erste Öffnung von Android Studio, SDK + Emulator installieren.
+    phase: phase-1-mvp
+    priority: P1
+    effort: XS
+    status: open
+    created: 2026-05-19
+
+  - id: TODO-011
+    title: Edge-Case "Produkt nicht in OFF" UX-Design
+    description: |
+      Folgefrage aus OFF-Spike: Selection Bias zeigt dass random gescannte
+      DE-Eigenmarken eventuell nicht in OFF sind. UI braucht klaren
+      Fallback-Zustand mit User-Beitrag-Option ("Daten ergänzen").
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    related_risks: [RISK-001]
+    created: 2026-05-19
+
+  - id: TODO-012
+    title: Eco-Score-Fallback-Logik definieren
+    description: |
+      Wenn ecoscore_grade = "unknown" oder "not-applicable" (30% der Spike-
+      Produkte): Wie bewerten wir das E? Optionen: (a) "Daten unvollständig"
+      transparent zeigen, (b) Heuristik aus Packaging + Origins + NOVA-Group,
+      (c) niedrigste Stufe annehmen (konservativ).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    depends_on: [TODO-001]
+    blocks: [TODO-002]
+    implementation_step: S01
+    created: 2026-05-19
+
+  - id: TODO-013
+    title: Methodik-Übernahme HIGH-ROI aus ai-context-vault
+    description: |
+      Status-Enum, Feature-State-Pattern, lade_manifest, decisions/INDEX.md
+      (siehe ADR 0009 Sektion ai_context_vault_adoption.high_roi_adopted_now).
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    implementation_step: S03, S04, S05, S09
+    created: 2026-05-19
+
+  - id: TODO-014
+    title: Solo-Variante Compliance-Gates aus Master-Thesis-Repo
+    description: |
+      Requirements/R001-R003 + 3 Rego-Policies + Conftest in GitHub Action
+      + evidence-log.jsonl + CDV-Pattern dokumentieren
+      (siehe ADR 0009 Sektion genaiops_compliance_gates_adoption.solo_variant).
+
+      Erweitert durch Apple-Compliance (ADR 0012):
+      Aus 40 Seiten Apple App Review Guidelines extrahiert: 16 Phase-1 +
+      10 Phase-2 Anforderungen. 5 R-AS aktiv (R-AS-01, 03, 06, 08, 12),
+      11 als TODOs unten (TODO-015 bis TODO-024).
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: in_progress
+    completed_parts:
+      - apple-review-relevance.md (40 Seiten gemappt)
+      - 5 R-AS-YAMLs aktiv
+      - 1 Beispiel-Gate (G-AS-NAME-LENGTH) + Rego + Tests
+      - ADR 0012 Apple Review Compliance Strategy
+    implementation_step: S10
+    related: [IDEA-009]
+    created: 2026-05-19
+    updated: 2026-05-19
+
+  # =========================================================================
+  # APPLE-COMPLIANCE-TODOs (Phase 1 — Aktivierung gestaffelt)
+  # Aus ADR 0012 und apple-review-relevance.md
+  # =========================================================================
+  - id: TODO-015
+    title: R-AS-02 (Consent für Datenerfassung) YAML schreiben + Gate
+    description: Aktivierungs-Trigger Supabase Auth implementiert
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Supabase Auth implementiert (Sprint 1/2)"
+    related: [TODO-014]
+    apple_ref: "5.1.1(ii)"
+    created: 2026-05-19
+
+  - id: TODO-016
+    title: R-AS-04 (Datensparsamkeit) YAML schreiben + Default-Check
+    description: Permission-Audit beim ersten Build
+    phase: phase-1-mvp
+    priority: P2
+    effort: XS
+    status: planned
+    activation_trigger: "Vor erstem TestFlight-Build"
+    apple_ref: "5.1.1(iii)"
+    created: 2026-05-19
+
+  - id: TODO-017
+    title: R-AS-05 (Account-Löschung) YAML + Implementation
+    description: Mit Supabase Auth zusammen — Apple verlangt "Delete Account"-Option in der App
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "Supabase Auth implementiert"
+    apple_ref: "5.1.1(v)"
+    created: 2026-05-19
+
+  - id: TODO-018
+    title: R-AS-07 (ATT-Prompt) YAML — wenn Analytics-SDK kommt
+    description: Falls Sentry/Bugsnag/Analytics mit Tracking-Funktion eingebunden wird
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Erste Analytics/Crash-Reporting-SDK-Integration"
+    apple_ref: "5.1.2(i)"
+    created: 2026-05-19
+
+  - id: TODO-019
+    title: R-AS-09 + R-AS-10 + R-AS-11 (Pre-Submission-Trio) YAMLs
+    description: |
+      Demo-Account + Screenshots + Age-Rating — alle drei zu schreiben
+      vor App-Store-Submission. Als Hybrid-Gates (auto + manuell).
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: planned
+    activation_trigger: "Vor TestFlight-Submission"
+    apple_ref: "2.1(a), 2.3.3, 2.3.6"
+    created: 2026-05-19
+
+  - id: TODO-020
+    title: R-AS-14 (Standard Review-API für Bewertungs-Prompt)
+    description: Falls SKStoreReviewController in App eingebaut wird
+    phase: phase-1-mvp
+    priority: P3
+    effort: XS
+    status: planned
+    activation_trigger: "Bei Implementation von In-App-Review-Prompt"
+    apple_ref: "3.2.2(x), 5.6.1"
+    created: 2026-05-19
+
+  - id: TODO-021
+    title: Restliche 4 Rego-Policies + Gates (G-AS-PRIVACY-URL, G-AS-CAMERA-PURPOSE, G-AS-SUPPORT-URL, G-AS-DATA-SOURCE-DISCLOSE)
+    description: |
+      Für aktive R-AS-01, R-AS-03, R-AS-06, R-AS-08 die jeweiligen Rego-Policies
+      + Tests + Gate-Definitions schreiben. Aktivierung wenn App-Settings-Screen
+      existiert (Sprint 2).
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "App-Settings-Screen implementiert"
+    apple_refs: ["1.5", "2.5.14", "5.1.1(i)", "5.1.1(viii)"]
+    created: 2026-05-19
+
+  - id: TODO-022
+    title: Conftest CI-Workflow .github/workflows/compliance.yml
+    description: |
+      GitHub Actions-Workflow der Conftest mit allen Apple-Policies ausführt,
+      Output in evidence-log.jsonl schreibt mit SHA-256-Hash. Übernommen aus
+      genaiops-compliance-gates/.github/workflows/gate-pipeline.yml.
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: planned
+    activation_trigger: "≥ 3 aktive Rego-Policies"
+    created: 2026-05-19
+
+  - id: TODO-023
+    title: evidence-store/evidence-log.jsonl Initial-Setup + SHA-256-Hash-Logik
+    description: |
+      Solo-Variante aus genaiops-compliance-gates (siehe ADR 0009 GCG-3):
+      jsonl-File pro CI-Run, jeder Eintrag mit SHA-256-Hash des vorherigen Eintrags.
+      Audit-Trail-tauglich, kein Postgres nötig.
+    phase: phase-1-mvp
+    priority: P2
+    effort: S
+    status: planned
+    activation_trigger: "Mit TODO-022 Conftest-Workflow"
+    created: 2026-05-19
+
+  - id: TODO-024
+    title: Phase-2-Apple-Compliance Welle (R-AS-17 bis R-AS-26)
+    description: |
+      Mit ScanFair+ Membership + KI-Chat: IAP-Pflicht, Chatbot-Regeln
+      (4.7.1-4.7.5), Sign-in-with-Apple, Push-Consent.
+    phase: phase-2-ki-layer
+    priority: P1
+    effort: L
+    status: parked
+    activation_trigger: "Phase 2 Start (KI-Layer + Membership)"
+    apple_refs: ["3.1.1", "3.1.2", "4.7", "4.8", "4.5.3"]
+    created: 2026-05-19

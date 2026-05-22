@@ -1,0 +1,110 @@
+id: 0010
+title: Eco-Score-Fallback-Logik bei unvollständigen OFF-Daten
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [scoring, esg, data-quality, ux]
+
+context: |
+  OFF-API-Spike (2026-05-19) hat gezeigt: nur 70% der Produkte haben
+  ecoscore_grade gesetzt. Die restlichen 30% liefern "unknown" oder
+  "not-applicable". Frage: wie verhält sich unsere App in dem Fall?
+  Davon hängt UI-Design, ESG-Formel und Vertrauen der User ab.
+
+  Wichtige Constraints:
+  - Greenwashing vermeiden (zu hohe Schätzung = Vertrauensbruch)
+  - Falsch-Niedrig-Bewertung vermeiden (Marke verklagt uns)
+  - Transparenz Pflicht (DSGVO Art. 5, App-Store-Guidelines)
+  - Solo-Founder: keine Zeit für komplexe ML-Fallback-Modelle
+
+options_considered:
+  - name: A — Transparenz-First (kein Score wenn Daten fehlen)
+    pros:
+      - Maximale Ehrlichkeit, kein Greenwashing-Risiko
+      - Einfach zu kommunizieren
+      - User-Vertrauen-Aufbau
+      - Triggert User-Beitrag-Loop (siehe TODO-011)
+    cons:
+      - 30% der Scans zeigen "keine Bewertung" — fühlt sich enttäuschend an
+      - Risiko: User wechseln zu Konkurrenz die Score zeigt
+
+  - name: B — Heuristik-Fallback (Packaging + NOVA + Origins)
+    pros:
+      - Liefert immer einen Score
+      - Nutzt vorhandene Felder maximal
+    cons:
+      - Methodisch unsauber — wir definieren Formel die nirgendwo
+        wissenschaftlich validiert ist
+      - Schwer zu erklären
+      - Bei Klage gegen Marke: Wir können Score nicht verteidigen
+
+  - name: C — Konservativer Fallback (niedrigste Stufe annehmen)
+    pros:
+      - Sicher gegen Greenwashing
+    cons:
+      - Unfair gegenüber Marken die einfach noch nicht eingetragen sind
+      - User sieht 30% "rot" obwohl Realität anders ist
+      - Methodisch unhaltbar
+
+  - name: D — Hybrid: Transparenz primär + optionale Heuristik-Hint
+    pros:
+      - Standard ist Transparenz (Option A)
+      - User kann optional eine "geschätzte Tendenz" sehen
+      - Klar getrennt: "echter Eco-Score" vs "Schätzung"
+      - Edukativ — User lernt was OFF-Daten sind
+    cons:
+      - UI komplexer (zwei Modi)
+      - Aufwand: ~1 Tag Extra-Implementierung
+
+decision: Option A (Transparenz-First) für MVP. Option D (Hybrid) als Phase-1.5-Erweiterung.
+rationale: |
+  MVP-Disziplin: Option A ist einfach, ehrlich, schnell zu implementieren
+  und schafft Vertrauen statt es zu verspielen. 30% Fehl-Daten ist real,
+  und das ehrlich zu zeigen ist methodisch das einzig Richtige.
+
+  Phase 1.5 (nach TestFlight-Feedback): falls User-Feedback zeigt dass
+  "keine Bewertung" zu frustrierend ist, ergänzen wir Hybrid-Modus
+  (Option D) mit klar markierter Heuristik-Schätzung als optionaler Layer.
+
+implementation_for_mvp:
+  esg_score_calculator:
+    - Wenn `ecoscore_grade ∈ {a, a-plus, b, c, d, e, f}`:
+        E-Säule = numerisch nach Eco-Score-Score (0-100)
+    - Wenn `ecoscore_grade ∈ {unknown, not-applicable, ""} ODER fehlt`:
+        E-Säule = null (kein numerischer Wert)
+        UI-State = "data_incomplete"
+
+  ui_states:
+    - state: full_score
+      shows: Ampel grün/gelb/rot + numerischer Score + E/S/G aufklappbar
+    - state: data_incomplete
+      shows: |
+        Statt Ampel: Info-Karte mit:
+        - "Für dieses Produkt liegen keine ausreichenden Daten vor"
+        - "Quelle: Open Food Facts (community-driven)"
+        - CTA: "Daten ergänzen auf openfoodfacts.org" (öffnet Browser)
+        - Sekundär-Info: Bio-Label / Fair-Trade-Label falls aus labels_tags
+          ableitbar (das ist Faktum, keine Schätzung)
+
+  s_pillar_independent: |
+    S-Säule wird UNABHÄNGIG berechnet aus labels_tags + origins +
+    manufacturing_places. Auch wenn E fehlt, kann S vorhanden sein.
+    Spike zeigte: 19/20 Produkte haben S-Daten.
+
+  edge_cases:
+    - Produkt komplett nicht in OFF → "Produkt nicht gefunden"-UX
+      (siehe TODO-011) — anderer Zustand als data_incomplete
+
+consequences:
+  - ESGScoreCalculator-Klasse muss Null-Werte für E sauber returnen
+  - UI braucht 3 States: full_score / data_incomplete / not_found
+  - Methodik-Footnote im Result-Screen muss klar erklären woher Daten kommen
+  - TODO-011 (Edge-Case-UX) auf data_incomplete-State erweitern
+  - In Phase 1.5: Hybrid-Modus als Feature evaluieren
+  - Tests müssen alle 3 States abdecken
+
+supersedes: null
+superseded_by: null
+related: [0003, 0011]
+related_risks: [RISK-001, RISK-003]
+related_todos: [TODO-011, TODO-012]

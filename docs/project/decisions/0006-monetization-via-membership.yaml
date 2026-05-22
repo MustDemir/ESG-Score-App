@@ -1,0 +1,72 @@
+id: 0006
+title: Monetarisierung via Membership — KI-Features als Paid-Tier
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [monetization, business-model, ai, strategy]
+
+context: |
+  App braucht ein nachhaltiges Geschäftsmodell. Optionen reichen von Werbung
+  über One-Time-Purchase bis Subscription. Gleichzeitig hat KI-Layer (Phase 2)
+  laufende Kosten (LLM-API, Embeddings) — die irgendwie refinanziert werden
+  müssen.
+
+  Kern-Frage: Sollen ALLE Features kostenlos sein, oder gibt es eine
+  Free/Paid-Trennung — und wenn ja, wo verläuft die Linie?
+
+options_considered:
+  - name: Komplett kostenlos + Werbung
+    pros:
+      - Maximale Reichweite
+      - Keine Friktion
+    cons:
+      - Werbung untergräbt Glaubwürdigkeit ("nachhaltig" + Tracking-Ads passt nicht)
+      - DSGVO-Risiken bei Ad-Networks
+      - Niedriger Revenue pro User
+  - name: One-Time-Purchase (z.B. 4,99 €)
+    pros:
+      - Einfach kommunizierbar
+    cons:
+      - Deckt nicht laufende KI/Backend-Kosten
+      - Schwierig Updates zu refinanzieren
+  - name: Freemium mit Membership für KI-Features
+    pros:
+      - Kern-Use-Case (Scan + Score) bleibt frei → Reichweite + Glaubwürdigkeit
+      - KI-Mehrwert ist sichtbarer "Premium"-Hebel
+      - Recurring Revenue refinanziert laufende LLM-/Embedding-Kosten
+      - Klare Wertversprechen-Trennung: Basis vs. "intelligent"
+    cons:
+      - Höhere Komplexität (Auth, Feature-Gates, In-App-Purchases)
+      - Conversion-Rate muss erst validiert werden
+      - Apple/Google nehmen 15-30% Provision
+  - name: Komplett kostenpflichtige App
+    pros:
+      - Klares Wertversprechen
+    cons:
+      - Killer für Early Adoption — ohne Reach kein Impact
+
+decision: Freemium-Modell mit Membership für KI-Features
+rationale: |
+  Beste Balance aus drei Zielen:
+  1) Mission: nachhaltigerer Konsum für viele → braucht freien Basis-Zugang
+  2) Refinanzierung: KI-Kosten skalieren mit Nutzung → braucht recurring Revenue
+  3) Glaubwürdigkeit: keine Werbung, klare User-Anbieter-Beziehung
+
+  Free-Tier umfasst Kern-Funktion (Scan → ESG-Score → einfache Ampel +
+  einfache Kategorie-Alternativen). Paid-Tier ("ScanFair+") schaltet die
+  KI-gestützten Features frei: personalisierte Score-Erklärung in Klartext,
+  semantische Alternativ-Vorschläge (pgvector), ESG-Wissens-Chat,
+  Trend-Insights.
+
+consequences:
+  - Auth-Layer von Anfang an einplanen (Supabase Auth, schon in ADR 0002)
+  - Subscription-Management: RevenueCat oder native StoreKit/Play Billing
+  - Feature-Flag-System nötig (zentrale Stelle: "ist User Pro?")
+  - In-App-Purchase-Compliance (Apple Guidelines 3.1.1, Google Play Billing)
+  - Detail-Strategie (Pricing, Tiers, Features) in monetization.yaml gepflegt
+  - Marketing-Kommunikation: Premium-Versprechen klar formulieren
+  - DSGVO: Zahlungsdaten via Apple/Google → wir speichern keine Kartendaten
+
+supersedes: null
+superseded_by: null
+related: [0002, 0004]

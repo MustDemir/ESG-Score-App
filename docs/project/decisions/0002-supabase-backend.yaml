@@ -1,0 +1,62 @@
+id: 0002
+title: Supabase (EU-Frankfurt) als Backend
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [backend, database, auth, dsgvo]
+
+context: |
+  Brauchen Auth, gecachte Produktdaten, Nutzer-Scan-Historie, später
+  Embeddings für semantische Alternativen. DSGVO-Konformität ist wegen
+  Zielmarkt DE/EU Pflicht.
+
+options_considered:
+  - name: Supabase (EU-Frankfurt)
+    pros:
+      - PostgreSQL-basiert, SQL-Skills übertragbar
+      - Auth + Storage + Realtime out of the box
+      - pgvector-Support für spätere Embeddings (Phase 2)
+      - EU-Hosting (Frankfurt) erfüllt DSGVO
+      - Free Tier ausreichend für MVP
+      - Open Source, Self-Hosting als Exit-Option
+    cons:
+      - Vendor-Lock-in (aber Postgres-kompatibel = migrierbar)
+      - Realtime über WebSocket — eigene Infrastruktur
+  - name: Firebase (Google)
+    pros:
+      - Sehr ausgereift, große Community
+    cons:
+      - US-Anbieter — DSGVO-Risiko (Schrems II)
+      - NoSQL (Firestore) — passt schlechter zu strukturierten ESG-Daten
+      - Vendor-Lock-in härter (proprietäre APIs)
+  - name: Eigenes Backend (FastAPI + Postgres + Auth)
+    pros:
+      - Volle Kontrolle, Python-Skills nutzbar
+    cons:
+      - Zeit-Killer für Solo-Founder
+      - Auth selbst bauen ist Sicherheits-Risiko
+      - Hosting + DevOps zusätzlich
+  - name: AWS Amplify
+    pros:
+      - Mächtig, skalierbar
+    cons:
+      - Komplexer Einstieg
+      - Kosten weniger transparent
+      - US-Anbieter, DSGVO komplizierter
+
+decision: Supabase mit EU-Region Frankfurt
+rationale: |
+  Beste Kombination aus: DSGVO-konform, schnellem Setup, SQL-Stärke,
+  Future-Proofing (pgvector für KI-Phase). Free Tier deckt MVP. Migration
+  zu Self-Hosting möglich falls Wachstum es erfordert.
+
+consequences:
+  - Supabase-Projekt in Frankfurt-Region anlegen
+  - Schema definieren: cached_products, users, scans, später embeddings
+  - Auth: Email + Apple Sign-In (siehe spätere ADR)
+  - SQL- und PostgREST-Skills aufbauen
+  - Row-Level Security (RLS) muss richtig konfiguriert werden
+
+supersedes: null
+superseded_by: null
+related: [0003]

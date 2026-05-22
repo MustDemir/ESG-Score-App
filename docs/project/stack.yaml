@@ -1,0 +1,112 @@
+last_updated: 2026-05-19
+
+# Tech-Stack-Inventar. Bei Versions-Update hier ändern.
+# Bei großen Wechseln: ADR schreiben.
+
+frontend:
+  framework: Flutter
+  version: 3.44.0
+  language: Dart
+  language_version: 3.12.0
+  state_management: TBD (Provider vs Riverpod — siehe spätere ADR)
+  key_packages:
+    - name: mobile_scanner
+      purpose: Barcode-Scanning
+      version: TBD
+    - name: google_fonts
+      purpose: Inter + Instrument Serif laden
+      version: TBD
+    - name: freezed
+      purpose: Immutable Datenmodelle generieren
+      version: TBD
+    - name: json_serializable
+      purpose: JSON ↔ Dart Mapping
+      version: TBD
+    - name: supabase_flutter
+      purpose: Supabase-Client
+      version: TBD
+    - name: http oder dio
+      purpose: HTTP-Client für OFF-API
+      version: TBD
+
+backend:
+  provider: Supabase
+  region: EU Central (Frankfurt)
+  database: PostgreSQL 15+
+  extensions:
+    - name: pgvector
+      purpose: Vektor-Suche für Phase 2 (Embeddings)
+      enabled: false  # erst in Phase 2 aktivieren
+  auth:
+    providers:
+      - email
+      - apple_sign_in
+  storage:
+    purpose: ggf. User-Avatare in Phase 3, MVP nutzt nichts
+
+apis:
+  - name: Open Food Facts
+    purpose: Produktdaten via EAN-Lookup
+    url: https://world.openfoodfacts.org/api/v2/product/<EAN>.json
+    auth: keine
+    rate_limit: "freundlich nutzen, kein hartes Limit"
+    license: CC BY-SA
+    decision_ref: 0003
+
+dev_tools:
+  - name: Homebrew
+    version: 5.1.11
+    purpose: Paket-Manager macOS
+  - name: Xcode
+    version: TBD (App-Store-Download läuft)
+    purpose: iOS-Build, Simulator
+  - name: Android Studio
+    version: 2025.3.4.7
+    purpose: Android-Build, Emulator
+  - name: CocoaPods
+    version: 1.16.2
+    purpose: iOS-Dependencies
+  - name: Git
+    version: bundled mit macOS
+    purpose: Versionskontrolle
+  - name: Claude Code
+    purpose: KI-gestützte Entwicklung
+
+ci_cd:
+  status: TBD
+  candidates:
+    - GitHub Actions (kostenlos für public + 2000 min/Monat private)
+    - Codemagic (Flutter-spezifisch)
+    - Fastlane (Build + Deploy-Automatisierung)
+
+monitoring_logging:
+  status: TBD für Phase 2
+  candidates:
+    - Sentry (Crashlytics + Error-Tracking)
+    - Supabase Logs (für Backend)
+
+distribution:
+  ios:
+    method: TestFlight (Phase 1) → App Store (Phase 3)
+    apple_dev_account: TBD ($99/Jahr — siehe TODO-003)
+  android:
+    method: Google Play Internal Testing (Phase 3)
+    play_console_account: TBD ($25 einmalig)
+
+ai_layer:
+  # Erst Phase 2 — aktuell nur Vor-Entscheidung
+  status: not_yet_integrated
+  provider_candidates:
+    - name: Mistral AI (FR)
+      pros: DSGVO sauber, günstig, EU
+      cons: Output-Qualität gut aber nicht top
+      preferred_for: Default-Wahl
+    - name: Claude Haiku
+      pros: Beste Output-Qualität, mehrsprachig stark
+      cons: US-Anbieter, EU-Region via AWS Bedrock möglich
+      preferred_for: Wenn Qualität entscheidend
+    - name: Aleph Alpha (DE)
+      pros: DSGVO-Maximum, On-Prem möglich, Deutsch top
+      cons: Teurer, kleinere Modelle
+      preferred_for: B2B-Pivot (Krankenkassen, Schulen)
+  decision_ref: 0004

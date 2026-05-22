@@ -1,0 +1,377 @@
+id: 0009
+title: Methodik-Übernahme aus ai-context-vault und genaiops-compliance-gates
+date: 2026-05-19
+status: accepted
+deciders: [Mustafa]
+tags: [methodology, adoption, ai-context-vault, compliance-as-code, eu-ai-act]
+
+context: |
+  Zwei eigene Mustafa-Repos wurden auf Methodik-Übernahme analysiert:
+
+  1) /Users/mustafademir/Projects/ai-context-vault
+     — Context-Engineering-Toolkit für AI-assistierte Projektarbeit,
+     entwickelt für Master-Thesis-Workflow. YAML-basierte Artefakte,
+     Python-Skripte für resume/save, 7 Cowork-Skills.
+
+  2) /Users/mustafademir/Projects/genaiops-compliance-gates
+     — Master-Thesis-Artefakt mit DOI (10.5281/zenodo.19920310).
+     EU-AI-Act-Compliance-Referenz-Architektur mit 16 Quality Gates,
+     105 Deny-Rules, 103 Tests, OPA/Rego, CDV-Framework.
+
+  Beide Repos enthalten exzellente Patterns. Frage: welche übernehmen wir
+  für unsere ESG-Score-App, welche nicht, wann.
+
+decision: |
+  Differenzierte Übernahme:
+
+  - Aus ai-context-vault: vier HIGH-ROI-Patterns sofort, drei MEDIUM-ROI
+    deferred zu Sprint 1+, fünf NICHT übernommen (Overkill für Solo-Mobile-App).
+
+  - Aus genaiops-compliance-gates: Solo-Variante in Sprint 0/1 (Anforderungs-
+    YAML + 2-3 Mini-Gates + evidence-log + CDV-Pattern), Voll-Framework in
+    Phase 2 mit KI-Layer (EU-AI-Act-Relevanz).
+
+# =============================================================================
+# AI-CONTEXT-VAULT — Übernahme-Entscheidungen
+# =============================================================================
+ai_context_vault_adoption:
+
+  high_roi_adopted_now:
+    - id: ACV-1
+      pattern: Feature-State-Pattern
+      original: chapter_state.yaml pro Kapitel
+      esg_translation: feature_state.yaml pro Feature-Modul
+      target_location: features/<feature>/state.yaml
+      when: Sprint 0 (Flutter-Setup)
+      effort: 30 Min
+      rationale: |
+        Heute weiß ich nicht „wie weit ist Feature X" außer via Backlog-
+        Lookup. Per-Feature-State mit Progress + Decisions + Next-Steps
+        gibt Granularität.
+
+    - id: ACV-2
+      pattern: Status-Enum standardisiert
+      original: planned → in_progress → draft → review → final
+      esg_translation: planned → in_progress → draft → review → done
+      target_location: methodology/conventions.md erweitert
+      when: Sofort
+      effort: 15 Min
+      rationale: |
+        Wir haben aktuell Wildwuchs (open/done vs accepted/proposed/etc).
+        Verbindlicher Enum macht Auswertbarkeit + Filter möglich.
+
+    - id: ACV-3
+      pattern: lade_manifest (Pflicht/Kontext-Trennung)
+      original: pro Kapitel deklariert was Volltext, was Metadata
+      esg_translation: pro Coding-Task in definition-of-done.yaml
+      target_location: definition-of-done.yaml erweitert
+      when: Sofort
+      effort: 20 Min
+      rationale: |
+        Token-Effizienz: Claude muss nicht 20 YAMLs lesen wenn 3 relevant.
+        Anti-Pattern: ganzer docs/project/-Ordner in jedem Coding-Task.
+
+    - id: ACV-4
+      pattern: Entscheidungs-Index (flache Tabelle)
+      original: entscheidungsregister.md
+      esg_translation: decisions/INDEX.md mit ADR-Übersichtstabelle
+      target_location: docs/project/decisions/INDEX.md
+      when: Sofort
+      effort: 10 Min
+      rationale: |
+        Schneller Überblick „welche Entscheidungen wurden getroffen" ohne
+        9 Files zu öffnen.
+
+  medium_roi_deferred:
+    - id: ACV-5
+      pattern: resume.py-Äquivalent
+      reason_for_defer: |
+        Claude liest YAMLs eh via CLAUDE.md auto. Mehrwert begrenzt,
+        bevor Repo nicht größer ist. Reactivate bei Bedarf.
+      when: Sprint 1+, falls Pain auftaucht
+
+    - id: ACV-6
+      pattern: Session-Summary-Artefakte
+      reason_for_defer: |
+        Detaillierter als weekly_log, aber aktuell kein Pain. Weekly_log
+        reicht für Solo.
+      when: Bei Bedarf
+
+    - id: ACV-7
+      pattern: Pre-Coding-Check P1-P6 (analog Pruefkatalog)
+      reason_for_defer: |
+        Wir haben definition-of-done (Post-Code-Check). Pre-Code-Check
+        ist ergänzendes Konzept — schauen wir an wenn DoD nicht reicht.
+      when: Phase 1 Ende oder Phase 2
+
+  # ---------------------------------------------------------------------------
+  # SKILL-PATTERN-ÜBERNAHMEN (Update 2026-05-19, nach Deep-Dive in 7 Skills)
+  # ---------------------------------------------------------------------------
+  skill_patterns_adopted:
+    - id: ACV-13
+      pattern: Session-Start-Workflow (analog thesis-session-manager S1-S5)
+      original: |
+        S1 Kontext-Laden via resume.py, S2 Dashboard, S3 Nächster Schritt,
+        S4 Definition of Ready, S5 Preflight-Trigger
+      esg_translation: |
+        Markdown-Workflow in docs/project/workflows/session-start.md.
+        Trigger-Phrasen in CLAUDE.md. Kein eigener Skill — Claude führt
+        Workflow direkt aus.
+      target_location: docs/project/workflows/session-start.md
+      when: Sofort
+      effort: 30 Min
+
+    - id: ACV-14
+      pattern: Pre-Coding-Check (analog thesis-preflight P0-P6)
+      original: 6 Prüfinstanzen vor Schreib-Block
+      esg_translation: |
+        6 Prüfinstanzen vor Coding-Block (Roadmap-Scope, ADRs, Failure-Modes,
+        Risks, Test-Plan, Negativ-Checklist). Output: Pre-Coding-Protokoll
+        im Conversation-Kontext.
+      target_location: docs/project/workflows/pre-coding-check.md
+      when: Sofort — pflicht bei allen Feature-Coding-Tasks ab Sprint 1
+      effort: 30 Min
+
+    - id: ACV-15
+      pattern: Post-Feature-Workflow (analog thesis-post-session A-F)
+      original: 6 Prüfpunkte nach Schreib-Session
+      esg_translation: |
+        6 Phasen A-F: Code & Tests / Feature-State / Entscheidungs-Register /
+        progress.yaml / Konsistenz-Diff / Commit. Ergänzt bestehende DoD um
+        klare Phasen-Struktur.
+      target_location: docs/project/workflows/post-feature.md
+      when: Sofort — pflicht am Ende jedes Coding-Blocks
+      effort: 30 Min
+
+    - id: ACV-16
+      pattern: Trigger-Phrasen-Mapping
+      original: Skills triggern per Phrase
+      esg_translation: |
+        Mapping-Tabelle in CLAUDE.md die User-Phrasen auf Workflows mappt.
+        Statt 7 Skills: 3 Workflows + standard Anthropic-Skills.
+      target_location: CLAUDE.md (Sektion „TRIGGER-PHRASEN → WORKFLOWS")
+      when: Sofort
+      effort: 15 Min
+
+  skill_patterns_deferred:
+    - id: ACV-17
+      pattern: Cross-Feature-Consistency-Workflow (analog thesis-consistency K1-K7)
+      reason_for_defer: |
+        Aktuell zu wenig Features für Cross-Feature-Drift. failure-modes +
+        quality-strategy decken Top-Risiken ab. Aktivieren wenn ≥5 Features
+        existieren.
+      when: Phase 1.5 oder Phase 2
+
+    - id: ACV-18
+      pattern: Akademischer Reviewer-Workflow (analog thesis-reviewer R1-R6)
+      reason_for_defer: |
+        engineering:code-review von Anthropic deckt 80% ab. Eigener Workflow
+        nur sinnvoll bei spezifischen Compliance-Audit-Anforderungen
+        (Phase 2 mit EU AI Act).
+      when: Phase 2
+
+    - id: ACV-19
+      pattern: Decision-Lookup-Chain (analog Quellen-Lookup-Kette)
+      reason_for_defer: |
+        Bei Unsicherheit: erst ADRs → dann backlog → dann risks → dann externe
+        Recherche. Aktuell genug klar. Bei Pain dokumentieren.
+      when: Bei Bedarf
+
+  skill_patterns_not_adopted:
+    - id: ACV-20
+      pattern: thesis-writer Absatz-für-Absatz mit BELEG/CLAIM/MATCH
+      reason: |
+        Code ≠ akademisches Schreiben. Test-Coverage + Code-Review erfüllen
+        äquivalenten Zweck (Belegbarkeit von Verhalten statt Belegbarkeit von
+        Aussagen).
+
+    - id: ACV-21
+      pattern: evidence-matrix-builder
+      reason: |
+        Quellen-Mapping ist akademisch. Im App-Kontext entspricht das einem
+        Dependency-Audit (kommt ab Sprint 2 in CI via Dependabot).
+
+    - id: ACV-22
+      pattern: Eigene Cowork-Skills als .skill-Bundles bauen
+      reason: |
+        ADR 0009 ACV-9 bereits: kein eigener Skill-Bau. Markdown-Workflows
+        + Anthropic-Skills genügen. Skill-Bau lohnt erst bei Multi-User-Team.
+
+  not_adopted:
+    - id: ACV-8
+      pattern: Azure Cloud Hub (Blob + AI Search)
+      reason: |
+        Cross-Session-RAG-Suche ist Overkill für Solo-Mobile-App.
+        Repo-lokal + Claude-Code-Kontext reicht.
+
+    - id: ACV-9
+      pattern: Eigene Cowork-Skills schreiben
+      reason: |
+        Anthropic-Skills sind plug-and-play. Eigene Skills zu maintainen
+        ist Overhead für Solo-Founder. Wir nutzen engineering:code-review,
+        engineering:debug, security-review aus Standard-Pool.
+
+    - id: ACV-10
+      pattern: Plugin-System
+      reason: |
+        Solo-Founder, kein Team-Sharing nötig. Plugins sind für
+        Distribution gedacht.
+
+    - id: ACV-11
+      pattern: Roter-Faden-Tracker
+      reason: |
+        Akademisches Konzept — eine App hat keine narrative Argumentation
+        wie eine Thesis. Wir haben Roadmap-Logik stattdessen.
+
+    - id: ACV-12
+      pattern: extract_yamls.py mit Claude-API
+      reason: |
+        Wir schreiben ADRs/Logs in der Conversation. API-Cost ohne
+        Mehrwert.
+
+# =============================================================================
+# GENAIOPS-COMPLIANCE-GATES (Master-Thesis) — Übernahme-Entscheidungen
+# =============================================================================
+genaiops_compliance_gates_adoption:
+
+  context_reminder: |
+    Solo-Founder-MVP ist KEIN High-Risk-GenAI-System (Phase 1 ohne KI).
+    Voll-Framework wäre Selbstsabotage (3-6 Wochen vor MVP). Phase 2
+    mit KI-Layer ändert die Lage — dann wird EU AI Act anwendbar.
+
+  solo_variant_phase_1_adopted:
+    - id: GCG-1
+      pattern: Requirements-YAML-Format
+      original: requirements/R001-R014.yaml mit acceptance_criteria, evidence_expected, linked_gates
+      esg_translation: requirements/R001-R003.yaml für MVP
+      target_location: docs/project/requirements/
+      when: Sprint 0
+      effort: 30 Min
+      initial_requirements:
+        - R001 Apple Privacy Manifest valide
+        - R002 Supabase RLS für ALLE Tabellen
+        - R003 Keine Secrets im Repo
+      rationale: |
+        Struktur ist Gold. Auch ohne Voll-Framework hilft eine formale
+        Anforderungs-Doku der Disziplin und ist Audit-tauglich.
+
+    - id: GCG-2
+      pattern: Mini-Gates mit Conftest in CI
+      original: 10 Rego-Policies mit 105 Deny-Rules + 103 Tests + Gatekeeper + Postgres-Evidence
+      esg_translation: 2-3 Rego-Policies in GitHub Action via Conftest, ohne K8s
+      target_location: policies/ + .github/workflows/compliance.yml
+      when: Sprint 0/1
+      effort: 1-2 Tage
+      initial_gates:
+        - gate-privacy-manifest.rego
+        - gate-rls-required.rego
+        - gate-secrets-free.rego (gitleaks-Wrap)
+      rationale: |
+        Selbe Tool-Chain wie Voll-Framework (Conftest + Rego), aber
+        deutlich kleinerer Scope. Skaliert wenn Phase 2 KI-Layer + EU
+        AI Act dazukommt.
+
+    - id: GCG-3
+      pattern: evidence-log.jsonl mit SHA-256
+      original: Postgres + Blob Storage + Hash-Chain
+      esg_translation: jsonl-File pro CI-Run, jeder Eintrag mit SHA-256
+      target_location: evidence-store/evidence-log.jsonl
+      when: Sprint 0/1 (parallel zu Mini-Gates)
+      effort: 2-3 Std
+      rationale: |
+        Gleiches Pattern (immutable audit trail), null Infrastruktur.
+        Kann später zu Postgres migriert werden ohne Pattern-Bruch.
+
+    - id: GCG-4
+      pattern: CDV-Framework (Contract → Validation → Severity → Decision)
+      original: voll
+      esg_translation: voll übernehmen — ist Methodik, kein Code
+      when: Sofort als Methodik-Doku
+      effort: in ADR 0009 dokumentiert
+      rationale: |
+        Klares Entscheidungs-Pattern für jede Compliance-Prüfung. Null
+        Implementation-Cost.
+
+    - id: GCG-5
+      pattern: 3-Stage-Traceability (Anforderung → Policy → Evidence)
+      original: 6-Stage (EU AI Act → R → DP → G → Policy → Evidence)
+      esg_translation: 3-Stage reicht für Mobile-App
+      when: Sprint 0/1
+      effort: implizit in YAML-Format
+      rationale: |
+        Für Phase 1 ohne KI sind die mittleren Stufen (DP, Gate) redundant.
+        Bei Phase 2 erweitern.
+
+  deferred_to_phase_2:
+    - id: GCG-6
+      pattern: Voll-Framework-Integration (16 Gates, Five-Pillar)
+      reason_for_defer: |
+        Erst sinnvoll wenn KI-Layer da ist (Phase 2) und EU AI Act anwendbar.
+        Solo-Founder-Aufwand in Phase 1: Selbstsabotage.
+      when: Phase 2 mit KI-Layer
+
+    - id: GCG-7
+      pattern: Drift Detection (PSI / Jensen-Shannon)
+      reason_for_defer: |
+        Nur sinnvoll wenn LLM-Output produktiv genutzt wird.
+      when: Phase 2 nach KI-Integration
+
+    - id: GCG-8
+      pattern: Post-Market Surveillance (Art. 72)
+      reason_for_defer: |
+        Erst relevant wenn High-Risk-AI deployed wird.
+      when: Phase 2/3 falls B2B-Pivot
+
+  not_adopted:
+    - id: GCG-9
+      pattern: OPA Gatekeeper (K8s Admission Controller)
+      reason: |
+        Wir deployen Mobile-App, nicht Kubernetes. Conftest in CI reicht.
+
+    - id: GCG-10
+      pattern: Postgres + Blob Storage Evidence Store
+      reason: |
+        Infrastruktur-Overkill. evidence-log.jsonl + Git-Versionierung
+        liefert äquivalente Audit-Tauglichkeit für Mobile-App-Skala.
+
+    - id: GCG-11
+      pattern: Hash-Chain (kryptografisch verkettet)
+      reason: |
+        SHA-256 pro Eintrag in jsonl ist ausreichend. Voll-Chain ist
+        für Court-Audit-Use-Case, nicht Mobile-App-MVP.
+
+    - id: GCG-12
+      pattern: Helm + Terraform Infrastruktur
+      reason: |
+        Keine Cloud-Infrastruktur nötig (Supabase ist managed).
+
+    - id: GCG-13
+      pattern: ArgoCD GitOps
+      reason: |
+        Mobile-App-Deployment läuft über App-Stores, nicht Kubernetes.
+
+  monetization_link: |
+    Voll-Framework-Integration ist Gold bei B2B-Pivot (IDEA-007:
+    Krankenkassen, Schulen). Da fragen Einkäufer genau danach.
+
+# =============================================================================
+# AUSWIRKUNGEN
+# =============================================================================
+consequences:
+  - Neue Datei: docs/project/decisions/INDEX.md
+  - Neue Datei: docs/project/methodology/conventions.md erweitert um Status-Enum
+  - Neue Datei: docs/project/methodology/feature-state-template.yaml
+  - Neue Datei: docs/project/definition-of-done.yaml erweitert um lade_manifest-Feld
+  - Sprint 0: features/<feature>/state.yaml-Struktur + requirements/R001-R003.yaml
+  - Sprint 0: .github/workflows/compliance.yml mit Conftest
+  - Sprint 0: evidence-store/ Ordner + Initial-jsonl-Struktur
+  - Phase 2: ADR-Update mit Voll-Framework-Integration und EU-AI-Act-Mapping
+
+supersedes: null
+superseded_by: null
+related: [0007, 0008]
+references:
+  - /Users/mustafademir/Projects/ai-context-vault
+  - /Users/mustafademir/Projects/genaiops-compliance-gates
+  - https://github.com/MustDemir/genaiops-compliance-gates
+  - https://doi.org/10.5281/zenodo.19920310

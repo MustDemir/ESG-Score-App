@@ -1,0 +1,42 @@
+id: G-AS-NAME-LENGTH
+name: "App-Name-Länge ≤ 30 Zeichen"
+dimension: "regulatorisch"
+lifecycle_phase: "pre-deployment"
+trigger: "PR merge to main; CI prüft pubspec.yaml + Info.plist + AndroidManifest.xml gegen App-Name-Längenregel."
+
+policy_checks:
+  - "policy_app_name_length"
+
+evidence_required:
+  - "app_metadata_extracted.json"
+  - "policy_eval_result.json"
+
+decision: "approve|block"      # CDV: BLOCK bei Überschreitung — Apple lehnt sonst ab
+
+owner: "Mustafa (Solo-Founder)"
+
+audit_trail:
+  enabled: true
+  evidence_store_ref: "evidence://gates/pre-deployment/G-AS-NAME-LENGTH"
+
+waiver:
+  allowed: false                # Apple-Regel ist hart — keine Ausnahme möglich
+  requires: null
+
+links:
+  requirements:
+    - "R-AS-12"
+  apple_guideline_refs:
+    - "2.3.7"
+    - "2.3.10"
+    - "5.2.5"
+
+sources:
+  - "docs/project/requirements/R-AS-12.yaml"
+  - "App-Review-Guidelines-German.pdf, Sektion 2.3.7"
+
+notes: |
+  AUTO-Gate (kein manueller Review nötig).
+  Severity: BLOCK — Apple lehnt App ab wenn Name > 30 Zeichen.
+  Cross-Plattform-Check: alle drei Metadaten-Stellen müssen konsistent sein
+  (pubspec.yaml, Info.plist CFBundleDisplayName, AndroidManifest application.label).

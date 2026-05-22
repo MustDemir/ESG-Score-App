@@ -1,0 +1,99 @@
+last_updated: 2026-05-19
+
+# Domänen-Begriffe für das ESG-Score-App-Projekt.
+# Hilft Claude Code und neuen Mitwirkenden, Kontext zu verstehen.
+
+terms:
+  - term: ESG
+    full: Environmental, Social, Governance
+    definition: |
+      Drei-Säulen-Bewertungssystem für Nachhaltigkeit eines Unternehmens
+      oder Produkts.
+      - Environmental: Umweltauswirkungen (CO2, Wasser, Verpackung)
+      - Social: Soziale Bedingungen (Arbeitsrechte, Lieferkette)
+      - Governance: Unternehmensführung (Transparenz, Compliance)
+
+  - term: Eco-Score
+    full: Eco-Score (Open Food Facts)
+    definition: |
+      Wissenschaftlich entwickelter Score (A-E) von Open Food Facts der
+      Umweltbelastung eines Lebensmittels bewertet — basiert auf Agribalyse-
+      Datenbank (französisches ADEME). Wird als Basis für unseren E-Wert
+      genutzt.
+    source: https://world.openfoodfacts.org/eco-score-the-environmental-impact-of-food-products
+
+  - term: Nutri-Score
+    full: Nutri-Score
+    definition: |
+      Lebensmittel-Ampel (A grün bis E rot) bewertet Nährwert. NICHT
+      Teil unseres ESG-Scores, da Nährwert ≠ Nachhaltigkeit. Eventuell
+      später als sekundäres Info-Element.
+
+  - term: EAN
+    full: European Article Number (Barcode)
+    definition: |
+      8- oder 13-stelliger numerischer Barcode für Konsumgüter in Europa.
+      Identifier für OFF-Lookups.
+
+  - term: OFF
+    full: Open Food Facts
+    definition: |
+      Crowdsourced Lebensmittel-Datenbank. Open Data unter CC BY-SA.
+      Primäre Datenquelle der App (siehe ADR 0003).
+    source: https://world.openfoodfacts.org/
+
+  - term: pgvector
+    full: pgvector (PostgreSQL Extension)
+    definition: |
+      Postgres-Extension für Vektor-Suche (Embeddings). Wird für
+      semantische Alternativ-Vorschläge in Phase 2 genutzt.
+
+  - term: RAG
+    full: Retrieval-Augmented Generation
+    definition: |
+      KI-Architektur: relevante Dokumente werden via Embedding-Suche
+      gefunden und dem LLM als Kontext mitgegeben. Geplant für Phase 2
+      (ESG-Wissens-Chat).
+
+  - term: ADR
+    full: Architecture Decision Record
+    definition: |
+      Strukturiertes Dokument einer bewussten Architektur-Entscheidung
+      mit Kontext, Alternativen, Rationale. Bei uns als YAML im Ordner
+      docs/project/decisions/.
+
+  - term: MVP
+    full: Minimum Viable Product
+    definition: |
+      Kleinste sinnvolle Version der App die Kern-Use-Case erfüllt.
+      Bei uns: Barcode-Scan → ESG-Score-Anzeige (siehe roadmap.yaml).
+
+  - term: RLS
+    full: Row-Level Security
+    definition: |
+      Postgres-Feature: Zugriffsregeln auf Zeilen-Ebene. Bei Supabase
+      kritisch — falsche RLS = Datenleak.
+
+  - term: TestFlight
+    full: TestFlight (Apple)
+    definition: |
+      Apples Beta-Distribution-Service. Erfordert $99/Jahr Developer-Account.
+      MVP-Distribution für interne Tester und Beta-User.
+
+  - term: DSGVO
+    full: Datenschutz-Grundverordnung (GDPR)
+    definition: |
+      EU-Datenschutzgesetz. Pflichten: Privacy Policy, Auftragsverarbeitungs-
+      verträge, Datenminimierung, Recht auf Löschung.
+
+  - term: CC BY-SA
+    full: Creative Commons Attribution-ShareAlike
+    definition: |
+      Lizenz von Open Food Facts: kommerzielle Nutzung erlaubt mit
+      Quellenangabe und gleicher Lizenz für abgeleitete Werke.
+
+  - term: ScanFair
+    full: ScanFair (Marken-/Produktname)
+    definition: |
+      Branding der App nach Design-Phase. Siehe docs/02-brand-identity.html.
+      Bundle-ID: com.scanfair.esg_app.
