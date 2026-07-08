@@ -1,9 +1,9 @@
 feature: scoring
 title: "ESG-Score-Calculator + OFF-Integration"
-status: planned
-progress: 0
-current_focus: "blockiert durch Models (S13) und State-Management-Entscheidung"
-last_sync: "2026-05-19"
+status: review
+progress: 75
+current_focus: "lokaler ESGScoreCalculator + DemoProductRepository implementiert; echter OFF-Adapter folgt spaeter"
+last_sync: "2026-07-08"
 
 lade_manifest:
   pflicht:
@@ -31,7 +31,15 @@ test_locations:
   - esg_app/test/services/esg_score_calculator_test.dart  # geplant, P0
   - esg_app/test/services/open_food_facts_service_test.dart  # geplant
 
-done: []
+done:
+  - 2026-07-08 — Handgeschriebene Product- und ESGScore-Modelle implementiert
+    (Freezed bewusst deferred, siehe ADR 0014).
+  - 2026-07-08 — ESGScoreCalculator nach ADR 0011 implementiert:
+    E=50%, S=30%, G=20%, Transparenz-First bei fehlendem Eco-Score.
+  - 2026-07-08 — DemoProductRepository mit lokalen OFF-aehnlichen Produktdaten
+    und Alternative-Suggestion implementiert.
+  - 2026-07-08 — Unit-Tests fuer Calculator, OFF-JSON-Mapping und Repository
+    ergaenzt; flutter test PASS.
 
 decisions:
   - id: FD-SCO-01
@@ -46,15 +54,16 @@ decisions:
     adr_ref: "0011"
 
 open_items:
-  - Test-Daten für Calculator-Tests: brauchen wir Fixture-OFF-Responses?
-    Ja — aus dem Spike-Output extrahieren (TODO-SC-001)
+  - Echter OpenFoodFactsService mit Timeout/Retry bleibt offen.
+  - State-Management-Entscheidung vor echter Scanner/API-Integration steht aus
+    (geplant als ADR 0015).
   - Methodik-Seite (App + Web) muss vor Launch geschrieben sein
   - Bei Score-Berechnung: Caching-Strategie in Supabase (für Phase 2 KI-Erklärungen relevant)
 
 next_steps:
-  - S13 (Models mit Freezed) als erstes
-  - Test-Fixtures aus OFF-Spike extrahieren
-  - ESGScoreCalculator mit 7 Test-Fällen aus ADR 0011 implementieren
+  - OFF-Service-Adapter mit Mock-Tests ergaenzen
+  - iOS-Scanner-Flow an Repository/Calculator anbinden
+  - Methodik-Seite fuer Formula v1.0 schreiben
 
 cross_feature_dependencies:
   - from: scoring

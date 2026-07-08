@@ -258,6 +258,55 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 
 ---
 
+## 11 · Lokale Entwicklung & Quality Gates
+
+Der aktuelle Entwicklungsstand bleibt lokal: kein iOS-Deployment, kein Hosting,
+kein Online-Release. Die App startet als Flutter-MVP mit lokal simuliertem
+Barcode-Flow, Demo-/OFF-aehnlichen Produktdaten, ESG-Score-Logik,
+Result-/Detail-Screens sowie Low-Data- und Not-Found-Zustaenden.
+
+**App lokal starten**
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+flutter pub get
+flutter run
+```
+
+**Quality Gates lokal ausfuehren**
+
+```bash
+cd /Users/mustafademir/ESG-Score-App
+bash scripts/quality/run_quality_gates.sh
+```
+
+Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
+
+| Gate | Zweck |
+| --- | --- |
+| `G-FLT-DEPS` | Flutter Dependencies reproduzierbar aufloesen |
+| `G-FLT-FORMAT` | Format-Drift blocken |
+| `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
+| `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
+| `G-REG-UNIT` | Rego-Policy-Tests fuer Compliance-Regeln |
+| `G-CMP-APPLE` | Conftest Apple-Compliance-Gates plus Evidence-Log |
+| `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
+
+**GitHub Actions**
+
+Die neue Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
+`main`, `dev`, `codex/**`, Pull Requests und manuell via `workflow_dispatch`.
+Sie veroeffentlicht ein Summary und das Artefakt
+`scanfair-quality-gate-results` mit `.quality/**` sowie generierten
+Evidence-Dateien.
+
+Explizit ausgeschlossen: iOS-Deployment, Online-Release, Hosting-Provider,
+Kubernetes und OPA Gatekeeper. Die App uebernimmt aus
+`genaiops-compliance-gates` nur die relevanten Muster: Gate-Definitionen,
+Policy-as-Code, Evidence-Log und sichtbare CI/CD-Entscheidung.
+
+---
+
 ## Autor
 
 **Mustafa Demir**  

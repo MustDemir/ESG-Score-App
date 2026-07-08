@@ -1,9 +1,9 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
-status: planned
-progress: 5
-current_focus: "Theme verfuegbar (S11 done) — wartet auf Models (S13) und Scoring (S14)"
-last_sync: "2026-05-19"
+status: review
+progress: 70
+current_focus: "lokale Result-, Detail-, LowData- und NotFound-Screens implementiert"
+last_sync: "2026-07-08"
 
 lade_manifest:
   pflicht:
@@ -37,6 +37,13 @@ test_locations:
 done:
   - 2026-05-19 — Theme-Foundation (S11): scanfair_tokens/colors/typography/theme.dart
     plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen)
+  - 2026-07-08 — Theme-Smoke-Screen durch echten lokalen App-Flow ersetzt:
+    Home, Result, Details, LowData und NotFound.
+  - 2026-07-08 — Wiederverwendbare Score-Komponenten implementiert:
+    ProductSummaryCard, ScoreHero, PillarBars, SecondaryInfoCard,
+    FactorExpansionTile und MethodFootnote.
+  - 2026-07-08 — Widget-Tests fuer Home, Result, LowData, NotFound und Theme
+    ergaenzt; flutter test PASS.
 
 decisions:
   - id: FD-R-01
@@ -46,15 +53,14 @@ decisions:
     adr_ref: "0010"
 
 open_items:
-  - Widget-Reihenfolge wie im Design-Handoff:
-    ProductCard → ScoreHero → ScoreBars → SecondaryBar → ScoreCTAs → MethodFootnote
-  - GEPA-Test-EAN als initiales Hardcode-Beispiel definieren (aus OFF-Spike)
+  - Native iOS-Scanner-Adapter fehlt noch.
+  - Echte Produktbilder aus OFF fehlen noch; aktuell Emoji-Platzhalter.
   - Accessibility-Pass nach erster Implementation (Screen-Reader-Labels)
 
 next_steps:
-  - Theme (S11) muss zuerst stehen
-  - Models (S13) brauchen wir für Type-Safety
-  - Erste Implementation mit Hardcode-Daten, dann mit echtem Service
+  - Scanner-Adapter an HomeScreen anbinden
+  - Details/Quellen mit echten OFF-Feldern ausbauen
+  - Accessibility-Pass fuer Result- und Detail-Screen
 
 cross_feature_dependencies:
   - from: scoring

@@ -215,15 +215,23 @@ todos:
     updated: 2026-05-19
 
   - id: TODO-006
-    title: Dart-Datenmodelle generieren (Freezed)
+    title: Dart-Datenmodelle implementieren
     description: |
       Models: Product, ESGScore, SecondaryInfo, ChecklistItem.
-      Mit Freezed + JsonSerializable für API-Mapping.
+      Urspruenglich mit Freezed + JsonSerializable geplant; fuer den lokalen
+      MVP wurden handgeschriebene, dependency-arme Modelle umgesetzt.
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: review
     depends_on: [TODO-005]
+    updated: 2026-07-08
+    completed_parts:
+      - Product- und ESGScore-Modelle implementiert
+      - OFF-JSON-Mapping fuer Product implementiert
+      - Unit-Tests ergaenzt
+    deferred_parts:
+      - Freezed/JsonSerializable vorerst nicht eingefuehrt (ADR 0014)
     created: 2026-05-19
 
   - id: TODO-007
@@ -234,8 +242,15 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: M
-    status: open
+    status: review
     depends_on: [TODO-006]
+    updated: 2026-07-08
+    completed_parts:
+      - Lokaler ResultScreen implementiert
+      - Details & Quellen implementiert
+      - LowData und NotFound implementiert
+      - DemoProductRepository statt echter OFF-API fuer lokale Validierung
+      - Widget-Tests fuer Hauptpfade ergaenzt
     created: 2026-05-19
 
   - id: TODO-008

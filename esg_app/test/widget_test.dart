@@ -1,55 +1,72 @@
-// =============================================================================
-// ScanFairApp — Smoke-Tests
-// =============================================================================
-
 import 'package:esg_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('App rendert ohne Crash + Theme-Smoke-Screen sichtbar', (
-    WidgetTester tester,
-  ) async {
+  testWidgets('Home screen renders the local ScanFair flow', (tester) async {
     await tester.pumpWidget(const ScanFairApp());
     await tester.pumpAndSettle();
 
-    // AppBar-Titel sichtbar
-    expect(find.text('ScanFair — Theme Smoke'), findsOneWidget);
-
-    // ESG-Pillar-Demo gerendert (E/S/G-Chips)
-    expect(find.text('E'), findsOneWidget);
-    expect(find.text('S'), findsOneWidget);
-    expect(find.text('G'), findsOneWidget);
-
-    // Score-Hero-Mock zeigt Score
-    expect(find.text('82'), findsOneWidget);
-    expect(find.text('GEPA Bio Kaffee'), findsOneWidget);
-  });
-
-  testWidgets('Theme: MaterialApp nutzt ScanFairTheme.light', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const ScanFairApp());
-
-    final BuildContext context = tester.element(
-      find.text('ScanFair — Theme Smoke'),
+    expect(find.text('ScanFair'), findsOneWidget);
+    expect(find.text("Was gibt's heute im Wagen?"), findsOneWidget);
+    expect(
+      find.widgetWithText(ElevatedButton, 'Barcode scannen'),
+      findsOneWidget,
     );
-    final ColorScheme scheme = Theme.of(context).colorScheme;
-
-    // Primary muss Forest Green sein (#0F7B5C)
-    expect(scheme.primary, const Color(0xFF0F7B5C));
-    // Surface muss bg sein (#FBFAF6)
-    expect(scheme.surface, const Color(0xFFFBFAF6));
+    expect(find.text('Bio Edelbitter Schokolade'), findsOneWidget);
   });
 
-  testWidgets('Buttons existieren (Primary/Secondary/Tertiary)', (
-    WidgetTester tester,
+  testWidgets('Scan action opens result screen for GEPA demo product', (
+    tester,
   ) async {
     await tester.pumpWidget(const ScanFairApp());
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(ElevatedButton, 'Primary'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'Secondary'), findsOneWidget);
-    expect(find.widgetWithText(TextButton, 'Tertiary'), findsOneWidget);
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ergebnis'), findsOneWidget);
+    expect(find.text('Empfehlung'), findsOneWidget);
+    expect(find.text('7.4'), findsOneWidget);
+  });
+
+  testWidgets('Manual barcode can open low-data state', (tester) async {
+    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '4025500287955');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Datengrundlage'), findsOneWidget);
+    expect(find.text('Wir geben hier keinen Score.'), findsOneWidget);
+  });
+
+  testWidgets('Manual barcode can open not-found state', (tester) async {
+    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '0000000000000');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Produkt nicht gefunden'), findsOneWidget);
+    expect(find.text('Dieses Produkt kennen wir noch nicht.'), findsOneWidget);
+  });
+
+  testWidgets('Theme uses ScanFair primary and surface colors', (tester) async {
+    await tester.pumpWidget(const ScanFairApp());
+
+    final context = tester.element(find.text('ScanFair').first);
+    final scheme = Theme.of(context).colorScheme;
+
+    expect(scheme.primary, const Color(0xFF0F7B5C));
+    expect(scheme.surface, const Color(0xFFFBFAF6));
   });
 }

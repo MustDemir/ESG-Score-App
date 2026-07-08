@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-05-19
+Letztes Update: 2026-07-08
 
 ## Aktive ADRs
 
@@ -23,20 +23,21 @@ Letztes Update: 2026-05-19
 | [0011](0011-esg-score-formel.yaml) | ESG-Score-Formel — E/S/G aus OFF-Feldern | accepted | 2026-05-19 | scoring, esg, formel, mvp, methodology | 0003, 0010 |
 | [0012](0012-apple-review-compliance.yaml) | Apple Review Compliance Strategy | accepted | 2026-05-19 | compliance, apple, app-store, gates, policy-as-code | 0006, 0007, 0008, 0009 |
 | [0013](0013-multi-regulation-strategy.yaml) | Multi-Regulation-Strategy — Cross-Regulation-Mapping | accepted | 2026-05-19 | compliance, methodology, multi-regulation, dsgvo, apple, framework | 0007, 0008, 0009, 0012 |
+| [0014](0014-local-mvp-quality-gates.yaml) | Lokale MVP-App-Architektur mit CI/CD-Quality-Gates | accepted | 2026-07-08 | architecture, flutter, ci-cd, quality-gates, local-first | 0001, 0003, 0007, 0008, 0009, 0010, 0011, 0012, 0013 |
 
 ## Geplante ADRs (im Backlog)
 
 | ID | Titel | Wann | Trigger |
 |---|---|---|---|
-| 0012 | State-Management-Wahl (Provider vs Riverpod) | Sprint 0/1 | Flutter-Setup, Architektur-Festlegung |
-| 0013 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
-| 0014 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
+| 0015 | State-Management-Wahl (Provider vs Riverpod) | Sprint 1/2 | Echte Scanner-/API-Integration braucht globalen App-State |
+| 0016 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
+| 0017 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
 
 ## Status-Verteilung
 
 | Status | Anzahl |
 |---|---|
-| accepted | 12 |
+| accepted | 13 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 0 |

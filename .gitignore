@@ -42,6 +42,7 @@ supabase/.temp/
 
 # Misc
 *.log
+.quality/
 # Achtung: pubspec.lock soll committet werden (Reproducibility) — daher kein generelles *.lock
 
 # Archives & Binaries

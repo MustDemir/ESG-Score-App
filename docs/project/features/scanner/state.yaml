@@ -1,9 +1,9 @@
 feature: scanner
 title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
-status: planned
-progress: 0
-current_focus: "noch nicht gestartet — wartet auf S13 (Models) und State-Management-Entscheidung"
-last_sync: "2026-05-19"
+status: draft
+progress: 35
+current_focus: "lokale Barcode-Simulation implementiert; echter iOS-Scanner bleibt Folgearbeit"
+last_sync: "2026-07-08"
 
 lade_manifest:
   pflicht:
@@ -25,7 +25,12 @@ code_locations:
 test_locations:
   - esg_app/test/screens/scanner_screen_test.dart  # geplant
 
-done: []
+done:
+  - 2026-07-08 — HomeScreen mit Scan-CTA und manueller Barcode-Eingabe
+    implementiert.
+  - 2026-07-08 — Lokale Demo-Barcodes routen zu Result, LowData oder NotFound.
+  - 2026-07-08 — Widget-Tests fuer Scan-CTA, manuelle LowData- und NotFound-
+    Pfade ergaenzt.
 
 decisions:
   - id: FD-SC-01
@@ -35,13 +40,15 @@ decisions:
     adr_ref: null
 
 open_items:
-  - State-Management-Entscheidung steht aus (Provider vs Riverpod) — wird ADR 0012
+  - State-Management-Entscheidung steht aus (Provider vs Riverpod) — wird ADR 0015
   - Permission-Handling iOS + Android Strategie definieren
   - Performance-Budget: <500ms von Tap auf Scanner bis erkannter EAN
+  - mobile_scanner-Integration fuer iOS nachziehen
 
 next_steps:
-  - Mit Theme + Models (S11, S13) warten bis abgeschlossen
-  - State-Management-ADR vor Implementation
+  - iOS-Scanner-Adapter planen und gegen ProductRepository testen
+  - Camera-Permission-UX mit Info.plist-Zwecktext pruefen
+  - State-Management-ADR vor echter Scanner/API-Integration
 
 cross_feature_dependencies:
   - from: scanner

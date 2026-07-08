@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W21
-last_updated: 2026-05-22
+current_week: 2026-W28
+last_updated: 2026-07-08
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -59,6 +59,19 @@ milestones:
       != "ScanFair"), nach Fix (Info.plist + AndroidManifest auf ScanFair)
       8/8 Tests PASS. Hash-Chain GENESIS->7d5b->cd1e->5162 verifiziert.
       R-AS-12 (App-Name-Branding) damit erfüllt. TODO-023 done.
+
+  - id: M10
+    title: Lokaler MVP-App-Flow und Quality-Gate-Action implementiert
+    date: 2026-07-08
+    phase: phase-1-mvp
+    notes: |
+      Branch codex/app-development-quality-gates angelegt.
+      Flutter-Smoke-Screen durch lokalen Home/Scan/Result/Detail-Flow ersetzt.
+      ESGScoreCalculator, DemoProductRepository, Low-Data- und Not-Found-State
+      implementiert. GitHub Action quality-gates.yml ergänzt; Android-Build
+      bewusst entfernt, Fokus bleibt iOS/App-Logik lokal. Lokale Pipeline:
+      7/7 Gates PASS (Flutter deps/format/analyze/test, OPA Rego tests,
+      Conftest Apple-Gate mit Evidence-Log, Docs-Traceability).
 
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
@@ -143,11 +156,42 @@ decisions_made:
   - adr: 0013
     title: Multi-Regulation-Strategy — Cross-Regulation-Mapping
     date: 2026-05-19
+  - adr: 0014
+    title: Lokale MVP-App-Architektur mit CI/CD-Quality-Gates
+    date: 2026-07-08
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W28
+    summary: |
+      Lokaler MVP-App-Flow + GitHub-Quality-Gates auf neuem Codex-Branch.
+    done:
+      - Branch codex/app-development-quality-gates von dev erstellt
+      - Compliance-Referenzrepo nur gelesen; keine Aenderungen dort
+      - ADR 0014 fuer lokale MVP-App-Architektur und CI/CD-Gates geschrieben
+      - Datenmodelle Product/ESGScore und ESGScoreCalculator nach ADR 0011 implementiert
+      - DemoProductRepository mit lokalen OFF-aehnlichen Produktdaten implementiert
+      - Home/Scan-Simulation, Result, Details, LowData und NotFound als Flutter-Screens gebaut
+      - Unit-Tests fuer Calculator/Repository und Widget-Tests fuer Hauptpfade ergaenzt
+      - .github/workflows/quality-gates.yml mit Flutter/Rego/Conftest/Secret-Gates ergaenzt
+      - scripts/quality/run_quality_gates.sh als lokale Pipeline ergaenzt
+      - README und esg_app/README fuer lokalen Start und Quality Gates aktualisiert
+    checks:
+      - dart format esg_app/lib esg_app/test
+      - flutter analyze --fatal-infos PASS
+      - flutter test --coverage PASS, 13 Tests
+      - bash scripts/quality/run_quality_gates.sh PASS, 7/7 Gates
+      - gitleaks git --redact PASS
+    blockers:
+      - Android SDK lokal nicht installiert; Android-Build bewusst aus aktuellem Fokus entfernt
+      - Echte Kamera/mobile_scanner und echter Open-Food-Facts-Netzwerkadapter sind Folgearbeit
+    next_week:
+      - iOS-fokussierten Scanner-Adapter planen, ohne TestFlight/Deployment
+      - State-Management-ADR 0015 erst vor echter Scanner/API-Integration entscheiden
+      - Optional: OFF-Service als Adapter mit Mock-Tests ergaenzen
+
   - week: 2026-W21-session2
     summary: |
       Methodik-Vertiefung + Sprint 0 Abschluss + Compliance-Mechanik bewiesen
@@ -240,11 +284,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 13
-  todos_open: 19
-  todos_in_progress: 1
+  decisions_total: 14
+  todos_open: 17
+  todos_in_progress: 2
   todos_done: 4
-  milestones_reached: 9
+  milestones_reached: 10
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1
