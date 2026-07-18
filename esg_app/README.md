@@ -54,8 +54,8 @@ bash scripts/quality/run_ios_build_gate.sh
 - `lib/services/open_food_facts_service.dart` kapselt OFF API v3 mit Timeout,
   Retry, User-Agent und Fehlerklassifikation.
 - `lib/services/product_repository.dart` trennt Live- und Demo-Datenquellen.
-- `lib/screens/scanner_screen.dart` kapselt Kamera, EAN-/UPC-Erkennung,
-  Lifecycle, Torch und Permission-Fallback.
+- `lib/screens/scanner_screen.dart` kapselt `mobile_scanner`, Kamera,
+  EAN-/UPC-Erkennung, Lifecycle, Torch und Permission-Fallback.
 - `lib/screens/` enthaelt ausserdem Home, Result, Details, LowData und NotFound.
 - `lib/widgets/score_widgets.dart` enthaelt wiederverwendbare Score-Komponenten.
 

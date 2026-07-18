@@ -79,6 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: scanfair-quality-gate-results
+          include-hidden-files: true
           path: |
             .quality/**
             esg_app/coverage/lcov.info

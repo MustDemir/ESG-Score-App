@@ -62,11 +62,30 @@ gate_app_compliance() {
 
 gate_docs_traceability() {
   cd "$REPO_ROOT" || return 1
-  grep -q "Quality Gates" README.md
-  grep -q "scripts/quality/run_quality_gates.sh" README.md
-  grep -q "flutter run" esg_app/README.md
-  grep -q "Open Food Facts API v3" esg_app/README.md
-  grep -q "G-FLT-COVERAGE" README.md
+  ruby -e '
+    checks = {
+      "README.md" => [
+        "Quality Gates",
+        "scripts/quality/run_quality_gates.sh",
+        "G-FLT-COVERAGE",
+        "G-IOS-COMPILE"
+      ],
+      "esg_app/README.md" => [
+        "flutter run",
+        "Open Food Facts API v3",
+        "mobile_scanner"
+      ]
+    }
+
+    missing = checks.flat_map do |path, required_texts|
+      content = File.read(path, encoding: "UTF-8")
+      required_texts.reject { |text| content.include?(text) }
+                    .map { |text| "#{path}: #{text}" }
+    end
+
+    abort "Missing documentation traceability:\n- #{missing.join("\n- ")}" unless missing.empty?
+    puts "Documentation traceability OK: #{checks.values.flatten.length} markers"
+  '
 }
 
 gate_yaml_syntax() {
