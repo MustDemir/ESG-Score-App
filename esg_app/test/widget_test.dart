@@ -1,10 +1,17 @@
 import 'package:esg_app/main.dart';
+import 'package:esg_app/models/product.dart';
+import 'package:esg_app/services/product_lookup_failure.dart';
+import 'package:esg_app/services/product_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  Widget buildDemoApp() {
+    return ScanFairApp(repository: DemoProductRepository());
+  }
+
   testWidgets('Home screen renders the local ScanFair flow', (tester) async {
-    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpWidget(buildDemoApp());
     await tester.pumpAndSettle();
 
     expect(find.text('ScanFair'), findsOneWidget);
@@ -19,7 +26,7 @@ void main() {
   testWidgets('Scan action opens result screen for GEPA demo product', (
     tester,
   ) async {
-    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpWidget(buildDemoApp());
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
@@ -33,7 +40,7 @@ void main() {
   });
 
   testWidgets('Manual barcode can open low-data state', (tester) async {
-    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpWidget(buildDemoApp());
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), '4025500287955');
@@ -47,7 +54,7 @@ void main() {
   });
 
   testWidgets('Manual barcode can open not-found state', (tester) async {
-    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpWidget(buildDemoApp());
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), '0000000000000');
@@ -61,7 +68,7 @@ void main() {
   });
 
   testWidgets('Theme uses ScanFair primary and surface colors', (tester) async {
-    await tester.pumpWidget(const ScanFairApp());
+    await tester.pumpWidget(buildDemoApp());
 
     final context = tester.element(find.text('ScanFair').first);
     final scheme = Theme.of(context).colorScheme;
@@ -69,4 +76,32 @@ void main() {
     expect(scheme.primary, const Color(0xFF0F7B5C));
     expect(scheme.surface, const Color(0xFFFBFAF6));
   });
+
+  testWidgets('Network failure opens a retryable error state', (tester) async {
+    await tester.pumpWidget(
+      ScanFairApp(repository: _FailingProductRepository()),
+    );
+
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Keine Verbindung'), findsOneWidget);
+    expect(find.text('Erneut versuchen'), findsOneWidget);
+  });
+}
+
+class _FailingProductRepository implements ProductRepository {
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    throw const ProductLookupFailure(
+      type: ProductLookupFailureType.noConnection,
+      message: 'Open Food Facts ist momentan nicht erreichbar.',
+    );
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
 }

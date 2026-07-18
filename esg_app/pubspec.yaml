@@ -38,6 +38,9 @@ dependencies:
   # Brand-Fonts (Inter + Instrument Serif) — siehe lib/theme/scanfair_typography.dart
   google_fonts: ^6.2.1
 
+  # Typed, mockable HTTP client for the Open Food Facts adapter.
+  http: ^1.6.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,9 +1,9 @@
 feature: scanner
 title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
 status: draft
-progress: 35
-current_focus: "lokale Barcode-Simulation implementiert; echter iOS-Scanner bleibt Folgearbeit"
-last_sync: "2026-07-08"
+progress: 40
+current_focus: "manueller Barcode-Flow nutzt OFF API v3; echter iOS-Scanner bleibt Folgearbeit"
+last_sync: "2026-07-18"
 
 lade_manifest:
   pflicht:
@@ -31,6 +31,9 @@ done:
   - 2026-07-08 — Lokale Demo-Barcodes routen zu Result, LowData oder NotFound.
   - 2026-07-08 — Widget-Tests fuer Scan-CTA, manuelle LowData- und NotFound-
     Pfade ergaenzt.
+  - 2026-07-18 — Manueller Barcode und Beispiel-CTA sind an den echten
+    OpenFoodFactsProductRepository angebunden; technische Fehler erhalten
+    einen retry-faehigen Screen.
 
 decisions:
   - id: FD-SC-01
@@ -38,17 +41,21 @@ decisions:
     date: "2026-05-19"
     rationale: "Battle-tested, native Performance, im Original-Plan benannt"
     adr_ref: null
+  - id: FD-SC-02
+    decision: Flutter-native State-Verwaltung plus Constructor Injection
+    date: "2026-07-18"
+    rationale: "Kleinster belastbarer Ansatz fuer den Phase-1-MVP"
+    adr_ref: "0015"
 
 open_items:
-  - State-Management-Entscheidung steht aus (Provider vs Riverpod) — wird ADR 0015
+  - "State-Management fuer Phase 1: Flutter-native + Constructor Injection (ADR 0015)"
   - Permission-Handling iOS + Android Strategie definieren
-  - Performance-Budget: <500ms von Tap auf Scanner bis erkannter EAN
+  - "Performance-Budget: unter 500ms von Tap bis erkannter EAN"
   - mobile_scanner-Integration fuer iOS nachziehen
 
 next_steps:
   - iOS-Scanner-Adapter planen und gegen ProductRepository testen
   - Camera-Permission-UX mit Info.plist-Zwecktext pruefen
-  - State-Management-ADR vor echter Scanner/API-Integration
 
 cross_feature_dependencies:
   - from: scanner

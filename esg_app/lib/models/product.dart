@@ -75,13 +75,23 @@ class ScanFairProduct {
       category: _firstTag(productMap['categories_tags']) ?? 'Lebensmittel',
       imageEmoji: '□',
       productType: ProductType.food,
-      ecoscoreGrade: _nullableString(productMap['ecoscore_grade']),
-      ecoscoreScore: _double(productMap['ecoscore_score']),
-      co2Total: _doubleFromPath(productMap, [
-        'ecoscore_data',
-        'agribalyse',
-        'co2_total',
-      ]),
+      ecoscoreGrade: _nullableString(
+        productMap['environmental_score_grade'] ?? productMap['ecoscore_grade'],
+      ),
+      ecoscoreScore: _double(
+        productMap['environmental_score_score'] ?? productMap['ecoscore_score'],
+      ),
+      co2Total:
+          _doubleFromPath(productMap, [
+            'environmental_score_data',
+            'agribalyse',
+            'co2_total',
+          ]) ??
+          _doubleFromPath(productMap, [
+            'ecoscore_data',
+            'agribalyse',
+            'co2_total',
+          ]),
       ingredientsText: _nullableString(productMap['ingredients_text']),
       packagingTags: _stringList(productMap['packaging_tags']),
       originTags: _stringList(productMap['origins_tags']),

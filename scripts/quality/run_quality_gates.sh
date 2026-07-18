@@ -36,6 +36,22 @@ gate_flutter_test() {
   cd "$APP_DIR" && flutter test --coverage
 }
 
+gate_flutter_coverage() {
+  local coverage_file="$APP_DIR/coverage/lcov.info"
+  local minimum_coverage=60
+
+  [ -f "$coverage_file" ] || return 1
+  awk -F: -v minimum="$minimum_coverage" '
+    /^LF:/ { total += $2 }
+    /^LH:/ { hit += $2 }
+    END {
+      coverage = total > 0 ? (hit * 100 / total) : 0
+      printf "Line coverage: %d/%d (%.2f%%), required: %.2f%%\n", hit, total, coverage, minimum
+      exit coverage >= minimum ? 0 : 1
+    }
+  ' "$coverage_file"
+}
+
 gate_rego_unit_tests() {
   cd "$REPO_ROOT" && opa test docs/project/policies
 }
@@ -49,6 +65,17 @@ gate_docs_traceability() {
   grep -q "Quality Gates" README.md
   grep -q "scripts/quality/run_quality_gates.sh" README.md
   grep -q "flutter run" esg_app/README.md
+  grep -q "Open Food Facts API v3" esg_app/README.md
+  grep -q "G-FLT-COVERAGE" README.md
+}
+
+gate_yaml_syntax() {
+  cd "$REPO_ROOT" || return 1
+  find docs/project -name '*.yaml' -print0 | xargs -0 ruby -e '
+    require "yaml"
+    ARGV.each { |path| YAML.parse_file(path) }
+    puts "YAML syntax OK: #{ARGV.length} files"
+  '
 }
 
 run_gate() {
@@ -83,9 +110,11 @@ run_gate "G-FLT-DEPS" "Flutter dependency resolution" gate_flutter_pub_get
 run_gate "G-FLT-FORMAT" "Dart format check" gate_flutter_format
 run_gate "G-FLT-ANALYZE" "Flutter static analysis" gate_flutter_analyze
 run_gate "G-FLT-TEST" "Flutter unit and widget tests" gate_flutter_test
+run_gate "G-FLT-COVERAGE" "Flutter line coverage baseline (60%)" gate_flutter_coverage
 run_gate "G-REG-UNIT" "Rego policy unit tests" gate_rego_unit_tests
 run_gate "G-CMP-APPLE" "Conftest compliance gates with evidence log" gate_app_compliance
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
+run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
 
 TOTAL=$((PASS_COUNT + FAIL_COUNT))
 

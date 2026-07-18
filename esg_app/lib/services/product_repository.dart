@@ -1,5 +1,6 @@
 import '../data/demo_products.dart';
 import '../models/product.dart';
+import 'open_food_facts_service.dart';
 
 abstract class ProductRepository {
   Future<ScanFairProduct?> findByBarcode(String barcode);
@@ -45,4 +46,32 @@ class DemoProductRepository implements ProductRepository {
       orElse: () => candidates.first,
     );
   }
+}
+
+class OpenFoodFactsProductRepository implements ProductRepository {
+  OpenFoodFactsProductRepository({required this.service});
+
+  final OpenFoodFactsService service;
+  final List<ScanFairProduct> _recentProducts = [];
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) async {
+    final product = await service.findByBarcode(barcode);
+    if (product == null) return null;
+
+    _recentProducts.removeWhere((entry) => entry.barcode == product.barcode);
+    _recentProducts.insert(0, product);
+    if (_recentProducts.length > 10) _recentProducts.removeLast();
+    return product;
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() {
+    return List.unmodifiable(_recentProducts.take(3));
+  }
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
+
+  void close() => service.close();
 }

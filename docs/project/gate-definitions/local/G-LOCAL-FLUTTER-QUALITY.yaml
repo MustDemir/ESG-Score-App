@@ -7,6 +7,7 @@ policy_checks:
   - dart format --set-exit-if-changed lib test
   - flutter analyze --fatal-infos
   - flutter test --coverage
+  - line coverage >= 60 percent
 evidence_required:
   - .quality/quality-gate-report.md
   - esg_app/coverage/lcov.info

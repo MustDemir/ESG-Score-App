@@ -63,12 +63,12 @@ ScanFair aggregiert bestehende, anerkannte Datenquellen. Die App erfindet keine 
 
 | Dimension | Gewicht | MVP-Status | Beispielquellen |
 | --- | ---: | --- | --- |
-| Environmental | 40% | vollständig geplant | Eco-Score, CO2, Verpackung, Herkunft, Bio-Siegel |
-| Social | 35% | vereinfacht | Fairtrade, Rainforest Alliance, soziale Labels |
-| Governance | 25% | Platzhalter | CSRD, B Corp, Transparenzdaten |
+| Environmental | 50% | implementiert | Environmental-/Eco-Score, CO2, Verpackung, Herkunft |
+| Social | 30% | implementiert | Fairtrade, Bio, Rainforest Alliance, Herkunftssignale |
+| Governance | 20% | implementiert | Datenvollstaendigkeit und Produkttransparenz |
 
 ```text
-Gesamt-Score = (E x 0.40) + (S x 0.35) + (G x 0.25)
+Gesamt-Score = (E x 0.50) + (S x 0.30) + (G x 0.20)
 ```
 
 **Ampel-Logik**
@@ -109,7 +109,7 @@ Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidu
 | Komponente | Technologie | Rolle |
 | --- | --- | --- |
 | Mobile App | Flutter / Dart | iOS-first App, später cross-platform |
-| State Management | Riverpod | klarer Datenfluss zwischen Scan, Produkt und Score |
+| State Management | Flutter-native + Constructor Injection | lokaler MVP-State ohne zusaetzliche Laufzeitabhaengigkeit |
 | Barcode Scanner | mobile_scanner | Kamera-Scan für EAN-Barcodes |
 | Produktdaten | Open Food Facts API | Produkt-, Label-, Eco-Score- und Verpackungsdaten |
 | Backend / Cache | Supabase EU | Auth, Cache, optionale Datenpersistenz |
@@ -261,9 +261,10 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 ## 11 · Lokale Entwicklung & Quality Gates
 
 Der aktuelle Entwicklungsstand bleibt lokal: kein iOS-Deployment, kein Hosting,
-kein Online-Release. Die App startet als Flutter-MVP mit lokal simuliertem
-Barcode-Flow, Demo-/OFF-aehnlichen Produktdaten, ESG-Score-Logik,
-Result-/Detail-Screens sowie Low-Data- und Not-Found-Zustaenden.
+kein Online-Release. Die App nutzt fuer manuelle Barcodes und das lokale
+Beispielprodukt die Open Food Facts API v3. Demo-Daten werden weiterhin explizit
+in Tests und Offline-Demos injiziert. ESG-Score-Logik, Result-/Detail-Screens,
+Low-Data-, Not-Found- und technische Fehlerzustaende sind implementiert.
 
 **App lokal starten**
 
@@ -288,9 +289,11 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-FLT-FORMAT` | Format-Drift blocken |
 | `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
 | `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
+| `G-FLT-COVERAGE` | Mindestens 60% Line-Coverage gemaess Sprint-2-Baseline |
 | `G-REG-UNIT` | Rego-Policy-Tests fuer Compliance-Regeln |
 | `G-CMP-APPLE` | Conftest Apple-Compliance-Gates plus Evidence-Log |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
+| `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
 
 **GitHub Actions**
 

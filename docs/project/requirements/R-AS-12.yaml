@@ -35,9 +35,9 @@ acceptance_criteria:
   - App-Name "ScanFair" oder Varianten ≤ 30 Zeichen
   - Untertitel (subtitle) ebenfalls ≤ 30 Zeichen
   - Kein Vorkommen verbotener Strings:
-    - Plattform-Namen: ["android", "google play", "samsung", "windows phone", "microsoft store"]
-    - Apple-Produkt-Imitation: ["app store", "iphone", "ipad", "macos", "finder", "imessage"]
-    - Anpreisungen: ["best", "#1", "free", "kostenlos"] (als Teil des Namens)
+    - "Plattform-Namen: android, google play, samsung, windows phone, microsoft store"
+    - "Apple-Produkt-Imitation: app store, iphone, ipad, macos, finder, imessage"
+    - "Anpreisungen im Namen: best, #1, free, kostenlos"
   - Markenname konsistent über iOS + Android + App Store
 
 linked_gates:

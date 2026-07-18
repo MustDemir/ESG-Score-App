@@ -45,6 +45,11 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Setup Ruby for YAML gate
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
       - name: Install OPA
         run: |
           curl -L -o opa "https://openpolicyagent.org/downloads/v${OPA_VERSION}/opa_linux_amd64_static"
@@ -76,6 +81,7 @@ jobs:
           name: scanfair-quality-gate-results
           path: |
             .quality/**
+            esg_app/coverage/lcov.info
             evidence-store/app_extracted.json
             evidence-store/compliance_input.json
             evidence-store/evidence-log.jsonl

@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../models/esg_score.dart';
 import '../models/product.dart';
 import '../services/esg_score_calculator.dart';
+import '../services/product_lookup_failure.dart';
 import '../services/product_repository.dart';
 import '../theme/scanfair_tokens.dart';
 import '../theme/scanfair_typography.dart';
 import '../widgets/score_widgets.dart';
 import 'detail_screen.dart';
 import 'low_data_screen.dart';
+import 'lookup_error_screen.dart';
 import 'not_found_screen.dart';
 import 'result_screen.dart';
 
@@ -37,27 +39,50 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openBarcode(String barcode) async {
-    if (barcode.trim().isEmpty || _isLoading) return;
+    final normalizedBarcode = barcode.trim();
+    if (normalizedBarcode.isEmpty || _isLoading) return;
 
     setState(() => _isLoading = true);
-    final product = await widget.repository.findByBarcode(barcode);
+    ScanFairProduct? product;
+    ProductLookupFailure? failure;
+    try {
+      product = await widget.repository.findByBarcode(normalizedBarcode);
+    } on ProductLookupFailure catch (error) {
+      failure = error;
+    }
     if (!mounted) return;
     setState(() => _isLoading = false);
 
-    if (product == null) {
+    if (failure != null) {
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
-          builder: (_) => NotFoundScreen(barcode: barcode.trim()),
+          builder: (_) => LookupErrorScreen(
+            failure: failure!,
+            onRetry: () {
+              Navigator.of(context).pop();
+              _openBarcode(normalizedBarcode);
+            },
+          ),
         ),
       );
       return;
     }
 
-    final score = widget.calculator.calculate(product);
+    if (product == null) {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => NotFoundScreen(barcode: normalizedBarcode),
+        ),
+      );
+      return;
+    }
+
+    final foundProduct = product;
+    final score = widget.calculator.calculate(foundProduct);
     if (score.state == ScoreState.dataIncomplete) {
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
-          builder: (_) => LowDataScreen(product: product, score: score),
+          builder: (_) => LowDataScreen(product: foundProduct, score: score),
         ),
       );
       return;
@@ -66,10 +91,10 @@ class _HomeScreenState extends State<HomeScreen> {
     await Navigator.of(context).push<void>(
       MaterialPageRoute(
         builder: (_) => ResultScreen(
-          product: product,
+          product: foundProduct,
           score: score,
-          alternative: widget.repository.suggestAlternativeFor(product),
-          onOpenDetails: () => _openDetails(product, score),
+          alternative: widget.repository.suggestAlternativeFor(foundProduct),
+          onOpenDetails: () => _openDetails(foundProduct, score),
         ),
       ),
     );
@@ -139,18 +164,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: ScanFairTokens.space5),
-            Text('Zuletzt gescannt', style: textTheme.titleMedium),
-            const SizedBox(height: ScanFairTokens.space3),
-            ...recentProducts.map(
-              (product) => Padding(
-                padding: const EdgeInsets.only(bottom: ScanFairTokens.space2),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(ScanFairTokens.radiusLg),
-                  onTap: () => _openBarcode(product.barcode),
-                  child: ProductSummaryCard(product: product, compact: true),
+            if (recentProducts.isNotEmpty) ...[
+              Text('Zuletzt gescannt', style: textTheme.titleMedium),
+              const SizedBox(height: ScanFairTokens.space3),
+              ...recentProducts.map(
+                (product) => Padding(
+                  padding: const EdgeInsets.only(bottom: ScanFairTokens.space2),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(
+                      ScanFairTokens.radiusLg,
+                    ),
+                    onTap: () => _openBarcode(product.barcode),
+                    child: ProductSummaryCard(product: product, compact: true),
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

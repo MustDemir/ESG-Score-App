@@ -1,0 +1,72 @@
+id: 0015
+title: Flutter-native State-Verwaltung fuer den Phase-1-MVP
+date: 2026-07-18
+status: accepted
+deciders:
+  - Mustafa
+tags:
+  - flutter
+  - state-management
+  - architecture
+  - mvp
+
+context: |
+  Der echte Scan- und API-Flow braucht klar getrennte Lade-, Erfolgs- und
+  Fehlerzustaende. Gleichzeitig ist die App klein, hat keine verschachtelten
+  globalen Datenabhaengigkeiten und soll fuer einen Solo-Founder lesbar bleiben.
+  Vor der Scanner- und OFF-Integration musste daher entschieden werden, ob eine
+  externe State-Management-Library eingefuehrt wird.
+
+options_considered:
+  - name: Flutter-native StatefulWidget plus Constructor Injection
+    pros:
+      - Keine neue Laufzeitabhaengigkeit
+      - Passt zur bestehenden kleinen App-Struktur
+      - Services und Repositories bleiben ueber Konstruktoren testbar
+      - Geringste Lern- und Wartungskosten fuer Phase 1
+    cons:
+      - Bei stark wachsendem globalem State entsteht spaeter Umbauaufwand
+      - Komplexe Cross-Feature-Abhaengigkeiten waeren schwerer zu koordinieren
+
+  - name: Provider mit ChangeNotifier
+    pros:
+      - Etabliertes Flutter-Pattern mit geringer Einstiegshuerde
+      - Abhaengigkeiten koennen ueber den Widget-Tree bereitgestellt werden
+    cons:
+      - Zusaetzliche Abhaengigkeit fuer aktuell wenig globalen State
+      - ChangeNotifier-Zustaende koennen bei Wachstum unuebersichtlich werden
+
+  - name: Riverpod
+    pros:
+      - Gute Testbarkeit und explizite Provider-Abhaengigkeiten
+      - Skaliert besser fuer viele asynchrone Features
+    cons:
+      - Hoehere Konzept- und Migrationskosten im aktuellen MVP
+      - Fuer den bestehenden lokalen Vertical Slice ueberdimensioniert
+
+decision: |
+  Phase 1 verwendet Flutter-native StatefulWidgets und ueber Konstruktoren
+  injizierte Services/Repositories. Asynchrone Zustaende werden lokal am
+  jeweiligen Screen gehalten. Eine externe State-Management-Library wird erst
+  eingefuehrt, wenn mindestens zwei Screens denselben veraenderlichen State
+  koordinieren muessen oder Auth/Profile einen globalen Session-State erfordern.
+
+rationale: |
+  Die Entscheidung minimiert Abhaengigkeiten und haelt den MVP fuer einen
+  Solo-Founder nachvollziehbar. Die bestehenden Abstraktionen ProductRepository
+  und ESGScoreCalculator erlauben bereits isolierte Unit- und Widget-Tests.
+  Constructor Injection schafft eine spaetere Migrationskante zu Provider oder
+  Riverpod, ohne die Business-Logik an Widgets zu koppeln.
+
+consequences:
+  - HomeScreen verwaltet Loading und Navigation weiterhin lokal.
+  - API- und Scanner-Abhaengigkeiten werden ueber Konstruktoren injiziert.
+  - Kein globaler Service-Locator und keine statischen Singleton-Zustaende.
+  - Die Entscheidung wird bei Auth/Profile oder geteiltem Scan-Verlauf neu bewertet.
+
+supersedes: null
+superseded_by: null
+related:
+  - 0001
+  - 0007
+  - 0014

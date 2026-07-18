@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-07-08
+Letztes Update: 2026-07-18
 
 ## Aktive ADRs
 
@@ -24,20 +24,21 @@ Letztes Update: 2026-07-08
 | [0012](0012-apple-review-compliance.yaml) | Apple Review Compliance Strategy | accepted | 2026-05-19 | compliance, apple, app-store, gates, policy-as-code | 0006, 0007, 0008, 0009 |
 | [0013](0013-multi-regulation-strategy.yaml) | Multi-Regulation-Strategy — Cross-Regulation-Mapping | accepted | 2026-05-19 | compliance, methodology, multi-regulation, dsgvo, apple, framework | 0007, 0008, 0009, 0012 |
 | [0014](0014-local-mvp-quality-gates.yaml) | Lokale MVP-App-Architektur mit CI/CD-Quality-Gates | accepted | 2026-07-08 | architecture, flutter, ci-cd, quality-gates, local-first | 0001, 0003, 0007, 0008, 0009, 0010, 0011, 0012, 0013 |
+| [0015](0015-phase-1-state-management.yaml) | Flutter-native State-Verwaltung fuer den Phase-1-MVP | accepted | 2026-07-18 | flutter, state-management, architecture, mvp | 0001, 0007, 0014 |
+| [0016](0016-open-food-facts-api-v3.yaml) | Open Food Facts API v3 fuer Produktabfragen | accepted | 2026-07-18 | api, open-food-facts, data, architecture | 0003, 0008, 0010, 0011, 0014 |
 
 ## Geplante ADRs (im Backlog)
 
 | ID | Titel | Wann | Trigger |
 |---|---|---|---|
-| 0015 | State-Management-Wahl (Provider vs Riverpod) | Sprint 1/2 | Echte Scanner-/API-Integration braucht globalen App-State |
-| 0016 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
-| 0017 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
+| 0017 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
+| 0018 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
 
 ## Status-Verteilung
 
 | Status | Anzahl |
 |---|---|
-| accepted | 13 |
+| accepted | 15 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 0 |
@@ -45,9 +46,9 @@ Letztes Update: 2026-07-08
 
 ## Tags-Index (häufigste)
 
-- **architecture** → 0001
+- **architecture** → 0001, 0014, 0015, 0016
 - **backend / database** → 0002
-- **data / api** → 0003
+- **data / api** → 0003, 0016
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
 - **ci-cd / testing** → 0007

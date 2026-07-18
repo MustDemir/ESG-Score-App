@@ -1,9 +1,10 @@
 # ScanFair Flutter App
 
 Lokaler Flutter-MVP fuer ScanFair. Die App bildet den Kernflow ab:
-Home/Scan-Simulation, Produktlookup ueber lokale Demo-/OFF-aehnliche Daten,
-ESG-Score-Berechnung, Ergebnisansicht, Detailansicht, Low-Data-Zustand und
-Not-Found-Zustand.
+Home/Scan-Simulation, echter Produktlookup ueber die Open Food Facts API v3,
+ESG-Score-Berechnung, Ergebnisansicht, Detailansicht sowie Low-Data-,
+Not-Found- und Netzwerkfehler-Zustaende. Demo-Daten bleiben fuer deterministische
+Tests verfuegbar.
 
 ## Lokal starten
 
@@ -32,9 +33,13 @@ bash scripts/quality/run_quality_gates.sh
 
 - `lib/models/` enthaelt Product- und ESG-Score-Datenmodelle.
 - `lib/services/esg_score_calculator.dart` implementiert ADR 0011.
-- `lib/services/product_repository.dart` kapselt den lokalen Demo-Lookup.
+- `lib/services/open_food_facts_service.dart` kapselt OFF API v3 mit Timeout,
+  Retry, User-Agent und Fehlerklassifikation.
+- `lib/services/product_repository.dart` trennt Live- und Demo-Datenquellen.
 - `lib/screens/` enthaelt Home, Result, Details, LowData und NotFound.
 - `lib/widgets/score_widgets.dart` enthaelt wiederverwendbare Score-Komponenten.
 
 Noch nicht Teil dieses lokalen Stands: echte Kamera via `mobile_scanner`,
-echter OFF-Netzwerkadapter, Supabase, iOS-Deployment, TestFlight oder Release.
+Supabase, iOS-Deployment, TestFlight oder Release. Fuer einen lokalen
+iOS-Simulator-Build muss die vollstaendige Xcode-App installiert und mit
+`xcode-select` aktiviert sein; aktuell sind nur die Command Line Tools aktiv.

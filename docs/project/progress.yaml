@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W28
-last_updated: 2026-07-08
+current_week: 2026-W29
+last_updated: 2026-07-18
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -72,6 +72,18 @@ milestones:
       bewusst entfernt, Fokus bleibt iOS/App-Logik lokal. Lokale Pipeline:
       7/7 Gates PASS (Flutter deps/format/analyze/test, OPA Rego tests,
       Conftest Apple-Gate mit Evidence-Log, Docs-Traceability).
+
+  - id: M11
+    title: Echter Open-Food-Facts-v3-Produktlookup implementiert
+    date: 2026-07-18
+    phase: phase-1-mvp
+    notes: |
+      ADR 0015 entscheidet Flutter-native State-Verwaltung fuer Phase 1.
+      ADR 0016 entscheidet OFF API v3 mit tolerantem Umweltfeld-Mapping.
+      OpenFoodFactsService und OpenFoodFactsProductRepository sind als
+      Standard-App-Datenquelle verdrahtet. Timeout, Retry, Rate-Limit,
+      Not-Found und technische Fehlerzustaende sind implementiert.
+      Teststand: 21 Tests PASS, Line-Coverage 82.63 Prozent.
 
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
@@ -159,11 +171,48 @@ decisions_made:
   - adr: 0014
     title: Lokale MVP-App-Architektur mit CI/CD-Quality-Gates
     date: 2026-07-08
+  - adr: 0015
+    title: Flutter-native State-Verwaltung fuer den Phase-1-MVP
+    date: 2026-07-18
+  - adr: 0016
+    title: Open Food Facts API v3 fuer Produktabfragen
+    date: 2026-07-18
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W29
+    summary: |
+      Echter OFF-v3-Produktlookup und zwei weitere lokale Quality Gates umgesetzt.
+    done:
+      - ADR 0015 fuer Flutter-native State-Verwaltung akzeptiert
+      - ADR 0016 fuer OFF API v3 und Legacy-Feldkompatibilitaet akzeptiert
+      - OpenFoodFactsService mit HTTPS, User-Agent, Timeout und Retry implementiert
+      - Live-Repository als Standard-App-Datenquelle verdrahtet
+      - LookupErrorScreen fuer technische API-Fehler implementiert
+      - G-FLT-COVERAGE mit 60-Prozent-Baseline ergaenzt
+      - G-DOC-YAML fuer alle 47 Projekt-YAMLs ergaenzt
+      - README, Backlog, ADR-Index und Feature-States aktualisiert
+    checks:
+      - flutter test --coverage PASS, 21 Tests
+      - Line-Coverage 609/737 = 82.63 Prozent
+      - Reale OFF-v3-Abfrage fuer Beispiel-EAN 4000417025005 validiert
+      - bash scripts/quality/run_quality_gates.sh PASS, 9/9 Gates
+      - gitleaks git --redact PASS
+    learnings:
+      - OFF empfiehlt v3 fuer neue Integrationen; v2 ist nur noch kompatibel
+      - Tolerantes Mapping bleibt noetig, weil reale v3-Antworten Legacy-Felder liefern
+      - Ein YAML-Syntax-Gate findet SSOT-Fehler, die reine Grep-Checks uebersehen
+      - Xcode Command Line Tools ersetzen keine vollstaendige Xcode-Installation
+    blockers:
+      - Vollstaendige Xcode-App ist nicht aktiv; xcode-select zeigt nur CommandLineTools
+      - Native iOS-Kamera via mobile_scanner bleibt bis zum Xcode-Setup offen
+    next_week:
+      - TODO-009 Xcode installieren/aktivieren und iOS-Simulator-Build validieren
+      - mobile_scanner integrieren und Camera-Permission-UX testen
+      - iOS-spezifische Privacy-/Metadata-Gates erweitern
+
   - week: 2026-W28
     summary: |
       Lokaler MVP-App-Flow + GitHub-Quality-Gates auf neuem Codex-Branch.
@@ -284,11 +333,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 14
-  todos_open: 17
+  decisions_total: 16
+  todos_open: 14
   todos_in_progress: 2
-  todos_done: 4
-  milestones_reached: 10
+  todos_done: 7
+  milestones_reached: 11
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

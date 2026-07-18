@@ -1,0 +1,30 @@
+id: G-LOCAL-YAML-SYNTAX
+name: Project YAML syntax baseline
+dimension: technisch
+lifecycle_phase: pre-deployment
+trigger: Pull request, push to dev/main/codex branches, local quality run
+policy_checks:
+  - Parse every YAML file below docs/project with Ruby Psych
+evidence_required:
+  - .quality/quality-gate-report.md
+  - .quality/logs/G-DOC-YAML.log
+decision: approve|block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - docs/project/definition-of-done.yaml
+  related_adrs:
+    - 0007
+    - 0009
+sources:
+  - docs/project/README.md
+  - docs/project/methodology/conventions.md
+notes: |
+  Prevents malformed ADR, requirement, backlog and progress YAML from being
+  accepted as project source of truth.

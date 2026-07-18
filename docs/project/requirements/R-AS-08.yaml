@@ -20,8 +20,8 @@ description: |
 evidence_expected:
   - support_url im pubspec.yaml oder app-config
   - Support-Email in App Store Connect Hinterlegt
-  - In-App-Settings: "Kontakt" oder "Support"-Eintrag
-  - Impressum-Seite (DE: Pflicht via TMG §5)
+  - "In-App-Settings: Kontakt- oder Support-Eintrag"
+  - "Impressum-Seite: Pflicht in Deutschland"
 
 acceptance_criteria:
   - Support-URL ist HTTPS

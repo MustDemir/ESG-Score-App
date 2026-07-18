@@ -1,0 +1,64 @@
+id: 0016
+title: Open Food Facts API v3 fuer Produktabfragen
+date: 2026-07-18
+status: accepted
+deciders:
+  - Mustafa
+tags:
+  - api
+  - open-food-facts
+  - data
+  - architecture
+
+context: |
+  ADR 0003 legt Open Food Facts als primaere Produktdatenquelle fest, aber
+  noch keine API-Version. Der Spike von Mai 2026 verwendete API v2. Open Food
+  Facts empfiehlt inzwischen API v3 fuer neue Integrationen und fuehrt v2 nur
+  noch zur Rueckwaertskompatibilitaet. In v3 wurden Eco-Score-Felder in
+  environmental_score-Felder umbenannt; reale Antworten koennen weiterhin
+  Legacy-Aliase enthalten.
+
+options_considered:
+  - name: API v2 beibehalten
+    pros:
+      - Entspricht dem vorhandenen Spike und den alten Feldnamen
+      - Geringster kurzfristiger Mapper-Aufwand
+    cons:
+      - Von Open Food Facts als deprecated markiert
+      - Neue Integration startet auf einem Migrationspfad
+
+  - name: API v3 mit tolerantem Mapper
+    pros:
+      - Aktuell empfohlene Produkt-API
+      - Standardisierte HTTP-Fehler inklusive 404 fuer nicht gefundene Produkte
+      - Mapper kann neue und alte Umweltfeldnamen akzeptieren
+    cons:
+      - Antwortschema und Feldnamen muessen bewusst normalisiert werden
+      - Bestehende Spike-Fixtures brauchen Kompatibilitaet
+
+decision: |
+  Produktabfragen verwenden GET /api/v3/product/{barcode}.json mit expliziter
+  fields-Liste und einem identifizierbaren User-Agent. Der Mapper akzeptiert
+  environmental_score_* sowie die Legacy-Felder ecoscore_*.
+
+rationale: |
+  Eine neue Integration soll nicht auf einer bereits als deprecated markierten
+  API starten. Die tolerante Feldnormalisierung schuetzt zugleich bestehende
+  Testdaten und reale Antworten, die noch Legacy-Aliase liefern.
+
+consequences:
+  - Ausschliesslich HTTPS-Zugriffe auf world.openfoodfacts.org.
+  - Request-Timeout maximal 8 Sekunden und hoechstens 3 Versuche.
+  - Retry nur bei Timeout, Netzwerkfehlern, 429 und temporaeren 5xx-Antworten.
+  - 404 wird als fachlicher Not-Found-State behandelt, nicht als technischer Fehler.
+  - Der User-Agent identifiziert ScanFair und verweist auf das Projekt-Repository.
+  - Produktabfragen muessen das OFF-Limit von 15 Requests pro Minute und IP beachten.
+
+supersedes: null
+superseded_by: null
+related:
+  - 0003
+  - 0008
+  - 0010
+  - 0011
+  - 0014

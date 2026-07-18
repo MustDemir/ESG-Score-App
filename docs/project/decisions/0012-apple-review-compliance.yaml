@@ -118,10 +118,10 @@ ci_integration:
   evidence_log_target: "evidence-store/evidence-log.jsonl"
 
 what_we_explicitly_dont_automate:
-  - "Privacy-Policy-Inhalt korrekt formuliert" → manueller Review
-  - "Screenshots zeigen App in Use" → manueller Review
-  - "Demo-Account funktioniert" → manueller Test vor Submission
-  - "Age-Rating korrekt beantwortet" → manueller Submission-Schritt
+  - "Privacy-Policy-Inhalt korrekt formuliert: manueller Review"
+  - "Screenshots zeigen App in Use: manueller Review"
+  - "Demo-Account funktioniert: manueller Test vor Submission"
+  - "Age-Rating korrekt beantwortet: manueller Submission-Schritt"
 
 consequences:
   - docs/project/compliance/ Ordner als neue Quelle für Compliance-Patterns

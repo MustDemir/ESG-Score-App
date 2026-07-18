@@ -72,7 +72,7 @@ baseline_practices:
       - Test: Anon-User darf nichts ohne Policy lesen
       - Code-Review: jede neue Tabelle braucht Policy in selbem PR
     common_pitfalls:
-      - "Anon Public Read" für vermeintlich "öffentliche" Daten — gefährlich
+      - "Anon Public Read fuer vermeintlich oeffentliche Daten ist gefaehrlich"
       - service_role-Key versehentlich im Client
 
   - id: SEC-4

@@ -120,8 +120,9 @@ claude_code_integration:
       when: vor jedem TestFlight-Build
   automation:
     - hooks: .claude/settings.json mit pre-commit-hooks (Format, Secret-Scan)
-    - routines: optional — wöchentlicher Dependency-Audit via GitHub Action
-      (NICHT via Claude Code Schedules — tool-agnostisch besser)
+    - routines: |
+        Optionaler woechentlicher Dependency-Audit via GitHub Action,
+        nicht via Claude Code Schedules.
 
 consequences:
   - .github/workflows/ci.yml muss in Sprint 0 angelegt werden

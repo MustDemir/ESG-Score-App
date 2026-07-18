@@ -1,4 +1,4 @@
-last_updated: 2026-05-19
+last_updated: 2026-07-18
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -155,7 +155,11 @@ todos:
     phase: phase-1-mvp
     priority: P0
     effort: M
-    status: open
+    status: done
+    completed: 2026-05-19
+    result: |
+      ADR 0011 akzeptiert und ESGScoreCalculator implementiert:
+      E=50%, S=30%, G=20%, Ampelgrenzen 70/40 und Methodik v1.0.
     blocks: [TODO-005]
     depends_on: [TODO-001]
     related_risks: [RISK-003]
@@ -202,15 +206,15 @@ todos:
     completed: 2026-05-19
     completed_parts:
       - Step S06 (flutter create) am 2026-05-19 abgeschlossen
-      - Step S11 (Theme aus tokens.css) am 2026-05-19 abgeschlossen:
-        * scanfair_tokens.dart (Tokens)
-        * scanfair_colors.dart (Material 3 ColorScheme)
-        * scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
-        * scanfair_theme.dart (ThemeData mit Buttons/Cards/Inputs)
-        * Smoke-Screen mit Score-Hero-Mock
-        * 3 Widget-Tests grün (Theme-Smoke + ColorScheme-Match + Buttons)
+      - Step S11 (Theme aus tokens.css) am 2026-05-19 abgeschlossen
+      - scanfair_tokens.dart (Tokens)
+      - scanfair_colors.dart (Material 3 ColorScheme)
+      - scanfair_typography.dart (Inter + Instrument Serif via google_fonts)
+      - scanfair_theme.dart (ThemeData mit Buttons/Cards/Inputs)
+      - Smoke-Screen mit Score-Hero-Mock
+      - 3 Widget-Tests grün (Theme-Smoke + ColorScheme-Match + Buttons)
     depends_on: [TODO-002]
-    notes: Step S06 fertig. Theme-Generierung als S11 verbleibend.
+    notes: Steps S06 und S11 abgeschlossen.
     created: 2026-05-19
     updated: 2026-05-19
 
@@ -223,13 +227,14 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: review
+    status: done
     depends_on: [TODO-005]
-    updated: 2026-07-08
+    updated: 2026-07-18
     completed_parts:
       - Product- und ESGScore-Modelle implementiert
       - OFF-JSON-Mapping fuer Product implementiert
       - Unit-Tests ergaenzt
+      - API-v3- und Legacy-Feldmapping getestet
     deferred_parts:
       - Freezed/JsonSerializable vorerst nicht eingefuehrt (ADR 0014)
     created: 2026-05-19
@@ -244,12 +249,14 @@ todos:
     effort: M
     status: review
     depends_on: [TODO-006]
-    updated: 2026-07-08
+    updated: 2026-07-18
     completed_parts:
       - Lokaler ResultScreen implementiert
       - Details & Quellen implementiert
       - LowData und NotFound implementiert
-      - DemoProductRepository statt echter OFF-API fuer lokale Validierung
+      - OpenFoodFactsProductRepository als Standard-App-Datenquelle
+      - DemoProductRepository fuer deterministische Tests und Offline-Demos
+      - Retry-faehiger technischer Fehlerzustand
       - Widget-Tests fuer Hauptpfade ergaenzt
     created: 2026-05-19
 
@@ -307,7 +314,11 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: done
+    completed: 2026-05-19
+    result: |
+      ADR 0010 akzeptiert und Transparenz-First umgesetzt. Bei fehlendem
+      Environmental-/Eco-Score zeigt die App LowData ohne Gesamtscore.
     depends_on: [TODO-001]
     blocks: [TODO-002]
     implementation_step: S01
