@@ -63,14 +63,15 @@ gate_app_compliance() {
 gate_docs_traceability() {
   cd "$REPO_ROOT" || return 1
   ruby -e '
+    root_readme, app_readme = ARGV
     checks = {
-      "README.md" => [
+      root_readme => [
         "Quality Gates",
         "scripts/quality/run_quality_gates.sh",
         "G-FLT-COVERAGE",
         "G-IOS-COMPILE"
       ],
-      "esg_app/README.md" => [
+      app_readme => [
         "flutter run",
         "Open Food Facts API v3",
         "mobile_scanner"
@@ -85,7 +86,7 @@ gate_docs_traceability() {
 
     abort "Missing documentation traceability:\n- #{missing.join("\n- ")}" unless missing.empty?
     puts "Documentation traceability OK: #{checks.values.flatten.length} markers"
-  '
+  ' "$REPO_ROOT/README.md" "$APP_DIR/README.md"
 }
 
 gate_yaml_syntax() {
