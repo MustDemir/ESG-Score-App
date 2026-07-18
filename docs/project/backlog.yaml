@@ -1,4 +1,4 @@
-last_updated: 2026-07-18
+last_updated: 2026-07-19
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -278,7 +278,12 @@ todos:
     phase: phase-1-mvp
     priority: P0
     effort: XS
-    status: in_progress
+    status: done
+    updated: 2026-07-19
+    completed_parts:
+      - Xcode 26.6 installiert und First-Launch-Status erfolgreich
+      - Nativer unsigned iOS-Simulator-Build erfolgreich
+      - Lokaler Build-Runner setzt DEVELOPER_DIR reproduzierbar
     created: 2026-05-19
 
   - id: TODO-010
@@ -435,7 +440,7 @@ todos:
     created: 2026-05-19
 
   - id: TODO-021
-    title: Restliche 4 Rego-Policies + Gates (G-AS-PRIVACY-URL, G-AS-CAMERA-PURPOSE, G-AS-SUPPORT-URL, G-AS-DATA-SOURCE-DISCLOSE)
+    title: Restliche Apple-Metadaten-Policies und Gates
     description: |
       Für aktive R-AS-01, R-AS-03, R-AS-06, R-AS-08 die jeweiligen Rego-Policies
       + Tests + Gate-Definitions schreiben. Aktivierung wenn App-Settings-Screen
@@ -445,7 +450,14 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: M
-    status: planned
+    status: in_progress
+    updated: 2026-07-19
+    completed_parts:
+      - G-AS-CAMERA-PURPOSE mit Rego-Tests, Conftest und Evidence-Log
+    remaining_parts:
+      - G-AS-PRIVACY-URL
+      - G-AS-SUPPORT-URL
+      - G-AS-DATA-SOURCE-DISCLOSE
     activation_trigger: "App-Settings-Screen implementiert"
     apple_refs: ["1.5", "2.5.14", "5.1.1(i)", "5.1.1(viii)"]
     created: 2026-05-19

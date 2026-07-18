@@ -40,6 +40,7 @@ dependencies:
 
   # Typed, mockable HTTP client for the Open Food Facts adapter.
   http: ^1.6.0
+  mobile_scanner: ^7.3.0
 
 dev_dependencies:
   flutter_test:

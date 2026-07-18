@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-05-19
+Letztes Update: 2026-07-19
 
 ---
 
@@ -41,6 +41,7 @@ Letztes Update: 2026-05-19
 | `lib/widgets/` (ProductCard, ScoreHero) | Widget | `flutter test` mit `WidgetTester` |
 | `lib/screens/` (Scanner, Result) | Widget + Integration | `flutter test` + `integration_test` |
 | API-Calls (echte OFF-API) | Manuell + selten in CI | `--tags=network` |
+| Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
 
 ### Coverage-Gates
 
@@ -96,6 +97,11 @@ jobs:
 - Require status checks: `flutter-check`, `secret-scan`
 - Require linear history
 - Block force-pushes
+
+Die produktive Quality-Gate-Action ergaenzt den Linux-Job um
+`G-IOS-COMPILE` auf einem macOS-Runner. Das Gate baut eine unsigned
+iOS-Simulator-App und erkennt native Plugin-, CocoaPods- und Swift-Fehler.
+Kameraerkennung selbst bleibt ein Smoke-Test auf einem physischen iPhone.
 
 ## 4. Pre-Commit-Hooks (lokal)
 

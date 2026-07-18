@@ -260,11 +260,13 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 
 ## 11 · Lokale Entwicklung & Quality Gates
 
-Der aktuelle Entwicklungsstand bleibt lokal: kein iOS-Deployment, kein Hosting,
-kein Online-Release. Die App nutzt fuer manuelle Barcodes und das lokale
-Beispielprodukt die Open Food Facts API v3. Demo-Daten werden weiterhin explizit
-in Tests und Offline-Demos injiziert. ESG-Score-Logik, Result-/Detail-Screens,
-Low-Data-, Not-Found- und technische Fehlerzustaende sind implementiert.
+Der aktuelle Entwicklungsstand bleibt lokal: kein TestFlight, kein App-Store,
+kein Hosting und kein Online-Release. Die App scannt EAN-/UPC-Barcodes mit der
+iPhone-Kamera und laedt Produktdaten ueber Open Food Facts API v3. Manuelle
+Barcode-Eingabe und injizierbare Demo-Daten bleiben als Fallback und fuer
+deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
+Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
+implementiert.
 
 **App lokal starten**
 
@@ -274,11 +276,24 @@ flutter pub get
 flutter run
 ```
 
+Die Kamera kann nicht realistisch im iOS-Simulator getestet werden. Fuer einen
+lokalen Test auf dem eigenen iPhone: iPhone per USB verbinden, entsperren,
+diesem Mac vertrauen und den Developer Mode aktivieren. Danach in Xcode unter
+`Runner > Signing & Capabilities` das eigene Apple-Team auswaehlen und starten:
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+flutter devices
+flutter run -d <IPHONE_DEVICE_ID>
+```
+
 **Quality Gates lokal ausfuehren**
 
 ```bash
 cd /Users/mustafademir/ESG-Score-App
 bash scripts/quality/run_quality_gates.sh
+bash scripts/quality/run_ios_build_gate.sh
 ```
 
 Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
@@ -294,14 +309,17 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-CMP-APPLE` | Conftest Apple-Compliance-Gates plus Evidence-Log |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
+| `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build auf macOS/Xcode validieren |
 
 **GitHub Actions**
 
 Die neue Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
 `main`, `dev`, `codex/**`, Pull Requests und manuell via `workflow_dispatch`.
-Sie veroeffentlicht ein Summary und das Artefakt
-`scanfair-quality-gate-results` mit `.quality/**` sowie generierten
-Evidence-Dateien.
+Sie veroeffentlicht Gate-Summaries und die Artefakte
+`scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Neben den
+neun lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-Job und ein
+separater Gitleaks-Secret-Scan. `G-CMP-APPLE` validiert aktuell App-Name und
+Kamera-Zwecktext als einzelne Rego/Conftest-Policies mit Evidence-Log.
 
 Explizit ausgeschlossen: iOS-Deployment, Online-Release, Hosting-Provider,
 Kubernetes und OPA Gatekeeper. Die App uebernimmt aus

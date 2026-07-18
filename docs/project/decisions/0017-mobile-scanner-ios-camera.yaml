@@ -1,0 +1,68 @@
+id: 0017
+title: mobile_scanner fuer den nativen iOS-Barcode-Scan
+date: 2026-07-19
+status: accepted
+deciders:
+  - Mustafa
+tags:
+  - flutter
+  - scanner
+  - ios
+  - camera
+  - privacy
+
+context: |
+  Der Phase-1-MVP kann Barcodes bereits manuell an Open Food Facts uebergeben,
+  braucht fuer den Einkaufseinsatz aber einen echten Kamera-Scan auf dem iPhone.
+  Die Loesung muss EAN-/UPC-Codes nativ und schnell erkennen, Kamera-Fehler
+  verstaendlich behandeln und ohne eigenes Computer-Vision-Modell auskommen.
+
+options_considered:
+  - name: mobile_scanner
+    pros:
+      - Verwendet auf iOS AVFoundation und Apple Vision
+      - Unterstuetzt EAN- und UPC-Formate sowie Torch und Kamerawechsel
+      - Aktive Flutter-Library mit BSD-3-Clause-Lizenz
+      - Kamera-Widget und Controller sind fuer Widget-Tests injizierbar
+    cons:
+      - Native Plugin-Abhaengigkeit erfordert einen echten iOS-Build
+      - Kameraerkennung kann nicht realistisch im iOS-Simulator validiert werden
+
+  - name: qr_code_scanner_plus
+    pros:
+      - Einfache API und bekannte QR-/Barcode-Anwendungsfaelle
+    cons:
+      - Weniger passend zur bereits dokumentierten Projektentscheidung
+      - Ein weiterer Technologiewechsel ohne erkennbaren MVP-Vorteil
+
+  - name: Eigene AVFoundation-Integration per Platform Channel
+    pros:
+      - Vollstaendige Kontrolle ueber iOS-Kamera und Erkennung
+    cons:
+      - Deutlich mehr nativer Swift-Code und Wartungsaufwand
+      - Fuer den MVP unnoetiges Fehler- und Test-Risiko
+
+decision: mobile_scanner 7.3.0 mit Flutter-native Constructor Injection
+rationale: |
+  mobile_scanner liefert die benoetigten nativen iOS-Funktionen ohne eigenes
+  Vision-System. Die BSD-3-Clause-Lizenz ist mit dem Projekt vereinbar. Der
+  produktive Scanner bleibt als Widget gekapselt; Tests ersetzen nur den
+  Kamera-Viewport und pruefen Barcode-Rueckgabe und Navigation deterministisch.
+
+consequences:
+  - Die App fordert Kamerazugriff erst beim Oeffnen des Scanner-Screens an.
+  - Info.plist enthaelt einen spezifischen NSCameraUsageDescription-Text.
+  - Nur EAN-8, EAN-13 und UPC-A/UPC-E werden an den Produktlookup uebergeben.
+  - Abgelehnte oder nicht verfuegbare Kamera wird als eigener UX-Zustand gezeigt.
+  - Reale Kameraerkennung bleibt ein Smoke-Test auf einem physischen iPhone.
+  - Bilder werden weder angefordert, gespeichert noch an Open Food Facts gesendet.
+
+supersedes: null
+superseded_by: null
+related:
+  - 0001
+  - 0007
+  - 0008
+  - 0012
+  - 0014
+  - 0015

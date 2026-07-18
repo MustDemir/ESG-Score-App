@@ -1,9 +1,9 @@
 feature: scanner
 title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
-status: draft
-progress: 40
-current_focus: "manueller Barcode-Flow nutzt OFF API v3; echter iOS-Scanner bleibt Folgearbeit"
-last_sync: "2026-07-18"
+status: review
+progress: 90
+current_focus: "nativer iOS-Scanner baut erfolgreich; physischer iPhone-Smoke-Test bleibt offen"
+last_sync: "2026-07-19"
 
 lade_manifest:
   pflicht:
@@ -20,10 +20,11 @@ implementation_steps:
   - S16  # S1 Scanner + S2 Loading + S4 Alternativen + Onboarding
 
 code_locations:
-  - esg_app/lib/screens/scanner_screen.dart    # geplant
-  - esg_app/lib/services/scanner_service.dart  # geplant
+  - esg_app/lib/screens/scanner_screen.dart
+  - esg_app/lib/screens/home_screen.dart
 test_locations:
-  - esg_app/test/screens/scanner_screen_test.dart  # geplant
+  - esg_app/test/screens/scanner_screen_test.dart
+  - esg_app/test/widget_test.dart
 
 done:
   - 2026-07-08 — HomeScreen mit Scan-CTA und manueller Barcode-Eingabe
@@ -34,13 +35,20 @@ done:
   - 2026-07-18 — Manueller Barcode und Beispiel-CTA sind an den echten
     OpenFoodFactsProductRepository angebunden; technische Fehler erhalten
     einen retry-faehigen Screen.
+  - 2026-07-19 — Echte iOS-Kamera via mobile_scanner 7.3.0 integriert.
+  - 2026-07-19 — EAN-8, EAN-13, UPC-A und UPC-E werden einmalig erkannt und
+    an den bestehenden OFF-/ESG-Flow uebergeben.
+  - 2026-07-19 — Permission-, Unsupported- und Kamera-Fehlerzustaende sowie
+    manuelle Eingabe als Fallback implementiert.
+  - 2026-07-19 — NSCameraUsageDescription und G-AS-CAMERA-PURPOSE aktiviert.
+  - 2026-07-19 — Nativer unsigned iOS-Simulator-Build mit Xcode 26.6 PASS.
 
 decisions:
   - id: FD-SC-01
     decision: mobile_scanner als Flutter-Plugin
     date: "2026-05-19"
     rationale: "Battle-tested, native Performance, im Original-Plan benannt"
-    adr_ref: null
+    adr_ref: "0017"
   - id: FD-SC-02
     decision: Flutter-native State-Verwaltung plus Constructor Injection
     date: "2026-07-18"
@@ -48,14 +56,13 @@ decisions:
     adr_ref: "0015"
 
 open_items:
-  - "State-Management fuer Phase 1: Flutter-native + Constructor Injection (ADR 0015)"
-  - Permission-Handling iOS + Android Strategie definieren
-  - "Performance-Budget: unter 500ms von Tap bis erkannter EAN"
-  - mobile_scanner-Integration fuer iOS nachziehen
+  - Physischer iPhone-Smoke-Test fuer Kamera, Permission und Torch
+  - "Performance-Budget: unter 500ms von Tap bis erkannter EAN auf echtem iPhone messen"
+  - Android-Scanner-Validierung bleibt gemaess Roadmap fuer Phase 3 geparkt
 
 next_steps:
-  - iOS-Scanner-Adapter planen und gegen ProductRepository testen
-  - Camera-Permission-UX mit Info.plist-Zwecktext pruefen
+  - iPhone per USB verbinden, Developer Mode aktivieren und lokales Signing setzen
+  - Reale Lebensmittel-Barcodes scannen und End-to-End-Latenz protokollieren
 
 cross_feature_dependencies:
   - from: scanner
@@ -68,8 +75,7 @@ cross_feature_dependencies:
     description: Bei Erfolg Navigation zu Result-Screen
 
 requirements:
-  # Sprint 0 noch nicht angelegt, später:
-  # - R-CAM-01 (Camera Permission Purpose String)
+  - R-AS-03
 
 related_risks:
   - FM-14  # Edge-Cases (no-internet, no-data, permission-denied)

@@ -13,16 +13,19 @@ import 'low_data_screen.dart';
 import 'lookup_error_screen.dart';
 import 'not_found_screen.dart';
 import 'result_screen.dart';
+import 'scanner_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.repository,
     required this.calculator,
+    this.scannerViewportBuilder,
     super.key,
   });
 
   final ProductRepository repository;
   final ESGScoreCalculator calculator;
+  final ScannerViewportBuilder? scannerViewportBuilder;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -108,6 +111,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _openScanner() async {
+    if (_isLoading) return;
+
+    final barcode = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (_) =>
+            ScannerScreen(viewportBuilder: widget.scannerViewportBuilder),
+      ),
+    );
+    if (!mounted || barcode == null) return;
+    await _openBarcode(barcode);
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
@@ -136,10 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: ScanFairTokens.space2),
             Text("Was gibt's heute im Wagen?", style: textTheme.displayMedium),
             const SizedBox(height: ScanFairTokens.space5),
-            _PrimaryScanButton(
-              isLoading: _isLoading,
-              onPressed: () => _openBarcode('4000417025005'),
-            ),
+            _PrimaryScanButton(isLoading: _isLoading, onPressed: _openScanner),
             const SizedBox(height: ScanFairTokens.space4),
             _ManualBarcodeCard(
               controller: _barcodeController,

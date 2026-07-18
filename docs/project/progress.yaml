@@ -85,6 +85,18 @@ milestones:
       Not-Found und technische Fehlerzustaende sind implementiert.
       Teststand: 21 Tests PASS, Line-Coverage 82.63 Prozent.
 
+  - id: M12
+    title: Nativer iOS-Kamera-Barcode-Scanner und Compile-Gate implementiert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      mobile_scanner 7.3.0 erkennt EAN-8, EAN-13, UPC-A und UPC-E und
+      uebergibt den ersten gueltigen Code an den bestehenden OFF-/ESG-Flow.
+      Kamera-Permission-, Unsupported- und Fehler-Fallback sind implementiert.
+      G-AS-CAMERA-PURPOSE validiert den Info.plist-Zwecktext mit Rego/Conftest.
+      Xcode 26.6 baut die unsigned iOS-Simulator-App erfolgreich; GitHub Actions
+      zeigt G-IOS-COMPILE als eigenen macOS-Job. Teststand: 25 Tests PASS.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -177,6 +189,9 @@ decisions_made:
   - adr: 0016
     title: Open Food Facts API v3 fuer Produktabfragen
     date: 2026-07-18
+  - adr: 0017
+    title: mobile_scanner fuer den nativen iOS-Barcode-Scan
+    date: 2026-07-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -184,7 +199,8 @@ decisions_made:
 weekly_log:
   - week: 2026-W29
     summary: |
-      Echter OFF-v3-Produktlookup und zwei weitere lokale Quality Gates umgesetzt.
+      Echter OFF-v3-Produktlookup, nativer iOS-Kamera-Scanner und erweiterte
+      CI/CD-Quality-Gates umgesetzt.
     done:
       - ADR 0015 fuer Flutter-native State-Verwaltung akzeptiert
       - ADR 0016 fuer OFF API v3 und Legacy-Feldkompatibilitaet akzeptiert
@@ -193,25 +209,35 @@ weekly_log:
       - LookupErrorScreen fuer technische API-Fehler implementiert
       - G-FLT-COVERAGE mit 60-Prozent-Baseline ergaenzt
       - G-DOC-YAML fuer alle 47 Projekt-YAMLs ergaenzt
+      - ADR 0017 fuer mobile_scanner und iOS-Kamera akzeptiert
+      - ScannerScreen mit EAN-/UPC-Filter, Torch, Lifecycle und einmaliger Erkennung
+      - Permission-, Unsupported- und Kamera-Fehler-UX mit manuellem Fallback
+      - NSCameraUsageDescription in Info.plist ergaenzt
+      - G-AS-CAMERA-PURPOSE mit sechs Rego-Tests und Evidence-Log aktiviert
+      - G-IOS-COMPILE als lokales Script und GitHub-macOS-Job ergaenzt
       - README, Backlog, ADR-Index und Feature-States aktualisiert
     checks:
-      - flutter test --coverage PASS, 21 Tests
-      - Line-Coverage 609/737 = 82.63 Prozent
+      - flutter test --coverage PASS, 25 Tests
+      - Line-Coverage 698/873 = 79.95 Prozent
       - Reale OFF-v3-Abfrage fuer Beispiel-EAN 4000417025005 validiert
+      - opa test docs/project/policies PASS, 15 Tests
+      - Conftest Apple-Gates PASS, 13 Checks
+      - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
       - bash scripts/quality/run_quality_gates.sh PASS, 9/9 Gates
       - gitleaks git --redact PASS
     learnings:
       - OFF empfiehlt v3 fuer neue Integrationen; v2 ist nur noch kompatibel
       - Tolerantes Mapping bleibt noetig, weil reale v3-Antworten Legacy-Felder liefern
       - Ein YAML-Syntax-Gate findet SSOT-Fehler, die reine Grep-Checks uebersehen
-      - Xcode Command Line Tools ersetzen keine vollstaendige Xcode-Installation
+      - Kamera-Permission-UX muss auf kleinen Hoehen scrollbar bleiben
+      - Native Plugin-Sicherheit braucht zusaetzlich zu Dart-Tests einen iOS-Build
     blockers:
-      - Vollstaendige Xcode-App ist nicht aktiv; xcode-select zeigt nur CommandLineTools
-      - Native iOS-Kamera via mobile_scanner bleibt bis zum Xcode-Setup offen
+      - Kein physisches iPhone verbunden; realer Kamera-Smoke-Test steht aus
+      - Lokales iPhone-Signing/Apple-Team kann erst mit verbundenem Geraet validiert werden
     next_week:
-      - TODO-009 Xcode installieren/aktivieren und iOS-Simulator-Build validieren
-      - mobile_scanner integrieren und Camera-Permission-UX testen
-      - iOS-spezifische Privacy-/Metadata-Gates erweitern
+      - iPhone verbinden, Developer Mode aktivieren und lokales Signing testen
+      - Reale Produkt-Barcodes scannen und End-to-End-Latenz messen
+      - Verbleibende Privacy-/Support-/Datenquellen-Gates umsetzen
 
   - week: 2026-W28
     summary: |
@@ -333,11 +359,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 16
-  todos_open: 14
+  decisions_total: 17
+  todos_open: 13
   todos_in_progress: 2
-  todos_done: 7
-  milestones_reached: 11
+  todos_done: 8
+  milestones_reached: 12
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

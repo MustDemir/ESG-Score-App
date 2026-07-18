@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-07-18
+Letztes Update: 2026-07-19
 
 ## Aktive ADRs
 
@@ -26,19 +26,20 @@ Letztes Update: 2026-07-18
 | [0014](0014-local-mvp-quality-gates.yaml) | Lokale MVP-App-Architektur mit CI/CD-Quality-Gates | accepted | 2026-07-08 | architecture, flutter, ci-cd, quality-gates, local-first | 0001, 0003, 0007, 0008, 0009, 0010, 0011, 0012, 0013 |
 | [0015](0015-phase-1-state-management.yaml) | Flutter-native State-Verwaltung fuer den Phase-1-MVP | accepted | 2026-07-18 | flutter, state-management, architecture, mvp | 0001, 0007, 0014 |
 | [0016](0016-open-food-facts-api-v3.yaml) | Open Food Facts API v3 fuer Produktabfragen | accepted | 2026-07-18 | api, open-food-facts, data, architecture | 0003, 0008, 0010, 0011, 0014 |
+| [0017](0017-mobile-scanner-ios-camera.yaml) | mobile_scanner fuer den nativen iOS-Barcode-Scan | accepted | 2026-07-19 | flutter, scanner, ios, camera, privacy | 0001, 0007, 0008, 0012, 0014, 0015 |
 
 ## Geplante ADRs (im Backlog)
 
 | ID | Titel | Wann | Trigger |
 |---|---|---|---|
-| 0017 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
-| 0018 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
+| 0018 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
+| 0019 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
 
 ## Status-Verteilung
 
 | Status | Anzahl |
 |---|---|
-| accepted | 15 |
+| accepted | 16 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 0 |
@@ -47,6 +48,7 @@ Letztes Update: 2026-07-18
 ## Tags-Index (häufigste)
 
 - **architecture** → 0001, 0014, 0015, 0016
+- **scanner / ios** → 0017
 - **backend / database** → 0002
 - **data / api** → 0003, 0016
 - **ai / scope** → 0004, 0005, 0006

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/scanner_screen.dart';
 import 'services/esg_score_calculator.dart';
 import 'services/open_food_facts_service.dart';
 import 'services/product_repository.dart';
@@ -19,11 +20,13 @@ class ScanFairApp extends StatelessWidget {
   const ScanFairApp({
     required this.repository,
     this.calculator = const ESGScoreCalculator(),
+    this.scannerViewportBuilder,
     super.key,
   });
 
   final ProductRepository repository;
   final ESGScoreCalculator calculator;
+  final ScannerViewportBuilder? scannerViewportBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +34,11 @@ class ScanFairApp extends StatelessWidget {
       title: 'ScanFair',
       debugShowCheckedModeBanner: false,
       theme: ScanFairTheme.light,
-      home: HomeScreen(repository: repository, calculator: calculator),
+      home: HomeScreen(
+        repository: repository,
+        calculator: calculator,
+        scannerViewportBuilder: scannerViewportBuilder,
+      ),
     );
   }
 }

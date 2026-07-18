@@ -1,0 +1,43 @@
+id: G-AS-CAMERA-PURPOSE
+name: Spezifischer Kamera-Zwecktext
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+trigger: Pull Request oder Push mit Aenderung an iOS-Metadaten oder Scanner-Code
+
+policy_checks:
+  - policy_camera_purpose
+
+evidence_required:
+  - esg_app/ios/Runner/Info.plist
+  - evidence-store/app_extracted.json
+  - evidence-store/compliance_input.json
+  - evidence-store/evidence-log.jsonl
+
+decision: approve|block
+owner: Mustafa (Solo-Founder)
+
+audit_trail:
+  enabled: true
+  evidence_store_ref: evidence://gates/pre-deployment/G-AS-CAMERA-PURPOSE
+
+waiver:
+  allowed: false
+  requires: null
+
+links:
+  requirements:
+    - R-AS-03
+  apple_guideline_refs:
+    - "2.5.14"
+    - "5.1.1(iii)"
+  decisions:
+    - "0017"
+
+sources:
+  - docs/project/requirements/R-AS-03.yaml
+  - esg_app/ios/Runner/Info.plist
+
+notes: |
+  AUTO-Gate. Conftest prueft, dass NSCameraUsageDescription vorhanden,
+  mindestens 50 Zeichen lang, domaenenspezifisch und nicht generisch ist.
+  Der Text muss ausserdem erklaeren, wie Kamera-/Bilddaten behandelt werden.

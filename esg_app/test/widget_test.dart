@@ -1,13 +1,17 @@
 import 'package:esg_app/main.dart';
 import 'package:esg_app/models/product.dart';
+import 'package:esg_app/screens/scanner_screen.dart';
 import 'package:esg_app/services/product_lookup_failure.dart';
 import 'package:esg_app/services/product_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget buildDemoApp() {
-    return ScanFairApp(repository: DemoProductRepository());
+  Widget buildDemoApp({ScannerViewportBuilder? scannerViewportBuilder}) {
+    return ScanFairApp(
+      repository: DemoProductRepository(),
+      scannerViewportBuilder: scannerViewportBuilder,
+    );
   }
 
   testWidgets('Home screen renders the local ScanFair flow', (tester) async {
@@ -26,12 +30,26 @@ void main() {
   testWidgets('Scan action opens result screen for GEPA demo product', (
     tester,
   ) async {
-    await tester.pumpWidget(buildDemoApp());
+    await tester.pumpWidget(
+      buildDemoApp(
+        scannerViewportBuilder: (context, onBarcodeDetected) => ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () => onBarcodeDetected('4000417025005'),
+              child: const Text('Testbarcode erfassen'),
+            ),
+          ),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Barcode in den Rahmen halten'), findsOneWidget);
+    await tester.tap(find.text('Testbarcode erfassen'));
     await tester.pumpAndSettle();
 
     expect(find.text('Ergebnis'), findsOneWidget);
@@ -79,10 +97,23 @@ void main() {
 
   testWidgets('Network failure opens a retryable error state', (tester) async {
     await tester.pumpWidget(
-      ScanFairApp(repository: _FailingProductRepository()),
+      ScanFairApp(
+        repository: _FailingProductRepository(),
+        scannerViewportBuilder: (context, onBarcodeDetected) => ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () => onBarcodeDetected('4000417025005'),
+              child: const Text('Testbarcode erfassen'),
+            ),
+          ),
+        ),
+      ),
     );
 
     await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Testbarcode erfassen'));
     await tester.pumpAndSettle();
 
     expect(find.text('Keine Verbindung'), findsOneWidget);

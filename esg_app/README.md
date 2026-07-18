@@ -1,10 +1,10 @@
 # ScanFair Flutter App
 
 Lokaler Flutter-MVP fuer ScanFair. Die App bildet den Kernflow ab:
-Home/Scan-Simulation, echter Produktlookup ueber die Open Food Facts API v3,
+Home/Kamera-Scan, echter Produktlookup ueber die Open Food Facts API v3,
 ESG-Score-Berechnung, Ergebnisansicht, Detailansicht sowie Low-Data-,
-Not-Found- und Netzwerkfehler-Zustaende. Demo-Daten bleiben fuer deterministische
-Tests verfuegbar.
+Not-Found-, Kamera-Permission- und Netzwerkfehler-Zustaende. Demo-Daten bleiben
+fuer deterministische Tests verfuegbar.
 
 ## Lokal starten
 
@@ -13,6 +13,23 @@ cd /Users/mustafademir/ESG-Score-App/esg_app
 flutter pub get
 flutter run
 ```
+
+## Auf dem eigenen iPhone testen
+
+1. iPhone per USB verbinden, entsperren und diesem Mac vertrauen.
+2. Auf dem iPhone den Developer Mode unter Datenschutz & Sicherheit aktivieren.
+3. `ios/Runner.xcworkspace` in Xcode oeffnen und fuer `Runner` unter
+   `Signing & Capabilities` das eigene Apple-Team auswaehlen.
+4. Das erkannte Geraet mit Flutter starten:
+
+```bash
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+flutter devices
+flutter run -d <IPHONE_DEVICE_ID>
+```
+
+Beim ersten Oeffnen des Scanners den Kamerazugriff erlauben. Der iOS-Simulator
+eignet sich fuer UI- und Build-Tests, aber nicht fuer den realen Kamera-Scan.
 
 ## Tests und Checks
 
@@ -27,6 +44,7 @@ Repo-weite Quality Gates:
 ```bash
 cd /Users/mustafademir/ESG-Score-App
 bash scripts/quality/run_quality_gates.sh
+bash scripts/quality/run_ios_build_gate.sh
 ```
 
 ## Architektur
@@ -36,10 +54,12 @@ bash scripts/quality/run_quality_gates.sh
 - `lib/services/open_food_facts_service.dart` kapselt OFF API v3 mit Timeout,
   Retry, User-Agent und Fehlerklassifikation.
 - `lib/services/product_repository.dart` trennt Live- und Demo-Datenquellen.
-- `lib/screens/` enthaelt Home, Result, Details, LowData und NotFound.
+- `lib/screens/scanner_screen.dart` kapselt Kamera, EAN-/UPC-Erkennung,
+  Lifecycle, Torch und Permission-Fallback.
+- `lib/screens/` enthaelt ausserdem Home, Result, Details, LowData und NotFound.
 - `lib/widgets/score_widgets.dart` enthaelt wiederverwendbare Score-Komponenten.
 
-Noch nicht Teil dieses lokalen Stands: echte Kamera via `mobile_scanner`,
-Supabase, iOS-Deployment, TestFlight oder Release. Fuer einen lokalen
-iOS-Simulator-Build muss die vollstaendige Xcode-App installiert und mit
-`xcode-select` aktiviert sein; aktuell sind nur die Command Line Tools aktiv.
+Noch nicht Teil dieses lokalen Stands: Supabase, TestFlight, App-Store-Release
+oder Online-Deployment. Xcode 26.6 und der unsigned iOS-Simulator-Build wurden
+lokal validiert. Der echte Kamera-Smoke-Test muss auf einem angeschlossenen,
+lokal signierten iPhone erfolgen.
