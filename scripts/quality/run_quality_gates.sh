@@ -61,32 +61,31 @@ gate_app_compliance() {
 }
 
 gate_docs_traceability() {
-  cd "$REPO_ROOT" || return 1
-  ruby -e '
-    root_readme, app_readme = ARGV
-    checks = {
-      root_readme => [
-        "Quality Gates",
-        "scripts/quality/run_quality_gates.sh",
-        "G-FLT-COVERAGE",
-        "G-IOS-COMPILE"
-      ],
-      app_readme => [
-        "flutter run",
-        "Open Food Facts API v3",
-        "mobile_scanner"
-      ]
-    }
+  local missing=0
+  local check
+  local file
+  local marker
+  local checks=(
+    "README.md|Quality Gates"
+    "README.md|scripts/quality/run_quality_gates.sh"
+    "README.md|G-FLT-COVERAGE"
+    "README.md|G-IOS-COMPILE"
+    "esg_app/README.md|flutter run"
+    "esg_app/README.md|Open Food Facts API v3"
+    "esg_app/README.md|mobile_scanner"
+  )
 
-    missing = checks.flat_map do |path, required_texts|
-      content = File.read(path, encoding: "UTF-8")
-      required_texts.reject { |text| content.include?(text) }
-                    .map { |text| "#{path}: #{text}" }
-    end
+  for check in "${checks[@]}"; do
+    file="${check%%|*}"
+    marker="${check#*|}"
+    if ! git -C "$REPO_ROOT" grep -Fq -- "$marker" HEAD -- "$file"; then
+      printf 'Missing documentation traceability in HEAD: %s: %s\n' "$file" "$marker"
+      missing=1
+    fi
+  done
 
-    abort "Missing documentation traceability:\n- #{missing.join("\n- ")}" unless missing.empty?
-    puts "Documentation traceability OK: #{checks.values.flatten.length} markers"
-  ' "$REPO_ROOT/README.md" "$APP_DIR/README.md"
+  [ "$missing" -eq 0 ] || return 1
+  printf 'Documentation traceability OK: %s committed markers\n' "${#checks[@]}"
 }
 
 gate_yaml_syntax() {
