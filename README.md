@@ -3,7 +3,7 @@
 > **Scan. Verstehen. Fairer entscheiden.**  
 > Eine mobile App für schnelle, transparente Nachhaltigkeitsentscheidungen direkt am Regal.
 
-**ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und später den Flutter-Code.
+**ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und den lokal validierten Flutter-MVP.
 
 ---
 
@@ -225,7 +225,7 @@ Dieses Repo enthält dafür Vorlagen:
 | --- | --- | --- |
 | Phase 0 | Discovery, Research, Design-System, Prototypen | abgeschlossen |
 | Phase 1 | Hi-Fi-Designs, klickbarer Prototyp, Developer-Handoff | abgeschlossen |
-| Phase 2 | Lebensmittel-MVP mit Scanner, Score und Details (Flutter) | nächster Umsetzungsschritt |
+| Phase 2 | Lebensmittel-MVP mit Scanner, Score und Details (Flutter) | implementiert und auf echtem iPhone validiert |
 | Phase 3 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
 | Phase 4 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
 
@@ -268,6 +268,25 @@ deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
 Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
 implementiert.
 
+**Validierter MVP-Stand (19. Juli 2026)**
+
+| Bereich | Ergebnis |
+| --- | --- |
+| Zielplattform | iOS-first Flutter-MVP auf physischem iPhone installiert |
+| App-Start | Signierter Profile-Build startet eigenstaendig vom Home-Bildschirm |
+| Kamera | Kameraberechtigung und nativer Barcode-Scanner erfolgreich getestet |
+| Scan-Flow | EAN-/UPC-Barcode erkannt und an den Produktlookup uebergeben |
+| Produktdaten | Open Food Facts API v3 liefert reale Produktinformationen |
+| Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
+| Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Layout und Stil im MVP-Smoke-Test bestaetigt |
+| Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
+| Release-Scope | Kein TestFlight, App-Store-Release, Hosting oder iOS-Deployment |
+
+Der physische Smoke-Test deckt die Kernschleife
+`Oeffnen -> Scannen -> Produkt finden -> Score verstehen -> Details pruefen`
+vollstaendig ab. Fachliche Spezifikationen, weitere Datenquellen und die
+Vertiefung des S-/G-Scores bleiben Gegenstand der naechsten Iterationen.
+
 **App lokal starten**
 
 ```bash
@@ -286,6 +305,17 @@ cd /Users/mustafademir/ESG-Score-App/esg_app
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 flutter devices
 flutter run -d <IPHONE_DEVICE_ID>
+```
+
+`flutter run` installiert einen Debug-Build. Dieser kann auf aktuellen
+iOS-Versionen nur mit aktiver Flutter-/Xcode-Verbindung gestartet werden. Fuer
+einen lokal installierten Build, der eigenstaendig vom Home-Bildschirm startet,
+wird der Profile-Modus verwendet:
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+flutter run --profile --no-resident -d <IPHONE_DEVICE_ID>
 ```
 
 **Quality Gates lokal ausfuehren**
@@ -320,6 +350,13 @@ Sie veroeffentlicht Gate-Summaries und die Artefakte
 neun lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-Job und ein
 separater Gitleaks-Secret-Scan. `G-CMP-APPLE` validiert aktuell App-Name und
 Kamera-Zwecktext als einzelne Rego/Conftest-Policies mit Evidence-Log.
+
+Der zuletzt validierte Stand bestand lokal alle neun Gate-Gruppen. Zusaetzlich
+bestanden 25 Flutter-Tests, 15 Rego-Tests, 13 Conftest-Checks, der
+Gitleaks-Scan, die YAML-Dokumentenpruefung und der native iOS-Simulator-Build.
+Die gemessene Line-Coverage liegt bei 79,95% und damit ueber dem Gate von 60%.
+Der zugehoerige GitHub-Actions-Lauf war in allen drei Jobs gruen:
+[Quality Gates Run 29664360331](https://github.com/MustDemir/ESG-Score-App/actions/runs/29664360331).
 
 Explizit ausgeschlossen: iOS-Deployment, Online-Release, Hosting-Provider,
 Kubernetes und OPA Gatekeeper. Die App uebernimmt aus
