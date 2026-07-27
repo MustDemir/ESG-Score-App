@@ -178,7 +178,7 @@ GitHub soll nicht nur Ablage sein, sondern unser Steuerungsinstrument für Produ
 
 | Bereich | Best Practice für dieses Projekt |
 | --- | --- |
-| Branches | `main` bleibt stabil; Arbeit passiert auf Feature-Branches wie `codex/integrate-design-artifacts` |
+| Branches | `main` bleibt stabil; Arbeit passiert auf kurzlebigen Branches wie `feature/integrate-design-artifacts` |
 | Pull Requests | Jeder größere Schritt bekommt einen PR mit Ziel, Änderungen, offenen Entscheidungen und Screenshots/Links |
 | Issues | Anforderungen, Bugs, Design-Entscheidungen und Forschungsfragen als Issues erfassen |
 | Labels | `type:feature`, `type:bug`, `type:docs`, `type:design`, `area:scoring`, `area:flutter`, `area:research` |
@@ -196,7 +196,7 @@ Dieses Repo enthält dafür Vorlagen:
 **Empfohlener Workflow**
 
 1. Issue anlegen: Was soll gebaut oder entschieden werden?
-2. Branch erstellen: `codex/<kurzer-zweck>` oder `feature/<kurzer-zweck>`.
+2. Branch erstellen: `feature/<kurzer-zweck>`.
 3. Änderung klein halten: ein Thema pro Branch.
 4. PR öffnen: Kontext, Screenshots/Links, Testhinweise, offene Fragen.
 5. Review nutzen: fachlich, technisch und UX-seitig prüfen.
@@ -349,7 +349,8 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 **GitHub Actions**
 
 Die Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
-`main`, `dev`, `codex/**`, Pull Requests und manuell via `workflow_dispatch`.
+`main`, `feature/**`, Pull Requests nach `main` und manuell via
+`workflow_dispatch`.
 Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den

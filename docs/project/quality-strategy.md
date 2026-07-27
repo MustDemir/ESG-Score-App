@@ -59,8 +59,8 @@ Coverage ist **Indikator, nicht Ziel**. Ein Test der nur Coverage erzeugt ist Sc
 
 Die verbindliche Workflow-Datei ist
 [`quality-gates.yml`](../../.github/workflows/quality-gates.yml). Sie laeuft
-bei Pushes nach `main`, `dev` und `codex/**`, bei Pull Requests nach `main`
-oder `dev` sowie manuell via `workflow_dispatch`. Aenderungen an der
+bei Pushes nach `main` und `feature/**`, bei Pull Requests nach `main` sowie
+manuell via `workflow_dispatch`. Aenderungen an der
 Repository-README loesen sie ebenfalls aus, weil `G-DOC-TRACE` diese Datei
 mitprueft.
 

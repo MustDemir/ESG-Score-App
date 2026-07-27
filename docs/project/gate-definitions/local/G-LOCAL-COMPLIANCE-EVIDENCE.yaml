@@ -2,7 +2,7 @@ id: G-LOCAL-COMPLIANCE-EVIDENCE
 name: Compliance policy and evidence baseline
 dimension: regulatorisch
 lifecycle_phase: pre-deployment
-trigger: Pull request, push to dev/main/codex branches, local quality run
+trigger: Pull request, push to main/feature branches, local quality run
 policy_checks:
   - scripts/compliance/validate_compliance_catalog.rb
   - opa test docs/project/policies

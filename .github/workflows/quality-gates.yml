@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - dev
-      - 'codex/**'
+      - 'feature/**'
     paths:
       # G-DOC-TRACE validates the repository README as a release-relevant artifact.
       - 'README.md'
@@ -16,7 +15,6 @@ on:
   pull_request:
     branches:
       - main
-      - dev
     paths:
       - 'README.md'
       - 'esg_app/**'

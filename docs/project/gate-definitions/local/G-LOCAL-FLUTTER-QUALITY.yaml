@@ -2,7 +2,7 @@ id: G-LOCAL-FLUTTER-QUALITY
 name: Flutter quality baseline
 dimension: technisch
 lifecycle_phase: pre-deployment
-trigger: Pull request, push to dev/main/codex branches, local quality run
+trigger: Pull request, push to main/feature branches, local quality run
 policy_checks:
   - dart format --set-exit-if-changed lib test
   - flutter analyze --fatal-infos

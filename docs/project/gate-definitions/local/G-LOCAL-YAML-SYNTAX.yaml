@@ -2,7 +2,7 @@ id: G-LOCAL-YAML-SYNTAX
 name: Project YAML syntax baseline
 dimension: technisch
 lifecycle_phase: pre-deployment
-trigger: Pull request, push to dev/main/codex branches, local quality run
+trigger: Pull request, push to main/feature branches, local quality run
 policy_checks:
   - Parse every YAML file below docs/project with Ruby Psych
 evidence_required:
