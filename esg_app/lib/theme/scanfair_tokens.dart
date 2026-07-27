@@ -70,10 +70,8 @@ abstract final class ScanFairTokens {
   // Ampel-Score Colors — 0-10 mapped zu green/yellow/red
   // siehe ADR 0011 (ESG-Score-Formel) fuer Schwellwerte
   // ---------------------------------------------------------------------------
-  static const Color trafficGreen = Color(0xFF0F7B5C); // 7.0-10  · "Empfehlung"
-  static const Color trafficYellow = Color(
-    0xFFD97706,
-  ); // 4.0-6.9 · "Mit Bedacht"
+  static const Color trafficGreen = Color(0xFF0F7B5C); // 7.0-10
+  static const Color trafficYellow = Color(0xFFD97706); // 4.0-6.9
   static const Color trafficRed = Color(0xFFC2410C); // 0-3.9   · "Vermeiden"
 
   // ---------------------------------------------------------------------------

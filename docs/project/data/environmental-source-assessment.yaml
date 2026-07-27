@@ -1,0 +1,93 @@
+schema_version: 1
+assessment_id: environmental-sources-2026-07-27
+status: review
+reviewed_on: "2026-07-27"
+methodology_version: 2.0-draft
+
+decision_rules:
+  - Prefer official or methodologically documented primary datasets.
+  - Validate license, attribution, scope, version and update cadence.
+  - Keep category and country risk separate from product-specific evidence.
+  - Do not activate a parameter in the score before calibration.
+
+sources:
+  - source_id: agribalyse
+    decision: accepted_for_raw_category_lca_evidence
+    authority: ADEME, INRAE, ACTA and ACTIA
+    version: "3.2"
+    license: Etalab-2.0
+    coverage: 2516 finished food categories and 16 EF impact indicators
+    suitable_parameters:
+      - parameter_id: E-COMPOSITE-LCA-SCORE
+        mapping_status: candidate
+        limitation: Raw EF single score still needs normalization and calibration.
+      - parameter_id: E-GHG-INTENSITY
+        mapping_status: validated
+        limitation: Category average per kg, not a measured brand-product value.
+      - parameter_id: E-LAND-USE
+        mapping_status: candidate
+        limitation: Interpretation and normalization are not yet approved.
+      - parameter_id: E-WATER-SCARCITY
+        mapping_status: candidate_with_method_limitations
+        limitation: AGRIBALYSE itself identifies limitations for the water indicator.
+      - parameter_id: E-TRANSPORT-COLD-CHAIN
+        mapping_status: candidate
+        limitation: Requires the life-cycle-stage detail dataset.
+      - parameter_id: E-PACKAGING-CIRCULARITY
+        mapping_status: insufficient_alone
+        limitation: LCA packaging impact does not establish recyclability or circularity.
+      - parameter_id: E-BIODIVERSITY-POLLUTION
+        mapping_status: insufficient_alone
+        limitation: LCA does not adequately cover all biodiversity impacts.
+      - parameter_id: E-DEFORESTATION-RISK
+        mapping_status: not_supported
+        limitation: Requires commodity, origin and land-use evidence.
+
+  - source_id: wri-aqueduct
+    decision: candidate_for_contextual_water_risk
+    authority: World Resources Institute
+    version: "4.0"
+    license: CC-BY-4.0
+    suitable_parameters:
+      - parameter_id: E-WATER-SCARCITY
+        mapping_status: candidate
+        limitation: |
+          Screening and prioritization indicator requiring a validated product
+          origin and geographic join. It is not a product-specific finding.
+
+  - source_id: eu-eudr-country-benchmarking
+    decision: candidate_for_regulatory_context
+    authority: European Commission
+    legal_basis: Commission Implementing Regulation EU 2025/1093
+    suitable_parameters:
+      - parameter_id: E-DEFORESTATION-RISK
+        mapping_status: candidate
+        limitation: |
+          Coarse country context for EUDR commodities. Coffee and cocoa are in
+          scope; bananas are not. Classification is not proof of deforestation.
+
+  - source_id: faostat-emissions-intensities
+    decision: rejected_for_current_pilots
+    authority: Food and Agriculture Organization of the United Nations
+    release: October 2025
+    license: CC-BY-4.0_with_database_terms
+    reason: |
+      Current published commodity coverage is selected cereals and animal
+      products. Coffee, cocoa and bananas are absent, and upstream/downstream
+      life-cycle stages and trade are excluded.
+
+coverage_gaps:
+  - parameter_id: E-BIODIVERSITY-POLLUTION
+    status: no_validated_primary_source
+  - parameter_id: E-PACKAGING-CIRCULARITY
+    status: requires_product_packaging_dataset
+  - parameter_id: E-DEFORESTATION-RISK
+    status: origin_and_commodity_mapping_required
+
+primary_references:
+  - https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/XTENSJ
+  - https://doc.agribalyse.fr/documentation/utiliser-agribalyse/precautions-et-conditions-dusage
+  - https://doc.agribalyse.fr/documentation-en/data-use/life-cycle-assessment-method
+  - https://www.wri.org/aqueduct/faq
+  - https://eur-lex.europa.eu/eli/reg_impl/2025/1093/oj/eng
+  - https://www.fao.org/contact-us/terms/db-terms-of-use/en

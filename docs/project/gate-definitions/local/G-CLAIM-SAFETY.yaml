@@ -1,0 +1,33 @@
+id: G-CLAIM-SAFETY
+name: ESG customer-claim safety
+dimension: compliance
+lifecycle_phase: scoring
+trigger: Pull request, feature push, local quality run
+policy_checks:
+  - Score is neither a certification nor a legal compliance determination
+  - Contextual risk is labelled as risk, not a product finding
+  - Category averages are not labelled as product measurements
+  - Unsupported absolute customer claims are prohibited
+evidence_required:
+  - docs/project/methodology-catalog/scoring-controls.yaml
+  - docs/project/methodology-catalog/parameters.yaml
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - G-AS-CLAIMS-TRANSPARENCY
+  related_adrs:
+    - 0021
+    - 0023
+    - 0024
+    - 0025
+sources:
+  - docs/project/methodology-catalog/scoring-controls.yaml
+  - docs/project/policies/apple/production/policy_claims_transparency.rego

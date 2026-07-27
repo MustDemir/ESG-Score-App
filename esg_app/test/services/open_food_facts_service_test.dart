@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:esg_app/services/open_food_facts_service.dart';
 import 'package:esg_app/services/product_lookup_failure.dart';
+import 'package:esg_app/models/esg_relationship.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -22,9 +23,21 @@ void main() {
             'environmental_score_grade': 'b',
             'environmental_score_score': 72,
             'environmental_score_data': {
-              'agribalyse': {'co2_total': 3.4},
+              'agribalyse': {
+                'code': '31074',
+                'version': '3.2',
+                'co2_total': 3.4,
+                'dqr': '1.89',
+              },
             },
+            'ingredients': [
+              {'id': 'en:cocoa', 'text': 'Cocoa'},
+            ],
+            'ingredients_text': 'cocoa, sugar',
+            'origins_tags': ['en:ghana'],
             'labels_tags': ['en:organic'],
+            'schema_version': 1004,
+            'last_updated_t': 1785100000,
           },
         }),
         200,
@@ -40,6 +53,46 @@ void main() {
     expect(product.ecoscoreGrade, 'b');
     expect(product.ecoscoreScore, 72);
     expect(product.co2Total, 3.4);
+    expect(product.evidence, isNotEmpty);
+    expect(
+      product.dataSources.map((source) => source.id),
+      containsAll(['open-food-facts', 'agribalyse']),
+    );
+    final ghgEvidence = product.evidenceFor('ghg_intensity').single;
+    expect(ghgEvidence.source.id, 'agribalyse');
+    expect(ghgEvidence.sourceRecordId, '31074');
+    expect(ghgEvidence.scope.name, 'category');
+    expect(ghgEvidence.sourceSchemaVersion, '3.2');
+    expect(ghgEvidence.retrievedVia?.id, 'open-food-facts');
+    expect(ghgEvidence.toMap()['retrieved_via_source_id'], 'open-food-facts');
+    expect(product.evidenceFor('source_quality_dqr').single.numericValue, 1.89);
+    final commodityRelationship = product
+        .relationshipsOfType(ESGRelationshipType.containsCommodity)
+        .single;
+    expect(commodityRelationship.to.id, 'commodity:cocoa');
+    expect(
+      commodityRelationship.assertionClass,
+      ESGAssertionClass.communityReported,
+    );
+    expect(commodityRelationship.scoreEligible, isFalse);
+    expect(
+      product
+          .relationshipsOfType(ESGRelationshipType.hasProductOrigin)
+          .single
+          .to
+          .id,
+      'country:GH',
+    );
+    expect(product.hasScoreEligibleCommodityOrigin, isFalse);
+    expect(product.hasScoreEligibleLegalEntity, isFalse);
+    expect(
+      product.evidenceFor('environmental_score').single.sourceSchemaVersion,
+      '1004',
+    );
+    expect(
+      product.evidenceFor('environmental_score').single.observedAt,
+      DateTime.fromMillisecondsSinceEpoch(1785100000000, isUtc: true),
+    );
     expect(capturedRequest.url.scheme, 'https');
     expect(capturedRequest.url.path, '/api/v3/product/4000417025005.json');
     expect(capturedRequest.headers['User-Agent'], contains('ScanFair/0.1'));
@@ -75,6 +128,10 @@ void main() {
     expect(product!.ecoscoreGrade, 'c');
     expect(product.ecoscoreScore, 54);
     expect(product.co2Total, 2.2);
+    expect(
+      product.evidenceFor('co2_total').single.source.id,
+      'open-food-facts',
+    );
   });
 
   test('returns null when Open Food Facts returns 404', () async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/esg_relationship.dart';
 import '../models/esg_score.dart';
 import '../models/product.dart';
 import '../theme/scanfair_colors.dart';
@@ -224,8 +225,189 @@ class MethodFootnote extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       'Daten: ${score.sources.join(', ')}. Formel ${ESGScore.formulaVersion}. '
-      'Fehlende Daten werden nicht geschätzt.',
+      'Fehlende Daten werden nicht geschätzt. Orientierung, keine '
+      'Zertifizierung.',
       style: ScanFairTypography.meta,
+    );
+  }
+}
+
+class DataProvenanceCard extends StatelessWidget {
+  const DataProvenanceCard({required this.product, super.key});
+
+  final ScanFairProduct product;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final sources = product.dataSources;
+    final retrievedAt = product.latestRetrievedAt;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(ScanFairTokens.space4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Datenherkunft', style: textTheme.titleMedium),
+            const SizedBox(height: ScanFairTokens.space2),
+            if (sources.isEmpty)
+              Text(
+                'Lokale Demo-Daten · keine externe Abfrage',
+                style: textTheme.bodySmall,
+              )
+            else
+              ...sources.map(
+                (source) => Padding(
+                  padding: const EdgeInsets.only(bottom: ScanFairTokens.space2),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.dataset_outlined, size: 20),
+                      const SizedBox(width: ScanFairTokens.space2),
+                      Expanded(
+                        child: Text(
+                          '${source.name} · ${source.datasetLicense}\n'
+                          '${source.attribution}',
+                          style: textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            Text(
+              '${product.evidence.length} Evidenzpunkte'
+              '${retrievedAt == null ? '' : ' · Abruf ${_date(retrievedAt)}'}',
+              style: ScanFairTypography.meta,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _date(DateTime value) {
+    final local = value.toLocal();
+    final day = local.day.toString().padLeft(2, '0');
+    final month = local.month.toString().padLeft(2, '0');
+    return '$day.$month.${local.year}';
+  }
+}
+
+class TraceabilityCard extends StatelessWidget {
+  const TraceabilityCard({required this.product, super.key});
+
+  final ScanFairProduct product;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final commodities = product
+        .relationshipsOfType(ESGRelationshipType.containsCommodity)
+        .toList(growable: false);
+    final origins = product
+        .relationshipsOfType(ESGRelationshipType.hasProductOrigin)
+        .toList(growable: false);
+    final legalEntities = product
+        .relationshipsOfType(ESGRelationshipType.responsibleLegalEntity)
+        .toList(growable: false);
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(ScanFairTokens.space4),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Zuordnungen', style: textTheme.titleMedium),
+            const SizedBox(height: ScanFairTokens.space3),
+            _TraceabilityRow(
+              icon: Icons.grain_outlined,
+              label: 'Rohstoffe',
+              relationships: commodities,
+              missingLabel: 'Nicht belastbar zugeordnet',
+            ),
+            const Divider(height: ScanFairTokens.space4),
+            _TraceabilityRow(
+              icon: Icons.public_outlined,
+              label: 'Produktherkunft',
+              relationships: origins,
+              missingLabel: 'Keine Herkunft belegt',
+            ),
+            const Divider(height: ScanFairTokens.space4),
+            _TraceabilityRow(
+              icon: Icons.corporate_fare_outlined,
+              label: 'Verantwortliches Unternehmen',
+              relationships: legalEntities,
+              missingLabel: 'Rechtsträger noch nicht aufgelöst',
+            ),
+            if (commodities.isNotEmpty || origins.isNotEmpty) ...[
+              const SizedBox(height: ScanFairTokens.space3),
+              Text(
+                product.hasScoreEligibleCommodityOrigin
+                    ? 'Rohstoff und Herkunft sind für kontextuelle '
+                          'Risikodaten freigegeben.'
+                    : 'Vorhandene Hinweise reichen noch nicht für eine '
+                          'Rohstoff-Länder-Risikobewertung.',
+                style: ScanFairTypography.meta,
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TraceabilityRow extends StatelessWidget {
+  const _TraceabilityRow({
+    required this.icon,
+    required this.label,
+    required this.relationships,
+    required this.missingLabel,
+  });
+
+  final IconData icon;
+  final String label;
+  final List<ESGRelationship> relationships;
+  final String missingLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final values = relationships
+        .map((entry) => entry.to.displayName)
+        .join(', ');
+    final hasEligibleRelationship = relationships.any(
+      (entry) => entry.scoreEligible,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 20),
+        const SizedBox(width: ScanFairTokens.space2),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: textTheme.titleSmall),
+              const SizedBox(height: ScanFairTokens.space1),
+              Text(
+                relationships.isEmpty ? missingLabel : values,
+                style: textTheme.bodySmall,
+              ),
+              if (relationships.isNotEmpty)
+                Text(
+                  hasEligibleRelationship
+                      ? 'belegt'
+                      : 'Hinweis · noch nicht score-aktiv',
+                  style: ScanFairTypography.meta,
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

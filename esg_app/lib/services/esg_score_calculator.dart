@@ -21,6 +21,7 @@ class ESGScoreCalculator {
         dataCompleteness: completeness,
         social: social,
         governance: governance,
+        sources: _scoreSources(product),
       );
     }
 
@@ -37,6 +38,7 @@ class ESGScoreCalculator {
       governance: governance,
       total: total,
       dataCompleteness: completeness,
+      sources: _scoreSources(product),
     );
   }
 
@@ -59,6 +61,7 @@ class ESGScoreCalculator {
               : 'Grad ${product.ecoscoreGrade!.toUpperCase()}',
           source: 'Open Food Facts',
           available: true,
+          evidenceIds: _evidenceIds(product, 'environmental_score'),
         ),
         ScoreFactor(
           label: 'Verpackung',
@@ -67,6 +70,7 @@ class ESGScoreCalculator {
               : product.packagingTags.join(', '),
           source: 'Open Food Facts',
           available: product.packagingTags.isNotEmpty,
+          evidenceIds: _evidenceIds(product, 'packaging'),
         ),
         ScoreFactor(
           label: 'Herkunft',
@@ -75,6 +79,7 @@ class ESGScoreCalculator {
               : product.originTags.join(', '),
           source: 'Open Food Facts',
           available: product.originTags.isNotEmpty,
+          evidenceIds: _evidenceIds(product, 'origin'),
         ),
       ],
     );
@@ -91,11 +96,12 @@ class ESGScoreCalculator {
     if (_containsAny(tags, ['fair-trade', 'fairtrade', 'gepa'])) {
       score += 25;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Fair-Trade-Signal',
           value: '+25',
           source: 'Open Food Facts labels_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'labels'),
         ),
       );
     }
@@ -103,11 +109,12 @@ class ESGScoreCalculator {
     if (_containsAny(tags, ['organic', 'bio', 'eu-organic', 'demeter'])) {
       score += 20;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Bio-Siegel',
           value: '+20',
           source: 'Open Food Facts labels_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'labels'),
         ),
       );
     }
@@ -115,11 +122,12 @@ class ESGScoreCalculator {
     if (_containsAny(tags, ['vegan', 'vegetarian'])) {
       score += 10;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Vegan/Vegetarisch',
           value: '+10',
           source: 'Open Food Facts labels_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'labels'),
         ),
       );
     }
@@ -133,11 +141,12 @@ class ESGScoreCalculator {
     ])) {
       score += 15;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Regionale/EU-Herkunft',
           value: '+15',
           source: 'Open Food Facts origins_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'origin'),
         ),
       );
     }
@@ -145,11 +154,12 @@ class ESGScoreCalculator {
     if (_containsAny(tags, ['rainforest-alliance', 'utz'])) {
       score += 20;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Sozial-/Anbaustandard',
           value: '+20',
           source: 'Open Food Facts labels_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'labels'),
         ),
       );
     }
@@ -158,11 +168,12 @@ class ESGScoreCalculator {
         !_containsAny(tags, ['rspo-certified', 'rspo'])) {
       score -= 15;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Palmöl ohne RSPO-Signal',
           value: '-15',
           source: 'ingredients_text',
           available: true,
+          evidenceIds: _evidenceIds(product, 'ingredients'),
         ),
       );
     }
@@ -198,23 +209,25 @@ class ESGScoreCalculator {
     ])) {
       score += 20;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Datenqualität',
           value: '+20',
           source: 'Open Food Facts data_quality_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'data_quality'),
         ),
       );
     }
 
-    if (product.brand.trim().isNotEmpty && !product.brand.contains(',')) {
+    if (product.hasKnownBrand && !product.brand.contains(',')) {
       score += 10;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Marke eindeutig',
           value: '+10',
           source: 'Open Food Facts brands',
           available: true,
+          evidenceIds: _evidenceIds(product, 'brand'),
         ),
       );
     }
@@ -223,11 +236,12 @@ class ESGScoreCalculator {
         product.ingredientsText!.trim().isNotEmpty) {
       score += 10;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Zutatenliste vorhanden',
           value: '+10',
           source: 'Open Food Facts ingredients_text',
           available: true,
+          evidenceIds: _evidenceIds(product, 'ingredients'),
         ),
       );
     }
@@ -235,11 +249,12 @@ class ESGScoreCalculator {
     if (_containsAny(product.dataQualityWarnings, ['missing'])) {
       score -= 10;
       factors.add(
-        const ScoreFactor(
+        ScoreFactor(
           label: 'Datenwarnung',
           value: '-10',
           source: 'Open Food Facts data_quality_warnings_tags',
           available: true,
+          evidenceIds: _evidenceIds(product, 'data_quality_warnings'),
         ),
       );
     }
@@ -321,5 +336,23 @@ class ESGScoreCalculator {
 
   bool _containsAny(List<String> tags, List<String> needles) {
     return tags.any((tag) => needles.any(tag.contains));
+  }
+
+  List<String> _evidenceIds(ScanFairProduct product, String metric) {
+    return product
+        .evidenceFor(metric)
+        .map((entry) => entry.id)
+        .toList(growable: false);
+  }
+
+  List<String> _scoreSources(ScanFairProduct product) {
+    final sources = product.dataSources
+        .map((source) => source.name)
+        .toList(growable: true);
+    if (sources.isEmpty) {
+      sources.add('Lokale Demo-Daten');
+    }
+    sources.add('ScanFair Methodik v${ESGScore.formulaVersion}');
+    return sources;
   }
 }

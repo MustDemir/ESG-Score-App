@@ -9,7 +9,8 @@ on:
       # G-DOC-TRACE validates the repository README as a release-relevant artifact.
       - 'README.md'
       - 'esg_app/**'
-      - 'docs/project/**'
+      - 'docs/**'
+      - 'supabase/**'
       - 'scripts/**'
       - '.github/workflows/quality-gates.yml'
   pull_request:
@@ -18,7 +19,8 @@ on:
     paths:
       - 'README.md'
       - 'esg_app/**'
-      - 'docs/project/**'
+      - 'docs/**'
+      - 'supabase/**'
       - 'scripts/**'
       - '.github/workflows/quality-gates.yml'
   workflow_dispatch:
@@ -40,6 +42,7 @@ env:
   FLUTTER_VERSION: '3.44.0'
   CONFTEST_VERSION: '0.62.0'
   OPA_VERSION: '1.14.1'
+  SUPABASE_CLI_VERSION: '2.110.0'
   COMPLIANCE_PROFILE: ${{ inputs.compliance_profile || 'development' }}
 
 jobs:
@@ -136,6 +139,30 @@ jobs:
             esg_app/build/ios/iphonesimulator/Runner.app
             evidence-store/ios_privacy_audit.json
           retention-days: 7
+
+  data-database-gate:
+    name: G-DATA-RLS migration and policy tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: ${{ env.SUPABASE_CLI_VERSION }}
+          github-token: ${{ github.token }}
+
+      - name: Rebuild schema and run pgTAP tests
+        id: database-tests
+        run: bash scripts/quality/run_data_database_gate.sh
+
+      - name: Publish database gate summary
+        if: always()
+        run: |
+          echo "## G-DATA-RLS" >> "$GITHUB_STEP_SUMMARY"
+          echo "Supabase migration replay, pgTAP RLS behavior tests and database lint: **${{ steps.database-tests.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
 
   secret-scan:
     name: Secret scan gate

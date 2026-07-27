@@ -1,0 +1,74 @@
+id: 0022
+title: Evidence-first data integration with an RLS-protected Supabase cache
+date: 2026-07-27
+status: accepted
+deciders: [Mustafa]
+tags: [data, architecture, provenance, supabase, security, licensing]
+
+context: |
+  ScanFair needs additional environmental, social and governance sources.
+  Directly mapping every database into the score would hide provenance,
+  complicate schema changes and risk mixing license-incompatible datasets.
+  Open Food Facts is ODbL-licensed, actively changes its API schema and applies
+  a product-read rate limit.
+
+options_considered:
+  - name: Direct database-to-score integration
+    pros: [fast initial implementation]
+    cons:
+      - source fields and derived judgments become difficult to distinguish
+      - score snapshots are not reproducible
+      - license and quality metadata are easily lost
+  - name: One large combined product document
+    pros: [simple cache reads]
+    cons:
+      - unclear field ownership
+      - ODbL share-alike compatibility risk with future sources
+      - difficult source-specific freshness handling
+  - name: Evidence-first adapters with source registry and normalized evidence
+    pros:
+      - every score factor remains traceable
+      - source schemas can evolve behind adapters
+      - source-specific quality and license rules remain visible
+      - score snapshots can reference exact evidence
+    cons:
+      - more explicit models and mapping tests
+
+decision: Evidence-first adapters with source registry and normalized evidence
+rationale: |
+  This structure preserves the working MVP while creating a defensible path
+  for multi-source scoring. Supabase is an optional cache/evidence store, not
+  the owner of the scoring method. Remote activation remains deferred until an
+  EU development project, DPA evidence and environment separation exist.
+
+implementation:
+  app:
+    - source-specific mapping is outside the domain product model
+    - ESGEvidence retains source, field, scope, quality and timestamps
+    - ScoreFactor references evidence IDs
+    - provenance is visible in the detail screen
+  database:
+    - schema changes are versioned in supabase/migrations
+    - RLS is enabled and forced for every public table
+    - clients cannot write product facts, evidence or score snapshots
+    - authenticated users can only access their own scans
+  quality_gate:
+    id: G-DATA-ARCH
+    checks:
+      - required tables and RLS statements exist
+      - client write grants for ESG facts do not exist
+      - scan ownership policies use auth.uid()
+      - OFF license metadata is registered
+      - Flutter code contains no service-role credential
+
+consequences:
+  - A remote Supabase project is not required for this local increment.
+  - Supabase Flutter dependency is deferred to avoid premature SDK/privacy
+    surface changes.
+  - Every future source requires a registry entry and license compatibility
+    review before activation.
+  - Formula v1.0 remains unchanged in this increment.
+
+supersedes: null
+superseded_by: null
+related: [0002, 0003, 0008, 0010, 0011, 0016, 0020, 0021]

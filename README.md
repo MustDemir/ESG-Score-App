@@ -48,7 +48,7 @@ Der MVP bleibt bewusst fokussiert: **Lebensmittel zuerst**. Kleidung und Kosmeti
 | --- | --- |
 | iOS-first Flutter App | Android-Version |
 | Barcode-Scan für Lebensmittel | Kleidung und Kosmetik als eigene Kategorien |
-| Open Food Facts Integration | weitere Produktdatenquellen |
+| Open Food Facts Integration mit Evidenz-Provenienz | weitere Produktdatenquellen |
 | E-Score vollständig | vollständiger S-Score und G-Score |
 | S-Score über Labels/Siegel | CSRD-, Lieferketten- und Unternehmensdaten |
 | Score-Ergebnis und Detailansicht | Impact-Tracker, Personalisierung, Community |
@@ -59,13 +59,16 @@ Der MVP bleibt bewusst fokussiert: **Lebensmittel zuerst**. Kleidung und Kosmeti
 
 ## 03 · Score-Modell
 
-ScanFair aggregiert bestehende, anerkannte Datenquellen. Die App erfindet keine eigenen Nachhaltigkeitsurteile, sondern macht verfügbare Signale verständlich.
+ScanFair aggregiert externe Daten und berechnet daraus nach der versionierten
+ScanFair-Methodik einen Orientierungsscore. Dieser ist keine Zertifizierung:
+Quellwerte, ScanFair-Regeln, Datenluecken und methodische Grenzen bleiben
+sichtbar.
 
 | Dimension | Gewicht | MVP-Status | Beispielquellen |
 | --- | ---: | --- | --- |
 | Environmental | 50% | implementiert | Environmental-/Eco-Score, CO2, Verpackung, Herkunft |
-| Social | 30% | implementiert | Fairtrade, Bio, Rainforest Alliance, Herkunftssignale |
-| Governance | 20% | implementiert | Datenvollstaendigkeit und Produkttransparenz |
+| Social | 30% | heuristischer MVP | Fairtrade, Bio, Rainforest Alliance, Herkunftssignale |
+| Governance | 20% | heuristischer MVP | Datenvollstaendigkeit und Produkttransparenz |
 
 ```text
 Gesamt-Score = (E x 0.50) + (S x 0.30) + (G x 0.20)
@@ -75,13 +78,15 @@ Gesamt-Score = (E x 0.50) + (S x 0.30) + (G x 0.20)
 
 | Score | Bedeutung |
 | --- | --- |
-| 7.0-10.0 | gute bis sehr gute Wahl |
-| 4.0-6.9 | mit Bedacht kaufen |
-| 0.0-3.9 | kritisch prüfen oder vermeiden |
+| 7.0-10.0 | ueberwiegend positive MVP-Signale |
+| 4.0-6.9 | gemischte MVP-Signale |
+| 0.0-3.9 | ueberwiegend kritische MVP-Signale |
 
 **Two-Score-Modell aus den Prototypen:** ESG bleibt der Hauptscore. Gesundheit, Material oder Inhaltsstoffe werden als separater Begleithinweis angezeigt und nicht in den ESG-Score eingerechnet.
 
-→ Methodik: [docs/ESG-SCORING-MODELL-v1.md](docs/ESG-SCORING-MODELL-v1.md)
+→ Verbindliche Formel: [ADR 0011](docs/project/decisions/0011-esg-score-formel.yaml)
+
+→ Daten- und Evidenzarchitektur: [docs/project/data/data-architecture.md](docs/project/data/data-architecture.md)
 
 ---
 
@@ -111,18 +116,23 @@ Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidu
 | Mobile App | Flutter / Dart | iOS-first App, später cross-platform |
 | State Management | Flutter-native + Constructor Injection | lokaler MVP-State ohne zusaetzliche Laufzeitabhaengigkeit |
 | Barcode Scanner | mobile_scanner | Kamera-Scan für EAN-Barcodes |
-| Produktdaten | Open Food Facts API | Produkt-, Label-, Eco-Score- und Verpackungsdaten |
-| Backend / Cache | Supabase EU | Auth, Cache, optionale Datenpersistenz |
-| Lokaler Cache | Hive | Offline-Grundmodus und letzte Scans |
+| Produktdaten | Open Food Facts API v3 | Produktdaten plus feldgenaue Evidenz-Provenienz |
+| Umwelt-LCA | AGRIBALYSE 3.2 | offizieller Kategorieproxy mit DQR; aktuell via OFF transportiert |
+| Traceability | evidenzbasierte Entity-/Relationship-Schicht | GTIN, Rohstoff, Herkunft, Marke und spaeter Rechtstraeger getrennt aufloesen |
+| Backend / Cache | Supabase/PostgreSQL | lokales RLS-Schema vorbereitet, Remote noch nicht verbunden |
+| Lokaler Cache | geplant | Offline-Grundmodus und letzte Scans |
 
 ```text
 iPhone Kamera
   -> Flutter App
   -> Barcode Scan
   -> Open Food Facts API
+  -> AGRIBALYSE-Kategorieevidenz mit Retrieval-Channel
+  -> normalisierte ESGEvidence
+  -> explizite Produkt-/Rohstoff-/Herkunfts-/Unternehmensbeziehungen
   -> regelbasierte ESG-Scoring Engine
   -> Score-Ergebnis + Details + Quellen
-  -> optionaler Supabase/Hive Cache
+  -> spaeter optionaler Supabase-Cache
 ```
 
 ---
@@ -165,9 +175,10 @@ ESG-Score-App/
 │   ├── tokens.css
 │   ├── products.js, brand/, data/
 │   └── screens, prototype, components, ios-frame…
-├── lib/                                # Flutter-App-Code, sobald die Umsetzung startet
-├── test/                               # Tests
-└── pubspec.yaml                        # Flutter Dependencies
+├── esg_app/                            # Flutter-App, iOS-Projekt und Tests
+├── supabase/                           # Lokales Schema, Migrationen und pgTAP
+├── scripts/                            # Quality- und Compliance-Runner
+└── evidence-store/                     # Lokale, hashverkettete Gate-Evidenz
 ```
 
 ---
@@ -250,7 +261,9 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | Dokument | Beschreibung |
 | --- | --- |
 | [MVP Requirements](docs/MVP-REQUIREMENTS.md) | technischer Bauplan für den ersten App-MVP |
-| [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | Gewichtungen, Formeln, Datenquellen und Beispiele |
+| [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | historischer Konzeptstand; ADR 0011 ist fuer die Formel verbindlich |
+| [ESG-Datenarchitektur](docs/project/data/data-architecture.md) | Provenienzmodell, Supabase-Grenze und Quellenregeln |
+| [ESG-Methodikkatalog](docs/project/methodology-catalog/README.md) | versionierter Parameterkern und Pilotprofile fuer Kaffee, Banane und Kakao |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
@@ -268,7 +281,7 @@ deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
 Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
 implementiert.
 
-**Validierter MVP-Stand (19. Juli 2026)**
+**Validierter MVP-Stand (27. Juli 2026)**
 
 | Bereich | Ergebnis |
 | --- | --- |
@@ -276,9 +289,13 @@ implementiert.
 | App-Start | Signierter Profile-Build startet eigenstaendig vom Home-Bildschirm |
 | Kamera | Kameraberechtigung und nativer Barcode-Scanner erfolgreich getestet |
 | Scan-Flow | EAN-/UPC-Barcode erkannt und an den Produktlookup uebergeben |
-| Produktdaten | Open Food Facts API v3 liefert reale Produktinformationen |
+| Produktdaten | Open Food Facts API v3 liefert reale Produktinformationen mit feldgenauer Evidenz-Provenienz |
+| Umweltquelle | AGRIBALYSE 3.2 liefert offiziellen GHG-Kategorieproxy, DQR und Attribution; noch nicht score-aktiv |
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Layout und Stil im MVP-Smoke-Test bestaetigt |
+| Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
+| Datenbank | Dreizehn Supabase-Tabellen reproduzierbar; 51 pgTAP-Tests und DB-Lint bestanden, Remote noch nicht verbunden |
+| Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
 | Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
 | Release-Scope | Kein TestFlight, App-Store-Release, Hosting oder iOS-Deployment |
 
@@ -324,6 +341,7 @@ flutter run --profile --no-resident -d <IPHONE_DEVICE_ID>
 cd /Users/mustafademir/ESG-Score-App
 bash scripts/quality/run_quality_gates.sh
 bash scripts/quality/run_ios_build_gate.sh
+bash scripts/quality/run_data_database_gate.sh
 
 # Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
 COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
@@ -342,9 +360,22 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-REG-UNIT` | Rego-Policy-Tests fuer Compliance-Regeln |
 | `G-CMP-APPLE` | Acht Apple-Entscheidungs-Gates via Conftest auswerten |
 | `G-CMP-EVIDENCE` | SHA-256-Evidence-Chain vollstaendig verifizieren |
+| `G-DATA-ARCH` | Supabase-Migration, RLS, Client-Rechte und Datenlizenzen pruefen |
+| `G-METHOD-CATALOG` | Parameter, Profile, Vererbung, Claims und ausgesetzte Gewichtung validieren |
+| `G-LINK-INTEGRITY` | Produkt-, Rohstoff-, Herkunfts- und Rechtstraegerlinks auf Evidenz und Confidence pruefen |
+| `G-MISSING-DATA` | Positive, neutrale oder Null-Imputation bei fehlenden Daten verbieten |
+| `G-RED-FLAG` | Nicht-kompensierbare Regeln fuer bestaetigte schwere Risiken pruefen |
+| `G-SCORE-REPRO` | Formel-, Evidenz-, Relationship- und Fingerprint-Lineage validieren |
+| `G-CLAIM-SAFETY` | Risiko-, Proxy- und Kundenaussagen gegen unzulaessige Behauptungen pruefen |
+| `G-DATA-RLS` | Migration real abspielen, 51 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
 | `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build und gebuendelte Privacy Manifests auf macOS/Xcode validieren |
+
+Die fuenf Scoring-Safety-Gates sichern die Aktivierungsregeln fuer
+Methodik `2.0-draft`. Sie erklaeren Formel v1.0 nicht nachtraeglich fuer
+wissenschaftlich kalibriert oder rechtlich ESG-konform; deren S-/G-Anteile
+bleiben als heuristischer MVP-Stand gekennzeichnet.
 
 **GitHub Actions**
 
@@ -354,8 +385,9 @@ Die Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
 Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
-geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den elf
-lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-/Privacy-Job und ein
+geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den achtzehn
+schnellen lokalen Gate-Gruppen laufen ein eigener nativer
+iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
 separater Gitleaks-Secret-Scan. Bei manuellen Laeufen kann zwischen
 `development`, `release_candidate` und `submission` gewaehlt werden.
 

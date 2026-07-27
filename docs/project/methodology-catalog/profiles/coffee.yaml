@@ -1,0 +1,42 @@
+schema_version: 1
+profile_id: coffee
+methodology_version: 2.0-draft
+status: draft
+display_name_de: Kaffee
+display_name_en: Coffee
+extends: food-base
+description_de: Risikoorientierte Erweiterung fuer Kaffeeprodukte.
+description_en: Risk-oriented extension for coffee products.
+
+parameters:
+  - parameter_id: E-WATER-SCARCITY
+    applicability: required
+    priority: high
+  - parameter_id: E-LAND-USE
+    applicability: required
+    priority: high
+  - parameter_id: E-DEFORESTATION-RISK
+    applicability: required
+    priority: high
+  - parameter_id: E-BIODIVERSITY-POLLUTION
+    applicability: required
+    priority: high
+  - parameter_id: S-CHILD-LABOR-RISK
+    applicability: required
+    priority: high
+  - parameter_id: S-FORCED-LABOR-RISK
+    applicability: required
+    priority: high
+  - parameter_id: S-LIVING-INCOME-WAGE
+    applicability: required
+    priority: high
+  - parameter_id: S-SUPPLY-CHAIN-TRACEABILITY
+    applicability: required
+    priority: high
+  - parameter_id: S-CERTIFICATION-ASSURANCE
+    applicability: conditional
+    priority: medium
+
+weighting:
+  status: deferred
+  rationale: Numeric weights require validated sources and calibration data.

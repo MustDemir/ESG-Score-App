@@ -1,15 +1,20 @@
 feature: scoring
 title: "ESG-Score-Calculator + OFF-Integration"
 status: review
-progress: 90
-current_focus: "OFF API v3 Adapter + ESGScoreCalculator implementiert und getestet"
-last_sync: "2026-07-18"
+progress: 95
+current_focus: "Methodikkatalog v2 und quellenbezogene Parametermappings"
+last_sync: "2026-07-27"
 
 lade_manifest:
   pflicht:
     - docs/project/decisions/0003-open-food-facts.yaml
     - docs/project/decisions/0010-eco-score-fallback.yaml
     - docs/project/decisions/0011-esg-score-formel.yaml
+    - docs/project/decisions/0022-evidence-first-data-integration.yaml
+    - docs/project/decisions/0023-hierarchical-esg-parameter-catalog.yaml
+    - docs/project/decisions/0025-evidence-backed-traceability-links.yaml
+    - docs/project/methodology-catalog/README.md
+    - docs/project/methodology-catalog/scoring-controls.yaml
     - docs/project/spikes/off-api-2026-05-19.md
     - docs/project/failure-modes.yaml  # FM-01, FM-11
   kontext:
@@ -27,6 +32,7 @@ code_locations:
   - esg_app/lib/services/esg_score_calculator.dart
   - esg_app/lib/models/product.dart
   - esg_app/lib/models/esg_score.dart
+  - esg_app/lib/models/esg_relationship.dart
 test_locations:
   - esg_app/test/services/esg_score_calculator_test.dart
   - esg_app/test/services/open_food_facts_service_test.dart
@@ -50,6 +56,37 @@ done:
   - |
     2026-07-18 — Mapper akzeptiert environmental_score_* und Legacy-
     ecoscore_*-Felder; API- und Edge-Case-Tests ergaenzt.
+  - |
+    2026-07-27 — OFF-Mapping aus dem Domain-Modell in einen Source-Adapter
+    verschoben. ESGEvidence haelt Quelle, Lizenz, Originalfeld, Qualitaet,
+    Zeitstempel und Schema-Version; Score-Faktoren referenzieren Evidenz-IDs.
+  - |
+    2026-07-27 — Lokale Supabase-Migration mit RLS fuer Quellen, Produktcache,
+    Evidenz, Score-Snapshots und private Scan-Historie angelegt. G-DATA-ARCH
+    prueft Schema, RLS, Client-Rechte, OFF-Lizenz und Service-Key-Verbot.
+  - |
+    2026-07-27 — Methodikkatalog 2.0-draft mit 26 Parametern,
+    Lebensmittel-Basisprofil und Pilotprofilen fuer Kaffee, Banane und
+    Kakao/Schokolade definiert. Gewichte bleiben bis zur Quellenvalidierung
+    ausgesetzt; Datenkonfidenz wird getrennt vom ESG-Score behandelt.
+  - |
+    2026-07-27 — Supabase um fuenf versionierte Methodiktabellen erweitert.
+    51 pgTAP-Tests belegen RLS, server-only Schreibrechte und die
+    Nicht-Sichtbarkeit von 2.0-draft fuer App-Clients.
+  - |
+    2026-07-27 — AGRIBALYSE 3.2 als offizielle LCA-Kategoriequelle
+    registriert. E-GHG-INTENSITY uebernimmt Code, Klimawert und DQR aus dem
+    von OFF transportierten Datensatz und speichert OFF als Retrieval-Channel.
+    Das validierte Rohmapping ist noch nicht score-aktiv.
+  - |
+    2026-07-27 — Produkt, Rohstoff, Herkunft, Marke und Rechtstraeger werden
+    als evidenzbasierte Beziehungen mit Assertion-Klasse und Confidence
+    modelliert. Ein allgemeiner Produktherkunftshinweis wird nicht als
+    Rohstoffherkunft verwendet; Community- und Inference-Links bleiben
+    score-ineligible.
+  - |
+    2026-07-27 — G-LINK-INTEGRITY, G-MISSING-DATA, G-RED-FLAG,
+    G-SCORE-REPRO und G-CLAIM-SAFETY als blockierende lokale Gates integriert.
 
 decisions:
   - id: FD-SCO-01
@@ -67,15 +104,33 @@ decisions:
     date: "2026-07-18"
     rationale: "Aktuell empfohlene API, ohne bestehende Fixtures zu brechen"
     adr_ref: "0016"
+  - id: FD-SCO-04
+    decision: Universeller Kern mit erbenden Kategorieprofilen
+    date: "2026-07-27"
+    rationale: "Vergleichbarkeit erhalten und Rohstoffmaterialitaet abbilden"
+    adr_ref: "0023"
+  - id: FD-SCO-05
+    decision: AGRIBALYSE als Quelle und OFF als Retrieval-Channel modellieren
+    date: "2026-07-27"
+    rationale: "Upstream-Provenienz erhalten und Kategorieproxy offenlegen"
+    adr_ref: "0024"
+  - id: FD-SCO-06
+    decision: ESG-Risiko-Joins benoetigen evidenzbasierte Subject Links
+    date: "2026-07-27"
+    rationale: "Produkt-, Rohstoff-, Herkunfts- und Unternehmensbezug getrennt pruefen"
+    adr_ref: "0025"
 
 open_items:
-  - Native iOS-Kamera liefert noch keinen Barcode an den Repository-Flow.
   - Methodik-Seite (App + Web) muss vor Launch geschrieben sein
   - Bei Score-Berechnung: Caching-Strategie in Supabase (für Phase 2 KI-Erklärungen relevant)
+  - Remote-EU-Projekt, DPA-Nachweis und Flutter-Cache-Adapter sind noch offen.
+  - Weitere Quellen, Gewichte und Kalibrierung fuer 2.0-draft sind offen.
 
 next_steps:
-  - iOS-Scanner-Flow an Repository/Calculator anbinden
-  - Methodik-Seite fuer Formula v1.0 schreiben
+  - Kandidatenquellen je Parameter fachlich und lizenzrechtlich bewerten
+  - Verifizierte Rohstoff-Herkunftsbindungen fuer Pilotprodukte aufbauen
+  - WRI Aqueduct nach erfolgreichem Origin-Link-Gate pruefen
+  - Methodik-Seite fuer Formel v1.0 und Katalog v2 schreiben
 
 cross_feature_dependencies:
   - from: scoring

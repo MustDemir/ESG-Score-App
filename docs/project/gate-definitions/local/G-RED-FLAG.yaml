@@ -1,0 +1,31 @@
+id: G-RED-FLAG
+name: Non-compensatory severe-risk control
+dimension: methodisch
+lifecycle_phase: scoring
+trigger: Pull request, feature push, local quality run
+policy_checks:
+  - Contextual risk is not a confirmed product finding
+  - Confirmed severe findings require official or audited matching evidence
+  - Severe social findings cannot be offset by other pillars
+  - Numeric score caps remain deferred until calibration
+evidence_required:
+  - docs/project/methodology-catalog/scoring-controls.yaml
+  - supabase/migrations/20260727000400_traceability_relationships.sql
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - S-CHILD-LABOR-RISK
+    - S-FORCED-LABOR-RISK
+  related_adrs:
+    - 0023
+    - 0025
+sources:
+  - docs/project/methodology-catalog/scoring-controls.yaml

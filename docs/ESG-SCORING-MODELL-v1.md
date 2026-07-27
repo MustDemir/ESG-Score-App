@@ -1,4 +1,10 @@
 # ESG-Scoring-Modell v1.0
+
+> **Historischer Konzeptstand.** Die verbindliche, implementierte Formel ist
+> seit ADR 0011 `E=50% / S=30% / G=20%` auf einer Skala von 0 bis 100.
+> Abweichende `40/35/25`-Beispiele in diesem Dokument sind nicht normativ und
+> werden vor einer Methodik-Veroeffentlichung konsolidiert.
+
 # Super-SMARTMarket ESG-Score App
 # Letzte Aktualisierung: Februar 2026
 

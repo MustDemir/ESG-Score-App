@@ -1,0 +1,44 @@
+id: ADR-0025
+title: Evidence-backed traceability links before ESG risk joins
+status: accepted
+date: "2026-07-27"
+owners:
+  - ScanFair
+
+context: |
+  A barcode resolves a trade item but does not by itself establish its
+  commodities, their countries of origin, or the responsible legal entity.
+  Country, commodity and company sources cannot be joined safely until those
+  subject relationships are explicit and evidence-backed.
+
+decision: |
+  Introduce versioned traceability entities, identifiers and relationships.
+  Every relationship records source, source record, evidence IDs, assertion
+  class, confidence and validity. Community-reported, inferred and
+  category-average relationships are score-ineligible by default.
+
+  Commodity-country risk requires both an eligible product-to-commodity link
+  and an eligible commodity-to-origin link. A generic product origin is not
+  treated as the origin of every ingredient. Governance assessment requires a
+  separate brand-to-responsible-legal-entity resolution.
+
+  The controls belong to methodology 2.0-draft and do not activate new weights
+  or change the published MVP formula 1.0.
+
+consequences:
+  positive:
+    - Contextual risk cannot be mistaken for a product-specific finding.
+    - Missing origin or legal entity blocks the affected factor assessment.
+    - Score snapshots can retain relationship and red-flag inputs.
+    - Later GS1, DPP, social-risk and GLEIF sources have explicit join points.
+  negative:
+    - Many current Open Food Facts records remain score-ineligible.
+    - Additional supplier or manufacturer evidence is required for high confidence.
+    - Methodology 2.0 remains draft until calibration and expert review.
+
+supersedes: []
+superseded_by: null
+references:
+  - docs/project/methodology-catalog/scoring-controls.yaml
+  - supabase/migrations/20260727000400_traceability_relationships.sql
+  - esg_app/lib/models/esg_relationship.dart

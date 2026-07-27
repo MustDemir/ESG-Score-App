@@ -1,0 +1,84 @@
+id: 0024
+title: AGRIBALYSE 3.2 as category-level environmental LCA source
+date: 2026-07-27
+status: accepted
+deciders: [Mustafa]
+tags: [data, environment, lca, agribalyse, provenance, licensing]
+
+context: |
+  ScanFair needs a documented environmental source beyond a pre-calculated
+  Open Food Facts score. Candidate sources must cover the coffee, banana and
+  cocoa/chocolate pilots, permit reuse and expose quality and version metadata.
+  AGRIBALYSE 3.2 publishes official LCA indicators for 2516 food categories.
+  Open Food Facts already transports the matched AGRIBALYSE code, version,
+  DQR and climate-change value for supported products.
+
+options_considered:
+  - name: Import the complete AGRIBALYSE dataset into the app
+    pros: [independent local lookup, complete indicator access]
+    cons:
+      - large data and update surface for the current increment
+      - product-to-category mapping still required
+      - premature redistribution and cache design
+  - name: Treat transported AGRIBALYSE values as Open Food Facts facts
+    pros: [no model change]
+    cons:
+      - hides the authoritative upstream source
+      - loses the AGRIBALYSE record, version and license boundary
+  - name: Preserve AGRIBALYSE as source and Open Food Facts as retrieval channel
+    pros:
+      - correct upstream provenance and attribution
+      - no additional runtime request
+      - category proxy and DQR remain visible
+      - future direct bulk import remains compatible
+    cons:
+      - only fields transported by Open Food Facts are currently available
+
+decision: Preserve AGRIBALYSE as source and Open Food Facts as retrieval channel
+rationale: |
+  This provides useful official LCA evidence without pretending that a
+  category average measures a specific brand product. The raw mapping is
+  validated independently from score activation.
+
+implementation:
+  source:
+    id: agribalyse
+    version: "3.2"
+    license: Etalab-2.0
+    attribution: Source ADEME, AGRIBALYSE v3.2
+  mapping:
+    file: docs/project/methodology-catalog/source-mappings/agribalyse-v3.2.yaml
+    parameter: E-GHG-INTENSITY
+    source_field: Changement climatique
+    unit: kg_co2e_per_kg
+    evidence_scope: category
+    active_in_formula: false
+  provenance:
+    source_id: agribalyse
+    retrieved_via_source_id: open-food-facts
+    required_fields:
+      - AGRIBALYSE code
+      - source version 3.2
+      - numeric climate-change value
+    optional_quality_field: DQR
+
+customer_claim_boundary: |
+  The value may be described as an AGRIBALYSE category reference or category
+  proxy. It must not be described as a measured carbon footprint of the
+  scanned brand product.
+
+publication_rule: |
+  Formula v1.0 remains unchanged. The mapping cannot affect a customer score
+  until product-to-category mapping, normalization, weighting and methodology
+  review are complete.
+
+consequences:
+  - The detail view can expose AGRIBALYSE as an additional source.
+  - Legacy or incomplete source responses retain the Open Food Facts fallback.
+  - A future direct dataset adapter can reuse the same evidence contract.
+  - Water, biodiversity, packaging and deforestation still need separate
+    source and methodology decisions.
+
+supersedes: null
+superseded_by: null
+related: [0003, 0011, 0016, 0022, 0023]

@@ -1,4 +1,5 @@
 import 'package:esg_app/data/demo_products.dart';
+import 'package:esg_app/data_sources/open_food_facts_product_mapper.dart';
 import 'package:esg_app/models/esg_score.dart';
 import 'package:esg_app/models/product.dart';
 import 'package:esg_app/services/esg_score_calculator.dart';
@@ -72,8 +73,8 @@ void main() {
   });
 
   test('maps Open Food Facts JSON into the local product model', () {
-    final product = ScanFairProduct.fromOpenFoodFactsJson({
-      'product': {
+    final product = const OpenFoodFactsProductMapper().map(
+      {
         'product_name': 'Haferdrink',
         'brands': 'Beispielmarke',
         'ecoscore_grade': 'b',
@@ -82,11 +83,14 @@ void main() {
         'labels_tags': ['en:eu-organic'],
         'ingredients_text': 'water, oats',
       },
-    }, barcode: '123');
+      barcode: '123',
+      retrievedAt: DateTime.utc(2026, 7, 27),
+    );
 
     expect(product.name, 'Haferdrink');
     expect(product.brand, 'Beispielmarke');
     expect(product.ecoscoreGrade, 'b');
     expect(product.originTags, contains('en:germany'));
+    expect(product.evidenceFor('environmental_score'), hasLength(1));
   });
 }

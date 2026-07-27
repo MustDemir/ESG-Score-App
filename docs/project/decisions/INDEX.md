@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-07-19
+Letztes Update: 2026-07-27
 
 ## Aktive ADRs
 
@@ -29,6 +29,10 @@ Letztes Update: 2026-07-19
 | [0017](0017-mobile-scanner-ios-camera.yaml) | mobile_scanner fuer den nativen iOS-Barcode-Scan | accepted | 2026-07-19 | flutter, scanner, ios, camera, privacy | 0001, 0007, 0008, 0012, 0014, 0015 |
 | [0020](0020-quality-gate-workflow-consolidation.yaml) | Einen verbindlichen Quality-Gate-Workflow verwenden | accepted | 2026-07-19 | ci-cd, quality-gates, github-actions, documentation | 0007, 0014 |
 | [0021](0021-apple-compliance-enforcement-profiles.yaml) | Apple-Compliance mit gestuften Enforcement-Profilen steuern | accepted | 2026-07-19 | apple, compliance, policy-as-code, evidence, release-readiness | 0009, 0012, 0013, 0020 |
+| [0022](0022-evidence-first-data-integration.yaml) | Evidence-first Datenintegration mit RLS-geschuetztem Supabase-Cache | accepted | 2026-07-27 | data, architecture, provenance, supabase, security, licensing | 0002, 0003, 0008, 0010, 0011, 0016, 0020, 0021 |
+| [0023](0023-hierarchical-esg-parameter-catalog.yaml) | Hierarchischer und versionierter ESG-Parameterkatalog | accepted | 2026-07-27 | methodology, scoring, parameters, profiles, transparency, data | 0003, 0009, 0010, 0011, 0022 |
+| [0024](0024-agribalyse-category-lca-source.yaml) | AGRIBALYSE 3.2 als Umwelt-LCA-Quelle auf Kategorieebene | accepted | 2026-07-27 | data, environment, lca, agribalyse, provenance, licensing | 0003, 0011, 0016, 0022, 0023 |
+| [0025](0025-evidence-backed-traceability-links.yaml) | Evidenzbasierte Traceability-Links vor ESG-Risiko-Joins | accepted | 2026-07-27 | data, traceability, scoring, confidence, claims | 0022, 0023, 0024 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -41,7 +45,7 @@ Letztes Update: 2026-07-19
 
 | Status | Anzahl |
 |---|---|
-| accepted | 17 |
+| accepted | 19 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 1 |
@@ -49,16 +53,16 @@ Letztes Update: 2026-07-19
 
 ## Tags-Index (häufigste)
 
-- **architecture** → 0001, 0014, 0015, 0016
+- **architecture** → 0001, 0014, 0015, 0016, 0022
 - **scanner / ios** → 0017
-- **backend / database** → 0002
-- **data / api** → 0003, 0016
+- **backend / database** → 0002, 0022
+- **data / api** → 0003, 0016, 0022, 0024, 0025
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
 - **ci-cd / testing** → 0007, 0020, 0021
 - **security / dsgvo** → 0008
-- **methodology** → 0009, 0011
-- **scoring / esg** → 0010, 0011
+- **methodology** → 0009, 0011, 0023, 0025
+- **scoring / esg** → 0010, 0011, 0023, 0025
 - **compliance** → 0009
 
 ## Wartung

@@ -1,0 +1,81 @@
+schema_version: 1
+profile_id: food-base
+methodology_version: 2.0-draft
+status: draft
+display_name_de: Lebensmittel-Basisprofil
+display_name_en: Food base profile
+extends: null
+description_de: Gemeinsamer Parametersatz fuer verpackte Lebensmittel.
+description_en: Shared parameter set for packaged food products.
+
+parameters:
+  - parameter_id: E-COMPOSITE-LCA-SCORE
+    applicability: required
+    priority: high
+  - parameter_id: E-GHG-INTENSITY
+    applicability: conditional
+    priority: high
+  - parameter_id: E-WATER-SCARCITY
+    applicability: conditional
+    priority: medium
+  - parameter_id: E-LAND-USE
+    applicability: conditional
+    priority: medium
+  - parameter_id: E-BIODIVERSITY-POLLUTION
+    applicability: conditional
+    priority: medium
+  - parameter_id: E-PACKAGING-CIRCULARITY
+    applicability: required
+    priority: medium
+  - parameter_id: E-TRANSPORT-COLD-CHAIN
+    applicability: conditional
+    priority: low
+  - parameter_id: S-LABOR-RIGHTS
+    applicability: conditional
+    priority: high
+  - parameter_id: S-OCCUPATIONAL-SAFETY
+    applicability: conditional
+    priority: medium
+  - parameter_id: S-SUPPLY-CHAIN-TRACEABILITY
+    applicability: required
+    priority: high
+  - parameter_id: S-CERTIFICATION-ASSURANCE
+    applicability: conditional
+    priority: medium
+  - parameter_id: G-LEGAL-ENTITY-RESOLUTION
+    applicability: required
+    priority: high
+  - parameter_id: G-SUSTAINABILITY-REPORTING
+    applicability: conditional
+    priority: medium
+  - parameter_id: G-SUPPLY-CHAIN-DUE-DILIGENCE
+    applicability: conditional
+    priority: high
+  - parameter_id: G-EXTERNAL-ASSURANCE
+    applicability: conditional
+    priority: medium
+  - parameter_id: G-TARGETS-PROGRESS
+    applicability: conditional
+    priority: medium
+  - parameter_id: G-INCIDENTS-SANCTIONS
+    applicability: conditional
+    priority: high
+  - parameter_id: G-ANTI-CORRUPTION-GRIEVANCE
+    applicability: conditional
+    priority: medium
+  - parameter_id: D-SOURCE-QUALITY
+    applicability: required
+    priority: high
+  - parameter_id: D-FRESHNESS
+    applicability: required
+    priority: high
+  - parameter_id: D-COVERAGE
+    applicability: required
+    priority: high
+  - parameter_id: D-SUBJECT-SPECIFICITY
+    applicability: required
+    priority: high
+
+weighting:
+  status: deferred
+  rationale: Numeric weights require validated sources and calibration data.

@@ -1,0 +1,351 @@
+schema_version: 1
+catalog_id: scanfair-esg-parameters
+methodology_version: 2.0-draft
+status: draft
+updated_at: "2026-07-27"
+
+principles:
+  - A parameter result must reference evidence.
+  - Missing relevant evidence reduces confidence and is not a positive result.
+  - Not applicable parameters do not reduce confidence.
+  - Country or commodity risk is not proof of a product-specific violation.
+  - Data confidence is reported separately and is not an ESG pillar.
+
+parameters:
+  - id: E-COMPOSITE-LCA-SCORE
+    pillar: environmental
+    display_name_de: Umwelt-Gesamtindikator
+    display_name_en: Composite environmental indicator
+    description_de: Quellenbasierter Umweltindikator, der mehrere Lebenszykluswirkungen zusammenfasst.
+    description_en: Source-based environmental indicator combining multiple life-cycle impacts.
+    scope: product
+    result_kind: performance
+    unit: score_0_100
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: E-GHG-INTENSITY
+    pillar: environmental
+    display_name_de: Treibhausgasintensitaet
+    display_name_en: Greenhouse gas intensity
+    description_de: Treibhausgasemissionen je funktionaler Produkteinheit.
+    description_en: Greenhouse gas emissions per functional product unit.
+    scope: product
+    result_kind: performance
+    unit: kg_co2e_per_kg
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: E-WATER-SCARCITY
+    pillar: environmental
+    display_name_de: Wasserknappheitswirkung
+    display_name_en: Water scarcity impact
+    description_de: Wasserverbrauch unter Beruecksichtigung regionaler Wasserknappheit.
+    description_en: Water use adjusted for regional water scarcity.
+    scope: commodity_country
+    result_kind: risk
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: risk_not_product_finding
+    status: draft
+
+  - id: E-LAND-USE
+    pillar: environmental
+    display_name_de: Landnutzung
+    display_name_en: Land use
+    description_de: Flaechenbedarf und damit verbundene Landnutzungswirkung.
+    description_en: Area demand and related land-use impact.
+    scope: category
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: E-DEFORESTATION-RISK
+    pillar: environmental
+    display_name_de: Entwaldungsrisiko
+    display_name_en: Deforestation risk
+    description_de: Rohstoff- und herkunftsbezogenes Risiko fuer Entwaldung.
+    description_en: Commodity- and origin-related deforestation risk.
+    scope: commodity_country
+    result_kind: risk
+    unit: risk_level
+    missing_behavior: reduce_confidence
+    customer_claim_rule: risk_not_product_finding
+    status: draft
+
+  - id: E-BIODIVERSITY-POLLUTION
+    pillar: environmental
+    display_name_de: Biodiversitaet und Verschmutzung
+    display_name_en: Biodiversity and pollution
+    description_de: Potenzielle Wirkung von Anbau, Betriebsmitteln und Schadstoffen auf Oekosysteme.
+    description_en: Potential ecosystem impact from cultivation, inputs and pollutants.
+    scope: commodity_country
+    result_kind: risk
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: risk_not_product_finding
+    status: draft
+
+  - id: E-PACKAGING-CIRCULARITY
+    pillar: environmental
+    display_name_de: Verpackung und Kreislauffaehigkeit
+    display_name_en: Packaging and circularity
+    description_de: Materialeinsatz, Wiederverwendbarkeit und Recyclingfaehigkeit der Verpackung.
+    description_en: Packaging material use, reusability and recyclability.
+    scope: product
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: E-TRANSPORT-COLD-CHAIN
+    pillar: environmental
+    display_name_de: Transport und Kuehlkette
+    display_name_en: Transport and cold chain
+    description_de: Umweltwirkung transport- und kuehlkettenbezogener Anforderungen.
+    description_en: Environmental impact of transport and cold-chain requirements.
+    scope: supply_chain
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: S-CHILD-LABOR-RISK
+    pillar: social
+    display_name_de: Kinderarbeitsrisiko
+    display_name_en: Child labor risk
+    description_de: Rohstoff- und herkunftsbezogenes Risiko fuer Kinderarbeit.
+    description_en: Commodity- and origin-related risk of child labor.
+    scope: commodity_country
+    result_kind: risk
+    unit: risk_level
+    missing_behavior: reduce_confidence
+    customer_claim_rule: risk_not_product_finding
+    status: draft
+
+  - id: S-FORCED-LABOR-RISK
+    pillar: social
+    display_name_de: Zwangsarbeitsrisiko
+    display_name_en: Forced labor risk
+    description_de: Rohstoff- und herkunftsbezogenes Risiko fuer Zwangsarbeit.
+    description_en: Commodity- and origin-related risk of forced labor.
+    scope: commodity_country
+    result_kind: risk
+    unit: risk_level
+    missing_behavior: reduce_confidence
+    customer_claim_rule: risk_not_product_finding
+    status: draft
+
+  - id: S-LABOR-RIGHTS
+    pillar: social
+    display_name_de: Arbeitsrechte
+    display_name_en: Labor rights
+    description_de: Hinweise zu Vereinigungsfreiheit, Tarifrechten und fairen Arbeitsbedingungen.
+    description_en: Evidence on freedom of association, collective bargaining and fair working conditions.
+    scope: supply_chain
+    result_kind: risk
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: S-OCCUPATIONAL-SAFETY
+    pillar: social
+    display_name_de: Arbeitsschutz
+    display_name_en: Occupational health and safety
+    description_de: Hinweise zu Gesundheits- und Sicherheitsbedingungen entlang der Lieferkette.
+    description_en: Evidence on health and safety conditions across the supply chain.
+    scope: supply_chain
+    result_kind: risk
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: S-LIVING-INCOME-WAGE
+    pillar: social
+    display_name_de: Existenzsicherndes Einkommen
+    display_name_en: Living income and wage
+    description_de: Hinweise auf existenzsichernde Einkommen oder Loehne bei Erzeugung und Verarbeitung.
+    description_en: Evidence on living income or wages in production and processing.
+    scope: supply_chain
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: S-SUPPLY-CHAIN-TRACEABILITY
+    pillar: social
+    display_name_de: Rueckverfolgbarkeit der Lieferkette
+    display_name_en: Supply-chain traceability
+    description_de: Nachvollziehbarkeit von Produkt, Rohstoff und Herkunft bis zu belastbaren Lieferkettenstufen.
+    description_en: Traceability of product, commodity and origin to substantiated supply-chain tiers.
+    scope: supply_chain
+    result_kind: assurance
+    unit: assurance_level
+    missing_behavior: reduce_confidence
+    customer_claim_rule: assurance_only
+    status: draft
+
+  - id: S-CERTIFICATION-ASSURANCE
+    pillar: social
+    display_name_de: Zertifizierungsnachweis
+    display_name_en: Certification assurance
+    description_de: Gueltiger, scope-passender und unabhaengig pruefbarer Zertifizierungsnachweis.
+    description_en: Valid, scope-appropriate and independently verifiable certification evidence.
+    scope: product
+    result_kind: assurance
+    unit: assurance_level
+    missing_behavior: not_applicable_when_out_of_scope
+    customer_claim_rule: assurance_only
+    status: draft
+
+  - id: G-LEGAL-ENTITY-RESOLUTION
+    pillar: governance
+    display_name_de: Zuordnung zum Unternehmen
+    display_name_en: Legal entity resolution
+    description_de: Belastbare Zuordnung von Marke und Produkt zum verantwortlichen Rechtstraeger.
+    description_en: Reliable mapping of brand and product to the responsible legal entity.
+    scope: company
+    result_kind: assurance
+    unit: assurance_level
+    missing_behavior: block_factor_assessment
+    customer_claim_rule: assurance_only
+    status: draft
+
+  - id: G-SUSTAINABILITY-REPORTING
+    pillar: governance
+    display_name_de: Nachhaltigkeitsberichterstattung
+    display_name_en: Sustainability reporting
+    description_de: Verfuegbarkeit, Aktualitaet und Abdeckung belastbarer Nachhaltigkeitsberichte.
+    description_en: Availability, recency and coverage of substantiated sustainability reporting.
+    scope: company
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: G-SUPPLY-CHAIN-DUE-DILIGENCE
+    pillar: governance
+    display_name_de: Sorgfaltspflichten in der Lieferkette
+    display_name_en: Supply-chain due diligence
+    description_de: Nachweis eines dokumentierten Prozesses zur Erkennung und Behandlung von Lieferkettenrisiken.
+    description_en: Evidence of a documented process to identify and address supply-chain risks.
+    scope: company
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: G-EXTERNAL-ASSURANCE
+    pillar: governance
+    display_name_de: Externe Pruefung
+    display_name_en: External assurance
+    description_de: Unabhaengige Pruefung veroeffentlichter Nachhaltigkeitsangaben.
+    description_en: Independent assurance of published sustainability information.
+    scope: company
+    result_kind: assurance
+    unit: assurance_level
+    missing_behavior: reduce_confidence
+    customer_claim_rule: assurance_only
+    status: draft
+
+  - id: G-TARGETS-PROGRESS
+    pillar: governance
+    display_name_de: Ziele und Fortschritt
+    display_name_en: Targets and progress
+    description_de: Messbare Nachhaltigkeitsziele mit Basisjahr, Frist und berichteter Zielerreichung.
+    description_en: Measurable sustainability targets with baseline, deadline and reported progress.
+    scope: company
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: G-INCIDENTS-SANCTIONS
+    pillar: governance
+    display_name_de: Vorfaelle und Sanktionen
+    display_name_en: Incidents and sanctions
+    description_de: Belastbar dokumentierte relevante Vorfaelle, Rueckrufe oder behoerdliche Sanktionen.
+    description_en: Substantiated relevant incidents, recalls or regulatory sanctions.
+    scope: company
+    result_kind: risk
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: G-ANTI-CORRUPTION-GRIEVANCE
+    pillar: governance
+    display_name_de: Integritaet und Beschwerdewege
+    display_name_en: Integrity and grievance mechanisms
+    description_de: Nachweis von Antikorruptionsregeln, Hinweisgeber- und Beschwerdemechanismen.
+    description_en: Evidence of anti-corruption controls, whistleblowing and grievance mechanisms.
+    scope: company
+    result_kind: performance
+    unit: source_defined
+    missing_behavior: reduce_confidence
+    customer_claim_rule: evidence_only
+    status: draft
+
+  - id: D-SOURCE-QUALITY
+    pillar: data_confidence
+    display_name_de: Quellenqualitaet
+    display_name_en: Source quality
+    description_de: Qualitaet, Unabhaengigkeit und Pruefbarkeit der verwendeten Quellen.
+    description_en: Quality, independence and verifiability of the sources used.
+    scope: product
+    result_kind: confidence
+    unit: score_0_100
+    missing_behavior: block_factor_assessment
+    customer_claim_rule: confidence_only
+    status: draft
+
+  - id: D-FRESHNESS
+    pillar: data_confidence
+    display_name_de: Aktualitaet
+    display_name_en: Data freshness
+    description_de: Zeitliche Aktualitaet der verwendeten Nachweise.
+    description_en: Temporal freshness of the evidence used.
+    scope: product
+    result_kind: confidence
+    unit: score_0_100
+    missing_behavior: block_factor_assessment
+    customer_claim_rule: confidence_only
+    status: draft
+
+  - id: D-COVERAGE
+    pillar: data_confidence
+    display_name_de: Datenabdeckung
+    display_name_en: Data coverage
+    description_de: Anteil der relevanten und anwendbaren Parameter mit belastbaren Nachweisen.
+    description_en: Share of relevant and applicable parameters backed by substantiated evidence.
+    scope: product
+    result_kind: confidence
+    unit: score_0_100
+    missing_behavior: block_factor_assessment
+    customer_claim_rule: confidence_only
+    status: draft
+
+  - id: D-SUBJECT-SPECIFICITY
+    pillar: data_confidence
+    display_name_de: Produktspezifitaet
+    display_name_en: Subject specificity
+    description_de: Grad, zu dem Nachweise das konkrete Produkt statt nur Kategorie, Land oder Unternehmen betreffen.
+    description_en: Degree to which evidence concerns the product rather than only its category, country or company.
+    scope: product
+    result_kind: confidence
+    unit: score_0_100
+    missing_behavior: block_factor_assessment
+    customer_claim_rule: confidence_only
+    status: draft
