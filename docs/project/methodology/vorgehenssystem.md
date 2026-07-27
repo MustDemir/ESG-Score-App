@@ -169,7 +169,7 @@ Etablierte Software-Engineering-Best-Practice, von Anfang an minimal integriert.
 
 | Element | Datei / Ort | ADR |
 |---|---|---|
-| CI/CD-Pipeline | `.github/workflows/ci.yml` | 0007 |
+| CI/CT-Quality-Gates | `.github/workflows/quality-gates.yml` | 0007, 0014, 0020 |
 | Pre-Commit-Hooks (gitleaks, dart format) | `scripts/hooks/pre-commit` | 0008 |
 | Test-Pyramide + Coverage-Gates | `quality-strategy.md` | 0007 |
 | Failure-Modes-Register | `failure-modes.yaml` | — |
@@ -295,7 +295,7 @@ Dies ist potenzielles Future-Work / Diskussions-Material für die Thesis:
 ```
 ESG-Score-App/
 ├── CLAUDE.md                      # Eingangspunkt + Session-Protokoll
-├── .github/workflows/ci.yml       # Quelle 1: CI/CD
+├── .github/workflows/quality-gates.yml # Quelle 1: CI/CT-Quality-Gates
 ├── scripts/hooks/pre-commit       # Quelle 1: Pre-Commit-Hooks
 ├── docs/project/
 │   ├── methodology/               # Wie wir arbeiten (inkl. dieser Datei)

@@ -1,0 +1,23 @@
+id: R-AS-04
+title: Data minimization, permission minimization and platform security
+kontrollmechanismus: Hybrid
+lifecycle_phase: pre-deployment
+governance_dimension: technisch
+must_should: MUST
+applicability: always
+activation_condition: Always
+verification: HYBRID
+source_type: mixed
+apple_guideline_refs: ["1.6", "5.1.1(iii)", "5.1.1(iv)"]
+description: The binary may request and process only data and device permissions needed for documented ScanFair functionality.
+evidence_expected: [permission inventory, data inventory, transport-security review, denial-path tests]
+acceptance_criteria:
+  - Every permission maps to a current feature and purpose
+  - Permission refusal has a usable fallback where feasible
+  - Data in transit and locally retained data receive appropriate protection
+linked_gates: [G-AS-BUILD-INTEGRITY, G-AS-PRIVACY, G-AS-CAMERA]
+deployer_implication: Remove unused entitlements, permissions, SDKs and stored data before release.
+audit_trigger: Every permission, entitlement, SDK or data-flow change
+source_refs: [APPLE-ARG, EU-GDPR]
+phase: phase-1-mvp
+notes: Internal security controls remain separate engineering gates but provide evidence here.

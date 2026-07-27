@@ -3,7 +3,7 @@
 > **Scan. Verstehen. Fairer entscheiden.**  
 > Eine mobile App für schnelle, transparente Nachhaltigkeitsentscheidungen direkt am Regal.
 
-**ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und später den Flutter-Code.
+**ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und den lokal validierten Flutter-MVP.
 
 ---
 
@@ -63,12 +63,12 @@ ScanFair aggregiert bestehende, anerkannte Datenquellen. Die App erfindet keine 
 
 | Dimension | Gewicht | MVP-Status | Beispielquellen |
 | --- | ---: | --- | --- |
-| Environmental | 40% | vollständig geplant | Eco-Score, CO2, Verpackung, Herkunft, Bio-Siegel |
-| Social | 35% | vereinfacht | Fairtrade, Rainforest Alliance, soziale Labels |
-| Governance | 25% | Platzhalter | CSRD, B Corp, Transparenzdaten |
+| Environmental | 50% | implementiert | Environmental-/Eco-Score, CO2, Verpackung, Herkunft |
+| Social | 30% | implementiert | Fairtrade, Bio, Rainforest Alliance, Herkunftssignale |
+| Governance | 20% | implementiert | Datenvollstaendigkeit und Produkttransparenz |
 
 ```text
-Gesamt-Score = (E x 0.40) + (S x 0.35) + (G x 0.25)
+Gesamt-Score = (E x 0.50) + (S x 0.30) + (G x 0.20)
 ```
 
 **Ampel-Logik**
@@ -109,7 +109,7 @@ Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidu
 | Komponente | Technologie | Rolle |
 | --- | --- | --- |
 | Mobile App | Flutter / Dart | iOS-first App, später cross-platform |
-| State Management | Riverpod | klarer Datenfluss zwischen Scan, Produkt und Score |
+| State Management | Flutter-native + Constructor Injection | lokaler MVP-State ohne zusaetzliche Laufzeitabhaengigkeit |
 | Barcode Scanner | mobile_scanner | Kamera-Scan für EAN-Barcodes |
 | Produktdaten | Open Food Facts API | Produkt-, Label-, Eco-Score- und Verpackungsdaten |
 | Backend / Cache | Supabase EU | Auth, Cache, optionale Datenpersistenz |
@@ -178,7 +178,7 @@ GitHub soll nicht nur Ablage sein, sondern unser Steuerungsinstrument für Produ
 
 | Bereich | Best Practice für dieses Projekt |
 | --- | --- |
-| Branches | `main` bleibt stabil; Arbeit passiert auf Feature-Branches wie `codex/integrate-design-artifacts` |
+| Branches | `main` bleibt stabil; Arbeit passiert auf kurzlebigen Branches wie `feature/integrate-design-artifacts` |
 | Pull Requests | Jeder größere Schritt bekommt einen PR mit Ziel, Änderungen, offenen Entscheidungen und Screenshots/Links |
 | Issues | Anforderungen, Bugs, Design-Entscheidungen und Forschungsfragen als Issues erfassen |
 | Labels | `type:feature`, `type:bug`, `type:docs`, `type:design`, `area:scoring`, `area:flutter`, `area:research` |
@@ -196,7 +196,7 @@ Dieses Repo enthält dafür Vorlagen:
 **Empfohlener Workflow**
 
 1. Issue anlegen: Was soll gebaut oder entschieden werden?
-2. Branch erstellen: `codex/<kurzer-zweck>` oder `feature/<kurzer-zweck>`.
+2. Branch erstellen: `feature/<kurzer-zweck>`.
 3. Änderung klein halten: ein Thema pro Branch.
 4. PR öffnen: Kontext, Screenshots/Links, Testhinweise, offene Fragen.
 5. Review nutzen: fachlich, technisch und UX-seitig prüfen.
@@ -225,7 +225,7 @@ Dieses Repo enthält dafür Vorlagen:
 | --- | --- | --- |
 | Phase 0 | Discovery, Research, Design-System, Prototypen | abgeschlossen |
 | Phase 1 | Hi-Fi-Designs, klickbarer Prototyp, Developer-Handoff | abgeschlossen |
-| Phase 2 | Lebensmittel-MVP mit Scanner, Score und Details (Flutter) | nächster Umsetzungsschritt |
+| Phase 2 | Lebensmittel-MVP mit Scanner, Score und Details (Flutter) | implementiert und auf echtem iPhone validiert |
 | Phase 3 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
 | Phase 4 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
 
@@ -255,6 +255,134 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
 | [Projekttagebuch](docs/PROJEKTTAGEBUCH.md) | Fortschritte, Entscheidungen und Learnings |
+
+---
+
+## 11 · Lokale Entwicklung & Quality Gates
+
+Der aktuelle Entwicklungsstand bleibt lokal: kein TestFlight, kein App-Store,
+kein Hosting und kein Online-Release. Die App scannt EAN-/UPC-Barcodes mit der
+iPhone-Kamera und laedt Produktdaten ueber Open Food Facts API v3. Manuelle
+Barcode-Eingabe und injizierbare Demo-Daten bleiben als Fallback und fuer
+deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
+Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
+implementiert.
+
+**Validierter MVP-Stand (19. Juli 2026)**
+
+| Bereich | Ergebnis |
+| --- | --- |
+| Zielplattform | iOS-first Flutter-MVP auf physischem iPhone installiert |
+| App-Start | Signierter Profile-Build startet eigenstaendig vom Home-Bildschirm |
+| Kamera | Kameraberechtigung und nativer Barcode-Scanner erfolgreich getestet |
+| Scan-Flow | EAN-/UPC-Barcode erkannt und an den Produktlookup uebergeben |
+| Produktdaten | Open Food Facts API v3 liefert reale Produktinformationen |
+| Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
+| Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Layout und Stil im MVP-Smoke-Test bestaetigt |
+| Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
+| Release-Scope | Kein TestFlight, App-Store-Release, Hosting oder iOS-Deployment |
+
+Der physische Smoke-Test deckt die Kernschleife
+`Oeffnen -> Scannen -> Produkt finden -> Score verstehen -> Details pruefen`
+vollstaendig ab. Fachliche Spezifikationen, weitere Datenquellen und die
+Vertiefung des S-/G-Scores bleiben Gegenstand der naechsten Iterationen.
+
+**App lokal starten**
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+flutter pub get
+flutter run
+```
+
+Die Kamera kann nicht realistisch im iOS-Simulator getestet werden. Fuer einen
+lokalen Test auf dem eigenen iPhone: iPhone per USB verbinden, entsperren,
+diesem Mac vertrauen und den Developer Mode aktivieren. Danach in Xcode unter
+`Runner > Signing & Capabilities` das eigene Apple-Team auswaehlen und starten:
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+flutter devices
+flutter run -d <IPHONE_DEVICE_ID>
+```
+
+`flutter run` installiert einen Debug-Build. Dieser kann auf aktuellen
+iOS-Versionen nur mit aktiver Flutter-/Xcode-Verbindung gestartet werden. Fuer
+einen lokal installierten Build, der eigenstaendig vom Home-Bildschirm startet,
+wird der Profile-Modus verwendet:
+
+```bash
+cd /Users/mustafademir/ESG-Score-App/esg_app
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+flutter run --profile --no-resident -d <IPHONE_DEVICE_ID>
+```
+
+**Quality Gates lokal ausfuehren**
+
+```bash
+cd /Users/mustafademir/ESG-Score-App
+bash scripts/quality/run_quality_gates.sh
+bash scripts/quality/run_ios_build_gate.sh
+
+# Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
+COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
+```
+
+Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
+
+| Gate | Zweck |
+| --- | --- |
+| `G-FLT-DEPS` | Flutter Dependencies reproduzierbar aufloesen |
+| `G-FLT-FORMAT` | Format-Drift blocken |
+| `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
+| `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
+| `G-FLT-COVERAGE` | Mindestens 60% Line-Coverage gemaess Sprint-2-Baseline |
+| `G-CMP-SCHEMA` | Requirement-, Source-, Gate- und Policy-Links validieren |
+| `G-REG-UNIT` | Rego-Policy-Tests fuer Compliance-Regeln |
+| `G-CMP-APPLE` | Acht Apple-Entscheidungs-Gates via Conftest auswerten |
+| `G-CMP-EVIDENCE` | SHA-256-Evidence-Chain vollstaendig verifizieren |
+| `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
+| `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
+| `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build und gebuendelte Privacy Manifests auf macOS/Xcode validieren |
+
+**GitHub Actions**
+
+Die Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
+`main`, `feature/**`, Pull Requests nach `main` und manuell via
+`workflow_dispatch`.
+Sie veroeffentlicht Gate-Summaries und die Artefakte
+`scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
+iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
+geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den elf
+lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-/Privacy-Job und ein
+separater Gitleaks-Secret-Scan. Bei manuellen Laeufen kann zwischen
+`development`, `release_candidate` und `submission` gewaehlt werden.
+
+`G-CMP-APPLE` umfasst `G-AS-BUILD-INTEGRITY`, `G-AS-PRIVACY`, `G-AS-CAMERA`,
+`G-AS-METADATA`, `G-AS-REVIEW-READINESS`, `G-AS-CLAIMS-TRANSPARENCY`,
+`G-AS-THIRD-PARTY-RIGHTS` und `G-AS-SUPPORT-IDENTITY`. Im Entwicklungsprofil bleiben noch nicht faellige
+Release-Nachweise als sichtbare Warnungen offen. Ab `release_candidate`
+blockiert jede anwendbare, unerfuellte MUST-Anforderung.
+
+Der operative Kontrollrahmen steht in
+[`apple-compliance-control-model.md`](docs/project/compliance/apple-compliance-control-model.md).
+Die bisherige gruene MVP-Pipeline bleibt ein Entwicklungsnachweis; sie ist nicht
+mit einer App-Store-Releasefreigabe gleichzusetzen. Der strenge Release-Check
+bleibt rot, bis Privacy-, Store-, Device-, Claims-, Lizenz- und Support-Evidenz
+vollstaendig vorliegt. Die technischen Privacy-Teile von
+`G-AS-BUILD-INTEGRITY` sind geschlossen: Das App-Privacy-Manifest ist im
+Xcode-Projekt eingebunden, das gebaute Bundle wird geprueft und der
+SDK-/Required-Reason-Review ist per SHA-256 an `pubspec.lock`,
+`PrivacyInfo.xcprivacy` und den iOS-Plugin-Registrant gebunden. Eine
+Abhaengigkeits- oder Manifest-Aenderung macht diesen Review automatisch
+ungueltig. Das strikte Gate bleibt bis zur Publisher-Signaturvalidierung der
+gelisteten binaeren SDKs am signierten Release-Archive bewusst rot.
+
+Explizit ausgeschlossen: iOS-Deployment, Online-Release, Hosting-Provider,
+Kubernetes und OPA Gatekeeper. Die App uebernimmt aus
+`genaiops-compliance-gates` nur die relevanten Muster: Gate-Definitionen,
+Policy-as-Code, Evidence-Log und sichtbare CI/CD-Entscheidung.
 
 ---
 

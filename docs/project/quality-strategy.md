@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-05-19
+Letztes Update: 2026-07-19
 
 ---
 
@@ -41,6 +41,7 @@ Letztes Update: 2026-05-19
 | `lib/widgets/` (ProductCard, ScoreHero) | Widget | `flutter test` mit `WidgetTester` |
 | `lib/screens/` (Scanner, Result) | Widget + Integration | `flutter test` + `integration_test` |
 | API-Calls (echte OFF-API) | Manuell + selten in CI | `--tags=network` |
+| Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
 
 ### Coverage-Gates
 
@@ -54,48 +55,51 @@ Letztes Update: 2026-05-19
 
 Coverage ist **Indikator, nicht Ziel**. Ein Test der nur Coverage erzeugt ist Schrott.
 
-## 3. CI-Pipeline (Sprint 0 Setup)
+## 3. CI/CT-Pipeline
 
-### `.github/workflows/ci.yml` (Skeleton)
+Die verbindliche Workflow-Datei ist
+[`quality-gates.yml`](../../.github/workflows/quality-gates.yml). Sie laeuft
+bei Pushes nach `main` und `feature/**`, bei Pull Requests nach `main` sowie
+manuell via `workflow_dispatch`. Aenderungen an der
+Repository-README loesen sie ebenfalls aus, weil `G-DOC-TRACE` diese Datei
+mitprueft.
 
-```yaml
-name: CI
-on:
-  pull_request:
-  push:
-    branches: [main, dev]
+| Job | Inhalt | Ergebnis |
+|---|---|---|
+| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
+| `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
+| `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
-jobs:
-  flutter-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.44.0'
-          channel: stable
-      - run: flutter pub get
-      - run: flutter format --set-exit-if-changed lib test
-      - run: flutter analyze --fatal-infos
-      - run: flutter test --coverage
-      - uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage/lcov.info
+Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
+Sie deckt elf Engineering-, Schema-, Policy-, Evidence- und Doku-Gates ab; der
+native iOS-Compile-Job und der vollstaendige Git-History-Scan erfolgen
+zusaetzlich in GitHub Actions. Es gibt keine automatische Auslieferung. Das
+Profil `release_candidate` ist eine strenge lokale Freigabepruefung und fuehrt
+weder TestFlight-Upload noch App-Store-Submission aus.
 
-  secret-scan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: gitleaks/gitleaks-action@v2
-```
+Die Apple-Kontrollen verwenden drei Profile:
+
+- `development`: objektive aktuelle MUST-Verstoesse blockieren, spaetere
+  Release-Evidenz bleibt als Warnung sichtbar.
+- `release_candidate`: jede anwendbare offene MUST-Evidenz blockiert.
+- `submission`: wie Release Candidate plus finale manuelle Attestation.
 
 ### Branch-Protection auf `main` (GitHub Settings)
 
 - Require pull request before merging
-- Require status checks: `flutter-check`, `secret-scan`
+- Require status checks: `Local CI quality gates`,
+  `G-IOS-COMPILE native iOS build`, `Secret scan gate`
 - Require linear history
 - Block force-pushes
+
+Die produktive Quality-Gate-Action ergaenzt den Linux-Job um
+`G-IOS-COMPILE` auf einem macOS-Runner. Das Gate baut eine unsigned
+iOS-Simulator-App, erkennt native Plugin-, CocoaPods- und Swift-Fehler und
+prueft anschliessend alle im `Runner.app` gebuendelten
+`PrivacyInfo.xcprivacy`-Dateien. Fehlende Standard-Keys, unbegruendete
+Required-Reason-API-Kategorien oder eine Tracking-Deklaration entgegen dem
+Compliance-Manifest blockieren den Job. Kameraerkennung selbst bleibt ein
+Smoke-Test auf einem physischen iPhone.
 
 ## 4. Pre-Commit-Hooks (lokal)
 
@@ -118,6 +122,8 @@ In dieser Reihenfolge abarbeiten:
 
 ```
 [ ] CI grün auf main
+[ ] COMPLIANCE_PROFILE=release_candidate ohne Findings
+[ ] Evidence-Hash-Chain verifiziert
 [ ] flutter test --coverage zeigt >=70%
 [ ] flutter analyze sauber
 [ ] /security-review Slash-Command durchgelaufen

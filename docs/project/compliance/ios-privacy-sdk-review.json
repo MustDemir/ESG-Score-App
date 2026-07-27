@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0",
+  "review_id": "IOS-PRIVACY-SDK-2026-07-27",
+  "reviewed_at": "2026-07-27",
+  "review_type": "technical_evidence_assisted",
+  "scope": "Current iOS dependency set, bundled privacy manifests, and required-reason API declarations",
+  "decision": {
+    "status": "approved_for_current_dependency_set",
+    "human_confirmation_required_before_submission": true,
+    "limitations": [
+      "This technical review does not complete the App Store Connect privacy questionnaire.",
+      "Barcode and network-request data classification remains open in G-AS-PRIVACY.",
+      "Listed binary SDK publisher-signature continuity still requires validation on the signed release archive.",
+      "Any dependency, plugin registration, or app privacy manifest change invalidates this review automatically."
+    ]
+  },
+  "reviewed_inputs": {
+    "pubspec_lock": {
+      "path": "esg_app/pubspec.lock",
+      "sha256": "27d56fee8e580c4e106c2386c7c9ed0e8b99a075f573955a81589deeb2c97453"
+    },
+    "app_privacy_manifest": {
+      "path": "esg_app/ios/Runner/PrivacyInfo.xcprivacy",
+      "sha256": "74b0cd72fc23c1ef302f22ee2753f61817cdc5af0ff7a7f2d0632b524fb8acea"
+    },
+    "generated_plugin_registrant": {
+      "path": "esg_app/ios/Runner/GeneratedPluginRegistrant.m",
+      "sha256": "2fbea26f5d53d2cdc1502dadc2dbf3f3de58db7b7118c958aea50a485534f951"
+    }
+  },
+  "toolchain": {
+    "flutter": "3.44.0",
+    "xcode": "26.6 (17F113)"
+  },
+  "native_ios_components": [
+    {
+      "name": "Flutter",
+      "version": "3.44.0",
+      "apple_listed_sdk": true,
+      "bundled": true,
+      "privacy_manifest_present": true,
+      "tracking": false,
+      "collected_data_types": [],
+      "required_reason_apis": [
+        {
+          "category": "NSPrivacyAccessedAPICategoryFileTimestamp",
+          "reasons": [
+            "0A2A.1",
+            "C617.1"
+          ]
+        },
+        {
+          "category": "NSPrivacyAccessedAPICategorySystemBootTime",
+          "reasons": [
+            "35F9.1"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mobile_scanner",
+      "version": "7.3.0",
+      "apple_listed_sdk": false,
+      "bundled": true,
+      "privacy_manifest_present": true,
+      "tracking": false,
+      "collected_data_types": [],
+      "required_reason_apis": []
+    },
+    {
+      "name": "objective_c",
+      "version": "9.3.0",
+      "apple_listed_sdk": false,
+      "bundled": true,
+      "privacy_manifest_present": false,
+      "required_reason_apis": [],
+      "review_note": "Dart Objective-C interoperability support. Source review found no direct use of Apple's listed required-reason APIs; final archive validation remains authoritative."
+    },
+    {
+      "name": "path_provider_foundation",
+      "version": "2.6.0",
+      "apple_listed_sdk_family": "path_provider",
+      "bundled": false,
+      "plugin_registered": false,
+      "review_note": "Resolved transitively but absent from GeneratedPluginRegistrant.m and the built Runner.app."
+    }
+  ],
+  "dart_only_dependencies": [
+    "google_fonts 6.3.3",
+    "http 1.6.0"
+  ],
+  "bundle_audit_snapshot": {
+    "evidence_path": "evidence-store/ios_privacy_audit.json",
+    "manifest_count": 3,
+    "framework_signature_count": 3,
+    "framework_signatures_valid_on_disk": true,
+    "framework_signature_scope": "Unsigned simulator build; all framework signatures are ad-hoc and do not prove SDK publisher identity.",
+    "decision": "PASS",
+    "violation_count": 0,
+    "built_app_manifest_sha256": "162ca095029713027dcdfcbd1834a8a534e55541e7f39a64ec900a29dd9a363d",
+    "flutter_manifest_sha256": "9f95d7e7862a4b56b66ed926bd6d622d2a6545a827d19847278b438d571d4212",
+    "mobile_scanner_manifest_sha256": "1bac827f49b2b8a5358491b9698203bf191791a6f1ba3a3ace3b1285d52d2d17"
+  },
+  "review_outcome": {
+    "required_reason_api_review_completed": true,
+    "third_party_sdk_privacy_review_completed": true,
+    "listed_binary_sdk_signature_validation_completed": false,
+    "app_store_privacy_details_completed": false
+  },
+  "sources": [
+    "APPLE-PRIVACY-MANIFEST",
+    "APPLE-REQUIRED-REASON-API",
+    "APPLE-THIRD-PARTY-SDK",
+    "APPLE-APP-PRIVACY-DETAILS"
+  ]
+}

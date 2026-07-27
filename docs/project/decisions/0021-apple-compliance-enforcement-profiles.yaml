@@ -1,0 +1,44 @@
+id: 0021
+title: Apple-Compliance mit gestuften Enforcement-Profilen steuern
+date: 2026-07-19
+status: accepted
+deciders: [Mustafa]
+tags: [apple, compliance, policy-as-code, evidence, release-readiness]
+
+context: |
+  Apple- und Rechtsanforderungen muessen streng genug fuer eine spaetere
+  App-Store-Submission sein. Viele Nachweise, etwa Store-Screenshots oder eine
+  oeffentliche Support-URL, koennen waehrend der Feature-Entwicklung jedoch noch
+  nicht vorliegen. Ein einziges undifferenziertes Blocker-Profil waere entweder
+  zu schwach fuer Releases oder wuerde normale Entwicklung unnoetig stoppen.
+
+options_considered:
+  - name: Alle offenen Anforderungen in jedem Build blockieren
+    pros: [Maximal einfache Entscheidungslogik]
+    cons: [Release-only Evidenz blockiert fruehe Entwicklung, hoher Anreiz fuer falsche Deklarationen]
+  - name: Compliance nur unmittelbar vor der Submission pruefen
+    pros: [Keine Belastung waehrend der Entwicklung]
+    cons: [Spaete Findings, fehlende Traceability, hohe Nacharbeitskosten]
+  - name: Drei Profile mit identischen Requirements und gestuftem Enforcement
+    pros: [Fruehe Sichtbarkeit, harte Release-Schranke, klare bedingte Aktivierung]
+    cons: [Manifest und Feature-Flags muessen wahrheitsgetreu gepflegt werden]
+
+decision: development, release_candidate und submission verwenden denselben Kontrollkatalog mit unterschiedlicher Faelligkeit der Evidenz
+rationale: |
+  Bereits anwendbare objektive MUST-Verstoesse blockieren immer. Release-only
+  Evidenz ist in development eine sichtbare Warnung und blockiert ab
+  release_candidate. submission verlangt zusaetzlich eine finale menschliche
+  Attestation. Bedingte Anforderungen werden durch pruefbare Feature-Trigger
+  aktiviert. Semantische und rechtliche Entscheidungen bleiben HYBRID.
+
+consequences:
+  - Acht Apple-Gate-Gruppen ersetzen kleinteilige Einzel-Gate-Planungen.
+  - Rego darf keine internen Heuristiken als Apple-MUST erfinden.
+  - Der Source-Register-Review wird vor Release faellig und versioniert.
+  - Conftest- und Evidence-Fehler werden fail-closed behandelt.
+  - Ein gruener Development-Lauf ist keine Releasefreigabe.
+  - App-Store-Upload und Deployment bleiben ausserhalb der Pipeline.
+
+supersedes: 0012
+superseded_by: null
+related: [0009, 0012, 0013, 0020]

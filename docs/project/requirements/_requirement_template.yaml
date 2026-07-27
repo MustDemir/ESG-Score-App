@@ -1,33 +1,21 @@
-# Requirement-Template für ScanFair
-# Übernommen aus genaiops-compliance-gates/requirements/_requirement_template.yaml
-# Adaptiert für App-Store-Compliance (Apple) statt EU AI Act.
-
-id: R-AS-NN                   # R-AS = Apple Store. R-DSGVO-NN für DSGVO später. R-OFF-NN für OFF-Lizenz, etc.
-title: ""                     # Was muss erfüllt sein?
-kontrollmechanismus: ""       # Wie wird's geprüft? "Policy-as-Code Conftest" oder "Manual Review" oder "Hybrid"
-
-lifecycle_phase: "pre-deployment"   # pre-deployment | deployment | operations
-governance_dimension: "regulatorisch"   # regulatorisch | technisch | strategisch
-must_should: "MUST"           # MUST | SHOULD (Apple Mandatory vs. Recommended)
-
-apple_guideline_refs: []      # z.B. ["2.3.7", "5.1.1(i)"]
-
-description: |
-  Detaillierte Beschreibung der Anforderung im Kontext von ScanFair.
-
-evidence_expected: []         # Welche Artefakte beweisen Erfüllung?
-
-acceptance_criteria: []       # Konkrete prüfbare Kriterien
-
-linked_gates: []              # G-AS-XXX die diese Anforderung implementieren
-
-deployer_implication: ""      # Was MUSS Mustafa konkret tun
-
-audit_trigger: ""             # Wann läuft die Prüfung?
-
-sources:                      # Externe Referenzen
-  - "App-Review-Guidelines-German.pdf, Sektion X.Y"
-
-phase: phase-1-mvp            # Wann wird die Anforderung aktiviert?
-
+# ScanFair requirement schema, adapted from genaiops-compliance-gates.
+id: R-AS-NN
+title: ""
+kontrollmechanismus: "Policy-as-Code|Hybrid|Manual Review"
+lifecycle_phase: "pre-deployment|deployment|operations"
+governance_dimension: "regulatorisch|technisch|strategisch"
+must_should: "MUST|SHOULD"
+applicability: "always|conditional"
+activation_condition: "always, or an objectively verifiable feature condition"
+verification: "AUTO|HYBRID|MANUAL"
+source_type: "apple|legal|license|internal|mixed"
+apple_guideline_refs: []
+description: ""
+evidence_expected: []
+acceptance_criteria: []
+linked_gates: []
+deployer_implication: ""
+audit_trigger: ""
+source_refs: []
+phase: "phase-1-mvp|phase-2|conditional"
 notes: ""

@@ -1,0 +1,23 @@
+id: R-AS-15
+title: Location use only for directly relevant functionality
+kontrollmechanismus: Policy-as-Code and on-device permission test
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: feature_location_enabled is true
+verification: HYBRID
+source_type: mixed
+apple_guideline_refs: ["5.1.1(iii)", "5.1.5"]
+description: Location may be requested only when directly relevant, with a precise purpose string and a usable denial path.
+evidence_expected: [feature flag, Info.plist key, purpose review, denial-path test, privacy update]
+acceptance_criteria:
+  - Location purpose is specific and matches actual processing
+  - Least-precise and least-permissive access is used
+  - Privacy documentation and App Privacy answers are updated
+linked_gates: [G-AS-PRIVACY]
+deployer_implication: Activate the control before implementing any regional-score feature.
+audit_trigger: Location feature activation or permission change
+source_refs: [APPLE-ARG, APPLE-APP-PRIVACY, EU-GDPR]
+phase: conditional
+notes: Inactive for the current MVP.

@@ -23,7 +23,7 @@ options_considered:
       - Sales-Cycle, NDA, PoC → Wochen Verzögerung
       - Massive Über-Dimensionierung für „Barcode → ESG-Score"
       - Vendor-Lock-in zu Enterprise-Plattform
-  - name: Stattdessen: Supabase + pgvector + Mistral/Claude/Aleph Alpha
+  - name: "Stattdessen: Supabase + pgvector + Mistral/Claude/Aleph Alpha"
     pros:
       - Solo-Founder-kompatible Kosten (~50 €/Monat)
       - Self-built = volle Kontrolle

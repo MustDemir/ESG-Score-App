@@ -1,0 +1,23 @@
+id: R-AS-14
+title: Use Apple's standard review request API without coercion
+kontrollmechanismus: Static dependency review and on-device UX test
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: A rating or review prompt is implemented
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["3.2.2(x)", "5.6.1"]
+description: Any request for an App Store rating must use the supported Apple API and must not gate rewards, access or functionality.
+evidence_expected: [feature inventory, API usage review, prompt UX test]
+acceptance_criteria:
+  - Only the supported Apple review-request mechanism is used
+  - No custom rating selector or incentive is shown
+  - Refusal or dismissal has no negative consequence
+linked_gates: [G-AS-REVIEW-READINESS]
+deployer_implication: Re-run this gate before adding any review-prompt package.
+audit_trigger: Review-prompt feature or dependency change
+source_refs: [APPLE-ARG]
+phase: conditional
+notes: Inactive while no rating prompt exists.

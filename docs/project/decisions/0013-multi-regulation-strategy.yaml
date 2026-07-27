@@ -44,9 +44,9 @@ options_considered:
       + Cross-Refs in jeder YAML (overlapping_with, apple_guideline_refs, dsgvo_refs)
       + cross-regulation-map.md als Übersicht
     pros:
-      - Eine Implementation wird in ALLEN betroffenen R-NN.yaml referenziert
-      - "overlapping_with" macht Duplikate explizit
-      - Klare Audit-Spur
+      - "Eine Implementation wird in ALLEN betroffenen R-NN.yaml referenziert"
+      - "overlapping_with macht Duplikate explizit"
+      - "Klare Audit-Spur"
     cons:
       - Mehr Pflege-Aufwand bei Refs
       - Map-Datei muss aktuell gehalten werden

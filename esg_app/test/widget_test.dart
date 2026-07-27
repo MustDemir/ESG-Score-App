@@ -1,55 +1,138 @@
-// =============================================================================
-// ScanFairApp — Smoke-Tests
-// =============================================================================
-
 import 'package:esg_app/main.dart';
+import 'package:esg_app/models/product.dart';
+import 'package:esg_app/screens/scanner_screen.dart';
+import 'package:esg_app/services/product_lookup_failure.dart';
+import 'package:esg_app/services/product_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('App rendert ohne Crash + Theme-Smoke-Screen sichtbar', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const ScanFairApp());
+  Widget buildDemoApp({ScannerViewportBuilder? scannerViewportBuilder}) {
+    return ScanFairApp(
+      repository: DemoProductRepository(),
+      scannerViewportBuilder: scannerViewportBuilder,
+    );
+  }
+
+  testWidgets('Home screen renders the local ScanFair flow', (tester) async {
+    await tester.pumpWidget(buildDemoApp());
     await tester.pumpAndSettle();
 
-    // AppBar-Titel sichtbar
-    expect(find.text('ScanFair — Theme Smoke'), findsOneWidget);
-
-    // ESG-Pillar-Demo gerendert (E/S/G-Chips)
-    expect(find.text('E'), findsOneWidget);
-    expect(find.text('S'), findsOneWidget);
-    expect(find.text('G'), findsOneWidget);
-
-    // Score-Hero-Mock zeigt Score
-    expect(find.text('82'), findsOneWidget);
-    expect(find.text('GEPA Bio Kaffee'), findsOneWidget);
+    expect(find.text('ScanFair'), findsOneWidget);
+    expect(find.text("Was gibt's heute im Wagen?"), findsOneWidget);
+    expect(
+      find.widgetWithText(ElevatedButton, 'Barcode scannen'),
+      findsOneWidget,
+    );
+    expect(find.text('Bio Edelbitter Schokolade'), findsOneWidget);
   });
 
-  testWidgets('Theme: MaterialApp nutzt ScanFairTheme.light', (
-    WidgetTester tester,
+  testWidgets('Scan action opens result screen for GEPA demo product', (
+    tester,
   ) async {
-    await tester.pumpWidget(const ScanFairApp());
-
-    final BuildContext context = tester.element(
-      find.text('ScanFair — Theme Smoke'),
+    await tester.pumpWidget(
+      buildDemoApp(
+        scannerViewportBuilder: (context, onBarcodeDetected) => ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () => onBarcodeDetected('4000417025005'),
+              child: const Text('Testbarcode erfassen'),
+            ),
+          ),
+        ),
+      ),
     );
-    final ColorScheme scheme = Theme.of(context).colorScheme;
+    await tester.pumpAndSettle();
 
-    // Primary muss Forest Green sein (#0F7B5C)
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Barcode in den Rahmen halten'), findsOneWidget);
+    await tester.tap(find.text('Testbarcode erfassen'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Ergebnis'), findsOneWidget);
+    expect(find.text('Empfehlung'), findsOneWidget);
+    expect(find.text('7.4'), findsOneWidget);
+  });
+
+  testWidgets('Manual barcode can open low-data state', (tester) async {
+    await tester.pumpWidget(buildDemoApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '4025500287955');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Datengrundlage'), findsOneWidget);
+    expect(find.text('Wir geben hier keinen Score.'), findsOneWidget);
+  });
+
+  testWidgets('Manual barcode can open not-found state', (tester) async {
+    await tester.pumpWidget(buildDemoApp());
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '0000000000000');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Produkt nicht gefunden'), findsOneWidget);
+    expect(find.text('Dieses Produkt kennen wir noch nicht.'), findsOneWidget);
+  });
+
+  testWidgets('Theme uses ScanFair primary and surface colors', (tester) async {
+    await tester.pumpWidget(buildDemoApp());
+
+    final context = tester.element(find.text('ScanFair').first);
+    final scheme = Theme.of(context).colorScheme;
+
     expect(scheme.primary, const Color(0xFF0F7B5C));
-    // Surface muss bg sein (#FBFAF6)
     expect(scheme.surface, const Color(0xFFFBFAF6));
   });
 
-  testWidgets('Buttons existieren (Primary/Secondary/Tertiary)', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const ScanFairApp());
+  testWidgets('Network failure opens a retryable error state', (tester) async {
+    await tester.pumpWidget(
+      ScanFairApp(
+        repository: _FailingProductRepository(),
+        scannerViewportBuilder: (context, onBarcodeDetected) => ColoredBox(
+          color: Colors.black,
+          child: Center(
+            child: ElevatedButton(
+              onPressed: () => onBarcodeDetected('4000417025005'),
+              child: const Text('Testbarcode erfassen'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Barcode scannen'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Testbarcode erfassen'));
     await tester.pumpAndSettle();
 
-    expect(find.widgetWithText(ElevatedButton, 'Primary'), findsOneWidget);
-    expect(find.widgetWithText(OutlinedButton, 'Secondary'), findsOneWidget);
-    expect(find.widgetWithText(TextButton, 'Tertiary'), findsOneWidget);
+    expect(find.text('Keine Verbindung'), findsOneWidget);
+    expect(find.text('Erneut versuchen'), findsOneWidget);
   });
+}
+
+class _FailingProductRepository implements ProductRepository {
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    throw const ProductLookupFailure(
+      type: ProductLookupFailureType.noConnection,
+      message: 'Open Food Facts ist momentan nicht erreichbar.',
+    );
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
 }

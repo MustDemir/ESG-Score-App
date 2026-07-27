@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W21
-last_updated: 2026-05-19
+current_week: 2026-W29
+last_updated: 2026-07-19
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -43,6 +43,83 @@ milestones:
       75 Files erstellt. flutter analyze clean, flutter test grün.
       .gitignore um Secrets-Patterns erweitert (ADR 0008 SEC-1).
       Step S06 abgeschlossen.
+
+  - id: M09
+    title: Compliance-Gate-Mechanik end-to-end funktionsfähig
+    date: 2026-05-19
+    phase: phase-1-mvp
+    notes: |
+      Evidence-Modell + Extraction-Pipeline gebaut und end-to-end getestet:
+      - evidence-model.md (3 Artefakt-Kategorien: auto/deklariert/manuell)
+      - compliance-manifest.json (Kategorie-B-Deklarationen)
+      - scripts/compliance/extract_app_metadata.sh (Kategorie A via plutil)
+      - scripts/compliance/build_compliance_input.sh (jq-Merge A+B)
+      - scripts/compliance/run_gates.sh (conftest + SHA-256 Evidence-Log)
+      Beweis: G-AS-NAME-LENGTH lief, fand Finding (Display-Name "Esg App"
+      != "ScanFair"), nach Fix (Info.plist + AndroidManifest auf ScanFair)
+      8/8 Tests PASS. Hash-Chain GENESIS->7d5b->cd1e->5162 verifiziert.
+      R-AS-12 (App-Name-Branding) damit erfüllt. TODO-023 done.
+
+  - id: M10
+    title: Lokaler MVP-App-Flow und Quality-Gate-Action implementiert
+    date: 2026-07-08
+    phase: phase-1-mvp
+    notes: |
+      Branch codex/app-development-quality-gates angelegt.
+      Flutter-Smoke-Screen durch lokalen Home/Scan/Result/Detail-Flow ersetzt.
+      ESGScoreCalculator, DemoProductRepository, Low-Data- und Not-Found-State
+      implementiert. GitHub Action quality-gates.yml ergänzt; Android-Build
+      bewusst entfernt, Fokus bleibt iOS/App-Logik lokal. Lokale Pipeline:
+      7/7 Gates PASS (Flutter deps/format/analyze/test, OPA Rego tests,
+      Conftest Apple-Gate mit Evidence-Log, Docs-Traceability).
+
+  - id: M11
+    title: Echter Open-Food-Facts-v3-Produktlookup implementiert
+    date: 2026-07-18
+    phase: phase-1-mvp
+    notes: |
+      ADR 0015 entscheidet Flutter-native State-Verwaltung fuer Phase 1.
+      ADR 0016 entscheidet OFF API v3 mit tolerantem Umweltfeld-Mapping.
+      OpenFoodFactsService und OpenFoodFactsProductRepository sind als
+      Standard-App-Datenquelle verdrahtet. Timeout, Retry, Rate-Limit,
+      Not-Found und technische Fehlerzustaende sind implementiert.
+      Teststand: 21 Tests PASS, Line-Coverage 82.63 Prozent.
+
+  - id: M12
+    title: Nativer iOS-Kamera-Barcode-Scanner und Compile-Gate implementiert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      mobile_scanner 7.3.0 erkennt EAN-8, EAN-13, UPC-A und UPC-E und
+      uebergibt den ersten gueltigen Code an den bestehenden OFF-/ESG-Flow.
+      Kamera-Permission-, Unsupported- und Fehler-Fallback sind implementiert.
+      G-AS-CAMERA-PURPOSE validiert den Info.plist-Zwecktext mit Rego/Conftest.
+      Xcode 26.6 baut die unsigned iOS-Simulator-App erfolgreich; GitHub Actions
+      zeigt G-IOS-COMPILE als eigenen macOS-Job. Teststand: 25 Tests PASS.
+
+  - id: M13
+    title: GitHub-Quality-Gate-Workflow konsolidiert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      ADR 0020 legt quality-gates.yml als einzigen verbindlichen CI/CT-Workflow
+      fest. Der redundante ci.yml-Workflow wurde entfernt, ohne Gates zu
+      reduzieren. Root-README-Aenderungen starten nun ebenfalls G-DOC-TRACE.
+      App-Code, iOS-Signing, Deployment und K8s/Gatekeeper bleiben unveraendert.
+
+  - id: M14
+    title: Apple-Compliance-Gates fail-closed und release-orientiert erweitert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      19 Apple-Requirements sind auf acht HYBRID-Entscheidungs-Gates abgebildet.
+      Development, Release Candidate und Submission verwenden denselben
+      Kontrollkatalog mit gestufter Evidenz-Faelligkeit. Conftest behandelt
+      technische Fehler fail-closed, protokolliert Einzelentscheidungen und
+      verifiziert die vollstaendige SHA-256-Evidence-Chain. Der lokale
+      Development-Lauf besteht 11/11 Gates mit 28 sichtbaren Warnungen;
+      das strenge Release-Candidate-Profil blockiert erwartungsgemaess 27 offene
+      MUST-Nachweise.
 
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
@@ -127,11 +204,165 @@ decisions_made:
   - adr: 0013
     title: Multi-Regulation-Strategy — Cross-Regulation-Mapping
     date: 2026-05-19
+  - adr: 0014
+    title: Lokale MVP-App-Architektur mit CI/CD-Quality-Gates
+    date: 2026-07-08
+  - adr: 0015
+    title: Flutter-native State-Verwaltung fuer den Phase-1-MVP
+    date: 2026-07-18
+  - adr: 0016
+    title: Open Food Facts API v3 fuer Produktabfragen
+    date: 2026-07-18
+  - adr: 0017
+    title: mobile_scanner fuer den nativen iOS-Barcode-Scan
+    date: 2026-07-19
+  - adr: 0020
+    title: Einen verbindlichen Quality-Gate-Workflow verwenden
+    date: 2026-07-19
+  - adr: 0021
+    title: Apple-Compliance mit gestuften Enforcement-Profilen steuern
+    date: 2026-07-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W31
+    summary: |
+      Apple Build Integrity mit echter iOS-Bundle-Evidenz erweitert, ohne
+      offene Signatur-, Privacy- oder App-Store-Nachweise faelschlich freizugeben.
+    done:
+      - App-eigenes PrivacyInfo.xcprivacy in den Runner-Resources eingebunden
+      - Privacy-Audit fuer App-, Flutter- und mobile_scanner-Manifests umgesetzt
+      - Integritaetspruefung fuer alle im Simulator-App-Bundle enthaltenen Framework-Signaturen umgesetzt
+      - Required-Reason-APIs und Reason-Codes aus dem gebauten Bundle inventarisiert
+      - Technischen SDK-Review mit SHA-256 an Lockfile, Manifest und Plugin-Registrant gebunden
+      - CI-macOS-Artefakt um ios_privacy_audit.json erweitert
+      - Source Register um Apple Required-Reason-, SDK- und App-Privacy-Details ergaenzt
+      - Build-Integrity-Policy bei invalidem Manifest oder stale Review fail-closed erweitert
+    checks:
+      - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
+      - Privacy-Bundle-Audit PASS, 3 Manifests, 0 Findings
+      - Technische Privacy-Teilkontrollen von G-AS-BUILD-INTEGRITY PASS
+      - Release-Candidate-Gesamtcheck erwartungsgemaess FAIL, 25 offene MUST-Nachweise
+      - Development Quality Pipeline 11/11 PASS, 26 Release-Warnungen sichtbar
+      - Compliance-Katalog 19 Requirements, 8 Gates, 14 Quellen valide
+      - OPA Policy-Tests 16/16 PASS
+    blockers:
+      - App-Store-Privacy-Klassifikation fuer Barcode-/Netzwerkdaten bleibt offen
+      - Publisher-Signaturkontinuitaet fuer gelistete binaere SDKs braucht ein signiertes Release-Archive
+      - Weitere Release-Evidenz fuer Kamera, Metadata, Review, Claims, Rechte und Support fehlt
+    next_week:
+      - In-App-OFF-Attribution und ESG-Limitationen umsetzen
+      - Privacy-/Support-Inhalte sowie versionierte App-Store-Metadaten vorbereiten
+      - Kamera-Lokalisierungen und dokumentierten Device-/IPv6-Smoke-Test schliessen
+
+  - week: 2026-W29
+    summary: |
+      Echter OFF-v3-Produktlookup, nativer iOS-Kamera-Scanner und erweiterte
+      CI/CD-Quality-Gates umgesetzt.
+    done:
+      - ADR 0015 fuer Flutter-native State-Verwaltung akzeptiert
+      - ADR 0016 fuer OFF API v3 und Legacy-Feldkompatibilitaet akzeptiert
+      - OpenFoodFactsService mit HTTPS, User-Agent, Timeout und Retry implementiert
+      - Live-Repository als Standard-App-Datenquelle verdrahtet
+      - LookupErrorScreen fuer technische API-Fehler implementiert
+      - G-FLT-COVERAGE mit 60-Prozent-Baseline ergaenzt
+      - G-DOC-YAML fuer alle 47 Projekt-YAMLs ergaenzt
+      - ADR 0017 fuer mobile_scanner und iOS-Kamera akzeptiert
+      - ScannerScreen mit EAN-/UPC-Filter, Torch, Lifecycle und einmaliger Erkennung
+      - Permission-, Unsupported- und Kamera-Fehler-UX mit manuellem Fallback
+      - NSCameraUsageDescription in Info.plist ergaenzt
+      - G-AS-CAMERA-PURPOSE mit sechs Rego-Tests und Evidence-Log aktiviert
+      - G-IOS-COMPILE als lokales Script und GitHub-macOS-Job ergaenzt
+      - README, Backlog, ADR-Index und Feature-States aktualisiert
+      - ADR 0020 akzeptiert und doppelte GitHub-CI auf quality-gates.yml konsolidiert
+      - ADR 0021 akzeptiert und acht Apple-Gate-Gruppen mit drei Enforcement-Profilen umgesetzt
+      - Compliance-Runner fail-closed sowie Evidence-Chain-Verifikation und Katalogschema aktiviert
+    checks:
+      - flutter test --coverage PASS, 25 Tests
+      - Line-Coverage 698/873 = 79.95 Prozent
+      - Reale OFF-v3-Abfrage fuer Beispiel-EAN 4000417025005 validiert
+      - opa test docs/project/policies PASS, 15 Tests
+      - Conftest Apple-Gates PASS, 13 Checks
+      - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
+      - bash scripts/quality/run_quality_gates.sh PASS, 9/9 Gates
+      - gitleaks git --redact PASS
+      - Development Quality Pipeline 11/11 PASS, 28 Warnungen sichtbar
+      - Release-Candidate Apple-Check erwartungsgemaess FAIL, 27 offene MUST-Nachweise
+      - Compliance-Katalog 19 Requirements, 8 Gates, 11 Quellen valide
+      - Neue OPA Gate-Group-Tests 14/14 PASS
+    learnings:
+      - OFF empfiehlt v3 fuer neue Integrationen; v2 ist nur noch kompatibel
+      - Tolerantes Mapping bleibt noetig, weil reale v3-Antworten Legacy-Felder liefern
+      - Ein YAML-Syntax-Gate findet SSOT-Fehler, die reine Grep-Checks uebersehen
+      - Kamera-Permission-UX muss auf kleinen Hoehen scrollbar bleiben
+      - Native Plugin-Sicherheit braucht zusaetzlich zu Dart-Tests einen iOS-Build
+    blockers:
+      - Release-Profil blockiert bis Privacy-, Store-, Claims-, Lizenz- und Support-Evidenz vollstaendig ist
+      - PrivacyInfo.xcprivacy und Required-Reason-API-/SDK-Review stehen aus
+    next_week:
+      - Privacy Manifest und SDK-Datenpraktiken gegen den finalen Dependency-Stand pruefen
+      - In-App-OFF-Attribution und ESG-Limitationen umsetzen
+      - Privacy-/Support-Seiten und versionierte App-Store-Metadaten vorbereiten
+
+  - week: 2026-W28
+    summary: |
+      Lokaler MVP-App-Flow + GitHub-Quality-Gates auf neuem Codex-Branch.
+    done:
+      - Branch codex/app-development-quality-gates von dev erstellt
+      - Compliance-Referenzrepo nur gelesen; keine Aenderungen dort
+      - ADR 0014 fuer lokale MVP-App-Architektur und CI/CD-Gates geschrieben
+      - Datenmodelle Product/ESGScore und ESGScoreCalculator nach ADR 0011 implementiert
+      - DemoProductRepository mit lokalen OFF-aehnlichen Produktdaten implementiert
+      - Home/Scan-Simulation, Result, Details, LowData und NotFound als Flutter-Screens gebaut
+      - Unit-Tests fuer Calculator/Repository und Widget-Tests fuer Hauptpfade ergaenzt
+      - .github/workflows/quality-gates.yml mit Flutter/Rego/Conftest/Secret-Gates ergaenzt
+      - scripts/quality/run_quality_gates.sh als lokale Pipeline ergaenzt
+      - README und esg_app/README fuer lokalen Start und Quality Gates aktualisiert
+    checks:
+      - dart format esg_app/lib esg_app/test
+      - flutter analyze --fatal-infos PASS
+      - flutter test --coverage PASS, 13 Tests
+      - bash scripts/quality/run_quality_gates.sh PASS, 7/7 Gates
+      - gitleaks git --redact PASS
+    blockers:
+      - Android SDK lokal nicht installiert; Android-Build bewusst aus aktuellem Fokus entfernt
+      - Echte Kamera/mobile_scanner und echter Open-Food-Facts-Netzwerkadapter sind Folgearbeit
+    next_week:
+      - iOS-fokussierten Scanner-Adapter planen, ohne TestFlight/Deployment
+      - State-Management-ADR 0015 erst vor echter Scanner/API-Integration entscheiden
+      - Optional: OFF-Service als Adapter mit Mock-Tests ergaenzen
+
+  - week: 2026-W21-session2
+    summary: |
+      Methodik-Vertiefung + Sprint 0 Abschluss + Compliance-Mechanik bewiesen
+    done:
+      - Mustafa-Repos analysiert + Methodik übernommen (ai-context-vault + genaiops-compliance-gates)
+      - ADR 0009-0013 (Methodik, Eco-Score-Fallback, ESG-Formel, Apple, Multi-Regulation)
+      - Workflows aus thesis-skills (session-start, pre-coding-check, post-feature)
+      - Flutter-Projekt + Theme-Foundation (S06, S11)
+      - CI/CD + Pre-Commit-Hooks + Feature-States (S07, S08, S09)
+      - Apple Review Guidelines (40 S.) + DSGVO komplett gemappt
+      - Compliance-Gate-Pipeline end-to-end bewiesen (Finding → Fix → PASS)
+      - Apple Dev Account gekauft
+      - Vorgehenssystem-Doku mit Mermaid-Diagrammen
+      - dev → main gemergt (PR #4), codex-Branches aufgeräumt
+      - Bug gefixt: Info.plist war via *.plist gitignored (iOS-Build-Breaker)
+    learnings:
+      - Master-Thesis-Framework ist regulation-agnostic (Apple + DSGVO mit gleicher Methodik)
+      - Python 3.14 auf diesem Mac defekt (pyexpat) → Bash+jq statt Python für Tooling
+      - Compliance-Gates fangen echte Fehler (Branding-Mismatch, gitignored Info.plist)
+      - Solo-Founder-Compliance-Aufwand kann nahe null sein wenn Extraktion automatisiert
+    blockers:
+      - Xcode-Installation Status unklar (für lokalen iOS-Build/Simulator)
+      - Apple-Verifizierung läuft noch
+    next_week:
+      - ADR 0014: State-Management (Provider vs Riverpod) entscheiden
+      - S13: Datenmodelle mit Freezed (Product, ESGScore, etc.)
+      - S14: OpenFoodFactsService + ESGScoreCalculator (nach ADR 0010/0011)
+      - Optional: weitere R-DSGVO-TODOs wenn App-Settings-Screen kommt
+
   - week: 2026-W21
     summary: Setup-Phase — Tooling installiert, Projekt-Doku aufgesetzt
     done:
@@ -195,11 +426,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 13
-  todos_open: 20
-  todos_in_progress: 1
-  todos_done: 3
-  milestones_reached: 8
+  decisions_total: 17
+  todos_open: 13
+  todos_in_progress: 2
+  todos_done: 8
+  milestones_reached: 12
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

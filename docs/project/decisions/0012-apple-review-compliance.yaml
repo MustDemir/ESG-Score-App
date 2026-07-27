@@ -1,7 +1,7 @@
 id: 0012
 title: Apple Review Compliance Strategy — Anforderungen + Gates aus App Review Guidelines
 date: 2026-05-19
-status: accepted
+status: superseded
 deciders: [Mustafa]
 tags: [compliance, apple, app-store, gates, policy-as-code]
 
@@ -118,10 +118,10 @@ ci_integration:
   evidence_log_target: "evidence-store/evidence-log.jsonl"
 
 what_we_explicitly_dont_automate:
-  - "Privacy-Policy-Inhalt korrekt formuliert" → manueller Review
-  - "Screenshots zeigen App in Use" → manueller Review
-  - "Demo-Account funktioniert" → manueller Test vor Submission
-  - "Age-Rating korrekt beantwortet" → manueller Submission-Schritt
+  - "Privacy-Policy-Inhalt korrekt formuliert: manueller Review"
+  - "Screenshots zeigen App in Use: manueller Review"
+  - "Demo-Account funktioniert: manueller Test vor Submission"
+  - "Age-Rating korrekt beantwortet: manueller Submission-Schritt"
 
 consequences:
   - docs/project/compliance/ Ordner als neue Quelle für Compliance-Patterns
@@ -139,7 +139,7 @@ dependencies:
   - ADR 0006 (Monetarisierung): Phase 2 IAP-Anforderungen (R-AS-17 bis 19)
 
 supersedes: null
-superseded_by: null
+superseded_by: 0021
 related: [0006, 0007, 0008, 0009]
 references:
   - /Users/mustafademir/Downloads/App-Review-Guidelines-German.pdf (40 Seiten, Februar 2026)

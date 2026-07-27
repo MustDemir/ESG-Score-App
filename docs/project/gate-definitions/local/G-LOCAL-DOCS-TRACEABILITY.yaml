@@ -1,0 +1,33 @@
+id: G-LOCAL-DOCS-TRACEABILITY
+name: Local documentation traceability
+dimension: strategisch
+lifecycle_phase: pre-deployment
+trigger: Local quality run and GitHub quality gate workflow
+policy_checks:
+  - README documents local start
+  - README documents quality gate execution
+  - esg_app README documents Flutter entrypoints
+evidence_required:
+  - README.md
+  - esg_app/README.md
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: true
+  requires: Dokumentierter Grund im PR
+links:
+  requirements:
+    - docs/project/definition-of-done.yaml
+  related_adrs:
+    - 0007
+    - 0009
+sources:
+  - docs/project/README.md
+  - docs/project/quality-strategy.md
+notes: |
+  Prevents code and pipeline behavior from drifting away from the documented
+  local workflow.

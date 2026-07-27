@@ -1,0 +1,23 @@
+id: R-AS-02
+title: Consent before collecting personal or sensitive data
+kontrollmechanismus: Hybrid
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: The shipped app or an included SDK collects personal data requiring consent
+verification: HYBRID
+source_type: mixed
+apple_guideline_refs: ["5.1.1(ii)", "5.1.2(i)"]
+description: Data collection and sharing must have a documented purpose and the required user consent before processing starts.
+evidence_expected: [data inventory, consent-flow test, SDK data-practice review]
+acceptance_criteria:
+  - Consent is obtained before the applicable processing
+  - Refusal does not activate the processing
+  - Consent withdrawal and proof are documented where required
+linked_gates: [G-AS-PRIVACY]
+deployer_implication: Reassess this requirement whenever a data-processing SDK or feature is added.
+audit_trigger: Every dependency, privacy or feature change and before submission
+source_refs: [APPLE-ARG, APPLE-APP-PRIVACY, EU-GDPR]
+phase: conditional
+notes: Consent is not used as a substitute for a missing lawful basis under GDPR.

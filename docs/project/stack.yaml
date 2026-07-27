@@ -1,4 +1,4 @@
-last_updated: 2026-05-19
+last_updated: 2026-07-19
 
 # Tech-Stack-Inventar. Bei Versions-Update hier ändern.
 # Bei großen Wechseln: ADR schreiben.
@@ -8,11 +8,11 @@ frontend:
   version: 3.44.0
   language: Dart
   language_version: 3.12.0
-  state_management: TBD (Provider vs Riverpod — siehe spätere ADR)
+  state_management: Flutter-native StatefulWidget + Constructor Injection (ADR 0015)
   key_packages:
     - name: mobile_scanner
       purpose: Barcode-Scanning
-      version: TBD
+      version: 7.3.0
     - name: google_fonts
       purpose: Inter + Instrument Serif laden
       version: TBD
@@ -25,9 +25,9 @@ frontend:
     - name: supabase_flutter
       purpose: Supabase-Client
       version: TBD
-    - name: http oder dio
+    - name: http
       purpose: HTTP-Client für OFF-API
-      version: TBD
+      version: 1.6.0
 
 backend:
   provider: Supabase
@@ -47,7 +47,7 @@ backend:
 apis:
   - name: Open Food Facts
     purpose: Produktdaten via EAN-Lookup
-    url: https://world.openfoodfacts.org/api/v2/product/<EAN>.json
+    url: https://world.openfoodfacts.org/api/v3/product/<EAN>.json
     auth: keine
     rate_limit: "freundlich nutzen, kein hartes Limit"
     license: CC BY-SA
@@ -58,7 +58,7 @@ dev_tools:
     version: 5.1.11
     purpose: Paket-Manager macOS
   - name: Xcode
-    version: TBD (App-Store-Download läuft)
+    version: 26.6
     purpose: iOS-Build, Simulator
   - name: Android Studio
     version: 2025.3.4.7
@@ -73,11 +73,10 @@ dev_tools:
     purpose: KI-gestützte Entwicklung
 
 ci_cd:
-  status: TBD
-  candidates:
-    - GitHub Actions (kostenlos für public + 2000 min/Monat private)
-    - Codemagic (Flutter-spezifisch)
-    - Fastlane (Build + Deploy-Automatisierung)
+  status: active-local-and-github-actions
+  tools:
+    - GitHub Actions für Flutter-, iOS-, Compliance- und Secret-Gates
+    - Lokale Bash-Gate-Runner mit Markdown-/JSON-Evidence
 
 monitoring_logging:
   status: TBD für Phase 2

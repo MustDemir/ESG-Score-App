@@ -1,0 +1,23 @@
+id: R-AS-07
+title: App Tracking Transparency when tracking is performed
+kontrollmechanismus: Policy-as-Code and on-device test
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: feature_tracking_enabled is true under Apple's tracking definition
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["5.1.2(i)"]
+description: Tracking across apps or websites requires ATT authorization before tracking data is accessed or shared.
+evidence_expected: [SDK inventory, tracking assessment, ATT prompt test, App Privacy answers]
+acceptance_criteria:
+  - Tracking classification is documented for every SDK
+  - ATT prompt precedes tracking and refusal is respected
+  - App remains usable without coerced authorization
+linked_gates: [G-AS-PRIVACY]
+deployer_implication: Do not add analytics or advertising SDKs without repeating the tracking assessment.
+audit_trigger: Every dependency or tracking configuration change
+source_refs: [APPLE-ARG, APPLE-APP-PRIVACY]
+phase: conditional
+notes: Inactive while feature_tracking_enabled is false and the binary confirms that declaration.

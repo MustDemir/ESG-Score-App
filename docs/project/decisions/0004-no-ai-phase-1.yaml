@@ -26,7 +26,7 @@ options_considered:
       - Kein Cost-Risk in Validierungsphase
       - Klare Trennung: MVP funktioniert auch ohne KI
     cons:
-      - "Weniger spannend" für frühe Demos
+      - "Weniger spannend fuer fruehe Demos"
 
 decision: Kein LLM/KI-Layer in Phase 1. KI ab Phase 2 (Use Cases A + B)
 rationale: |

@@ -5,6 +5,10 @@ kontrollmechanismus: Hybrid (Conftest prüft URL-Feld + HTTP-Smoke-Test in CI)
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
 must_should: MUST
+applicability: always
+activation_condition: App is submitted to the App Store
+verification: HYBRID
+source_type: mixed
 
 apple_guideline_refs:
   - "1.5"
@@ -15,13 +19,14 @@ description: |
   bieten, mit dem Entwickler in Kontakt zu treten.
 
   Fehlende oder veraltete Kontaktdaten können zur Ablehnung führen und
-  verstoßen unter Umständen gegen Gesetze (DE: Impressumspflicht TMG §5).
+  koennen zur Ablehnung fuehren. Deutsche Anbieterinformationen werden getrennt
+  gegen das aktuell geltende DDG bewertet.
 
 evidence_expected:
   - support_url im pubspec.yaml oder app-config
   - Support-Email in App Store Connect Hinterlegt
-  - In-App-Settings: "Kontakt" oder "Support"-Eintrag
-  - Impressum-Seite (DE: Pflicht via TMG §5)
+  - "In-App-Settings: Kontakt- oder Support-Eintrag"
+  - "Impressum-Seite: Pflicht in Deutschland"
 
 acceptance_criteria:
   - Support-URL ist HTTPS
@@ -30,7 +35,7 @@ acceptance_criteria:
   - In-App-Kontakt-Mechanismus vorhanden (Mailto-Link oder eingebettetes Form)
 
 linked_gates:
-  - G-AS-SUPPORT-URL
+  - G-AS-SUPPORT-IDENTITY
 
 deployer_implication: |
   - Domain reservieren (scanfair.de oder .app)
@@ -41,8 +46,9 @@ deployer_implication: |
 audit_trigger: "Pre-Deployment CI/CD (HTTP-Check); manueller Test vor Submission"
 
 sources:
-  - App-Review-Guidelines-German.pdf, Sektion 1.5
-  - TMG §5 (Impressumspflicht DE)
+  - Apple App Review Guidelines 1.5
+  - DDG Section 5
+source_refs: [APPLE-ARG, APPLE-ASC-METADATA, DE-DDG]
 
 phase: phase-1-mvp
 

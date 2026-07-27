@@ -1,0 +1,23 @@
+id: R-AS-11
+title: Accurate age rating and audience declaration
+kontrollmechanismus: Hybrid questionnaire review
+lifecycle_phase: deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: always
+activation_condition: Initial submission and every content or feature change affecting rating
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["2.3.6"]
+description: App Store Connect age-rating answers must reflect all shipped content, links and interactive features.
+evidence_expected: [age-rating questionnaire export, feature inventory, reviewer sign-off]
+acceptance_criteria:
+  - Questionnaire matches the reviewed binary and external content
+  - Alcohol, tobacco, UGC, chatbot and unrestricted web-content exposure are assessed
+  - Rating is re-evaluated when conditional features activate
+linked_gates: [G-AS-METADATA]
+deployer_implication: Retain the questionnaire export with each release evidence package.
+audit_trigger: Every release candidate and applicable feature activation
+source_refs: [APPLE-ARG, APPLE-ASC-METADATA]
+phase: phase-1-mvp
+notes: The rating must not be hard-coded as 4+ before the questionnaire is completed.

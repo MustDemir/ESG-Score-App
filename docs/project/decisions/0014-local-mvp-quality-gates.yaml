@@ -1,0 +1,67 @@
+id: 0014
+title: Lokale MVP-App-Architektur mit CI/CD-Quality-Gates
+date: 2026-07-08
+status: accepted
+deciders: [Mustafa]
+tags: [architecture, flutter, ci-cd, quality-gates, local-first]
+
+context: |
+  Die ESG-Score-App soll lokal vollständig weiterentwickelt und ueber eine
+  CI/CD-orientierte Quality-Gate-Pipeline validiert werden. iOS-Deployment,
+  Hosting, Online-Release und K8s/Gatekeeper sind ausdruecklich nicht Teil
+  des aktuellen Scopes.
+
+  Das Repo enthaelt bereits Flutter-Theme, Design-Handoff, Scoring-ADRs,
+  erste Apple-Compliance-Gates und ein Evidence-Log-Pattern. Der eigentliche
+  App-Flow war vor dieser Entscheidung noch ein Theme-Smoke-Screen.
+
+options_considered:
+  - name: Vollstaendige Kopie der GenAIOps-Compliance-Repo-Struktur
+    pros:
+      - Maximale Naehe zur Referenzarchitektur
+      - Viele Gate-Muster sofort verfuegbar
+    cons:
+      - Overkill fuer lokale Mobile-App ohne KI-Layer
+      - K8s/Gatekeeper und Postgres-Evidence passen nicht zum aktuellen Scope
+      - Mehr Wartungsaufwand als Produktfortschritt
+  - name: App-spezifische Adaption der relevanten Gate-Muster
+    pros:
+      - Bewahrt Requirements -> Gate -> Policy -> Evidence Traceability
+      - GitHub Actions zeigt Ergebnisse als Jobs, Summaries und Artefakte
+      - Keine Deployment-Provider- oder Release-Kopplung
+      - K8s/Gatekeeper bleibt sauber ausgeschlossen
+    cons:
+      - Weniger umfassend als die Thesis-Referenzarchitektur
+      - Spaetere KI-/EU-AI-Act-Gates muessen erneut ergaenzt werden
+  - name: Nur Flutter-App bauen, Gates spaeter nachziehen
+    pros:
+      - Schnellster Produktfortschritt
+    cons:
+      - Widerspricht ADR 0007 und Failure-Mode FM-01/FM-03
+      - Keine sichtbare CI/CD-Validierung in GitHub Actions
+
+decision: App-spezifische Adaption der relevanten Gate-Muster
+rationale: |
+  Fuer den aktuellen lokalen MVP ist die beste Balance: produktiver App-Flow
+  plus nachvollziehbare Quality-Gates. Die GenAIOps-Pattern CDV, Evidence-Log
+  und Policy-as-Code werden uebernommen; K8s/Gatekeeper, Online-Release und
+  Provider-Deployment werden ausgeschlossen.
+
+  Die App nutzt zunaechst lokale Demo-/OFF-aehnliche Daten, damit Scoring,
+  Result-Screens, Low-Data- und Not-Found-Zustaende deterministisch testbar
+  sind. Echte Kamera und OFF-Netzwerkadapter bleiben anschlussfaehig, werden
+  aber nicht als Blocker fuer lokale Validierung eingefuehrt.
+
+consequences:
+  - Der alte Theme-Smoke-Screen wird durch einen lokalen Home/Scan/Result/Detail-Flow ersetzt
+  - ESGScoreCalculator ist zentrale, getestete Business-Logik nach ADR 0011
+  - scripts/quality/run_quality_gates.sh bildet die lokale Pipeline ab
+  - .github/workflows/quality-gates.yml macht Gate-Ergebnisse in GitHub Actions sichtbar
+  - Compile-Sicherheit wird aktuell ueber flutter analyze und flutter test erreicht
+  - Android-Builds werden bewusst spaeter nachgezogen
+  - iOS-Deployment, Hosting, Online-Release und K8s/Gatekeeper bleiben out of scope
+  - Riverpod/mobile_scanner bleiben fuer den spaeteren echten Scanner-Adapter offen
+
+supersedes: null
+superseded_by: null
+related: [0001, 0003, 0007, 0008, 0009, 0010, 0011, 0012, 0013]

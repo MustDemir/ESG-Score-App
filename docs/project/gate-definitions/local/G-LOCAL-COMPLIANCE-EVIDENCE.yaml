@@ -1,0 +1,42 @@
+id: G-LOCAL-COMPLIANCE-EVIDENCE
+name: Compliance policy and evidence baseline
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+trigger: Pull request, push to main/feature branches, local quality run
+policy_checks:
+  - scripts/compliance/validate_compliance_catalog.rb
+  - opa test docs/project/policies
+  - scripts/compliance/run_gates.sh
+  - scripts/compliance/verify_evidence_chain.sh
+evidence_required:
+  - evidence-store/app_extracted.json
+  - evidence-store/compliance_input.json
+  - evidence-store/evidence-log.jsonl
+  - evidence-store/latest-gate-results.json
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results/evidence-log.jsonl
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - R-AS-01
+    - R-AS-03
+    - R-AS-06
+    - R-AS-08
+    - R-AS-12
+    - R-AS-27
+  related_adrs:
+    - 0009
+    - 0012
+sources:
+  - docs/project/compliance/source-register.yaml
+  - docs/project/compliance/apple-compliance-control-model.md
+  - docs/project/gate-definitions/apple/
+  - scripts/compliance/run_gates.sh
+notes: |
+  Validates the eight Apple gate groups, requirement-policy cross-links and the
+  full tamper-evident hash chain. K8s Gatekeeper remains explicitly excluded.

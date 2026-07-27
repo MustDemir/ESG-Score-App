@@ -5,9 +5,12 @@ kontrollmechanismus: Hybrid (Conftest prüft App-Config-Flag; manueller Inhaltsp
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
 must_should: MUST
+applicability: conditional
+activation_condition: Open Food Facts data or services are used by the shipped app
+verification: HYBRID
+source_type: license
 
 apple_guideline_refs:
-  - "5.1.1(viii)"
   - "5.2"
   - "5.2.2"
 
@@ -18,16 +21,10 @@ overlapping_with:
   - R-DSGVO-03   # Privacy Policy nach Art. 13 enthält OFF-Erwähnung
 
 description: |
-  Apple-Richtlinie 5.1.1(viii) verbietet die Zusammenstellung personenbezogener
-  Daten aus öffentlichen Datenbanken ohne explizite Einwilligung. OFF ist eine
-  öffentliche, crowdsourced Datenbank (CC BY-SA).
-
-  Wir sammeln KEINE personenbezogenen Daten aus OFF (OFF enthält Produktdaten,
-  keine Personendaten), aber wir nutzen die Datenbank intensiv. Apple erwartet
-  Transparenz dazu.
-
-  Zusätzlich Apple-Richtlinie 5.2.2: bei Nutzung von Drittanbieter-Diensten muss
-  Erlaubnis dokumentiert sein. OFF CC-BY-SA-Lizenz dokumentieren in:
+  Open Food Facts liefert Produktdaten und wird nicht allein wegen seiner
+  Oeffentlichkeit als personenbezogene Datenbank nach Apple 5.1.1(viii)
+  klassifiziert. Apple 5.2.2 verlangt jedoch nachweisbare Rechte fuer verwendete
+  Drittanbieter-Dienste. Die jeweils geltenden OFF-Lizenzen sind zu dokumentieren in:
   - Privacy Policy
   - In-App-Settings ("Datenquellen" Sektion)
   - App Store Beschreibung (optional aber empfohlen)
@@ -44,7 +41,7 @@ acceptance_criteria:
   - In-App-Attribution sichtbar (nicht versteckt im Settings-3-Ebenen-Untermenu)
 
 linked_gates:
-  - G-AS-DATA-SOURCE-DISCLOSE
+  - G-AS-THIRD-PARTY-RIGHTS
 
 deployer_implication: |
   - Privacy Policy schreiben (TODO-008) muss OFF-Sektion enthalten
@@ -55,8 +52,9 @@ deployer_implication: |
 audit_trigger: "Pre-Deployment manueller Review; Conftest prüft App-Config-Flags"
 
 sources:
-  - App-Review-Guidelines-German.pdf, Sektion 5.1.1(viii), 5.2, 5.2.2
+  - Apple App Review Guidelines 5.2 und 5.2.2
   - Open Food Facts CC BY-SA Attribution-Pflicht (https://world.openfoodfacts.org/files-and-tools)
+source_refs: [APPLE-ARG, OFF-LICENSE]
 
 phase: phase-1-mvp
 

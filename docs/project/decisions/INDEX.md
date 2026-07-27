@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-05-19
+Letztes Update: 2026-07-19
 
 ## Aktive ADRs
 
@@ -21,35 +21,41 @@ Letztes Update: 2026-05-19
 | [0009](0009-methodology-adoption.yaml) | Methodik-Übernahme aus ai-context-vault + genaiops-compliance-gates | accepted | 2026-05-19 | methodology, adoption, compliance | 0007, 0008 |
 | [0010](0010-eco-score-fallback.yaml) | Eco-Score-Fallback-Logik bei unvollständigen Daten | accepted | 2026-05-19 | scoring, esg, data-quality, ux | 0003, 0011 |
 | [0011](0011-esg-score-formel.yaml) | ESG-Score-Formel — E/S/G aus OFF-Feldern | accepted | 2026-05-19 | scoring, esg, formel, mvp, methodology | 0003, 0010 |
-| [0012](0012-apple-review-compliance.yaml) | Apple Review Compliance Strategy | accepted | 2026-05-19 | compliance, apple, app-store, gates, policy-as-code | 0006, 0007, 0008, 0009 |
+| [0012](0012-apple-review-compliance.yaml) | Apple Review Compliance Strategy | superseded | 2026-05-19 | compliance, apple, app-store, gates, policy-as-code | 0006, 0007, 0008, 0009 |
 | [0013](0013-multi-regulation-strategy.yaml) | Multi-Regulation-Strategy — Cross-Regulation-Mapping | accepted | 2026-05-19 | compliance, methodology, multi-regulation, dsgvo, apple, framework | 0007, 0008, 0009, 0012 |
+| [0014](0014-local-mvp-quality-gates.yaml) | Lokale MVP-App-Architektur mit CI/CD-Quality-Gates | accepted | 2026-07-08 | architecture, flutter, ci-cd, quality-gates, local-first | 0001, 0003, 0007, 0008, 0009, 0010, 0011, 0012, 0013 |
+| [0015](0015-phase-1-state-management.yaml) | Flutter-native State-Verwaltung fuer den Phase-1-MVP | accepted | 2026-07-18 | flutter, state-management, architecture, mvp | 0001, 0007, 0014 |
+| [0016](0016-open-food-facts-api-v3.yaml) | Open Food Facts API v3 fuer Produktabfragen | accepted | 2026-07-18 | api, open-food-facts, data, architecture | 0003, 0008, 0010, 0011, 0014 |
+| [0017](0017-mobile-scanner-ios-camera.yaml) | mobile_scanner fuer den nativen iOS-Barcode-Scan | accepted | 2026-07-19 | flutter, scanner, ios, camera, privacy | 0001, 0007, 0008, 0012, 0014, 0015 |
+| [0020](0020-quality-gate-workflow-consolidation.yaml) | Einen verbindlichen Quality-Gate-Workflow verwenden | accepted | 2026-07-19 | ci-cd, quality-gates, github-actions, documentation | 0007, 0014 |
+| [0021](0021-apple-compliance-enforcement-profiles.yaml) | Apple-Compliance mit gestuften Enforcement-Profilen steuern | accepted | 2026-07-19 | apple, compliance, policy-as-code, evidence, release-readiness | 0009, 0012, 0013, 0020 |
 
 ## Geplante ADRs (im Backlog)
 
 | ID | Titel | Wann | Trigger |
 |---|---|---|---|
-| 0012 | State-Management-Wahl (Provider vs Riverpod) | Sprint 0/1 | Flutter-Setup, Architektur-Festlegung |
-| 0013 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
-| 0014 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
+| 0018 | RevenueCat als Subscription-Infrastruktur | Phase 2 | Membership-Implementation |
+| 0019 | KI-Provider final (Mistral / Claude / Aleph Alpha) | Phase 2 | KI-Layer-Start |
 
 ## Status-Verteilung
 
 | Status | Anzahl |
 |---|---|
-| accepted | 12 |
+| accepted | 17 |
 | rejected | 1 |
 | proposed | 0 |
-| superseded | 0 |
+| superseded | 1 |
 | deprecated | 0 |
 
 ## Tags-Index (häufigste)
 
-- **architecture** → 0001
+- **architecture** → 0001, 0014, 0015, 0016
+- **scanner / ios** → 0017
 - **backend / database** → 0002
-- **data / api** → 0003
+- **data / api** → 0003, 0016
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
-- **ci-cd / testing** → 0007
+- **ci-cd / testing** → 0007, 0020, 0021
 - **security / dsgvo** → 0008
 - **methodology** → 0009, 0011
 - **scoring / esg** → 0010, 0011

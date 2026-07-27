@@ -1,9 +1,9 @@
 feature: scoring
 title: "ESG-Score-Calculator + OFF-Integration"
-status: planned
-progress: 0
-current_focus: "blockiert durch Models (S13) und State-Management-Entscheidung"
-last_sync: "2026-05-19"
+status: review
+progress: 90
+current_focus: "OFF API v3 Adapter + ESGScoreCalculator implementiert und getestet"
+last_sync: "2026-07-18"
 
 lade_manifest:
   pflicht:
@@ -23,15 +23,33 @@ implementation_steps:
   - S14  # OpenFoodFactsService + ESGScoreCalculator
 
 code_locations:
-  - esg_app/lib/services/open_food_facts_service.dart   # geplant
-  - esg_app/lib/services/esg_score_calculator.dart      # geplant
-  - esg_app/lib/models/product.dart                     # geplant
-  - esg_app/lib/models/esg_score.dart                   # geplant
+  - esg_app/lib/services/open_food_facts_service.dart
+  - esg_app/lib/services/esg_score_calculator.dart
+  - esg_app/lib/models/product.dart
+  - esg_app/lib/models/esg_score.dart
 test_locations:
-  - esg_app/test/services/esg_score_calculator_test.dart  # geplant, P0
-  - esg_app/test/services/open_food_facts_service_test.dart  # geplant
+  - esg_app/test/services/esg_score_calculator_test.dart
+  - esg_app/test/services/open_food_facts_service_test.dart
 
-done: []
+done:
+  - |
+    2026-07-08 — Handgeschriebene Product- und ESGScore-Modelle implementiert
+    (Freezed bewusst deferred, siehe ADR 0014).
+  - |
+    2026-07-08 — ESGScoreCalculator nach ADR 0011 implementiert:
+    E=50%, S=30%, G=20%, Transparenz-First bei fehlendem Eco-Score.
+  - |
+    2026-07-08 — DemoProductRepository mit lokalen OFF-aehnlichen Produktdaten
+    und Alternative-Suggestion implementiert.
+  - |
+    2026-07-08 — Unit-Tests fuer Calculator, OFF-JSON-Mapping und Repository
+    ergaenzt; flutter test PASS.
+  - |
+    2026-07-18 — Echter OpenFoodFactsService auf API v3 mit HTTPS,
+    User-Agent, 8s Timeout, maximal 3 Retries und Fehlerklassifikation gebaut.
+  - |
+    2026-07-18 — Mapper akzeptiert environmental_score_* und Legacy-
+    ecoscore_*-Felder; API- und Edge-Case-Tests ergaenzt.
 
 decisions:
   - id: FD-SCO-01
@@ -44,17 +62,20 @@ decisions:
     date: "2026-05-19"
     rationale: "ADR 0011 — gewichtete Säulen, E dominiert (Hauptthema)"
     adr_ref: "0011"
+  - id: FD-SCO-03
+    decision: OFF API v3 mit tolerantem Legacy-Feldmapping
+    date: "2026-07-18"
+    rationale: "Aktuell empfohlene API, ohne bestehende Fixtures zu brechen"
+    adr_ref: "0016"
 
 open_items:
-  - Test-Daten für Calculator-Tests: brauchen wir Fixture-OFF-Responses?
-    Ja — aus dem Spike-Output extrahieren (TODO-SC-001)
+  - Native iOS-Kamera liefert noch keinen Barcode an den Repository-Flow.
   - Methodik-Seite (App + Web) muss vor Launch geschrieben sein
   - Bei Score-Berechnung: Caching-Strategie in Supabase (für Phase 2 KI-Erklärungen relevant)
 
 next_steps:
-  - S13 (Models mit Freezed) als erstes
-  - Test-Fixtures aus OFF-Spike extrahieren
-  - ESGScoreCalculator mit 7 Test-Fällen aus ADR 0011 implementieren
+  - iOS-Scanner-Flow an Repository/Calculator anbinden
+  - Methodik-Seite fuer Formula v1.0 schreiben
 
 cross_feature_dependencies:
   - from: scoring

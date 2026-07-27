@@ -1,0 +1,153 @@
+name: Quality Gates
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+    paths:
+      # G-DOC-TRACE validates the repository README as a release-relevant artifact.
+      - 'README.md'
+      - 'esg_app/**'
+      - 'docs/project/**'
+      - 'scripts/**'
+      - '.github/workflows/quality-gates.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'README.md'
+      - 'esg_app/**'
+      - 'docs/project/**'
+      - 'scripts/**'
+      - '.github/workflows/quality-gates.yml'
+  workflow_dispatch:
+    inputs:
+      compliance_profile:
+        description: Apple compliance enforcement profile
+        required: true
+        type: choice
+        default: development
+        options:
+          - development
+          - release_candidate
+          - submission
+
+permissions:
+  contents: read
+
+env:
+  FLUTTER_VERSION: '3.44.0'
+  CONFTEST_VERSION: '0.62.0'
+  OPA_VERSION: '1.14.1'
+  COMPLIANCE_PROFILE: ${{ inputs.compliance_profile || 'development' }}
+
+jobs:
+  local-quality-gates:
+    name: Local CI quality gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Setup Ruby for YAML gate
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+
+      - name: Install OPA
+        run: |
+          curl -L -o opa "https://openpolicyagent.org/downloads/v${OPA_VERSION}/opa_linux_amd64_static"
+          chmod +x opa
+          sudo mv opa /usr/local/bin/opa
+          opa version
+
+      - name: Install Conftest
+        run: |
+          curl -L "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" -o conftest.tar.gz
+          tar xzf conftest.tar.gz
+          sudo mv conftest /usr/local/bin/conftest
+          conftest --version
+
+      - name: Run quality gates
+        run: bash scripts/quality/run_quality_gates.sh
+
+      - name: Publish quality gate summary
+        if: always()
+        run: |
+          if [ -f .quality/quality-gate-report.md ]; then
+            cat .quality/quality-gate-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload quality gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanfair-quality-gate-results
+          include-hidden-files: true
+          path: |
+            .quality/**
+            esg_app/coverage/lcov.info
+            evidence-store/app_extracted.json
+            evidence-store/compliance_input.json
+            evidence-store/evidence-log.jsonl
+            evidence-store/latest-gate-results.json
+            docs/project/compliance/source-register.yaml
+
+  ios-compile-gate:
+    name: G-IOS-COMPILE native iOS build
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Compile unsigned iOS simulator app
+        id: ios-build
+        run: bash scripts/quality/run_ios_build_gate.sh
+
+      - name: Publish iOS gate summary
+        if: always()
+        run: |
+          echo "## G-IOS-COMPILE" >> "$GITHUB_STEP_SUMMARY"
+          echo "Native unsigned iOS simulator build and bundled privacy-manifest audit: **${{ steps.ios-build.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload iOS build and privacy evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scanfair-ios-simulator-app
+          path: |
+            esg_app/build/ios/iphonesimulator/Runner.app
+            evidence-store/ios_privacy_audit.json
+          retention-days: 7
+
+  secret-scan:
+    name: Secret scan gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

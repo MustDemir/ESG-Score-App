@@ -60,12 +60,12 @@ rationale: |
 
 consequences:
   - Auth-Layer von Anfang an einplanen (Supabase Auth, schon in ADR 0002)
-  - Subscription-Management: RevenueCat oder native StoreKit/Play Billing
-  - Feature-Flag-System nötig (zentrale Stelle: "ist User Pro?")
+  - "Subscription-Management: RevenueCat oder native StoreKit/Play Billing"
+  - "Feature-Flag-System noetig (zentrale Stelle: ist User Pro?)"
   - In-App-Purchase-Compliance (Apple Guidelines 3.1.1, Google Play Billing)
   - Detail-Strategie (Pricing, Tiers, Features) in monetization.yaml gepflegt
-  - Marketing-Kommunikation: Premium-Versprechen klar formulieren
-  - DSGVO: Zahlungsdaten via Apple/Google → wir speichern keine Kartendaten
+  - "Marketing-Kommunikation: Premium-Versprechen klar formulieren"
+  - "DSGVO: Zahlungsdaten via Apple/Google; wir speichern keine Kartendaten"
 
 supersedes: null
 superseded_by: null

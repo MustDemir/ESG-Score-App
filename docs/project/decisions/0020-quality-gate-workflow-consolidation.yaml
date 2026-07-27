@@ -1,0 +1,59 @@
+id: 0020
+title: Einen verbindlichen Quality-Gate-Workflow verwenden
+date: 2026-07-19
+status: accepted
+deciders:
+  - Mustafa
+tags:
+  - ci-cd
+  - quality-gates
+  - github-actions
+  - documentation
+
+context: |
+  Zwei GitHub-Actions-Workflows prueften teilweise dieselben Qualitaetsaspekte.
+  Die aeltere ci.yml deckte Flutter-Format, Analyse, Tests und Gitleaks ab.
+  quality-gates.yml deckt diese Aspekte bereits ab und ergaenzt Coverage,
+  OPA/Rego, Conftest mit Evidence-Hash-Chain, Dokumentations-Checks und einen
+  nativen unsigned iOS-Simulator-Build. Doppelte Workflows erzeugen unklare
+  Branch-Protection-Checks und redundant verbrauchte GitHub-Runner-Minuten.
+
+options_considered:
+  - name: Beide Workflows beibehalten
+    pros:
+      - Keine Anpassung bestehender Workflow-Dateien
+    cons:
+      - Doppelte Format-, Analyse-, Test- und Secret-Scans
+      - Unklare fachlich verbindliche Check-Namen fuer Branch Protection
+      - Mehr Laufzeit ohne zusaetzliche Abdeckung
+
+  - name: quality-gates.yml als verbindlichen Workflow verwenden
+    pros:
+      - Ein nachvollziehbarer Satz verbindlicher Checks
+      - Alle vorhandenen Gates bleiben erhalten
+      - GitHub-Action-Summary und Artefakte liegen an einer Stelle
+      - Root-README kann als G-DOC-TRACE-Eingabe einen Lauf ausloesen
+    cons:
+      - Branch-Protection muss auf die aktuellen Job-Namen zeigen
+
+decision: quality-gates.yml ist der einzige verbindliche GitHub-Actions-Workflow fuer CI/CT-Quality-Gates
+rationale: |
+  Die Konsolidierung beseitigt ausschliesslich redundante Orchestrierung. Sie
+  reduziert keine Checks und aendert weder App-Code noch iOS-Signing,
+  Deployment- oder Release-Verhalten. Die vorhandene lokale Pipeline bleibt
+  die reproduzierbare Vorpruefung; GitHub Actions liefert die sichtbare
+  serverseitige Validierung einschliesslich macOS-Compile und Gitleaks.
+
+consequences:
+  - .github/workflows/ci.yml wird entfernt.
+  - .github/workflows/quality-gates.yml prueft auch Root-README-Aenderungen.
+  - Branch Protection verwendet die drei Job-Namen aus quality-gates.yml.
+  - Kein K8s/Gatekeeper-, Deployment- oder App-Store-Gate wird eingefuehrt.
+  - ADR 0007 bleibt die grundsaetzliche CI/CD/CT-Entscheidung; dieses ADR
+    konkretisiert nur deren aktuelle Workflow-Orchestrierung.
+
+supersedes: null
+superseded_by: null
+related:
+  - 0007
+  - 0014

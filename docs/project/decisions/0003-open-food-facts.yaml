@@ -47,8 +47,8 @@ rationale: |
   validiert werden (siehe RISK-001 und TODO-001).
 
 consequences:
-  - Attribution-Pflicht: "Powered by Open Food Facts" im App-Footer
-  - CC BY-SA: eigene Daten-Beiträge müssen gleich lizenziert sein
+  - "Attribution-Pflicht: Powered by Open Food Facts im App-Footer"
+  - "CC BY-SA: eigene Daten-Beitraege muessen gleich lizenziert sein"
   - Edge-Case "Produkt nicht in OFF" muss UX-mäßig sauber gelöst werden
   - OFF-API-Spike vor Flutter-Code-Start zwingend (TODO-001)
   - Plan B definieren falls DE-Coverage <70%

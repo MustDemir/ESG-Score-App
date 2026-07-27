@@ -1,0 +1,23 @@
+id: R-AS-10
+title: Accurate App Store screenshots and previews
+kontrollmechanismus: Manual review with retained metadata export
+lifecycle_phase: deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: always
+activation_condition: App Store listing is prepared or changed
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["2.3.3", "2.3.8"]
+description: Screenshots and previews must show the actual shipped app, current functionality and age-appropriate content.
+evidence_expected: [versioned screenshots, binary version, screenshot review record]
+acceptance_criteria:
+  - Screenshots come from the reviewed release candidate
+  - Core scanning and result views are represented accurately
+  - No unsupported feature or misleading device frame is shown
+linked_gates: [G-AS-METADATA]
+deployer_implication: Regenerate and review store media after material UI or feature changes.
+audit_trigger: Every metadata or user-interface release change
+source_refs: [APPLE-ARG, APPLE-ASC-METADATA]
+phase: phase-1-mvp
+notes: Image semantics cannot be decided reliably by Rego alone.

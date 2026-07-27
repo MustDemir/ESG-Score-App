@@ -98,7 +98,7 @@ block_2_sprint_0:
       topic_ref: Topic 1 (CI/CD-Strategie)
       effort: 1 Std
       blocked_by: [S06]
-      target: .github/workflows/ci.yml
+      target: .github/workflows/quality-gates.yml
       adr_ref: 0007
       description: |
         flutter analyze + format --set-exit-if-changed + test --coverage.

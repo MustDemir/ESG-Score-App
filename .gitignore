@@ -15,7 +15,9 @@ build/
 
 # macOS
 .DS_Store
-*.plist
+# Hinweis: KEIN blanket "*.plist" — Flutter-iOS braucht Info.plist im Repo.
+# Geheime Plists (GoogleService-Info.plist etc.) werden in esg_app/.gitignore
+# spezifisch ignoriert (ADR 0008 SEC-1).
 
 # iOS (Flutter unter esg_app/)
 esg_app/ios/Pods/
@@ -40,6 +42,7 @@ supabase/.temp/
 
 # Misc
 *.log
+.quality/
 # Achtung: pubspec.lock soll committet werden (Reproducibility) — daher kein generelles *.lock
 
 # Archives & Binaries

@@ -1,0 +1,32 @@
+id: G-AS-BUILD-INTEGRITY
+name: iOS build and platform integrity
+dimension: technisch
+lifecycle_phase: pre-deployment
+source_type: apple
+trigger: Every pull request; release_candidate and submission profiles before App Store upload
+automation: HYBRID
+policy_checks: [policy_build_integrity]
+criteria:
+  - Native iOS compile succeeds with the required Xcode and iOS SDK baseline
+  - Privacy manifest and required-reason API declarations match the shipped binary and SDKs
+  - Listed binary SDK publisher signatures are validated on the signed release archive
+  - Only supported public APIs and justified background modes are used
+evidence_required:
+  - esg_app/ios/Runner/PrivacyInfo.xcprivacy
+  - docs/project/compliance/ios-privacy-sdk-review.json
+  - evidence-store/ios_privacy_audit.json
+  - native iOS build log
+  - signed archive SDK signature validation record
+decision: manual_review
+enforcement:
+  development: warn_release_evidence
+  release_candidate: block
+  submission: block
+owner: Release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-BUILD-INTEGRITY"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-04, R-AS-13]
+  apple_guideline_refs: ["1.6", "2.4.2", "2.5.1", "2.5.2", "2.5.4"]
+sources: [APPLE-ARG, APPLE-SUBMISSION, APPLE-PRIVACY-MANIFEST, APPLE-REQUIRED-REASON-API, APPLE-THIRD-PARTY-SDK]
+notes: Simulator framework signatures prove bundle integrity but not publisher continuity; signed release archive validation remains mandatory.

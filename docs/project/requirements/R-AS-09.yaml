@@ -1,0 +1,24 @@
+id: R-AS-09
+title: Complete and accessible App Review build
+kontrollmechanismus: Hybrid release rehearsal
+lifecycle_phase: deployment
+governance_dimension: technisch
+must_should: MUST
+applicability: always
+activation_condition: Release candidate or submission
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["2.1(a)", "2.3.1", "4.2", "4.3(b)"]
+description: The submitted binary, services and review instructions must expose complete production behavior without placeholders or hidden features.
+evidence_expected: [release checklist, review notes, known barcode, reviewer account when applicable]
+acceptance_criteria:
+  - Backend and product lookup work during review
+  - A known barcode and clear reviewer instructions are supplied
+  - Login credentials are supplied only when authentication is active
+  - No placeholder, debug or hidden feature remains
+linked_gates: [G-AS-REVIEW-READINESS]
+deployer_implication: Rehearse the exact archived build and its backend before upload.
+audit_trigger: Every release candidate and submission
+source_refs: [APPLE-ARG, APPLE-SUBMISSION]
+phase: phase-1-mvp
+notes: Development warnings intentionally become blocking release findings.

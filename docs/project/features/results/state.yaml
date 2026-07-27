@@ -1,9 +1,9 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
-status: planned
-progress: 5
-current_focus: "Theme verfuegbar (S11 done) — wartet auf Models (S13) und Scoring (S14)"
-last_sync: "2026-05-19"
+status: review
+progress: 75
+current_focus: "Result-, Detail-, LowData-, NotFound- und API-Fehler-Screens implementiert"
+last_sync: "2026-07-18"
 
 lade_manifest:
   pflicht:
@@ -35,8 +35,22 @@ test_locations:
   - esg_app/test/widgets/score_hero_test.dart              # geplant
 
 done:
-  - 2026-05-19 — Theme-Foundation (S11): scanfair_tokens/colors/typography/theme.dart
+  - |
+    2026-05-19 — Theme-Foundation (S11): scanfair_tokens/colors/typography/theme.dart
     plus Smoke-Screen mit Score-Hero-Mock (GEPA 82 → trafficGreen)
+  - |
+    2026-07-08 — Theme-Smoke-Screen durch echten lokalen App-Flow ersetzt:
+    Home, Result, Details, LowData und NotFound.
+  - |
+    2026-07-08 — Wiederverwendbare Score-Komponenten implementiert:
+    ProductSummaryCard, ScoreHero, PillarBars, SecondaryInfoCard,
+    FactorExpansionTile und MethodFootnote.
+  - |
+    2026-07-08 — Widget-Tests fuer Home, Result, LowData, NotFound und Theme
+    ergaenzt; flutter test PASS.
+  - |
+    2026-07-18 — Retry-faehiger LookupErrorScreen fuer Netzwerk, Timeout,
+    Rate-Limit, Server- und Response-Fehler implementiert und getestet.
 
 decisions:
   - id: FD-R-01
@@ -46,15 +60,14 @@ decisions:
     adr_ref: "0010"
 
 open_items:
-  - Widget-Reihenfolge wie im Design-Handoff:
-    ProductCard → ScoreHero → ScoreBars → SecondaryBar → ScoreCTAs → MethodFootnote
-  - GEPA-Test-EAN als initiales Hardcode-Beispiel definieren (aus OFF-Spike)
+  - Native iOS-Scanner-Adapter fehlt noch.
+  - Echte Produktbilder aus OFF fehlen noch; aktuell Emoji-Platzhalter.
   - Accessibility-Pass nach erster Implementation (Screen-Reader-Labels)
 
 next_steps:
-  - Theme (S11) muss zuerst stehen
-  - Models (S13) brauchen wir für Type-Safety
-  - Erste Implementation mit Hardcode-Daten, dann mit echtem Service
+  - Scanner-Adapter an HomeScreen anbinden
+  - Details/Quellen mit echten OFF-Feldern ausbauen
+  - Accessibility-Pass fuer Result- und Detail-Screen
 
 cross_feature_dependencies:
   - from: scoring
@@ -64,11 +77,11 @@ cross_feature_dependencies:
   - from: scanner
     to: results
     type: navigation
-    description: Nach erfolgreichem Scan: navigate to ResultScreen
+    description: "Nach erfolgreichem Scan: navigate to ResultScreen"
   - from: results
     to: alternatives
     type: navigation
-    description: "Bessere Alternative anzeigen" CTA navigiert weiter (Phase 1.5)
+    description: "Bessere Alternative anzeigen navigiert weiter (Phase 1.5)"
 
 requirements: []
 

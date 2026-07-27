@@ -20,7 +20,7 @@ failure_modes:
     severity: high
     symptoms:
       - PRs ohne Tests
-      - "test/" Ordner leer oder nur Boilerplate
+      - "test/-Ordner leer oder nur Boilerplate"
       - Refactor-Angst nach 3 Monaten
     our_defense:
       - Coverage-Gate in CI (siehe quality-strategy.md §2)
@@ -49,7 +49,7 @@ failure_modes:
     frequency: very_high
     severity: medium
     symptoms:
-      - "Works on my machine" Bugs
+      - "Works-on-my-machine-Bugs"
       - Vergessene Dependencies in pubspec.yaml
       - Build-Konfigurationen divergieren
     our_defense:
@@ -192,7 +192,7 @@ failure_modes:
     severity: high
     symptoms:
       - Phase 1 dauert 6 Monate statt 6 Wochen
-      - "Eine Feature noch" wiederholt sich
+      - "Ein Feature noch wiederholt sich"
     our_defense:
       - Strikte out_of_scope-Liste in roadmap.yaml
       - Wöchentlich progress.yaml mit ehrlichem Self-Check

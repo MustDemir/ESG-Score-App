@@ -46,15 +46,15 @@ options_considered:
       - User sieht 30% "rot" obwohl Realität anders ist
       - Methodisch unhaltbar
 
-  - name: D — Hybrid: Transparenz primär + optionale Heuristik-Hint
+  - name: "D — Hybrid: Transparenz primaer + optionale Heuristik-Hint"
     pros:
       - Standard ist Transparenz (Option A)
       - User kann optional eine "geschätzte Tendenz" sehen
-      - Klar getrennt: "echter Eco-Score" vs "Schätzung"
+      - "Klar getrennt: echter Eco-Score vs Schaetzung"
       - Edukativ — User lernt was OFF-Daten sind
     cons:
       - UI komplexer (zwei Modi)
-      - Aufwand: ~1 Tag Extra-Implementierung
+      - "Aufwand: etwa 1 Tag Extra-Implementierung"
 
 decision: Option A (Transparenz-First) für MVP. Option D (Hybrid) als Phase-1.5-Erweiterung.
 rationale: |
