@@ -100,50 +100,7 @@ gate_claim_safety() {
 }
 
 gate_docs_traceability() {
-  local missing=0
-  local check
-  local file
-  local marker
-  local checks=(
-    "README.md|Quality Gates"
-    "README.md|scripts/quality/run_quality_gates.sh"
-    "README.md|G-FLT-COVERAGE"
-    "README.md|G-IOS-COMPILE"
-    "README.md|G-CMP-SCHEMA"
-    "README.md|G-DATA-ARCH"
-    "README.md|G-METHOD-CATALOG"
-    "README.md|G-LINK-INTEGRITY"
-    "README.md|G-MISSING-DATA"
-    "README.md|G-RED-FLAG"
-    "README.md|G-SCORE-REPRO"
-    "README.md|G-CLAIM-SAFETY"
-    "README.md|AGRIBALYSE 3.2"
-    "README.md|G-AS-CLAIMS-TRANSPARENCY"
-    "docs/project/compliance/apple-compliance-control-model.md|release_candidate"
-    "docs/project/compliance/source-register.yaml|APPLE-ARG"
-    "esg_app/README.md|flutter run"
-    "esg_app/README.md|Open Food Facts API v3"
-    "esg_app/README.md|mobile_scanner"
-    "docs/project/data/data-architecture.md|ESGEvidence"
-    "docs/project/data/data-architecture.md|retrieval channel"
-    "docs/project/methodology-catalog/README.md|2.0-draft"
-    "docs/project/methodology-catalog/README.md|active_in_formula: false"
-    "docs/project/methodology-catalog/README.md|scoring-controls.yaml"
-    "docs/project/data/data-architecture.md|traceability_relationships"
-    "supabase/README.md|supabase db reset --local"
-  )
-
-  for check in "${checks[@]}"; do
-    file="${check%%|*}"
-    marker="${check#*|}"
-    if ! grep -Fq -- "$marker" "$REPO_ROOT/$file"; then
-      printf 'Missing documentation traceability: %s: %s\n' "$file" "$marker"
-      missing=1
-    fi
-  done
-
-  [ "$missing" -eq 0 ] || return 1
-  printf 'Documentation traceability OK: %s working-tree markers\n' "${#checks[@]}"
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_documentation_traceability.rb
 }
 
 gate_yaml_syntax() {
