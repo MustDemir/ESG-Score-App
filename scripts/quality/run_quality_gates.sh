@@ -93,14 +93,14 @@ gate_docs_traceability() {
   for check in "${checks[@]}"; do
     file="${check%%|*}"
     marker="${check#*|}"
-    if ! grep -Fq -- "$marker" "$REPO_ROOT/$file"; then
-      printf 'Missing documentation traceability: %s: %s\n' "$file" "$marker"
+    if ! git -C "$REPO_ROOT" grep -Fq -- "$marker" HEAD -- "$file"; then
+      printf 'Missing documentation traceability in HEAD: %s: %s\n' "$file" "$marker"
       missing=1
     fi
   done
 
   [ "$missing" -eq 0 ] || return 1
-  printf 'Documentation traceability OK: %s working-tree markers\n' "${#checks[@]}"
+  printf 'Documentation traceability OK: %s committed markers\n' "${#checks[@]}"
 }
 
 gate_yaml_syntax() {
