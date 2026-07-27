@@ -22,5 +22,7 @@ fi
 cd "$APP_DIR"
 flutter pub get
 flutter build ios --simulator --no-codesign
+bash "$REPO_ROOT/scripts/compliance/audit_ios_privacy_bundle.sh" \
+  "$APP_DIR/build/ios/iphonesimulator/Runner.app"
 
-echo "G-IOS-COMPILE PASS: unsigned iOS simulator build completed."
+echo "G-IOS-COMPILE PASS: unsigned iOS simulator build and privacy audit completed."

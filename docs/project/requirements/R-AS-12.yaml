@@ -5,6 +5,10 @@ kontrollmechanismus: Policy-as-Code (Conftest prüft pubspec.yaml + Info.plist +
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
 must_should: MUST
+applicability: always
+activation_condition: App Store metadata is prepared or changed
+verification: HYBRID
+source_type: apple
 
 apple_guideline_refs:
   - "2.3.7"
@@ -41,8 +45,7 @@ acceptance_criteria:
   - Markenname konsistent über iOS + Android + App Store
 
 linked_gates:
-  - G-AS-NAME-LENGTH
-  - G-AS-PLATFORM-NAMES
+  - G-AS-METADATA
 
 deployer_implication: |
   - Beim Konfigurieren der App-Metadaten: Namen ≤ 30 Zeichen halten
@@ -52,7 +55,8 @@ deployer_implication: |
 audit_trigger: "Pre-Deployment CI/CD (Conftest); Re-Audit vor App-Store-Submission"
 
 sources:
-  - App-Review-Guidelines-German.pdf, Sektion 2.3.7, 2.3.10, 5.2.5
+  - Apple App Review Guidelines 2.3.7, 2.3.10 und 5.2.5
+source_refs: [APPLE-ARG, APPLE-ASC-METADATA]
 
 phase: phase-1-mvp
 

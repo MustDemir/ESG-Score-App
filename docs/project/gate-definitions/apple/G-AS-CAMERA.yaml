@@ -1,0 +1,26 @@
+id: G-AS-CAMERA
+name: Camera permission and barcode-scanner behavior
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+source_type: apple
+trigger: Every scanner, permission text or localization change; on-device test before release
+automation: HYBRID
+policy_checks: [policy_camera]
+criteria:
+  - NSCameraUsageDescription clearly explains barcode/product scanning
+  - System consent and visible recording indication are verified on a physical iPhone
+  - Manual barcode entry remains usable when permission is denied
+evidence_required:
+  - esg_app/ios/Runner/Info.plist
+  - localized permission strings
+  - on-device test protocol and screenshots
+decision: manual_review
+enforcement: {development: block_objective_findings, release_candidate: block, submission: block}
+owner: iOS feature owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-CAMERA"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-03, R-AS-04]
+  apple_guideline_refs: ["2.5.14", "5.1.1(iii)", "5.1.1(iv)"]
+sources: [APPLE-ARG, APPLE-PLIST-CAMERA]
+notes: Text presence is automated; runtime behavior and localization are hybrid evidence.

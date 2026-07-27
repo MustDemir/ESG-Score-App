@@ -11,7 +11,7 @@ policy_checks:
 evidence_required:
   - .quality/quality-gate-report.md
   - esg_app/coverage/lcov.info
-decision: approve|block
+decision: block
 owner: Mustafa
 audit_trail:
   enabled: true

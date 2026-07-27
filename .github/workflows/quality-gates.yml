@@ -7,27 +7,42 @@ on:
       - dev
       - 'codex/**'
     paths:
+      # G-DOC-TRACE validates the repository README as a release-relevant artifact.
+      - 'README.md'
       - 'esg_app/**'
       - 'docs/project/**'
       - 'scripts/**'
       - '.github/workflows/quality-gates.yml'
-      - '.github/workflows/ci.yml'
   pull_request:
     branches:
       - main
       - dev
     paths:
+      - 'README.md'
       - 'esg_app/**'
       - 'docs/project/**'
       - 'scripts/**'
       - '.github/workflows/quality-gates.yml'
-      - '.github/workflows/ci.yml'
   workflow_dispatch:
+    inputs:
+      compliance_profile:
+        description: Apple compliance enforcement profile
+        required: true
+        type: choice
+        default: development
+        options:
+          - development
+          - release_candidate
+          - submission
+
+permissions:
+  contents: read
 
 env:
   FLUTTER_VERSION: '3.44.0'
   CONFTEST_VERSION: '0.62.0'
   OPA_VERSION: '1.14.1'
+  COMPLIANCE_PROFILE: ${{ inputs.compliance_profile || 'development' }}
 
 jobs:
   local-quality-gates:
@@ -86,6 +101,8 @@ jobs:
             evidence-store/app_extracted.json
             evidence-store/compliance_input.json
             evidence-store/evidence-log.jsonl
+            evidence-store/latest-gate-results.json
+            docs/project/compliance/source-register.yaml
 
   ios-compile-gate:
     name: G-IOS-COMPILE native iOS build
@@ -110,14 +127,16 @@ jobs:
         if: always()
         run: |
           echo "## G-IOS-COMPILE" >> "$GITHUB_STEP_SUMMARY"
-          echo "Native unsigned iOS simulator build: **${{ steps.ios-build.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "Native unsigned iOS simulator build and bundled privacy-manifest audit: **${{ steps.ios-build.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload iOS build artifact
+      - name: Upload iOS build and privacy evidence
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: scanfair-ios-simulator-app
-          path: esg_app/build/ios/iphonesimulator/Runner.app
+          path: |
+            esg_app/build/ios/iphonesimulator/Runner.app
+            evidence-store/ios_privacy_audit.json
           retention-days: 7
 
   secret-scan:

@@ -1,0 +1,27 @@
+id: G-AS-REVIEW-READINESS
+name: Complete and reviewable release candidate
+dimension: technisch
+lifecycle_phase: deployment
+source_type: apple
+trigger: Release-candidate build and final submission rehearsal
+automation: HYBRID
+policy_checks: [policy_review_readiness]
+criteria:
+  - App and backend are complete with no placeholder or hidden functionality
+  - Review notes include a known barcode and account access when needed
+  - Physical-device and IPv6-only network tests pass
+  - Apple HIG and accessibility behavior are reviewed as SHOULD evidence
+evidence_required:
+  - release checklist and review notes
+  - physical-device smoke-test log
+  - IPv6-only test result
+decision: manual_review
+enforcement: {development: warn_release_evidence, release_candidate: block, submission: block}
+owner: Release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-REVIEW-READINESS"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-09, R-AS-13, R-AS-14, R-AS-28, R-AS-29]
+  apple_guideline_refs: ["2.1(a)", "2.3.1", "2.5.5", "4.2", "4.3(b)", "5.6.4"]
+sources: [APPLE-ARG, APPLE-SUBMISSION, APPLE-HIG]
+notes: A green development build is not equivalent to App Store submission readiness.

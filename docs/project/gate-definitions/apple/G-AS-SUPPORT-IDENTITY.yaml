@@ -1,0 +1,26 @@
+id: G-AS-SUPPORT-IDENTITY
+name: Developer identity, support and legal notice
+dimension: regulatorisch
+lifecycle_phase: deployment
+source_type: mixed
+trigger: Release candidate and every support, contact or legal-identity change
+automation: HYBRID
+policy_checks: [policy_support_identity]
+criteria:
+  - Public HTTPS support URL and reachable support email are current
+  - Users can reach support from inside the app
+  - Provider identity and German legal notice have been reviewed
+evidence_required:
+  - support URL response and App Store Connect metadata
+  - in-app contact screenshot
+  - reviewed legal notice
+decision: manual_review
+enforcement: {development: warn_release_evidence, release_candidate: block, submission: block}
+owner: Developer and release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-SUPPORT-IDENTITY"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-08]
+  apple_guideline_refs: ["1.5"]
+sources: [APPLE-ARG, APPLE-ASC-METADATA, DE-DDG]
+notes: URL reachability can be automated; identity and legal sufficiency require human review.

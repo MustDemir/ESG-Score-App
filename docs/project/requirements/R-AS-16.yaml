@@ -1,0 +1,23 @@
+id: R-AS-16
+title: Open Food Facts and third-party license obligations
+kontrollmechanismus: Hybrid license and attribution review
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: Open Food Facts or another third-party dataset is shipped or queried
+verification: HYBRID
+source_type: license
+apple_guideline_refs: ["5.2", "5.2.2"]
+description: Database, content, image and API licenses must be identified separately and their attribution and reuse obligations fulfilled.
+evidence_expected: [license inventory, OFF terms snapshot, in-app attribution, share-alike assessment]
+acceptance_criteria:
+  - Database, text and image licenses are not conflated
+  - Required attribution is visible in the shipped app
+  - Share-alike and database-right obligations are reviewed for actual reuse
+linked_gates: [G-AS-THIRD-PARTY-RIGHTS]
+deployer_implication: Retain the reviewed license terms and implementation evidence for each release.
+audit_trigger: Data-source, API, caching, image-use or license change
+source_refs: [APPLE-ARG, OFF-LICENSE]
+phase: phase-1-mvp
+notes: Legal interpretation remains a human responsibility; automation verifies evidence completeness.

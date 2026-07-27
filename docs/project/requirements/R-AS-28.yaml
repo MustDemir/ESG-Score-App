@@ -1,0 +1,24 @@
+id: R-AS-28
+title: Conditional compliance reclassification for high-impact features
+kontrollmechanismus: Policy-as-Code activation guard plus feature-specific manual review
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: Accounts, tracking, location, IAP, social login, third-party AI, chatbot, UGC or push is enabled
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["1.2", "3.1", "4.5.3", "4.5.4", "4.7", "4.8", "5.1.2(i)"]
+description: High-impact capability flags must activate a current feature-specific Apple review before the capability can ship.
+evidence_expected: [binary feature inventory, capability-specific guideline assessment, on-device tests, reviewer sign-off]
+acceptance_criteria:
+  - Every enabled high-impact feature has a completed current-scope review
+  - Third-party AI data sharing includes disclosure and explicit permission evidence
+  - UGC, chatbot, payment, login and push obligations are assessed against actual architecture and region
+  - Disabled flags are verified against the shipped binary
+linked_gates: [G-AS-PRIVACY, G-AS-REVIEW-READINESS]
+deployer_implication: Enable no high-impact feature flag until its specific requirements, implementation and evidence are complete.
+audit_trigger: Every feature activation, architecture change, region change or Apple guideline update
+source_refs: [APPLE-ARG, APPLE-APP-PRIVACY]
+phase: conditional
+notes: This guard prevents future features from bypassing the current phase-1 gate catalog.

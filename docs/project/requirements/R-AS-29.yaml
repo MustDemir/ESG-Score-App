@@ -1,0 +1,24 @@
+id: R-AS-29
+title: Apple HIG and accessibility quality baseline
+kontrollmechanismus: Automated widget checks plus manual assistive-technology review
+lifecycle_phase: deployment
+governance_dimension: technisch
+must_should: SHOULD
+applicability: always
+activation_condition: Every user-facing iOS release
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: []
+description: ScanFair should follow current iOS interaction and accessibility conventions without presenting HIG guidance as an invented App Store rejection rule.
+evidence_expected: [VoiceOver review, Dynamic Type review, contrast review, touch-target review, reduced-motion review]
+acceptance_criteria:
+  - Core scan and result flow is understandable with VoiceOver
+  - Text remains usable with larger accessibility sizes
+  - Contrast, touch targets, focus order and status communication are reviewed
+  - Motion does not block use when Reduce Motion is enabled
+linked_gates: [G-AS-REVIEW-READINESS]
+deployer_implication: Record accessibility test evidence for the release candidate and create defects for unresolved SHOULD findings.
+audit_trigger: Every material UI change and release candidate
+source_refs: [APPLE-HIG]
+phase: phase-1-mvp
+notes: This is advisory unless a specific Apple rule or applicable law makes a criterion mandatory.

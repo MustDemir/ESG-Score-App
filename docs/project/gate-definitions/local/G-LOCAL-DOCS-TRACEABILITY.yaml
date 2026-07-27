@@ -11,7 +11,7 @@ evidence_required:
   - README.md
   - esg_app/README.md
   - .quality/quality-gate-report.md
-decision: approve|block
+decision: block
 owner: Mustafa
 audit_trail:
   enabled: true

@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W29
-last_updated: 2026-07-18
+last_updated: 2026-07-19
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -96,6 +96,30 @@ milestones:
       G-AS-CAMERA-PURPOSE validiert den Info.plist-Zwecktext mit Rego/Conftest.
       Xcode 26.6 baut die unsigned iOS-Simulator-App erfolgreich; GitHub Actions
       zeigt G-IOS-COMPILE als eigenen macOS-Job. Teststand: 25 Tests PASS.
+
+  - id: M13
+    title: GitHub-Quality-Gate-Workflow konsolidiert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      ADR 0020 legt quality-gates.yml als einzigen verbindlichen CI/CT-Workflow
+      fest. Der redundante ci.yml-Workflow wurde entfernt, ohne Gates zu
+      reduzieren. Root-README-Aenderungen starten nun ebenfalls G-DOC-TRACE.
+      App-Code, iOS-Signing, Deployment und K8s/Gatekeeper bleiben unveraendert.
+
+  - id: M14
+    title: Apple-Compliance-Gates fail-closed und release-orientiert erweitert
+    date: 2026-07-19
+    phase: phase-1-mvp
+    notes: |
+      19 Apple-Requirements sind auf acht HYBRID-Entscheidungs-Gates abgebildet.
+      Development, Release Candidate und Submission verwenden denselben
+      Kontrollkatalog mit gestufter Evidenz-Faelligkeit. Conftest behandelt
+      technische Fehler fail-closed, protokolliert Einzelentscheidungen und
+      verifiziert die vollstaendige SHA-256-Evidence-Chain. Der lokale
+      Development-Lauf besteht 11/11 Gates mit 28 sichtbaren Warnungen;
+      das strenge Release-Candidate-Profil blockiert erwartungsgemaess 27 offene
+      MUST-Nachweise.
 
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
@@ -192,11 +216,47 @@ decisions_made:
   - adr: 0017
     title: mobile_scanner fuer den nativen iOS-Barcode-Scan
     date: 2026-07-19
+  - adr: 0020
+    title: Einen verbindlichen Quality-Gate-Workflow verwenden
+    date: 2026-07-19
+  - adr: 0021
+    title: Apple-Compliance mit gestuften Enforcement-Profilen steuern
+    date: 2026-07-19
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W31
+    summary: |
+      Apple Build Integrity mit echter iOS-Bundle-Evidenz erweitert, ohne
+      offene Signatur-, Privacy- oder App-Store-Nachweise faelschlich freizugeben.
+    done:
+      - App-eigenes PrivacyInfo.xcprivacy in den Runner-Resources eingebunden
+      - Privacy-Audit fuer App-, Flutter- und mobile_scanner-Manifests umgesetzt
+      - Integritaetspruefung fuer alle im Simulator-App-Bundle enthaltenen Framework-Signaturen umgesetzt
+      - Required-Reason-APIs und Reason-Codes aus dem gebauten Bundle inventarisiert
+      - Technischen SDK-Review mit SHA-256 an Lockfile, Manifest und Plugin-Registrant gebunden
+      - CI-macOS-Artefakt um ios_privacy_audit.json erweitert
+      - Source Register um Apple Required-Reason-, SDK- und App-Privacy-Details ergaenzt
+      - Build-Integrity-Policy bei invalidem Manifest oder stale Review fail-closed erweitert
+    checks:
+      - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
+      - Privacy-Bundle-Audit PASS, 3 Manifests, 0 Findings
+      - Technische Privacy-Teilkontrollen von G-AS-BUILD-INTEGRITY PASS
+      - Release-Candidate-Gesamtcheck erwartungsgemaess FAIL, 25 offene MUST-Nachweise
+      - Development Quality Pipeline 11/11 PASS, 26 Release-Warnungen sichtbar
+      - Compliance-Katalog 19 Requirements, 8 Gates, 14 Quellen valide
+      - OPA Policy-Tests 16/16 PASS
+    blockers:
+      - App-Store-Privacy-Klassifikation fuer Barcode-/Netzwerkdaten bleibt offen
+      - Publisher-Signaturkontinuitaet fuer gelistete binaere SDKs braucht ein signiertes Release-Archive
+      - Weitere Release-Evidenz fuer Kamera, Metadata, Review, Claims, Rechte und Support fehlt
+    next_week:
+      - In-App-OFF-Attribution und ESG-Limitationen umsetzen
+      - Privacy-/Support-Inhalte sowie versionierte App-Store-Metadaten vorbereiten
+      - Kamera-Lokalisierungen und dokumentierten Device-/IPv6-Smoke-Test schliessen
+
   - week: 2026-W29
     summary: |
       Echter OFF-v3-Produktlookup, nativer iOS-Kamera-Scanner und erweiterte
@@ -216,6 +276,9 @@ weekly_log:
       - G-AS-CAMERA-PURPOSE mit sechs Rego-Tests und Evidence-Log aktiviert
       - G-IOS-COMPILE als lokales Script und GitHub-macOS-Job ergaenzt
       - README, Backlog, ADR-Index und Feature-States aktualisiert
+      - ADR 0020 akzeptiert und doppelte GitHub-CI auf quality-gates.yml konsolidiert
+      - ADR 0021 akzeptiert und acht Apple-Gate-Gruppen mit drei Enforcement-Profilen umgesetzt
+      - Compliance-Runner fail-closed sowie Evidence-Chain-Verifikation und Katalogschema aktiviert
     checks:
       - flutter test --coverage PASS, 25 Tests
       - Line-Coverage 698/873 = 79.95 Prozent
@@ -225,6 +288,10 @@ weekly_log:
       - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
       - bash scripts/quality/run_quality_gates.sh PASS, 9/9 Gates
       - gitleaks git --redact PASS
+      - Development Quality Pipeline 11/11 PASS, 28 Warnungen sichtbar
+      - Release-Candidate Apple-Check erwartungsgemaess FAIL, 27 offene MUST-Nachweise
+      - Compliance-Katalog 19 Requirements, 8 Gates, 11 Quellen valide
+      - Neue OPA Gate-Group-Tests 14/14 PASS
     learnings:
       - OFF empfiehlt v3 fuer neue Integrationen; v2 ist nur noch kompatibel
       - Tolerantes Mapping bleibt noetig, weil reale v3-Antworten Legacy-Felder liefern
@@ -232,12 +299,12 @@ weekly_log:
       - Kamera-Permission-UX muss auf kleinen Hoehen scrollbar bleiben
       - Native Plugin-Sicherheit braucht zusaetzlich zu Dart-Tests einen iOS-Build
     blockers:
-      - Kein physisches iPhone verbunden; realer Kamera-Smoke-Test steht aus
-      - Lokales iPhone-Signing/Apple-Team kann erst mit verbundenem Geraet validiert werden
+      - Release-Profil blockiert bis Privacy-, Store-, Claims-, Lizenz- und Support-Evidenz vollstaendig ist
+      - PrivacyInfo.xcprivacy und Required-Reason-API-/SDK-Review stehen aus
     next_week:
-      - iPhone verbinden, Developer Mode aktivieren und lokales Signing testen
-      - Reale Produkt-Barcodes scannen und End-to-End-Latenz messen
-      - Verbleibende Privacy-/Support-/Datenquellen-Gates umsetzen
+      - Privacy Manifest und SDK-Datenpraktiken gegen den finalen Dependency-Stand pruefen
+      - In-App-OFF-Attribution und ESG-Limitationen umsetzen
+      - Privacy-/Support-Seiten und versionierte App-Store-Metadaten vorbereiten
 
   - week: 2026-W28
     summary: |

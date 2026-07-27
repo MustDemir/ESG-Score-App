@@ -1,36 +1,86 @@
 {
-  "_comment": "Kategorie-B-Deklarationen fuer Compliance-Gates. Hand-gepflegt. Siehe evidence-model.md. Felder mit null sind noch nicht festgelegt (TBD) — Gates melden das als Finding.",
-  "_schema_version": "1.0",
-  "_last_updated": "2026-05-19",
+  "_comment": "Release evidence declarations. Extracted app state overrides matching declarations. False/null values are visible warnings in development and blockers in release_candidate/submission.",
+  "_schema_version": "2.0",
+  "_last_updated": "2026-07-27",
 
+  "apple_guidelines_version": "2026-06-08",
   "app_name_pubspec": "ScanFair",
+  "app_store_name": "ScanFair",
   "subtitle": "ESG-Score beim Einkauf",
 
+  "feature_accounts_enabled": false,
+  "feature_tracking_enabled": false,
+  "feature_location_enabled": false,
+  "feature_in_app_purchases_enabled": false,
+  "feature_social_login_enabled": false,
+  "feature_third_party_ai_enabled": false,
+  "feature_chatbot_enabled": false,
+  "feature_user_generated_content_enabled": false,
+  "feature_review_prompt_enabled": false,
+  "feature_push_notifications_enabled": false,
+
   "privacy_policy_url": null,
-  "support_url": null,
-
-  "off_data_source_disclosed": false,
-  "supabase_region": "eu-central-1 (Frankfurt)",
-
-  "data_retention_days": 365,
+  "in_app_privacy_link_present": false,
+  "privacy_policy_content_reviewed": false,
+  "app_privacy_details_completed": false,
+  "data_inventory_completed": false,
+  "required_reason_api_review_completed": false,
+  "third_party_sdk_privacy_review_completed": false,
+  "listed_binary_sdk_signature_validation_completed": false,
   "account_deletion_implemented": false,
-
-  "tracking_enabled": false,
   "att_prompt_implemented": false,
+  "location_purpose_reviewed": false,
+  "standard_review_api_verified": false,
+  "iap_compliance_review_completed": false,
+  "social_login_compliance_review_completed": false,
+  "third_party_ai_data_consent_reviewed": false,
+  "chatbot_compliance_review_completed": false,
+  "ugc_safety_review_completed": false,
+  "push_compliance_review_completed": false,
+
+  "camera_runtime_review_completed": false,
+  "camera_manual_fallback_verified": true,
+  "camera_localizations_reviewed": false,
+
+  "metadata_review_completed": false,
+  "screenshots_reviewed": false,
+  "age_rating_completed": false,
+  "brand_rights_reviewed": false,
+
+  "app_complete": false,
+  "backend_ready_for_review": false,
+  "review_notes_completed": false,
+  "review_sample_barcode": "3017620422003",
+  "physical_device_smoke_test_completed": true,
+  "ipv6_network_test_completed": false,
+  "review_account_available": false,
+  "accessibility_review_completed": false,
+
+  "esg_sources_disclosed_in_app": true,
+  "esg_limitations_disclosed_in_app": false,
+  "esg_claims_manual_review_completed": false,
+
+  "off_license_identified": true,
+  "off_share_alike_obligations_reviewed": false,
+  "third_party_rights_review_completed": false,
+
+  "support_url": null,
+  "support_email": null,
+  "in_app_contact_present": false,
+  "legal_notice_reviewed": false,
 
   "manual_review": {
     "reviewed_by": null,
     "review_date": null,
-    "scope": null
+    "scope": null,
+    "evidence_uri": null
   },
 
   "_field_docs": {
-    "app_name_pubspec": "Kanonischer Markenname (Soll). Gate vergleicht ios/android Display-Names damit.",
-    "privacy_policy_url": "R-AS-01 / R-DSGVO-03. Setzen wenn Policy live (TODO-008).",
-    "support_url": "R-AS-08. Setzen wenn Domain steht.",
-    "off_data_source_disclosed": "R-AS-06. Auf true wenn 'Powered by Open Food Facts' + Privacy-Policy-Erwaehnung implementiert.",
-    "account_deletion_implemented": "R-AS-05 / R-DSGVO-07. Auf true wenn Loesch-Funktion in App (mit Supabase Auth).",
-    "att_prompt_implemented": "R-AS-07 / R-DSGVO-02. Auf true wenn Tracking-SDK + ATT-Prompt.",
-    "manual_review": "Kategorie C. Pro Release ausfuellen fuer HYBRID-Gates."
+    "feature_*": "Activates conditional requirements. A false feature flag must reflect the shipped binary.",
+    "*_reviewed": "Hybrid evidence. Set only after the named review has been performed and retained.",
+    "privacy_policy_url": "Public HTTPS URL used in the app and App Store Connect.",
+    "review_sample_barcode": "Known product barcode supplied in App Review notes.",
+    "manual_review": "Final submission attestation. Required only in submission profile."
   }
 }

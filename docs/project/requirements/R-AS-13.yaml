@@ -1,0 +1,23 @@
+id: R-AS-13
+title: Resource efficiency, supported platform behavior and IPv6 networking
+kontrollmechanismus: Automated build plus on-device and IPv6 tests
+lifecycle_phase: deployment
+governance_dimension: technisch
+must_should: MUST
+applicability: always
+activation_condition: Release candidate
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["2.4.2", "2.5.4", "2.5.5"]
+description: Scanner resources must stop when inactive, background modes must be justified and API traffic must work on IPv6-only networks.
+evidence_expected: [camera lifecycle tests, background-mode inventory, physical-device test, IPv6-only test]
+acceptance_criteria:
+  - Camera is released when leaving or pausing the scanner
+  - No unjustified background mode or sustained high resource use is present
+  - Product API lookup succeeds on an IPv6-only test network
+linked_gates: [G-AS-BUILD-INTEGRITY, G-AS-REVIEW-READINESS]
+deployer_implication: Run physical-device resource and IPv6 tests for every release candidate.
+audit_trigger: Scanner, networking, background-mode or dependency change
+source_refs: [APPLE-ARG]
+phase: phase-1-mvp
+notes: This requirement is broader than merely prohibiting background mining.

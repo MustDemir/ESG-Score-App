@@ -1,157 +1,58 @@
-# Evidence-Modell — welche Artefakte die Gates brauchen
+# Compliance evidence model
 
-> Erklärt WIE die Compliance-Gates in CI an ihre Prüf-Daten kommen und WAS
-> du als Entwickler nach jedem Dev-Step bereitstellen musst.
-> Bezug: [ADR 0012](../decisions/0012-apple-review-compliance.yaml),
-> [ADR 0013](../decisions/0013-multi-regulation-strategy.yaml),
-> [ADR 0009](../decisions/0009-methodology-adoption.yaml) (GCG-3 Evidence-Log).
-> Letztes Update: 2026-05-19
+Last updated: 2026-07-19
 
----
+## Evidence categories
 
-## Grundprinzip
-
-Conftest (das Gate-Tool) prüft **nicht direkt** deine `Info.plist` oder
-`pubspec.yaml`. Es prüft eine **Input-Datei** (`compliance_input.json`), die
-deinen App-Zustand abbildet. Diese Input-Datei entsteht automatisch aus zwei
-Quellen.
-
-```
-Echte App-Files                      Hand-gepflegte Deklaration
-(Info.plist, pubspec.yaml,           (compliance-manifest.json)
- AndroidManifest.xml,                       │
- PrivacyInfo.xcprivacy)                     │
-        │                                   │
-        │ extract_app_metadata.sh           │
-        ▼                                   ▼
-  app_extracted.json  ───── jq merge ─────  compliance-manifest.json
-                            │
-                            ▼
-                  evidence-store/compliance_input.json   ◄── DAS prüft Conftest
-                            │
-                            │ conftest test --policy policies/apple
-                            ▼
-                  Pass/Fail + evidence-store/evidence-log.jsonl (SHA-256)
-```
-
----
-
-## Die 3 Artefakt-Kategorien
-
-| Kategorie | Was | Quelle | Dein Aufwand |
-|---|---|---|---|
-| **A — Auto-extrahiert** | App-Name, Camera-String, Cleartext-Config, Privacy-Manifest | echte App-Files | **Null** (Script liest sie) |
-| **B — Deklariert** | Privacy-URL, Support-URL, OFF-Disclose, Aufbewahrungsfristen | `compliance-manifest.json` | einmalig + bei Änderung |
-| **C — Manueller Nachweis** | „Review von X am Datum", Demo-Account bereit, Screenshots geprüft | du trägst ein (HYBRID-Gates) | pro Release |
-
-### Kategorie A — Auto-extrahiert (Null Aufwand)
-
-Das Script `scripts/compliance/extract_app_metadata.sh` liest:
-
-| Feld | Aus Datei | Methode |
+| Category | Examples | Trust rule |
 |---|---|---|
-| `app_name_ios` | `ios/Runner/Info.plist` → CFBundleDisplayName | plutil |
-| `app_name_android` | `android/.../AndroidManifest.xml` → android:label | grep/sed |
-| `app_name_pubspec_package` | `pubspec.yaml` → name | grep/sed |
-| `camera_purpose_string` | `Info.plist` → NSCameraUsageDescription | plutil |
-| `ios_allows_arbitrary_loads` | `Info.plist` → NSAppTransportSecurity | plutil |
-| `privacy_manifest_present` | Existenz `PrivacyInfo.xcprivacy` | file-check |
+| A: extracted | Info.plist display name, camera purpose, privacy-manifest validity, hash-bound SDK review, required docs | Shipped files override declarations |
+| B: declared | feature activation, public URLs, App Store metadata state | Must be reviewed whenever the related feature changes |
+| C: hybrid | on-device behavior, screenshots, legal/license review, claims substantiation | Reviewer, date, scope and evidence URI are required for submission |
 
-Du musst **nichts** tun außer die App korrekt zu konfigurieren (was du eh tust).
+`extract_app_metadata.sh` creates `app_extracted.json` from repository files.
+`build_compliance_input.sh` merges this with `compliance-manifest.json`; extracted
+facts win. `run_gates.sh` evaluates only production policies and appends one
+versioned record to `evidence-log.jsonl`.
 
-### Kategorie B — Deklariert (einmalig pflegen)
+The iOS privacy review is retained in `ios-privacy-sdk-review.json`. Its
+approval is current only while the SHA-256 values of `pubspec.lock`, the app
+privacy manifest and `GeneratedPluginRegistrant.m` match the reviewed values.
+The macOS build gate independently inspects the shipped `Runner.app` and writes
+`ios_privacy_audit.json`. The technical review deliberately does not mark App
+Store Connect privacy answers or legal data classification as complete.
 
-In `compliance-manifest.json` deklarierst du was nicht aus Code lesbar ist:
+Each version-2 evidence record contains:
 
-| Feld | Beispiel |
-|---|---|
-| `app_name_pubspec` (kanonischer Markenname) | "ScanFair" |
-| `subtitle` | "ESG-Score beim Einkauf" |
-| `privacy_policy_url` | "https://scanfair.de/privacy" |
-| `support_url` | "https://scanfair.de/support" |
-| `off_data_source_disclosed` | true |
-| `data_retention_days` | 365 |
+- profile and aggregate decision
+- per-gate PASS, WARN or FAIL with messages
+- input SHA-256
+- commit SHA, branch/ref, workflow run ID and actor
+- dirty-working-tree marker for local runs
+- previous-entry hash and current-entry hash
 
-Pflegst du **einmal** wenn der Wert feststeht, danach nur bei Änderung.
+`verify_evidence_chain.sh` recomputes every entry hash and every previous-hash
+link. The log is tamper-evident, not an immutable external archive. GitHub Actions
+artifacts preserve each CI run; a production evidence store remains future work.
 
-### Kategorie C — Manueller Nachweis (pro Release, HYBRID-Gates)
+## Profiles
 
-Manche Gates sind HYBRID — Conftest prüft die Struktur, ein Mensch die
-Substanz. Der menschliche Teil wird als Evidence eingetragen:
+`development` keeps unfinished release evidence as visible warnings.
+`release_candidate` converts all applicable release evidence gaps into failures.
+`submission` additionally requires a final manual attestation with evidence URI.
 
-```json
-"manual_review": {
-  "reviewed_by": "Mustafa Demir",
-  "review_date": "2026-06-15",
-  "scope": "Privacy Policy inhaltlich geprüft, OFF + Supabase erwähnt"
-}
-```
+The manifest must remain truthful. A feature flag set to false while the feature
+exists in the binary is a compliance defect, not a permitted workaround.
 
-Das machst du als Teil des `post-feature`- bzw. Release-Workflows.
-
----
-
-## Was du nach JEDEM Dev-Step tun musst (Kurzfassung)
-
-| Dev-Step betrifft… | Aktion | Häufigkeit |
-|---|---|---|
-| Code / App-Config (Kategorie A) | **Nichts** — CI extrahiert automatisch | — |
-| Neue feststehende Info (Kategorie B) | `compliance-manifest.json` ergänzen | selten |
-| HYBRID-Gate-Schritt (Kategorie C) | Evidence-Eintrag im manual_review | pro Release |
-
-**Faustregel:** Solange du nur Code schreibst, ist dein Compliance-Aufwand
-**null**. Das Gate liest den Zustand selbst. Nur Deklarationen + manuelle
-Reviews erfordern aktives Eintragen.
-
----
-
-## Lokaler Test-Lauf (so prüfst du selbst)
+## Local commands
 
 ```bash
-# 1. App-Metadaten extrahieren
-bash scripts/compliance/extract_app_metadata.sh
-
-# 2. Mit Deklarationen mergen
-bash scripts/compliance/build_compliance_input.sh
-
-# 3. Gates laufen lassen (braucht conftest)
-bash scripts/compliance/run_gates.sh
+ruby scripts/compliance/validate_compliance_catalog.rb
+opa test docs/project/policies
+COMPLIANCE_PROFILE=development bash scripts/compliance/run_gates.sh
+bash scripts/compliance/verify_evidence_chain.sh
 ```
 
-Output: Pass/Fail pro Gate + Eintrag in `evidence-store/evidence-log.jsonl`.
-
----
-
-## Aktivierungs-Stand (was JETZT prüfbar ist)
-
-| Gate | Input-Felder vorhanden? | Status |
-|---|---|---|
-| G-AS-NAME-LENGTH | ja (ios/android Name) | ✅ läuft — meldet aktuell Finding (Display-Name noch "Esg App" statt "ScanFair") |
-| G-AS-CAMERA-PURPOSE | nein (Scanner-Code fehlt) | ⏳ wartet auf Scanner-Feature |
-| G-AS-PRIVACY-URL | Deklaration TBD | ⏳ wartet auf Privacy-Policy-URL |
-| G-AS-SUPPORT-URL | Deklaration TBD | ⏳ wartet auf Domain |
-
-**Das ist gewollt:** Die Gates melden ehrlich was noch nicht fertig ist. Ein
-Finding heißt nicht „kaputt", sondern „dieser Schritt steht noch aus".
-
----
-
-## Technische Notiz — warum JSON statt YAML für das Manifest
-
-Unsere Projekt-Konvention ist YAML. Das `compliance-manifest` ist aber
-bewusst **JSON**:
-- conftest liest JSON nativ
-- `jq` (cross-platform, installiert) merged JSON trivial
-- Python-YAML-Tooling ist auf dem aktuellen Setup defekt (Python 3.14
-  pyexpat-Bug auf macOS) — JSON ist dependency-frei robust
-
-Sobald ein zuverlässiger YAML→JSON-Konverter verfügbar ist, kann das Manifest
-auf YAML umgestellt werden ohne die Gate-Logik zu ändern.
-
----
-
-## Wartung
-
-- Bei neuem Gate: prüfen welche Kategorie der Input ist (A/B/C) + hier eintragen
-- Bei neuer Kategorie-B-Info: `compliance-manifest.json` ergänzen
-- Extraction-Script erweitern wenn neue Kategorie-A-Felder gebraucht werden
+Expected current behavior: development passes with explicit release warnings;
+release_candidate fails until privacy, metadata, device, claims, license and
+support evidence are complete.

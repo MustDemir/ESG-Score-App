@@ -1,0 +1,104 @@
+schema_version: "1.0"
+last_verified: 2026-07-27
+next_review_due: 2026-08-26
+review_owner: Release owner
+
+sources:
+  - id: APPLE-ARG
+    authority: Apple
+    title: App Review Guidelines
+    url: https://developer.apple.com/app-store/review/guidelines/
+    version: 2026-06-08
+    normative_weight: MUST
+    scope: App Store acceptance
+  - id: APPLE-SUBMISSION
+    authority: Apple
+    title: Submitting apps to the App Store
+    url: https://developer.apple.com/app-store/submitting/
+    version: current-web
+    normative_weight: MUST
+    scope: Toolchain, SDK and submission requirements
+  - id: APPLE-PRIVACY-MANIFEST
+    authority: Apple
+    title: Privacy manifest files and required-reason APIs
+    url: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+    version: current-web
+    normative_weight: CONDITIONAL_MUST
+    scope: App and third-party SDK privacy declarations
+  - id: APPLE-REQUIRED-REASON-API
+    authority: Apple
+    title: Describing use of required reason API
+    url: https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api
+    version: current-web
+    normative_weight: CONDITIONAL_MUST
+    scope: Required-reason API categories and approved reason codes
+  - id: APPLE-THIRD-PARTY-SDK
+    authority: Apple
+    title: Third-party SDK requirements
+    url: https://developer.apple.com/support/third-party-SDK-requirements/
+    version: current-web
+    normative_weight: CONDITIONAL_MUST
+    scope: SDK privacy manifests, signatures and developer responsibility
+  - id: APPLE-APP-PRIVACY
+    authority: Apple
+    title: Manage app privacy
+    url: https://developer.apple.com/help/app-store-connect/manage-app-information/manage-app-privacy/
+    version: current-web
+    normative_weight: MUST
+    scope: App Store Connect privacy answers
+  - id: APPLE-APP-PRIVACY-DETAILS
+    authority: Apple
+    title: App privacy details on the App Store
+    url: https://developer.apple.com/app-store/app-privacy-details/
+    version: current-web
+    normative_weight: MUST
+    scope: Data collection classification and third-party partner disclosures
+  - id: APPLE-ASC-METADATA
+    authority: Apple
+    title: App information properties
+    url: https://developer.apple.com/help/app-store-connect/reference/app-information/app-information
+    version: current-web
+    normative_weight: MUST
+    scope: App Store listing metadata
+  - id: APPLE-PLIST-CAMERA
+    authority: Apple
+    title: NSCameraUsageDescription
+    url: https://developer.apple.com/documentation/bundleresources/information-property-list/nscamerausagedescription
+    version: current-web
+    normative_weight: CONDITIONAL_MUST
+    scope: Camera permission declaration
+  - id: APPLE-HIG
+    authority: Apple
+    title: Human Interface Guidelines
+    url: https://developer.apple.com/design/human-interface-guidelines/
+    version: current-web
+    normative_weight: SHOULD
+    scope: iOS interaction, accessibility and visual conventions
+  - id: EU-GDPR
+    authority: European Union
+    title: General Data Protection Regulation
+    url: https://eur-lex.europa.eu/eli/reg/2016/679/oj
+    version: consolidated-current
+    normative_weight: MUST
+    scope: Personal-data processing where applicable
+  - id: DE-DDG
+    authority: Germany
+    title: Digitale-Dienste-Gesetz, Section 5
+    url: https://www.gesetze-im-internet.de/ddg/__5.html
+    version: current-law
+    normative_weight: CONDITIONAL_MUST
+    scope: Provider information where applicable
+  - id: OFF-LICENSE
+    authority: Open Food Facts
+    title: Data reuse and licenses
+    url: https://world.openfoodfacts.org/data
+    version: current-web
+    normative_weight: MUST
+    scope: Database, content and image reuse
+  - id: INTERNAL-SCORING
+    authority: ScanFair
+    title: ESG scoring model v1
+    path: docs/ESG-SCORING-MODELL-v1.md
+    version: "1.0"
+    normative_weight: INTERNAL_MUST
+    scope: Reproducibility and claim substantiation

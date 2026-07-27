@@ -1,0 +1,26 @@
+id: G-AS-CLAIMS-TRANSPARENCY
+name: ESG claim truthfulness and methodological transparency
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+source_type: mixed
+trigger: Every scoring, source-data, result-copy or marketing change
+automation: HYBRID
+policy_checks: [policy_claims_transparency]
+criteria:
+  - Every ESG result is traceable to method version, source data and completeness
+  - Limitations and fallback behavior are visible and do not imply unsupported precision
+  - Claims receive a retained substantiation review before release
+evidence_required:
+  - docs/ESG-SCORING-MODELL-v1.md
+  - score fixtures and source attribution
+  - manual claims substantiation record
+decision: manual_review
+enforcement: {development: block_missing_method, release_candidate: block, submission: block}
+owner: Product methodology owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-CLAIMS-TRANSPARENCY"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-27]
+  apple_guideline_refs: ["1.1.6", "2.3.1", "5.2.2"]
+sources: [APPLE-ARG, EU-GDPR, INTERNAL-SCORING]
+notes: Rego verifies artifacts and declarations; substantive truthfulness remains a hybrid decision.

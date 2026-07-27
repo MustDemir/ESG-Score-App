@@ -1,0 +1,23 @@
+id: R-AS-05
+title: In-app account deletion when account creation is supported
+kontrollmechanismus: Hybrid
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: conditional
+activation_condition: feature_accounts_enabled is true
+verification: HYBRID
+source_type: apple
+apple_guideline_refs: ["5.1.1(v)"]
+description: An app that supports account creation must let users initiate deletion of the account from inside the app.
+evidence_expected: [feature flag, deletion UI test, backend deletion evidence, retention exceptions]
+acceptance_criteria:
+  - In-app deletion path is available and functional
+  - Associated personal data is deleted or lawful retention is explained
+  - Reviewer credentials cover the deletion flow
+linked_gates: [G-AS-PRIVACY]
+deployer_implication: Activate and test this control before enabling authentication.
+audit_trigger: Authentication feature activation and every account-flow change
+source_refs: [APPLE-ARG]
+phase: conditional
+notes: Inactive for the current account-free MVP.

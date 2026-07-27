@@ -73,7 +73,7 @@
 | **dart format** | Dart-Code-Formatierer | Einheitlicher Stil |
 | **flutter analyze** | Statische Code-Analyse | Lint-Prüfung |
 | **flutter test** | Test-Runner | 3 Widget-Tests pro Lauf |
-| **GitHub Actions** | CI/CD-Plattform, läuft bei jedem Push | `.github/workflows/ci.yml` |
+| **GitHub Actions** | CI/CT-Plattform fuer Quality Gates und nativen iOS-Compile | `.github/workflows/quality-gates.yml` |
 
 Zwei Verteidigungslinien: **lokal** (Pre-Commit-Hook) + **remote** (GitHub Actions).
 
@@ -103,11 +103,12 @@ compliance-manifest.json ──────────────────�
 | Tool / Methode | Was ist das? | Eingesetzt für |
 |---|---|---|
 | **SHA-256** | Kryptografische Hash-Funktion (eindeutiger Fingerabdruck) | Fingerabdruck pro Protokoll-Eintrag |
-| **Hash-Chain** | Jeder Eintrag enthält Fingerabdruck des vorherigen | `evidence-log.jsonl` manipulationssicher |
+| **Hash-Chain** | Jeder Eintrag enthält Fingerabdruck des vorherigen | `evidence-log.jsonl` manipulations-erkennbar |
 | **JSONL** | Eine JSON-Zeile pro Eintrag | Audit-Trail-Format |
 
-Manipulation eines alten Eintrags bricht die Kette → sofort erkennbar. Solo-
-Variante des Evidence-Stores aus der Master-Thesis (dort Postgres + Hash-Chain).
+`verify_evidence_chain.sh` erkennt Manipulationen an Eintraegen und Links. Die
+lokale Datei ist kein unveraenderlicher externer Speicher. Sie ist die
+Solo-Variante des Evidence-Stores aus der Master-Thesis.
 
 ### Die App selbst
 
@@ -126,7 +127,7 @@ Variante des Evidence-Stores aus der Master-Thesis (dort Postgres + Hash-Chain).
 > Git + GitHub Actions für CI/CD, gitleaks + Git-Hooks als Security-Gate, und —
 > als Kern — **Policy-as-Code mit OPA/Rego + Conftest** das regulatorische
 > Anforderungen (Apple, DSGVO) automatisch gegen den echten App-Zustand prüft,
-> mit SHA-256-Hash-Chain als manipulationssicherem Audit-Trail. Die Compliance-
+> mit verifizierter SHA-256-Hash-Chain als manipulations-erkennbarem Audit-Trail. Die Compliance-
 > Methodik stammt aus meiner Masterarbeit über EU-AI-Act-Quality-Gates."
 
 ---

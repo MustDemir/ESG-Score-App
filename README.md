@@ -324,6 +324,9 @@ flutter run --profile --no-resident -d <IPHONE_DEVICE_ID>
 cd /Users/mustafademir/ESG-Score-App
 bash scripts/quality/run_quality_gates.sh
 bash scripts/quality/run_ios_build_gate.sh
+
+# Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
+COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
 ```
 
 Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
@@ -335,28 +338,45 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
 | `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
 | `G-FLT-COVERAGE` | Mindestens 60% Line-Coverage gemaess Sprint-2-Baseline |
+| `G-CMP-SCHEMA` | Requirement-, Source-, Gate- und Policy-Links validieren |
 | `G-REG-UNIT` | Rego-Policy-Tests fuer Compliance-Regeln |
-| `G-CMP-APPLE` | Conftest Apple-Compliance-Gates plus Evidence-Log |
+| `G-CMP-APPLE` | Acht Apple-Entscheidungs-Gates via Conftest auswerten |
+| `G-CMP-EVIDENCE` | SHA-256-Evidence-Chain vollstaendig verifizieren |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
-| `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build auf macOS/Xcode validieren |
+| `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build und gebuendelte Privacy Manifests auf macOS/Xcode validieren |
 
 **GitHub Actions**
 
-Die neue Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
+Die Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
 `main`, `dev`, `codex/**`, Pull Requests und manuell via `workflow_dispatch`.
 Sie veroeffentlicht Gate-Summaries und die Artefakte
-`scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Neben den
-neun lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-Job und ein
-separater Gitleaks-Secret-Scan. `G-CMP-APPLE` validiert aktuell App-Name und
-Kamera-Zwecktext als einzelne Rego/Conftest-Policies mit Evidence-Log.
+`scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
+iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
+geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den elf
+lokalen Gate-Gruppen laufen ein eigener nativer iOS-Compile-/Privacy-Job und ein
+separater Gitleaks-Secret-Scan. Bei manuellen Laeufen kann zwischen
+`development`, `release_candidate` und `submission` gewaehlt werden.
 
-Der zuletzt validierte Stand bestand lokal alle neun Gate-Gruppen. Zusaetzlich
-bestanden 25 Flutter-Tests, 15 Rego-Tests, 13 Conftest-Checks, der
-Gitleaks-Scan, die YAML-Dokumentenpruefung und der native iOS-Simulator-Build.
-Die gemessene Line-Coverage liegt bei 79,95% und damit ueber dem Gate von 60%.
-Der zugehoerige GitHub-Actions-Lauf war in allen drei Jobs gruen:
-[Quality Gates Run 29664360331](https://github.com/MustDemir/ESG-Score-App/actions/runs/29664360331).
+`G-CMP-APPLE` umfasst `G-AS-BUILD-INTEGRITY`, `G-AS-PRIVACY`, `G-AS-CAMERA`,
+`G-AS-METADATA`, `G-AS-REVIEW-READINESS`, `G-AS-CLAIMS-TRANSPARENCY`,
+`G-AS-THIRD-PARTY-RIGHTS` und `G-AS-SUPPORT-IDENTITY`. Im Entwicklungsprofil bleiben noch nicht faellige
+Release-Nachweise als sichtbare Warnungen offen. Ab `release_candidate`
+blockiert jede anwendbare, unerfuellte MUST-Anforderung.
+
+Der operative Kontrollrahmen steht in
+[`apple-compliance-control-model.md`](docs/project/compliance/apple-compliance-control-model.md).
+Die bisherige gruene MVP-Pipeline bleibt ein Entwicklungsnachweis; sie ist nicht
+mit einer App-Store-Releasefreigabe gleichzusetzen. Der strenge Release-Check
+bleibt rot, bis Privacy-, Store-, Device-, Claims-, Lizenz- und Support-Evidenz
+vollstaendig vorliegt. Die technischen Privacy-Teile von
+`G-AS-BUILD-INTEGRITY` sind geschlossen: Das App-Privacy-Manifest ist im
+Xcode-Projekt eingebunden, das gebaute Bundle wird geprueft und der
+SDK-/Required-Reason-Review ist per SHA-256 an `pubspec.lock`,
+`PrivacyInfo.xcprivacy` und den iOS-Plugin-Registrant gebunden. Eine
+Abhaengigkeits- oder Manifest-Aenderung macht diesen Review automatisch
+ungueltig. Das strikte Gate bleibt bis zur Publisher-Signaturvalidierung der
+gelisteten binaeren SDKs am signierten Release-Archive bewusst rot.
 
 Explizit ausgeschlossen: iOS-Deployment, Online-Release, Hosting-Provider,
 Kubernetes und OPA Gatekeeper. Die App uebernimmt aus

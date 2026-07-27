@@ -1,0 +1,24 @@
+id: R-AS-27
+title: Truthful, substantiated and traceable ESG claims
+kontrollmechanismus: Automated artifact checks plus manual substantiation review
+lifecycle_phase: pre-deployment
+governance_dimension: regulatorisch
+must_should: MUST
+applicability: always
+activation_condition: The app displays ESG scores or related environmental and social claims
+verification: HYBRID
+source_type: mixed
+apple_guideline_refs: ["1.1.6", "2.3.1"]
+description: Scores and marketing claims must not present uncertain, missing or inferred product data as verified fact.
+evidence_expected: [versioned scoring method, test fixtures, source mapping, limitations text, claims review]
+acceptance_criteria:
+  - Every score exposes method version and source provenance
+  - Missing data and fallback logic are visible to the user
+  - Marketing and result copy do not exceed available substantiation
+  - Manual review records reviewer, date, scope and evidence URI
+linked_gates: [G-AS-CLAIMS-TRANSPARENCY]
+deployer_implication: Treat every scoring or result-copy change as a release-relevant compliance change.
+audit_trigger: Every scoring, data-source, result-copy or marketing change
+source_refs: [APPLE-ARG, INTERNAL-SCORING]
+phase: phase-1-mvp
+notes: App Store approval does not replace a separate legal review of environmental claims.

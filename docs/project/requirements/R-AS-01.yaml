@@ -5,6 +5,10 @@ kontrollmechanismus: Hybrid (Conftest prüft URL-Feld vorhanden + Smoke-Test in 
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
 must_should: MUST
+applicability: always
+activation_condition: App is submitted to the App Store
+verification: HYBRID
+source_type: mixed
 
 apple_guideline_refs:
   - "5.1.1(i)"
@@ -34,13 +38,13 @@ evidence_expected:
 acceptance_criteria:
   - URL ist HTTPS (kein HTTP)
   - URL liefert HTTP 200 OK
-  - URL-Inhalt ist auf Deutsch (Primärsprache) + Englisch (Fallback)
-  - Inhalt erwähnt OFF-Datenquelle (siehe R-AS-06)
-  - Inhalt erwähnt Supabase als Backend (DSGVO Art. 28)
-  - Inhalt erwähnt Datenaufbewahrungs-Dauer
+  - Link ist in der App und in App Store Connect vorhanden
+  - Inhalt beschreibt die tatsaechlich verarbeiteten Daten, Zwecke und Empfaenger
+  - Inhalt beschreibt Aufbewahrung und Loeschmoeglichkeiten, soweit anwendbar
+  - Es werden keine noch nicht integrierten Dienste als aktiv dargestellt
 
 linked_gates:
-  - G-AS-PRIVACY-URL
+  - G-AS-PRIVACY
 
 deployer_implication: |
   - Privacy Policy schreiben (DSGVO + Apple-Compliant) → TODO-008
@@ -51,9 +55,9 @@ deployer_implication: |
 audit_trigger: "Pre-Deployment CI/CD (Conftest); Re-Audit bei jedem Release"
 
 sources:
-  - App-Review-Guidelines-German.pdf, Sektion 5.1.1(i)
-  - DSGVO Art. 13
-  - Apple Privacy Manifest Spec (ab 2024)
+  - Apple App Review Guidelines 5.1.1(i)
+  - GDPR Articles 12 and 13
+source_refs: [APPLE-ARG, APPLE-APP-PRIVACY, EU-GDPR]
 
 phase: phase-1-mvp
 

@@ -1,6 +1,8 @@
 # Generierte Compliance-Artefakte — transient, werden bei jedem Lauf neu erzeugt.
 # Nicht committen (lokale Test-Laeufe wuerden Noise erzeugen).
-# In CI (TODO-022) wird Evidence separat als Artefakt/Upload gesichert.
+# In CI wird Evidence separat als GitHub-Actions-Artefakt gesichert.
 app_extracted.json
 compliance_input.json
 evidence-log.jsonl
+latest-gate-results.json
+ios_privacy_audit.json

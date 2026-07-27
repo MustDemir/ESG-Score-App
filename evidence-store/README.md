@@ -13,25 +13,32 @@
 | `app_extracted.json` | Kategorie-A-Felder aus echten App-Files | `extract_app_metadata.sh` |
 | `compliance_input.json` | Merge A + B, von Conftest geprüft | `build_compliance_input.sh` |
 | `evidence-log.jsonl` | Audit-Trail mit SHA-256-Chain, ein Eintrag pro Gate-Lauf | `run_gates.sh` |
+| `latest-gate-results.json` | Letzte Gesamt- und Einzelentscheidungen | `run_gates.sh` |
+| `ios_privacy_audit.json` | Privacy Manifests aus dem gebauten `Runner.app` | `audit_ios_privacy_bundle.sh` |
 
 Diese Dateien sind **transient** (gitignored) — bei jedem Lauf neu erzeugt.
 Lokale Test-Läufe würden sonst Commit-Noise erzeugen.
 
 ## Hash-Chain
 
-Jeder `evidence-log.jsonl`-Eintrag enthält:
-- `prev_entry_hash` — SHA-256 des vorherigen Eintrags (oder "GENESIS")
-- `entry_hash` — SHA-256 dieses Eintrags
+Jeder Version-2-Eintrag enthaelt Profil, Einzelentscheidungen der acht Apple-Gates,
+Input-Hash, Commit, Ref, Workflow-Run, Actor und Dirty-Status sowie:
+- `prev_entry_hash` - SHA-256 des vorherigen Eintrags (oder "GENESIS")
+- `entry_hash` - SHA-256 dieses Eintrags
 
-Manipulation eines früheren Eintrags bricht die Kette → erkennbar.
+`verify_evidence_chain.sh` berechnet jeden Hash und Link neu. Die lokale Datei
+ist damit manipulations**erkennbar**, aber kein unveraenderlicher externer Store.
 
 ## Lokal ausführen
 
 ```bash
 bash scripts/compliance/run_gates.sh
+bash scripts/compliance/verify_evidence_chain.sh
+COMPLIANCE_PROFILE=release_candidate bash scripts/compliance/run_gates.sh
 ```
 
-## CI (geplant, TODO-022)
+## CI
 
-In `.github/workflows/compliance.yml` läuft `run_gates.sh`, das Ergebnis wird
-als CI-Artefakt hochgeladen (nicht ins Repo committet).
+`.github/workflows/quality-gates.yml` fuehrt den Runner aus, zeigt alle acht
+Entscheidungen in der GitHub-Zusammenfassung und laedt Input, Einzelresultate,
+Hash-Chain und Quality-Logs als CI-Artefakt hoch.

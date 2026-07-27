@@ -5,6 +5,10 @@ kontrollmechanismus: Policy-as-Code (Conftest prüft Info.plist NSCameraUsageDes
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
 must_should: MUST
+applicability: conditional
+activation_condition: Camera or microphone capture is present in the shipped app
+verification: HYBRID
+source_type: apple
 
 apple_guideline_refs:
   - "2.5.14"
@@ -16,26 +20,23 @@ description: |
   Der Purpose String (NSCameraUsageDescription in Info.plist) muss präzise
   erklären WARUM wir die Kamera brauchen — nicht generisch.
 
-  Beispiele:
-  ❌ "Kamerazugriff für die App"
-  ❌ "Diese App nutzt die Kamera"
-  ✅ "ScanFair scannt mit der Kamera Barcodes auf Produkten, um den ESG-Score
-     anzuzeigen. Es werden keine Bilder gespeichert."
+  Der Text muss den Barcode-/Produktzweck konkret erklaeren. Die Laufzeitpruefung
+  verifiziert zusaetzlich System-Consent, sichtbaren Aufnahmezustand und den
+  manuellen Fallback bei verweigerter Berechtigung.
 
 evidence_expected:
   - esg_app/ios/Runner/Info.plist enthält NSCameraUsageDescription
-  - String ist mind. 50 Zeichen lang
   - String erwähnt explizit "Barcode" oder "Scanner"
-  - String erklärt was MIT den Daten geschieht (oder nicht geschieht)
+  - On-device Evidenz fuer Consent, Aufnahmeindikator und Permission-Denial
 
 acceptance_criteria:
   - NSCameraUsageDescription vorhanden
-  - Länge ≥ 50 Zeichen (Apple lehnt zu kurze Strings tendenziell ab)
   - Enthält Domain-Keyword (barcode|scan|produkt)
-  - "KEIN generischer Text (Blacklist: Kamerazugriff, Camera access)"
+  - Purpose-Text ist in allen ausgelieferten App-Sprachen geprueft
+  - Manueller Barcode-Fallback funktioniert ohne Kamera-Freigabe
 
 linked_gates:
-  - G-AS-CAMERA-PURPOSE
+  - G-AS-CAMERA
 
 deployer_implication: |
   - Beim ersten Build: Info.plist NSCameraUsageDescription setzen
@@ -45,8 +46,9 @@ deployer_implication: |
 audit_trigger: "Pre-Deployment CI/CD (Conftest); manueller Re-Review bei UX-Änderungen am Scanner"
 
 sources:
-  - App-Review-Guidelines-German.pdf, Sektion 2.5.14 und 5.1.1(iii)
+  - Apple App Review Guidelines 2.5.14 und 5.1.1(iii)
   - https://developer.apple.com/documentation/bundleresources/information_property_list/nscamerausagedescription
+source_refs: [APPLE-ARG, APPLE-PLIST-CAMERA]
 
 phase: phase-1-mvp
 

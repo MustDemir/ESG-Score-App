@@ -1,0 +1,26 @@
+id: G-AS-PRIVACY
+name: Privacy, consent and data declarations
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+source_type: mixed
+trigger: Every privacy, SDK, permission, account or tracking change; mandatory before submission
+automation: HYBRID
+policy_checks: [policy_privacy]
+criteria:
+  - Privacy policy is reachable in the app and declared in App Store Connect
+  - App Privacy answers cover first-party and third-party data practices
+  - Tracking, accounts and location activate their conditional controls
+evidence_required:
+  - data inventory
+  - privacy policy and App Store Connect privacy export
+  - consent and account-deletion test evidence when applicable
+decision: manual_review
+enforcement: {development: warn_release_evidence, release_candidate: block, submission: block}
+owner: Privacy and release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-PRIVACY"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-01, R-AS-02, R-AS-04, R-AS-05, R-AS-07, R-AS-15, R-AS-28]
+  apple_guideline_refs: ["5.1.1(i)", "5.1.1(ii)", "5.1.1(iii)", "5.1.1(iv)", "5.1.1(v)", "5.1.2(i)", "5.1.5"]
+sources: [APPLE-ARG, APPLE-APP-PRIVACY, EU-GDPR]
+notes: Feature flags control applicability, but must be verified against the shipped binary.

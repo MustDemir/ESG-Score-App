@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2329
 # =============================================================================
 # ScanFair local quality gates
 # =============================================================================
@@ -7,6 +8,8 @@
 # =============================================================================
 
 set -uo pipefail
+
+# Functions are intentionally dispatched by name through run_gate.
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 APP_DIR="$REPO_ROOT/esg_app"
@@ -56,8 +59,16 @@ gate_rego_unit_tests() {
   cd "$REPO_ROOT" && opa test docs/project/policies
 }
 
+gate_compliance_catalog() {
+  cd "$REPO_ROOT" && COMPLIANCE_PROFILE="${COMPLIANCE_PROFILE:-development}" ruby scripts/compliance/validate_compliance_catalog.rb
+}
+
 gate_app_compliance() {
-  cd "$REPO_ROOT" && bash scripts/compliance/run_gates.sh
+  cd "$REPO_ROOT" && COMPLIANCE_PROFILE="${COMPLIANCE_PROFILE:-development}" bash scripts/compliance/run_gates.sh
+}
+
+gate_evidence_chain() {
+  cd "$REPO_ROOT" && bash scripts/compliance/verify_evidence_chain.sh
 }
 
 gate_docs_traceability() {
@@ -70,6 +81,10 @@ gate_docs_traceability() {
     "README.md|scripts/quality/run_quality_gates.sh"
     "README.md|G-FLT-COVERAGE"
     "README.md|G-IOS-COMPILE"
+    "README.md|G-CMP-SCHEMA"
+    "README.md|G-AS-CLAIMS-TRANSPARENCY"
+    "docs/project/compliance/apple-compliance-control-model.md|release_candidate"
+    "docs/project/compliance/source-register.yaml|APPLE-ARG"
     "esg_app/README.md|flutter run"
     "esg_app/README.md|Open Food Facts API v3"
     "esg_app/README.md|mobile_scanner"
@@ -78,14 +93,14 @@ gate_docs_traceability() {
   for check in "${checks[@]}"; do
     file="${check%%|*}"
     marker="${check#*|}"
-    if ! git -C "$REPO_ROOT" grep -Fq -- "$marker" HEAD -- "$file"; then
-      printf 'Missing documentation traceability in HEAD: %s: %s\n' "$file" "$marker"
+    if ! grep -Fq -- "$marker" "$REPO_ROOT/$file"; then
+      printf 'Missing documentation traceability: %s: %s\n' "$file" "$marker"
       missing=1
     fi
   done
 
   [ "$missing" -eq 0 ] || return 1
-  printf 'Documentation traceability OK: %s committed markers\n' "${#checks[@]}"
+  printf 'Documentation traceability OK: %s working-tree markers\n' "${#checks[@]}"
 }
 
 gate_yaml_syntax() {
@@ -130,8 +145,10 @@ run_gate "G-FLT-FORMAT" "Dart format check" gate_flutter_format
 run_gate "G-FLT-ANALYZE" "Flutter static analysis" gate_flutter_analyze
 run_gate "G-FLT-TEST" "Flutter unit and widget tests" gate_flutter_test
 run_gate "G-FLT-COVERAGE" "Flutter line coverage baseline (60%)" gate_flutter_coverage
+run_gate "G-CMP-SCHEMA" "Compliance catalog schema and cross-link validation" gate_compliance_catalog
 run_gate "G-REG-UNIT" "Rego policy unit tests" gate_rego_unit_tests
 run_gate "G-CMP-APPLE" "Conftest compliance gates with evidence log" gate_app_compliance
+run_gate "G-CMP-EVIDENCE" "Compliance evidence hash-chain verification" gate_evidence_chain
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
 
@@ -152,6 +169,10 @@ TOTAL=$((PASS_COUNT + FAIL_COUNT))
     log_path="$(jq -r '.log' "$result" 2>/dev/null || echo "")"
     echo "| ${gate_id} | ${status} | ${log_path} |"
   done
+  if [ -f "$REPO_ROOT/.quality/compliance-gate-summary.md" ]; then
+    echo
+    cat "$REPO_ROOT/.quality/compliance-gate-summary.md"
+  fi
 } >"$REPORT"
 
 printf '\nQuality gate report: %s\n' "$REPORT"

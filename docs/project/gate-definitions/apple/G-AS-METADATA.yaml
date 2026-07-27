@@ -1,0 +1,26 @@
+id: G-AS-METADATA
+name: App Store metadata, screenshots and age rating
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+source_type: apple
+trigger: Every app-name or store-listing change; final review before submission
+automation: HYBRID
+policy_checks: [policy_metadata]
+criteria:
+  - App name and subtitle are present, truthful and at most 30 characters
+  - Metadata contains no foreign platform references or unsupported claims
+  - Screenshots show the actual app and the age-rating questionnaire is accurate
+evidence_required:
+  - versioned App Store metadata export
+  - screenshots and age-rating export
+  - brand and naming rights review
+decision: manual_review
+enforcement: {development: block_objective_findings, release_candidate: block, submission: block}
+owner: Product and release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-METADATA"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-10, R-AS-11, R-AS-12]
+  apple_guideline_refs: ["2.3.1", "2.3.3", "2.3.6", "2.3.7", "2.3.8", "2.3.10", "4.1(c)"]
+sources: [APPLE-ARG, APPLE-ASC-METADATA]
+notes: Length and forbidden terms are automated; truthfulness, imagery and rights require review.

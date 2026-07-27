@@ -1,0 +1,26 @@
+id: G-AS-THIRD-PARTY-RIGHTS
+name: Third-party data, SDK and license rights
+dimension: regulatorisch
+lifecycle_phase: pre-deployment
+source_type: mixed
+trigger: Every dependency, API, dataset or attribution change
+automation: HYBRID
+policy_checks: [policy_third_party_rights]
+criteria:
+  - Rights to every third-party service, SDK, dataset and asset are documented
+  - Open Food Facts attribution and applicable share-alike obligations are fulfilled
+  - App Store reviewer evidence can demonstrate authorization
+evidence_required:
+  - docs/licenses.md
+  - dependency and data-source inventory
+  - in-app attribution evidence and rights review
+decision: manual_review
+enforcement: {development: block_missing_license_inventory, release_candidate: block, submission: block}
+owner: Dependency and release owner
+audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-THIRD-PARTY-RIGHTS"}
+waiver: {allowed: false, requires: null}
+links:
+  requirements: [R-AS-06, R-AS-16]
+  apple_guideline_refs: ["5.2", "5.2.1", "5.2.2"]
+sources: [APPLE-ARG, OFF-LICENSE]
+notes: OFF product data is not treated as personal data merely because it is public.
