@@ -5,6 +5,9 @@
 
 **ScanFair** ist der Produktname. **ESG-Score App** bleibt der Projekt- und Repository-Name. Das Repo bündelt Produktstrategie, Discovery, Prototypen, Scoring-Methodik und den lokal validierten Flutter-MVP.
 
+**Arbeitsrolle:** AI-gestütztes, compliance-orientiertes Product Engineering
+mit Technical Product Ownership, DevSecOps und Data Governance.
+
 ---
 
 ## 00 · Strategischer Kontext
