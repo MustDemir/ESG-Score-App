@@ -240,6 +240,58 @@ Dieses Repo enthält dafür Vorlagen:
 | Phase 3 | vollständiger S-/G-Score, Impact, Personalisierung | geplant |
 | Phase 4 | Supermarkt-Integration, Payment, AR, Skalierung | Vision |
 
+### Fortschritt der grossen Meilensteine
+
+Die Prozentwerte messen den nachweisbaren Abschluss gegen das jeweilige
+Meilensteinziel, nicht den Zeitverbrauch. Sie werden in 5-Prozent-Schritten
+aktualisiert. `0%` bedeutet, dass fuer das konkrete Arbeitspaket noch keine
+Implementierung begonnen hat; reine Planung oder Quellenrecherche zaehlt nicht
+als technische Fertigstellung.
+
+```text
+M1  Lokaler MVP und Integrationsbaseline [####################] 100%
+M2  Backend- und Datenanbindung           [########------------]  40%
+M3  Kaffee als Referenzfall               [####----------------]  20%
+M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
+M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
+M6  MVP-Beta und Product Hardening        [#############-------]  65%
+M7  App-Store-Release-Candidate           [#######-------------]  35%
+M8  TestFlight, Submission und Release    [--------------------]   0%
+```
+
+| Meilenstein | Bereits erreicht | Noch bis 100% |
+| --- | --- | --- |
+| M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
+| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, Migrationen und 51 pgTAP-Tests | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
+| M3 | Kaffeeprofil, Parameterkatalog und erstes AGRIBALYSE-Rohmapping | verifizierte Pilotprodukte, Rohstoff-/Herkunftslinks und reproduzierbare Detailerklaerung |
+| M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
+| M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
+| M6 | realer iPhone-Scanflow, Fehlerzustaende, Tests und 79% Coverage | Offline/History-Entscheidung, Accessibility, Lokalisierung und Feldtest |
+| M7 | acht Apple-Gate-Gruppen, iOS-Compile und Privacy-Bundle-Audit | alle offenen Release-Evidenzen und signiertes Release-Archive |
+| M8 | bewusst noch nicht begonnen | TestFlight, App-Store-Submission und Releaseentscheidung |
+
+### Naechste Arbeitspakete
+
+Diese Pakete beginnen nach der Integration bewusst bei `0%`:
+
+```text
+N1  Kaffee-Pilotprodukte festlegen        [--------------------]   0%
+N2  Produkt -> Rohstoff -> Herkunft       [--------------------]   0%
+N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
+N4  Server-Writer und Flutter-Cache       [--------------------]   0%
+N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
+N6  ILAB-Social-Risikomapping             [--------------------]   0%
+N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
+N8  Kalibrierung und Expertenreview       [--------------------]   0%
+```
+
+**Umsetzungsreihenfolge:** Nach dem Merge startet M3 mit einem lokalen,
+evidence-first Kaffee-Referenzfall. Sobald Produkt-, Rohstoff-, Herkunfts- und
+Evidenzvertraege fuer diesen vertikalen Schnitt stabil sind, laufen die offenen
+M2-Arbeiten parallel: EU-Supabase, vertrauenswuerdiger Server-Writer und
+read-only Flutter-Cache. Erst danach werden WRI, ILAB und GLEIF/BRIS
+score-relevant angebunden.
+
 ---
 
 ## 09 · Wissenschaftlicher Rahmen

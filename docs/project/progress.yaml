@@ -1,7 +1,60 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W31
-last_updated: 2026-07-27
+last_updated: 2026-07-28
+
+# Completion is measured against milestone acceptance criteria, not elapsed
+# time. Values move in five-percent increments and need repository evidence.
+roadmap_progress:
+  scale: acceptance_criteria_completion
+  increment_percent: 5
+  milestones:
+    - id: M1-local-mvp-integration
+      progress_percent: 100
+      next: complete_with_current_integration
+    - id: M2-backend-data-integration
+      progress_percent: 40
+      next: connect_eu_supabase_server_writer_and_flutter_read_cache
+    - id: M3-coffee-reference-case
+      progress_percent: 20
+      next: verify_pilot_products_commodity_origin_and_explanation
+    - id: M4-esg-source-expansion
+      progress_percent: 15
+      next: integrate_and_review_environmental_social_governance_sources
+    - id: M5-methodology-calibration
+      progress_percent: 15
+      next: calibrate_weights_normalization_and_red_flag_handling
+    - id: M6-mvp-beta-hardening
+      progress_percent: 65
+      next: decide_offline_history_and_run_accessibility_localization_field_tests
+    - id: M7-app-store-release-candidate
+      progress_percent: 35
+      next: close_release_evidence_and_validate_signed_archive
+    - id: M8-submission-release
+      progress_percent: 0
+      next: testflight_submission_and_release_decision
+  next_work_packages:
+    - id: N1-coffee-pilot-products
+      progress_percent: 0
+    - id: N2-product-commodity-origin-links
+      progress_percent: 0
+    - id: N3-eu-supabase-project
+      progress_percent: 0
+    - id: N4-server-writer-flutter-cache
+      progress_percent: 0
+    - id: N5-wri-aqueduct
+      progress_percent: 0
+    - id: N6-ilab-social-risk
+      progress_percent: 0
+    - id: N7-gleif-bris-legal-entity
+      progress_percent: 0
+    - id: N8-calibration-expert-review
+      progress_percent: 0
+  execution_order:
+    - merge_validated_integration
+    - start_local_evidence_first_coffee_vertical
+    - parallelize_m2_after_relationship_contracts_stabilize
+    - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
