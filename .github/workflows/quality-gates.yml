@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'feature/**'
     paths:
       # G-DOC-TRACE validates the repository README as a release-relevant artifact.
       - 'README.md'
@@ -34,6 +33,10 @@ on:
           - development
           - release_candidate
           - submission
+
+concurrency:
+  group: quality-gates-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read

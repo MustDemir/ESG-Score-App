@@ -316,6 +316,7 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [ESG-Scoring-Modell v1.0](docs/ESG-SCORING-MODELL-v1.md) | historischer Konzeptstand; ADR 0011 ist fuer die Formel verbindlich |
 | [ESG-Datenarchitektur](docs/project/data/data-architecture.md) | Provenienzmodell, Supabase-Grenze und Quellenregeln |
 | [ESG-Methodikkatalog](docs/project/methodology-catalog/README.md) | versionierter Parameterkern und Pilotprofile fuer Kaffee, Banane und Kakao |
+| [Delivery Operating Model](docs/project/delivery-operating-model.md) | verbindlicher Arbeitsrahmen fuer Prozess, Compliance, Entwicklung und Release |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
