@@ -1,5 +1,9 @@
 # ESG-Score App – Pitch & Konzeptdokument
 
+> **Historischer Konzeptstand.** Fuer die implementierte Score-Formel gilt
+> ADR 0011 mit `E=50% / S=30% / G=20%`. Abweichende Formeln in diesem Dokument
+> sind nicht die technische Source of Truth.
+>
 > **Version 2.0 | Februar 2026 | Mustafa Demir**
 >
 > Aktualisiertes Konzeptdokument basierend auf der Management-Präsentation

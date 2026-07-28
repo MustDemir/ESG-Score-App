@@ -53,7 +53,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Ergebnis'), findsOneWidget);
-    expect(find.text('Empfehlung'), findsOneWidget);
+    expect(find.text('Positive Signale'), findsOneWidget);
     expect(find.text('7.4'), findsOneWidget);
   });
 

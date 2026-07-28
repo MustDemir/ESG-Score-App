@@ -1,0 +1,67 @@
+schema_version: 1
+mapping_set_id: agribalyse-v3.2
+methodology_version: 2.0-draft
+status: validated
+source_id: agribalyse
+source_version: "3.2"
+retrieval_channel_source_id: open-food-facts
+reviewed_on: "2026-07-27"
+active_in_formula: false
+
+source_record:
+  id_field: Code AGB
+  url_template: https://agribalyse.ademe.fr/app/aliments/{agribalyse_code}
+  canonical_dataset: https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/XTENSJ
+  license: Etalab-2.0
+  attribution: Source ADEME, AGRIBALYSE v3.2
+
+mappings:
+  - id: AGB32-E-GHG-INTENSITY
+    parameter_id: E-GHG-INTENSITY
+    status: validated
+    mapping_kind: direct_raw_indicator
+    source_field: Changement climatique
+    source_unit: kg_co2e_per_kg
+    evidence_scope: category
+    delivery_paths:
+      value:
+        - environmental_score_data.agribalyse.co2_total
+        - ecoscore_data.agribalyse.co2_total
+      record_id:
+        - environmental_score_data.agribalyse.code
+        - ecoscore_data.agribalyse.code
+      source_version:
+        - environmental_score_data.agribalyse.version
+        - ecoscore_data.agribalyse.version
+      source_quality:
+        - environmental_score_data.agribalyse.dqr
+        - ecoscore_data.agribalyse.dqr
+    applicability:
+      profiles:
+        - coffee
+        - bananas
+        - cocoa-chocolate
+    evidence_requirements:
+      - source version equals 3.2
+      - AGRIBALYSE code and numeric value are present
+      - DQR is retained when available
+      - retrieval channel is recorded
+    customer_claim_rule: category_proxy_not_product_measurement
+    active_in_formula: false
+    activation_requires:
+      - product-to-AGRIBALYSE mapping validation
+      - normalization and weighting calibration
+      - methodology review
+    reference_records:
+      - code: "18003"
+        name_en: Coffee, ground
+        climate_change_kg_co2e_per_kg: 8.4
+        dqr: 3.67
+      - code: "13005"
+        name_en: Banana, pulp, raw
+        climate_change_kg_co2e_per_kg: 0.909
+        dqr: 2.61
+      - code: "31074"
+        name_en: Dark chocolate bar, more than 70% cocoa
+        climate_change_kg_co2e_per_kg: 19.1
+        dqr: 1.89

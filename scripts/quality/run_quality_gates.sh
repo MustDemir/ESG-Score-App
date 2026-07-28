@@ -71,36 +71,36 @@ gate_evidence_chain() {
   cd "$REPO_ROOT" && bash scripts/compliance/verify_evidence_chain.sh
 }
 
+gate_data_architecture() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_data_architecture.rb
+}
+
+gate_methodology_catalog() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_methodology_catalog.rb
+}
+
+gate_link_integrity() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate link-integrity
+}
+
+gate_missing_data() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate missing-data
+}
+
+gate_red_flag() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate red-flag
+}
+
+gate_score_reproducibility() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate score-reproducibility
+}
+
+gate_claim_safety() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate claim-safety
+}
+
 gate_docs_traceability() {
-  local missing=0
-  local check
-  local file
-  local marker
-  local checks=(
-    "README.md|Quality Gates"
-    "README.md|scripts/quality/run_quality_gates.sh"
-    "README.md|G-FLT-COVERAGE"
-    "README.md|G-IOS-COMPILE"
-    "README.md|G-CMP-SCHEMA"
-    "README.md|G-AS-CLAIMS-TRANSPARENCY"
-    "docs/project/compliance/apple-compliance-control-model.md|release_candidate"
-    "docs/project/compliance/source-register.yaml|APPLE-ARG"
-    "esg_app/README.md|flutter run"
-    "esg_app/README.md|Open Food Facts API v3"
-    "esg_app/README.md|mobile_scanner"
-  )
-
-  for check in "${checks[@]}"; do
-    file="${check%%|*}"
-    marker="${check#*|}"
-    if ! git -C "$REPO_ROOT" grep -Fq -- "$marker" HEAD -- "$file"; then
-      printf 'Missing documentation traceability in HEAD: %s: %s\n' "$file" "$marker"
-      missing=1
-    fi
-  done
-
-  [ "$missing" -eq 0 ] || return 1
-  printf 'Documentation traceability OK: %s committed markers\n' "${#checks[@]}"
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_documentation_traceability.rb
 }
 
 gate_yaml_syntax() {
@@ -149,6 +149,13 @@ run_gate "G-CMP-SCHEMA" "Compliance catalog schema and cross-link validation" ga
 run_gate "G-REG-UNIT" "Rego policy unit tests" gate_rego_unit_tests
 run_gate "G-CMP-APPLE" "Conftest compliance gates with evidence log" gate_app_compliance
 run_gate "G-CMP-EVIDENCE" "Compliance evidence hash-chain verification" gate_evidence_chain
+run_gate "G-DATA-ARCH" "ESG data schema, RLS and license validation" gate_data_architecture
+run_gate "G-METHOD-CATALOG" "ESG methodology catalog validation" gate_methodology_catalog
+run_gate "G-LINK-INTEGRITY" "Evidence-backed subject-link integrity" gate_link_integrity
+run_gate "G-MISSING-DATA" "No positive, neutral or zero missing-data imputation" gate_missing_data
+run_gate "G-RED-FLAG" "Non-compensatory severe-risk controls" gate_red_flag
+run_gate "G-SCORE-REPRO" "Versioned score-input reproducibility" gate_score_reproducibility
+run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
 

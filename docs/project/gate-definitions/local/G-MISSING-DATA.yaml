@@ -1,0 +1,32 @@
+id: G-MISSING-DATA
+name: Missing-data safety
+dimension: methodisch
+lifecycle_phase: scoring
+trigger: Pull request, feature push, local quality run
+policy_checks:
+  - Missing evidence is never imputed as positive, neutral or zero
+  - Missing required links block the affected factor
+  - Missing relevant parameters reduce confidence
+  - Blocked assessments use the data-incomplete state
+evidence_required:
+  - docs/project/methodology-catalog/scoring-controls.yaml
+  - docs/project/methodology-catalog/parameters.yaml
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - D-COVERAGE
+    - D-SOURCE-QUALITY
+  related_adrs:
+    - 0010
+    - 0023
+    - 0025
+sources:
+  - docs/project/methodology-catalog/scoring-controls.yaml

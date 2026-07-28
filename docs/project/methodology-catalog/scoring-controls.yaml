@@ -1,0 +1,105 @@
+schema_version: 1
+control_set_id: scoring-safety-controls
+methodology_version: 2.0-draft
+status: draft
+active_in_formula: false
+updated_at: "2026-07-27"
+
+purpose: |
+  Prevent unsupported product claims and non-reproducible scores while the
+  hierarchical methodology is calibrated. These controls are mandatory before
+  methodology 2.0 can become customer-facing.
+
+assertion_classes:
+  measured:
+    score_eligible: true
+    description: Product- or supply-chain-specific measurement.
+  verified:
+    score_eligible: true
+    description: Independently verified record with matching subject and scope.
+  declared:
+    score_eligible: true
+    description: Attributable declaration by the responsible economic operator.
+  modeled:
+    score_eligible: false
+    description: Model output that requires a separately approved parameter mapping.
+  category_average:
+    score_eligible: false
+    description: Category proxy that is not a measurement of the scanned product.
+  community_reported:
+    score_eligible: false
+    description: Community-maintained fact requiring corroboration.
+  inferred:
+    score_eligible: false
+    description: ScanFair-derived link that must not be presented as a fact.
+  unknown:
+    score_eligible: false
+    description: No substantiated assertion is available.
+
+link_integrity:
+  minimum_score_confidence: medium
+  score_eligible_assertion_classes:
+    - measured
+    - verified
+    - declared
+  every_relationship_requires:
+    - source_id
+    - source_record_id
+    - retrieved_at
+    - confidence
+    - assertion_class
+    - evidence_ids
+  contextual_commodity_country_risk_requires:
+    - contains_commodity
+    - commodity_has_origin
+  legal_entity_governance_requires:
+    - marketed_by_brand
+    - responsible_legal_entity
+  unbound_product_origin_is_not_commodity_origin: true
+
+missing_data:
+  no_positive_imputation: true
+  no_neutral_imputation: true
+  no_zero_imputation: true
+  required_link_missing_behavior: block_factor_assessment
+  required_parameter_missing_behavior: reduce_confidence
+  customer_state_when_score_blocked: data_incomplete
+
+red_flags:
+  non_compensatory: true
+  confirmed_finding_requires:
+    - official_or_audited_evidence
+    - matching_subject
+    - matching_scope
+    - valid_time_window
+  contextual_risk_is_not_confirmed_finding: true
+  confirmed_severe_social_finding:
+    publication_decision: block_pending_methodology_review
+    may_be_offset_by_other_pillars: false
+  numeric_cap:
+    status: deferred
+    rationale: A numeric cap requires calibration and expert validation.
+
+reproducibility:
+  required_snapshot_fields:
+    - formula_version
+    - input_fingerprint
+    - evidence_ids
+    - relationship_ids
+    - data_confidence_score
+    - red_flag_evidence_ids
+    - calculated_at
+  immutable_source_snapshot_required: true
+  deterministic_formula_required: true
+  formula_version_required: true
+
+claims:
+  score_is_not_certification: true
+  score_is_not_legal_compliance_determination: true
+  category_proxy_label: category_average_not_product_measurement
+  contextual_risk_label: risk_not_product_finding
+  missing_data_label: not_assessed
+  prohibited_customer_phrases:
+    - guaranteed_esg_compliant
+    - free_from_child_labor_without_product_evidence
+    - measured_product_footprint_from_category_proxy

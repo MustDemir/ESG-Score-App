@@ -39,6 +39,7 @@ esg_app/android/app/google-services.json
 .env
 .env.local
 supabase/.temp/
+supabase/.branches/
 
 # Misc
 *.log

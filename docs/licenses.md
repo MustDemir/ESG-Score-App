@@ -3,15 +3,31 @@
 ## Produktdaten
 
 ### Open Food Facts
-Lizenz: **Open Database License (ODbL) v1.0** — Produktdaten
-Inhalte (Texte, Bilder): **Creative Commons Attribution-ShareAlike (CC BY-SA)**
+Produktdatenbank: **Open Database License (ODbL) v1.0**
+Einzelne Datenbankinhalte: **Database Contents License**
+Produktbilder: **Creative Commons Attribution-ShareAlike (CC BY-SA)**
 
 Pflicht-Attribution in der App:
 > Produktdaten © Open Food Facts contributors — odbl.openfoodfacts.org
 
-Wer von OFF-Daten *abgeleitete* Datenbanken veröffentlicht, muss sie unter ODbL teilen.
-→ Konsequenz für ScanFair: berechnete ESG-Scores, die auf OFF-Daten basieren, müssen
-auf Anfrage offengelegt werden bzw. unter kompatibler Lizenz publiziert werden.
+Wer eine aus OFF-Daten abgeleitete oder kombinierte Datenbank oeffentlich
+verwendet, muss die ODbL-Bedingungen zu Attribution und Share-Alike beachten.
+Vor dem Mischen mit weiteren Quellen ist deren Lizenzkompatibilitaet zu pruefen.
+Die konkrete Einordnung berechneter ScanFair-Scores bleibt vor einer
+Veroeffentlichung juristisch zu bestaetigen.
+
+### AGRIBALYSE
+
+Umwelt-LCA-Daten: **Etalab Open Licence 2.0**
+
+Attribution:
+> Source ADEME, AGRIBALYSE v3.2
+
+Die Lizenz erlaubt Anpassung, abgeleitete Informationen und kommerzielle
+Nutzung mit Quellen- und Aktualitaetsangabe. ScanFair fuehrt AGRIBALYSE
+logisch getrennt von der ODbL-Produktdatenbank und kennzeichnet Open Food Facts
+als Retrieval-Channel. Die Werte sind Kategorieproxies und keine gemessenen
+Markenprodukt-Fussabdruecke.
 
 ## Schriften
 - **Inter** — SIL Open Font License 1.1

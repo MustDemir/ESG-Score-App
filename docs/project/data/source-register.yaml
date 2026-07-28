@@ -1,0 +1,153 @@
+version: "1.0"
+last_updated: "2026-07-27"
+owner: "ScanFair"
+
+integration_rules:
+  - Every score-relevant fact must retain source, source field, record ID,
+    retrieval time, quality class and license.
+  - Source data and ScanFair-derived scores must remain distinguishable.
+  - A new source must pass technical, methodological and license review before
+    activation.
+  - Data must not be combined into a reusable database until license
+    compatibility and redistribution duties are documented.
+
+sources:
+  - id: open-food-facts
+    name: Open Food Facts
+    status: active
+    role: primary_product_source
+    api:
+      family: v3
+      latest_reviewed_subversion: "3.6"
+      product_schema_version: response_field
+      endpoint: https://world.openfoodfacts.org/api/v3/product/{barcode}.json
+      authentication: none_for_read
+      user_agent_required: true
+      product_read_rate_limit: 15_per_minute_per_ip
+    license:
+      database: ODbL-1.0
+      contents: Database Contents License
+      images: CC-BY-SA
+      attribution: Open Food Facts contributors
+      share_alike_review_required: true
+      terms: https://world.openfoodfacts.org/terms-of-use
+    quality:
+      class: community_and_source_calculated
+      limitations:
+        - completeness_not_guaranteed
+        - correctness_not_guaranteed
+        - schema_changes_over_time
+    reviewed_on: "2026-07-27"
+    review_due: "2026-10-27"
+
+  - id: agribalyse
+    name: AGRIBALYSE
+    status: active
+    role: authoritative_environmental_lca_reference
+    release:
+      version: "3.2"
+      persistent_id: doi:10.57745/XTENSJ
+      official_dataset: https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/XTENSJ
+      summary_csv: https://www.data.gouv.fr/api/1/datasets/r/41397293-3e85-4959-8936-940bb79d91fc
+      record_url_template: https://agribalyse.ademe.fr/app/aliments/{agribalyse_code}
+    delivery:
+      canonical: official_bulk_dataset
+      current_app_channel: open-food-facts
+      channel_fields:
+        - environmental_score_data.agribalyse
+        - ecoscore_data.agribalyse
+    license:
+      database: Etalab-2.0
+      attribution: Source ADEME, AGRIBALYSE v3.2
+      commercial_reuse_allowed: true
+      derived_information_allowed: true
+      terms: https://doc.agribalyse.fr/documentation/utiliser-agribalyse/precautions-et-conditions-dusage
+    quality:
+      class: official_lca_reference
+      dqr_scale: 1_very_good_to_5_very_poor
+      use_caution_above_dqr: 3
+      limitations:
+        - category_average_not_brand_product_measurement
+        - simplified_data_cannot_compare_brands_within_one_category
+        - not_sufficient_as_only_environmental_source
+        - biodiversity_and_water_method_limitations
+        - source_updates_every_18_to_24_months
+    reviewed_on: "2026-07-27"
+    review_due: "2026-10-27"
+
+planned_sources:
+  - id: gs1-traceability-standards
+    status: reference_standard
+    role: product_identity_and_supply_chain_interoperability
+    scope:
+      - gtin_product_identity
+      - gln_party_and_location_identity
+      - epcis_traceability_events
+      - digital_link_resolution
+    official_reference: https://www.gs1.org/standards/traceability
+    note: Reference architecture only; no GS1 dataset is currently ingested.
+  - id: gleif-lei
+    status: candidate
+    role: legal_entity_and_ownership_resolution
+    official_api: https://www.gleif.org/en/lei-data/gleif-api
+    activation_requires:
+      - API_and_bulk_data_terms_reviewed
+      - brand_to_legal_entity_matching_benchmark_created
+      - ambiguous_matches_require_manual_review
+      - ownership_relationship_scope_documented
+  - id: eu-bris
+    status: candidate
+    role: eu_business_register_corroboration
+    official_reference: https://ec.europa.eu/digital-building-blocks/sites/display/DIGITAL/Business+Registers+Interconnection+System
+    activation_requires:
+      - machine_access_path_and_terms_reviewed
+      - jurisdiction_identifier_mapping_validated
+      - no_unverified_name_only_match
+  - id: us-dol-ilab-goods-list
+    status: candidate
+    role: contextual_commodity_country_child_and_forced_labor_risk
+    official_reference: https://www.dol.gov/agencies/ilab/reports/child-labor/list-of-goods
+    activation_requires:
+      - current_release_and_download_format_versioned
+      - redistribution_terms_reviewed
+      - commodity_country_mapping_validated
+      - risk_not_product_finding_claim_enforced
+      - no_product_specific_violation_inference
+  - id: wri-aqueduct
+    status: candidate
+    role: contextual_water_risk
+    version: "4.0"
+    license: CC-BY-4.0
+    activation_requires:
+      - origin_geography_mapping_validated
+      - hydrobasin_or_country_join_validated
+      - risk_claim_language_reviewed
+      - methodology_version_updated
+  - id: eu-eudr-country-benchmarking
+    status: candidate
+    role: regulatory_deforestation_country_context
+    legal_basis: Commission Implementing Regulation EU 2025/1093
+    activation_requires:
+      - current_legal_version_check_automated
+      - product_commodity_and_origin_mapping_validated
+      - risk_not_product_finding_claim_enforced
+      - bananas_explicitly_excluded_from_eudr_mapping
+  - id: faostat-emissions-intensities
+    status: rejected_for_pilot_profiles
+    reason: |
+      The October 2025 domain covers selected cereals and animal products,
+      but not coffee, cocoa or bananas. It is not a full life-cycle dataset.
+  - id: social-country-risk
+    status: candidate
+    activation_requires:
+      - authoritative_dataset_selected
+      - country_mapping_and_versioning_validated
+      - redistribution_compatible_with_odbl
+      - methodology_version_updated
+  - id: governance-company-reporting
+    status: candidate
+    activation_requires:
+      - authoritative_dataset_selected
+      - brand_to_legal_entity_resolution_validated
+      - claims_review_completed
+      - methodology_version_updated

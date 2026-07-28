@@ -4,7 +4,11 @@ Lokaler Flutter-MVP fuer ScanFair. Die App bildet den Kernflow ab:
 Home/Kamera-Scan, echter Produktlookup ueber die Open Food Facts API v3,
 ESG-Score-Berechnung, Ergebnisansicht, Detailansicht sowie Low-Data-,
 Not-Found-, Kamera-Permission- und Netzwerkfehler-Zustaende. Demo-Daten bleiben
-fuer deterministische Tests verfuegbar.
+fuer deterministische Tests verfuegbar. Live-Daten werden in feldgenaue
+`ESGEvidence`-Eintraege mit Quelle, Lizenz, Zeitstempel und Qualitaetsklasse
+ueberfuehrt. AGRIBALYSE-3.2-Klimadaten werden bei vorhandenem AGB-Code als
+offizielle Kategorieevidenz erfasst; Open Food Facts bleibt als
+Retrieval-Channel sichtbar. Dieses Rohmapping veraendert Formel v1.0 nicht.
 
 ## Lokal starten
 
@@ -50,6 +54,10 @@ bash scripts/quality/run_ios_build_gate.sh
 ## Architektur
 
 - `lib/models/` enthaelt Product- und ESG-Score-Datenmodelle.
+- `lib/models/esg_evidence.dart` definiert die normalisierte Datenprovenienz.
+- `lib/models/esg_relationship.dart` modelliert GTIN-, Rohstoff-, Herkunfts-,
+  Marken- und Rechtstraegerbeziehungen mit Assertion-Klasse und Confidence.
+- `lib/data_sources/` enthaelt quellenspezifische Mapper.
 - `lib/services/esg_score_calculator.dart` implementiert ADR 0011.
 - `lib/services/open_food_facts_service.dart` kapselt OFF API v3 mit Timeout,
   Retry, User-Agent und Fehlerklassifikation.
@@ -59,7 +67,13 @@ bash scripts/quality/run_ios_build_gate.sh
 - `lib/screens/` enthaelt ausserdem Home, Result, Details, LowData und NotFound.
 - `lib/widgets/score_widgets.dart` enthaelt wiederverwendbare Score-Komponenten.
 
-Noch nicht Teil dieses lokalen Stands: Supabase, TestFlight, App-Store-Release
-oder Online-Deployment. Xcode 26.6 und der unsigned iOS-Simulator-Build wurden
-lokal validiert. Der echte Kamera-Smoke-Test muss auf einem angeschlossenen,
-lokal signierten iPhone erfolgen.
+Die Detailansicht zeigt die aktuell aufgeloesten Beziehungen. Community-Daten
+und abgeleitete Rohstoffhinweise bleiben sichtbar, sind aber nicht automatisch
+score-aktiv. Eine Rohstoff-Laender-Risikobewertung benoetigt einen belastbaren
+Produkt-Rohstoff-Link und einen separaten Rohstoff-Herkunfts-Link.
+
+Das RLS-gesicherte Supabase-Schema liegt migrationsbasiert unter `../supabase/`.
+Noch nicht verbunden sind ein Remote-Supabase-Projekt, der Flutter-Supabase-
+Client, Auth, TestFlight, App-Store-Release oder Online-Deployment. Xcode 26.6
+und der unsigned iOS-Simulator-Build wurden lokal validiert. Der echte Kamera-
+Smoke-Test muss auf einem angeschlossenen, lokal signierten iPhone erfolgen.

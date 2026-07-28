@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../data_sources/open_food_facts_product_mapper.dart';
 import '../models/product.dart';
 import 'product_lookup_failure.dart';
 
@@ -15,6 +16,7 @@ class OpenFoodFactsService {
     this.maxAttempts = 3,
     this.retryBaseDelay = const Duration(milliseconds: 250),
     this.userAgent = defaultUserAgent,
+    this.mapper = const OpenFoodFactsProductMapper(),
     RetryDelay? delay,
   }) : assert(maxAttempts > 0),
        _client = client ?? http.Client(),
@@ -37,12 +39,16 @@ class OpenFoodFactsService {
     'ecoscore_grade',
     'ecoscore_score',
     'ecoscore_data',
+    'ingredients',
     'ingredients_text',
     'packaging_tags',
     'origins_tags',
     'labels_tags',
     'data_quality_tags',
     'data_quality_warnings_tags',
+    'schema_version',
+    'last_modified_t',
+    'last_updated_t',
   ];
 
   final http.Client _client;
@@ -52,6 +58,7 @@ class OpenFoodFactsService {
   final int maxAttempts;
   final Duration retryBaseDelay;
   final String userAgent;
+  final OpenFoodFactsProductMapper mapper;
 
   Future<ScanFairProduct?> findByBarcode(String barcode) async {
     final normalized = barcode.trim();
@@ -140,9 +147,10 @@ class OpenFoodFactsService {
 
     final product = payload['product'];
     if (product is Map) {
-      return ScanFairProduct.fromOpenFoodFactsJson(
+      return mapper.map(
         Map<String, Object?>.from(product),
         barcode: barcode,
+        retrievedAt: DateTime.now().toUtc(),
       );
     }
 

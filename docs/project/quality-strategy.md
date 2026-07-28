@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-07-19
+Letztes Update: 2026-07-27
 
 ---
 
@@ -41,6 +41,9 @@ Letztes Update: 2026-07-19
 | `lib/widgets/` (ProductCard, ScoreHero) | Widget | `flutter test` mit `WidgetTester` |
 | `lib/screens/` (Scanner, Result) | Widget + Integration | `flutter test` + `integration_test` |
 | API-Calls (echte OFF-API) | Manuell + selten in CI | `--tags=network` |
+| Methodikkatalog und Profile | Schema-, Referenz- und Claim-Regeln | `G-METHOD-CATALOG` |
+| Subject Links und Score-Sicherheit | Link-, Missing-Data-, Red-Flag-, Reproduzierbarkeits- und Claim-Regeln | `G-LINK-INTEGRITY` bis `G-CLAIM-SAFETY` |
+| Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
 | Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
 
 ### Coverage-Gates
@@ -66,14 +69,19 @@ mitprueft.
 
 | Job | Inhalt | Ergebnis |
 |---|---|---|
-| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
+| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
+| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 51 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt elf Engineering-, Schema-, Policy-, Evidence- und Doku-Gates ab; der
-native iOS-Compile-Job und der vollstaendige Git-History-Scan erfolgen
-zusaetzlich in GitHub Actions. Es gibt keine automatische Auslieferung. Das
+Sie deckt achtzehn Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
+und Doku-Gates ab.
+Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
+vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
+Datenbanktest ist lokal ueber
+`bash scripts/quality/run_data_database_gate.sh` reproduzierbar. Es gibt keine
+automatische Auslieferung. Das
 Profil `release_candidate` ist eine strenge lokale Freigabepruefung und fuehrt
 weder TestFlight-Upload noch App-Store-Submission aus.
 
@@ -88,7 +96,8 @@ Die Apple-Kontrollen verwenden drei Profile:
 
 - Require pull request before merging
 - Require status checks: `Local CI quality gates`,
-  `G-IOS-COMPILE native iOS build`, `Secret scan gate`
+  `G-IOS-COMPILE native iOS build`,
+  `G-DATA-RLS migration and policy tests`, `Secret scan gate`
 - Require linear history
 - Block force-pushes
 

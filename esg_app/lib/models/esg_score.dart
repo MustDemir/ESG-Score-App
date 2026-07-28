@@ -40,11 +40,11 @@ class ESGScore {
   String get verdictLabel {
     switch (trafficLight) {
       case TrafficLight.green:
-        return 'Empfehlung';
+        return 'Positive Signale';
       case TrafficLight.yellow:
-        return 'Mit Bedacht';
+        return 'Gemischte Signale';
       case TrafficLight.red:
-        return 'Kritisch prüfen';
+        return 'Kritische Signale';
       case TrafficLight.grey:
         return 'Daten unvollständig';
     }
@@ -90,10 +90,12 @@ class ScoreFactor {
     required this.value,
     required this.source,
     required this.available,
+    this.evidenceIds = const [],
   });
 
   final String label;
   final String value;
   final String source;
   final bool available;
+  final List<String> evidenceIds;
 }

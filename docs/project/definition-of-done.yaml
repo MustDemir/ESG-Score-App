@@ -103,12 +103,50 @@ task_types:
       - ALTER TABLE ... ENABLE ROW LEVEL SECURITY für neue Tabellen
       - RLS-Policies explizit pro Operation (SELECT/INSERT/UPDATE/DELETE)
       - Test: Anon-Role darf NICHT was nicht erlaubt ist
+      - supabase db reset --local erfolgreich
+      - supabase test db --local erfolgreich
+      - supabase db lint --local --level warning ohne Findings
       - Default-Werte und NOT-NULL-Constraints bewusst gewählt
       - Indizes für häufige Queries
       - Rollback-Strategie dokumentiert (kann ich die Migration zurücknehmen?)
     references:
       - decisions/0008-security-baseline.yaml [SEC-3]
       - failure-modes.yaml [FM-12]
+
+  # ---------------------------------------------------------------------------
+  - id: methodology_catalog_change
+    title: ESG-Parameter- oder Profiländerung
+    description: Methodikdefinition, Kategorieprofil oder Quellenmapping
+    lade_manifest:
+      pflicht:
+        - decisions/0011-esg-score-formel.yaml
+        - decisions/0022-evidence-first-data-integration.yaml
+        - decisions/0023-hierarchical-esg-parameter-catalog.yaml
+        - decisions/0025-evidence-backed-traceability-links.yaml
+        - methodology-catalog/README.md
+        - methodology-catalog/scoring-controls.yaml
+      kontext:
+        - data/source-register.yaml
+    checks:
+      - Parameter-ID und Bedeutung bleiben innerhalb einer Version stabil
+      - Anwendbarkeit unterscheidet required, conditional und not_applicable
+      - Fehlende relevante Daten werden nicht als positives Ergebnis gewertet
+      - Länder- oder Rohstoffrisiko wird nicht als Produktverstoß dargestellt
+      - Datenkonfidenz bleibt außerhalb der E-/S-/G-Gewichtung
+      - Neue Gewichte benötigen Kalibrierung, Review und neue Methodikversion
+      - Quelle, Lizenz, Scope, Aktualität und Mapping sind dokumentiert
+      - G-METHOD-CATALOG erfolgreich
+      - G-LINK-INTEGRITY erfolgreich
+      - G-MISSING-DATA erfolgreich
+      - G-RED-FLAG erfolgreich
+      - G-SCORE-REPRO erfolgreich
+      - G-CLAIM-SAFETY erfolgreich
+      - Bei Datenbankänderung G-DATA-RLS erfolgreich
+    references:
+      - decisions/0023-hierarchical-esg-parameter-catalog.yaml
+      - decisions/0025-evidence-backed-traceability-links.yaml
+      - methodology-catalog/parameters.yaml
+      - methodology-catalog/scoring-controls.yaml
 
   # ---------------------------------------------------------------------------
   - id: architecture_decision

@@ -1,0 +1,42 @@
+schema_version: 1
+profile_id: bananas
+methodology_version: 2.0-draft
+status: draft
+display_name_de: Bananen
+display_name_en: Bananas
+extends: food-base
+description_de: Risikoorientierte Erweiterung fuer Bananen.
+description_en: Risk-oriented extension for bananas.
+
+parameters:
+  - parameter_id: E-WATER-SCARCITY
+    applicability: required
+    priority: high
+  - parameter_id: E-BIODIVERSITY-POLLUTION
+    applicability: required
+    priority: high
+  - parameter_id: E-TRANSPORT-COLD-CHAIN
+    applicability: required
+    priority: medium
+  - parameter_id: S-CHILD-LABOR-RISK
+    applicability: conditional
+    priority: medium
+  - parameter_id: S-FORCED-LABOR-RISK
+    applicability: conditional
+    priority: medium
+  - parameter_id: S-LABOR-RIGHTS
+    applicability: required
+    priority: high
+  - parameter_id: S-OCCUPATIONAL-SAFETY
+    applicability: required
+    priority: high
+  - parameter_id: S-LIVING-INCOME-WAGE
+    applicability: required
+    priority: high
+  - parameter_id: S-SUPPLY-CHAIN-TRACEABILITY
+    applicability: required
+    priority: high
+
+weighting:
+  status: deferred
+  rationale: Numeric weights require validated sources and calibration data.

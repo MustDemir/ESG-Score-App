@@ -1,5 +1,9 @@
 # MVP Requirements Document – ESG-Score App
 
+> **Historischer Requirements-Stand.** Fuer die implementierte Score-Formel
+> gilt ADR 0011 mit `E=50% / S=30% / G=20%`. Abweichende Formeln in diesem
+> Dokument sind durch diese spaetere Entscheidung ersetzt.
+>
 > **Version 1.0 | Februar 2026 | Autor: Mustafa Demir**
 >
 > Dieses Dokument ist der technische Bauplan für das MVP der ESG-Score App.

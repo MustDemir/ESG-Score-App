@@ -1,7 +1,60 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W29
-last_updated: 2026-07-19
+current_week: 2026-W31
+last_updated: 2026-07-28
+
+# Completion is measured against milestone acceptance criteria, not elapsed
+# time. Values move in five-percent increments and need repository evidence.
+roadmap_progress:
+  scale: acceptance_criteria_completion
+  increment_percent: 5
+  milestones:
+    - id: M1-local-mvp-integration
+      progress_percent: 100
+      next: complete_with_current_integration
+    - id: M2-backend-data-integration
+      progress_percent: 40
+      next: connect_eu_supabase_server_writer_and_flutter_read_cache
+    - id: M3-coffee-reference-case
+      progress_percent: 20
+      next: verify_pilot_products_commodity_origin_and_explanation
+    - id: M4-esg-source-expansion
+      progress_percent: 15
+      next: integrate_and_review_environmental_social_governance_sources
+    - id: M5-methodology-calibration
+      progress_percent: 15
+      next: calibrate_weights_normalization_and_red_flag_handling
+    - id: M6-mvp-beta-hardening
+      progress_percent: 65
+      next: decide_offline_history_and_run_accessibility_localization_field_tests
+    - id: M7-app-store-release-candidate
+      progress_percent: 35
+      next: close_release_evidence_and_validate_signed_archive
+    - id: M8-submission-release
+      progress_percent: 0
+      next: testflight_submission_and_release_decision
+  next_work_packages:
+    - id: N1-coffee-pilot-products
+      progress_percent: 0
+    - id: N2-product-commodity-origin-links
+      progress_percent: 0
+    - id: N3-eu-supabase-project
+      progress_percent: 0
+    - id: N4-server-writer-flutter-cache
+      progress_percent: 0
+    - id: N5-wri-aqueduct
+      progress_percent: 0
+    - id: N6-ilab-social-risk
+      progress_percent: 0
+    - id: N7-gleif-bris-legal-entity
+      progress_percent: 0
+    - id: N8-calibration-expert-review
+      progress_percent: 0
+  execution_order:
+    - merge_validated_integration
+    - start_local_evidence_first_coffee_vertical
+    - parallelize_m2_after_relationship_contracts_stabilize
+    - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -121,6 +174,57 @@ milestones:
       das strenge Release-Candidate-Profil blockiert erwartungsgemaess 27 offene
       MUST-Nachweise.
 
+  - id: M15
+    title: Evidence-first Datenarchitektur und lokales Supabase-Schema
+    date: 2026-07-27
+    phase: phase-1-mvp
+    notes: |
+      ADR 0022 trennt externe Quellfakten, normalisierte ESGEvidence und
+      versionierte Score-Snapshots. Der OFF-Mapper speichert Lizenz,
+      Originalfeld, Qualitaetsklasse, Schema-Version und Zeitstempel. Eine
+      lokale Supabase-Migration definiert Datenquellen, Produktcache, Evidenz,
+      Score-Snapshots und private Scans mit RLS. G-DATA-ARCH prueft
+      Migration, Client-Rechte, Lizenzmetadaten und Service-Key-Verbot.
+
+  - id: M16
+    title: Hierarchischer ESG-Methodikkatalog v2 als gepruefter Entwurf
+    date: 2026-07-27
+    phase: phase-1-mvp
+    notes: |
+      ADR 0023 definiert einen universellen Lebensmittelkern mit erbenden
+      Pilotprofilen fuer Kaffee, Banane und Kakao/Schokolade. 26 Parameter
+      trennen Performance, Kontext-Risiko, Assurance und Datenkonfidenz.
+      Formel v1.0 bleibt aktiv; 2.0-draft hat keine Gewichte und ist per RLS
+      fuer App-Clients unsichtbar. G-METHOD-CATALOG validiert Definitionen,
+      Referenzen, Vererbung und zulässige Kundenaussagen. Der echte
+      Der aktuelle Migration-Replay besteht nach der Traceability-Erweiterung
+      51/51 pgTAP-Tests ohne DB-Lint-Findings.
+
+  - id: M17
+    title: Erste autoritative Umweltquelle und Rohmapping integriert
+    date: 2026-07-27
+    phase: phase-1-mvp
+    notes: |
+      ADR 0024 registriert AGRIBALYSE 3.2 unter Etalab Open Licence 2.0.
+      Der OFF-Adapter erhaelt AGB-Code, Version, Klimawert und DQR, ordnet die
+      Evidenz aber korrekt AGRIBALYSE zu und dokumentiert OFF als
+      Retrieval-Channel. E-GHG-INTENSITY ist fuer Kaffee, Banane und
+      Kakao/Schokolade als Rohmapping validiert, bleibt jedoch Kategorieproxy
+      und bis zu Normalisierung, Kalibrierung und Review nicht score-aktiv.
+
+  - id: M18
+    title: Evidenzbasierte Traceability- und Scoring-Safety-Schicht
+    date: 2026-07-27
+    phase: phase-1-mvp
+    notes: |
+      ADR 0025 trennt Produkt, Rohstoff, Herkunft, Marke und Rechtstraeger als
+      explizite Entitaeten und Beziehungen. OFF-Links tragen Quelle,
+      Assertion-Klasse und Confidence, bleiben als Community-Hinweise aber
+      nicht score-aktiv. Fuenf neue Gates pruefen Link-Integritaet,
+      Missing-Data-Regeln, nicht-kompensierbare Red Flags,
+      Score-Reproduzierbarkeit und sichere Kundenaussagen. Der lokale
+      Migration-Replay besteht 51/51 pgTAP-Tests ohne DB-Lint-Findings.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -222,6 +326,15 @@ decisions_made:
   - adr: 0021
     title: Apple-Compliance mit gestuften Enforcement-Profilen steuern
     date: 2026-07-19
+  - adr: 0022
+    title: Evidence-first Datenintegration mit RLS-geschuetztem Supabase-Cache
+    date: 2026-07-27
+  - adr: 0023
+    title: Hierarchischer und versionierter ESG-Parameterkatalog
+    date: 2026-07-27
+  - adr: 0024
+    title: AGRIBALYSE 3.2 als Umwelt-LCA-Quelle auf Kategorieebene
+    date: 2026-07-27
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -229,8 +342,9 @@ decisions_made:
 weekly_log:
   - week: 2026-W31
     summary: |
-      Apple Build Integrity mit echter iOS-Bundle-Evidenz erweitert, ohne
-      offene Signatur-, Privacy- oder App-Store-Nachweise faelschlich freizugeben.
+      Apple Build Integrity mit echter iOS-Bundle-Evidenz und die
+      Evidence-first Datenarchitektur um einen versionierten, hierarchischen
+      ESG-Methodikkatalog erweitert.
     done:
       - App-eigenes PrivacyInfo.xcprivacy in den Runner-Resources eingebunden
       - Privacy-Audit fuer App-, Flutter- und mobile_scanner-Manifests umgesetzt
@@ -240,22 +354,50 @@ weekly_log:
       - CI-macOS-Artefakt um ios_privacy_audit.json erweitert
       - Source Register um Apple Required-Reason-, SDK- und App-Privacy-Details ergaenzt
       - Build-Integrity-Policy bei invalidem Manifest oder stale Review fail-closed erweitert
+      - OFF-Produktdaten in normalisierte Evidenz mit Feld- und Lizenzprovenienz ueberfuehrt
+      - Lokale Supabase-Migration mit RLS und Default-Deny-Schreibrechten erstellt
+      - G-DATA-ARCH in lokale Pipeline und GitHub Actions integriert
+      - G-DATA-RLS als eigener GitHub-Job und lokales pgTAP-Skript integriert
+      - Supabase CLI 2.110.0 installiert und lokalen Stack reproduzierbar validiert
+      - 26 ESG- und Datenkonfidenz-Parameter als YAML-SSOT definiert
+      - Lebensmittel-Basisprofil und Profile fuer Kaffee, Banane und Kakao/Schokolade erstellt
+      - Fuenf versionierte Methodiktabellen mit published-only RLS ergaenzt
+      - G-METHOD-CATALOG fuer Referenzen, Vererbung, Claims und Gewichtung integriert
+      - AGRIBALYSE 3.2 und Etalab-Lizenz als Umweltquelle registriert
+      - E-GHG-INTENSITY-Rohmapping fuer die drei Pilotprofile validiert
+      - AGRIBALYSE-Code, DQR und OFF-Retrieval-Channel im App-Evidenzmodell umgesetzt
+      - Traceability-Entitaeten, Identifikatoren und evidenzbasierte Beziehungen modelliert
+      - OFF-Rohstoff-, Produktherkunfts- und Markenhinweise mit Confidence normalisiert
+      - Community- und Inference-Links per Default von Score-Eingaben ausgeschlossen
+      - Score-Snapshots um Confidence-, Relationship- und Red-Flag-Lineage erweitert
+      - Fuenf Scoring-Safety-Gates in lokale Pipeline und GitHub Actions integriert
     checks:
       - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
       - Privacy-Bundle-Audit PASS, 3 Manifests, 0 Findings
       - Technische Privacy-Teilkontrollen von G-AS-BUILD-INTEGRITY PASS
       - Release-Candidate-Gesamtcheck erwartungsgemaess FAIL, 25 offene MUST-Nachweise
-      - Development Quality Pipeline 11/11 PASS, 26 Release-Warnungen sichtbar
+      - Development Quality Pipeline 18/18 PASS, 26 Release-Warnungen sichtbar
       - Compliance-Katalog 19 Requirements, 8 Gates, 14 Quellen valide
-      - OPA Policy-Tests 16/16 PASS
+      - OPA Policy-Tests 17/17 PASS
+      - Betroffene Flutter-Service-Tests 12/12 PASS
+      - Flutter Analyze PASS
+      - G-DATA-ARCH PASS
+      - Supabase Migration-Replay PASS, pgTAP 51/51 PASS, DB-Lint ohne Findings
+      - Methodikkatalog PASS, 26 Parameter, 4 Profile, 1 Rohmapping, Gewichte ausgesetzt
+      - Flutter-Test-Suite 29/29 PASS, Line-Coverage 79.08 Prozent
+      - Scoring-Safety-Gates 5/5 PASS
     blockers:
       - App-Store-Privacy-Klassifikation fuer Barcode-/Netzwerkdaten bleibt offen
       - Publisher-Signaturkontinuitaet fuer gelistete binaere SDKs braucht ein signiertes Release-Archive
       - Weitere Release-Evidenz fuer Kamera, Metadata, Review, Claims, Rechte und Support fehlt
+      - Remote-EU-Projekt, AVV/Region-Evidenz und Flutter-Cache-Adapter fehlen
+      - Weitere Quellenmappings, Gewichte und Kalibrierung fuer 2.0-draft fehlen
     next_week:
       - In-App-OFF-Attribution und ESG-Limitationen umsetzen
       - Privacy-/Support-Inhalte sowie versionierte App-Store-Metadaten vorbereiten
       - Kamera-Lokalisierungen und dokumentierten Device-/IPv6-Smoke-Test schliessen
+      - WRI Aqueduct fuer kontextuelles Wasserknappheitsrisiko pruefen
+      - Produkt-Herkunftszuordnung fuer Laender- und Rohstoffrisiken definieren
 
   - week: 2026-W29
     summary: |
@@ -426,11 +568,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 17
+  decisions_total: 19
   todos_open: 13
   todos_in_progress: 2
   todos_done: 8
-  milestones_reached: 12
+  milestones_reached: 18
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

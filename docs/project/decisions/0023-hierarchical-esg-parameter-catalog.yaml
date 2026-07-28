@@ -1,0 +1,95 @@
+id: 0023
+title: Hierarchical and versioned ESG parameter catalog
+date: 2026-07-27
+status: accepted
+deciders: [Mustafa]
+tags: [methodology, scoring, parameters, profiles, transparency, data]
+
+context: |
+  A single flat factor list cannot represent materially different food supply
+  chains. Coffee, bananas and cocoa share a common ESG core but differ in
+  water, deforestation, labor, income, transport and traceability relevance.
+  Creating a separate formula per SKU would be unmaintainable and would make
+  comparisons and customer explanations inconsistent.
+
+options_considered:
+  - name: One universal flat parameter list
+    pros: [simple implementation]
+    cons:
+      - irrelevant parameters distort completeness
+      - commodity-specific risks remain hidden
+  - name: Independent formula for every product or SKU
+    pros: [maximum theoretical specificity]
+    cons:
+      - unbounded catalog growth
+      - no consistent comparison or governance
+      - weights and rules become impossible to review
+  - name: Universal core with inheriting category profiles
+    pros:
+      - common definitions remain comparable
+      - profiles can express category materiality
+      - product evidence remains separate from methodology
+      - versions and customer claims remain auditable
+    cons:
+      - profile inheritance and publication require validation
+
+decision: Universal core with inheriting category profiles
+rationale: |
+  The hierarchy separates reusable definitions, category materiality and
+  product-specific evidence. It also distinguishes relevant missing evidence
+  from a confirmed non-applicable parameter. Numeric weights are deferred
+  until candidate sources, coverage and calibration data have been reviewed.
+
+implementation:
+  source_of_truth:
+    parameters: docs/project/methodology-catalog/parameters.yaml
+    base_profile: docs/project/methodology-catalog/profiles/food-base.yaml
+    pilot_profiles:
+      - docs/project/methodology-catalog/profiles/coffee.yaml
+      - docs/project/methodology-catalog/profiles/bananas.yaml
+      - docs/project/methodology-catalog/profiles/cocoa-chocolate.yaml
+  database:
+    tables:
+      - methodology_versions
+      - parameters
+      - category_profiles
+      - profile_parameters
+      - source_mappings
+    client_boundary: Only published methodology versions are readable.
+  quality_gates:
+    - G-METHOD-CATALOG validates definitions, references and claim rules.
+    - G-DATA-ARCH validates schema, RLS and server-only catalog writes.
+    - G-DATA-RLS executes migrations and pgTAP behavior tests.
+
+customer_result_contract:
+  first_view:
+    - overall ESG score and verdict
+    - environmental, social and transparency pillar results
+    - separate data confidence
+    - separate health companion indicator
+  detail_view:
+    - factor results and evidence
+    - source, scope, freshness and quality
+    - missing and non-applicable parameters
+    - methodology and score version
+  constraints:
+    - Internal governance remains the G pillar; the customer label may use
+      Transparency and Corporate Governance.
+    - Health is not part of the ESG total.
+    - Commodity or country risk must not be presented as proof of a
+      product-specific labor or environmental violation.
+
+publication_rule: |
+  Formula v1.0 remains the active MVP method. Version 2.0-draft cannot create
+  customer-facing scores until sources, mappings, weights, calibration and
+  claims have passed review and a dedicated publication migration.
+
+consequences:
+  - The next increment researches sources against explicit parameters.
+  - Source mappings need license, scope, freshness and quality review.
+  - Profile weights cannot be added silently.
+  - Published score snapshots retain their methodology version.
+
+supersedes: null
+superseded_by: null
+related: [0003, 0009, 0010, 0011, 0022]

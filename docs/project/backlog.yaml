@@ -191,7 +191,18 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: in_progress
+    completed_parts:
+      - Evidence-first Datenmodell und OFF-Provenienz implementiert
+      - Lokale Supabase-Migration fuer Datenquellen, Cache, Evidenz,
+        Score-Snapshots und private Scans erstellt
+      - RLS und Default-Deny Client-Schreibrechte via G-DATA-ARCH validiert
+    remaining:
+      - Supabase CLI installieren und Migration mit db reset --local ausfuehren
+      - Dediziertes EU-Development-Projekt anlegen und AVV/Region belegen
+      - Flutter-Cache-Adapter erst nach Environment- und Privacy-Review anbinden
+      - Auth-Provider und Account-Loeschung separat umsetzen
+    updated: 2026-07-27
     created: 2026-05-19
 
   - id: TODO-005
@@ -519,3 +530,32 @@ todos:
     activation_trigger: "Vor TestFlight oder App-Store-Submission"
     related: [TODO-014, TODO-021, TODO-022, TODO-023]
     created: 2026-07-19
+
+  - id: TODO-026
+    title: ESG-Methodikkatalog v2 validieren und mit Quellen belegen
+    description: |
+      Den hierarchischen Lebensmittel-Parameterkatalog schrittweise von
+      2.0-draft zur pruefbaren Methodik entwickeln: Quellenkandidaten je
+      Parameter bewerten, Herkunfts- und Unternehmenszuordnung absichern,
+      Mappingregeln definieren, Testprodukte kalibrieren und Claims reviewen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: L
+    status: in_progress
+    completed_parts:
+      - 26 wiederverwendbare ESG- und Datenkonfidenz-Parameter definiert
+      - Lebensmittel-Basisprofil mit Vererbungsregeln definiert
+      - Pilotprofile fuer Kaffee, Banane und Kakao/Schokolade definiert
+      - Versionierte Supabase-Methodiktabellen mit RLS erstellt
+      - G-METHOD-CATALOG und 51 pgTAP-Datenbanktests integriert
+      - AGRIBALYSE 3.2 samt Etalab-Lizenz und Retrieval-Channel registriert
+      - Rohmapping E-GHG-INTENSITY fuer drei Pilotprofile validiert
+    remaining_parts:
+      - Weitere Quellen- und Lizenzpruefung je unversorgtem Parameter
+      - Brand-zu-Rechtstraeger- und Produkt-zu-Herkunft-Mapping
+      - Numerische Gewichtung und Kalibrierung mit dokumentierten Testprodukten
+      - Fachlicher Review der Kundenaussagen
+      - Publikationsmigration von 2.0-draft erst nach Freigabe
+    related: [0022, 0023, TODO-002, TODO-004]
+    created: 2026-07-27
+    updated: 2026-07-27
