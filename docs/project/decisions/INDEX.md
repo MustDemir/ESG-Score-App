@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-07-27
+Letztes Update: 2026-07-28
 
 ## Aktive ADRs
 
@@ -33,6 +33,7 @@ Letztes Update: 2026-07-27
 | [0023](0023-hierarchical-esg-parameter-catalog.yaml) | Hierarchischer und versionierter ESG-Parameterkatalog | accepted | 2026-07-27 | methodology, scoring, parameters, profiles, transparency, data | 0003, 0009, 0010, 0011, 0022 |
 | [0024](0024-agribalyse-category-lca-source.yaml) | AGRIBALYSE 3.2 als Umwelt-LCA-Quelle auf Kategorieebene | accepted | 2026-07-27 | data, environment, lca, agribalyse, provenance, licensing | 0003, 0011, 0016, 0022, 0023 |
 | [0025](0025-evidence-backed-traceability-links.yaml) | Evidenzbasierte Traceability-Links vor ESG-Risiko-Joins | accepted | 2026-07-27 | data, traceability, scoring, confidence, claims | 0022, 0023, 0024 |
+| [0026](0026-reproducible-supply-chain-baseline.yaml) | Reproduzierbare Dependency- und Supply-Chain-Baseline | accepted | 2026-07-28 | security, dependencies, supply-chain, github-actions, ios, licensing | 0007, 0008, 0017, 0020, 0021 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -45,7 +46,7 @@ Letztes Update: 2026-07-27
 
 | Status | Anzahl |
 |---|---|
-| accepted | 19 |
+| accepted | 22 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 1 |
@@ -59,8 +60,8 @@ Letztes Update: 2026-07-27
 - **data / api** → 0003, 0016, 0022, 0024, 0025
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
-- **ci-cd / testing** → 0007, 0020, 0021
-- **security / dsgvo** → 0008
+- **ci-cd / testing** → 0007, 0020, 0021, 0026
+- **security / dsgvo** → 0008, 0026
 - **methodology** → 0009, 0011, 0023, 0025
 - **scoring / esg** → 0010, 0011, 0023, 0025
 - **compliance** → 0009

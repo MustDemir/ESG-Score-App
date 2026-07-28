@@ -278,7 +278,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 Diese Pakete beginnen nach der Integration bewusst bei `0%`:
 
 ```text
-N0  Compliance-/Security-Baseline        [--------------------]   0%
+N0  Compliance-/Security-Baseline        [######--------------]  30%
 N1  Kaffee-Pilotprodukte festlegen        [--------------------]   0%
 N2  Produkt -> Rohstoff -> Herkunft       [--------------------]   0%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
@@ -323,6 +323,7 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [ESG-Methodikkatalog](docs/project/methodology-catalog/README.md) | versionierter Parameterkern und Pilotprofile fuer Kaffee, Banane und Kakao |
 | [Delivery Operating Model](docs/project/delivery-operating-model.md) | verbindlicher Arbeitsrahmen fuer Prozess, Compliance, Entwicklung und Release |
 | [Verbesserungsregister](docs/project/improvement-register.yaml) | priorisierte Prozess-, Compliance-, Entwicklungs- und Betriebsverbesserungen mit Evidenz |
+| [Supply-Chain-Policy](docs/project/compliance/supply-chain-policy.yaml) | OSV-, Lizenz-, native iOS-, Action-Pin- und Ausnahmevorgaben |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
@@ -340,7 +341,7 @@ deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
 Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
 implementiert.
 
-**Validierter MVP-Stand (27. Juli 2026)**
+**Validierter MVP-Stand (28. Juli 2026)**
 
 | Bereich | Ergebnis |
 | --- | --- |
@@ -355,6 +356,7 @@ implementiert.
 | Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
 | Datenbank | Dreizehn Supabase-Tabellen reproduzierbar; 51 pgTAP-Tests und DB-Lint bestanden, Remote noch nicht verbunden |
 | Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
+| Supply Chain | 59 Dart-Pakete, 2 iOS-Plugins und 16 Action-Referenzen inventarisiert; OSV meldet 0 bekannte Schwachstellen |
 | Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
 | Release-Scope | Kein TestFlight, App-Store-Release, Hosting oder iOS-Deployment |
 
@@ -399,6 +401,7 @@ flutter run --profile --no-resident -d <IPHONE_DEVICE_ID>
 ```bash
 cd /Users/mustafademir/ESG-Score-App
 bash scripts/quality/run_quality_gates.sh
+bash scripts/quality/run_supply_chain_gate.sh
 bash scripts/quality/run_ios_build_gate.sh
 bash scripts/quality/run_data_database_gate.sh
 
@@ -411,6 +414,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | Gate | Zweck |
 | --- | --- |
 | `G-FLT-DEPS` | Flutter Dependencies reproduzierbar aufloesen |
+| `G-SUPPLY-CHAIN` | Lockfile, OSV-Findings, Lizenzen, native iOS-Plugins und unveraenderliche Action-SHAs pruefen |
 | `G-FLT-FORMAT` | Format-Drift blocken |
 | `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
 | `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
@@ -444,12 +448,16 @@ Pushes nach `main`, Pull Requests nach `main` und manuell via
 `workflow_dispatch`. Branch-Pushes ohne Pull Request erzeugen bewusst keinen
 doppelten Lauf.
 Sie veroeffentlicht Gate-Summaries und die Artefakte
-`scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
+`scanfair-quality-gate-results`, `scanfair-supply-chain-evidence` sowie
+`scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
-geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den neunzehn
-schnellen lokalen Gate-Gruppen laufen ein eigener nativer
+geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
+zwanzig schnellen lokalen Gate-Gruppen laufen ein sichtbarer
+Supply-Chain-/Dependency-Review-Job, ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
-separater Gitleaks-Secret-Scan. Bei manuellen Laeufen kann zwischen
+separater Gitleaks-Secret-Scan. Dependabot prueft `pub` und GitHub Actions
+woechentlich; ein geplanter Montagslauf prueft den bestehenden Lockfile-Stand
+erneut gegen neu veroeffentlichte Schwachstellen. Bei manuellen Laeufen kann zwischen
 `development`, `release_candidate` und `submission` gewaehlt werden.
 
 `G-CMP-APPLE` umfasst `G-AS-BUILD-INTEGRITY`, `G-AS-PRIVACY`, `G-AS-CAMERA`,

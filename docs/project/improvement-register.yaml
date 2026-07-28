@@ -35,7 +35,6 @@ allowed_values:
     - submission
 
 execution_order:
-  - IMP-PROC-002
   - IMP-COMP-001
   - IMP-COMP-002
   - IMP-COMP-003
@@ -75,7 +74,7 @@ improvements:
   - id: IMP-PROC-002
     layer: process
     title: Verbesserungsregister und Projektstatus als pruefbare SSOT
-    status: review
+    status: done
     priority: P0
     risk: M
     owner: Mustafa Demir
@@ -93,17 +92,19 @@ improvements:
       - docs/project/features/README.md
       - scripts/quality/validate_project_control.rb
       - docs/project/gate-definitions/local/G-LOCAL-PROJECT-CONTROL.yaml
+      - https://github.com/MustDemir/ESG-Score-App/pull/8
     verification:
       - G-PROJECT-CONTROL lokal erfolgreich
       - Gesamte lokale Quality-Gate-Pipeline erfolgreich
+      - Post-Merge Quality-Gate-Run 30372528843 erfolgreich
     dependencies:
       - IMP-PROC-001
-    next_action: Nach gruenem PR und Post-Merge-CI auf done setzen
+    next_action: Keine; Register und Validator bei neuen Statusfeldern gemeinsam pflegen
 
   - id: IMP-COMP-001
     layer: compliance
     title: Reproduzierbarer Dependency- und Supply-Chain-Scan
-    status: planned
+    status: review
     priority: P0
     risk: H
     owner: Engineering
@@ -117,12 +118,26 @@ improvements:
       - Verwundbarkeits- und Lizenzpruefung ist lokal und in GitHub reproduzierbar
       - Kritische Findings blockieren; Ausnahmen haben Owner und Ablaufdatum
       - GitHub Actions sind auf gepruefte Versionen oder Commit-SHAs festgelegt
-    evidence: []
+    evidence:
+      - docs/project/decisions/0026-reproducible-supply-chain-baseline.yaml
+      - docs/project/compliance/supply-chain-policy.yaml
+      - docs/project/gate-definitions/local/G-LOCAL-SUPPLY-CHAIN.yaml
+      - scripts/quality/run_supply_chain_gate.sh
+      - scripts/quality/validate_supply_chain.rb
+      - .github/dependabot.yml
+      - .github/dependency-review-config.yml
+      - .github/workflows/quality-gates.yml
     verification:
-      - Neues Supply-Chain-Gate mit Pass- und Fail-Nachweis
+      - Sieben automatisierte Pass-/Fail-Tests fuer Pins, Findings, native Pakete und Ausnahmen
+      - Lokaler Scan inventarisiert 59 Dart-Pakete und 2 iOS-Plugins
+      - Lokaler OSV-Scan meldet 0 bekannte Schwachstellen
+      - Alle 16 Action-Referenzen verwenden volle Commit-SHAs
+      - GitHub Dependabot Alerts und Security Updates sind aktiviert
+      - GitHub meldet 0 offene Dependabot Alerts
+      - flutter pub outdated meldet keine advisory-betroffenen oder zurueckgezogenen Pakete
     dependencies:
       - IMP-PROC-002
-    next_action: Tooling und Finding-Schwellen fuer Flutter, CocoaPods und Actions festlegen
+    next_action: PR-CI validieren, nach Merge GitHub-SHA-Pinning und den neuen Required Check aktivieren
 
   - id: IMP-COMP-002
     layer: compliance

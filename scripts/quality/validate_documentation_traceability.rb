@@ -16,6 +16,7 @@ checks = {
     "G-SCORE-REPRO",
     "G-CLAIM-SAFETY",
     "G-PROJECT-CONTROL",
+    "G-SUPPLY-CHAIN",
     "AGRIBALYSE 3.2",
     "G-AS-CLAIMS-TRANSPARENCY",
     "Delivery Operating Model",
@@ -32,6 +33,11 @@ checks = {
     "IMP-COMP-001",
     "IMP-DEV-001",
     "IMP-OPS-001",
+  ],
+  "docs/project/compliance/supply-chain-policy.yaml" => [
+    "OSV-Scanner",
+    "require_full_length_commit_sha",
+    "maximum_validity_days",
   ],
   "docs/project/compliance/apple-compliance-control-model.md" => [
     "release_candidate",

@@ -1,0 +1,87 @@
+schema_version: "1.0"
+last_reviewed: "2026-07-28"
+owner: Engineering
+
+scope:
+  dart_lockfile: esg_app/pubspec.lock
+  dart_package_config: esg_app/.dart_tool/package_config.json
+  flutter_plugin_inventory: esg_app/.flutter-plugins-dependencies
+  github_workflows: .github/workflows
+  ios_dependency_model: flutter_swift_package_manager
+
+vulnerability_policy:
+  scanner: OSV-Scanner
+  version: "2.4.0"
+  fail_on_known_vulnerability: true
+  data_transmitted:
+    - package name
+    - package version
+    - package ecosystem
+  binaries:
+    darwin-arm64:
+      url: https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_darwin_arm64
+      sha256: 9ca3185ad63e9ab54f7cb90f46a7362be02d80e37f0123d095a54355ea202f5d
+    darwin-amd64:
+      url: https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_darwin_amd64
+      sha256: 088119325156321c34c456ac3703d6013538fd71cbac82b891ab34db491e4d66
+    linux-amd64:
+      url: https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_amd64
+      sha256: 15314940c10d26af9c6649f150b8a47c1262e8fc7e17b1d1029b0e479e8ed8a0
+    linux-arm64:
+      url: https://github.com/google/osv-scanner/releases/download/v2.4.0/osv-scanner_linux_arm64
+      sha256: 44e580752910f0ff36ec99aff59af20f65df1e859aa31e5605a8f0d055b496e9
+
+license_policy:
+  allowed_identifiers:
+    - Apache-2.0
+    - BSD-3-Clause
+    - MIT
+    - LicenseRef-Flutter-SDK-Composite
+  fail_on_missing_or_unknown_license: true
+  note: |
+    LicenseRef-Flutter-SDK-Composite is limited to the Flutter SDK package
+    sky_engine. Flutter exposes the bundled third-party notices at runtime.
+
+github_actions_policy:
+  require_full_length_commit_sha: true
+  require_version_comment: true
+  allowed_reference_types:
+    - local
+    - full_commit_sha
+
+native_ios_policy:
+  expected_integration: flutter_swift_package_manager
+  allow_unlocked_remote_swift_packages: false
+  allow_unreviewed_cocoapods_lockfile: false
+  note: |
+    The current iOS plugins are local Flutter Swift packages. If a remote
+    Swift package or Podfile.lock appears, the gate fails until scanning,
+    licensing and lockfile handling are explicitly reviewed.
+
+exception_policy:
+  maximum_validity_days: 90
+  required_fields:
+    - id
+    - kind
+    - owner
+    - reason
+    - approved_on
+    - expires_on
+  allowed_kinds:
+    - vulnerability
+    - license
+    - action_reference
+
+exceptions: []
+
+references:
+  - title: OSV-Scanner supported lockfiles
+    url: https://google.github.io/osv-scanner/supported-languages-and-lockfiles/
+  - title: OSV-Scanner license scanning
+    url: https://google.github.io/osv-scanner/usage/license-scanning/
+  - title: Dart security advisories
+    url: https://dart.dev/tools/pub/security-advisories
+  - title: GitHub secure use for Actions
+    url: https://docs.github.com/en/actions/reference/security/secure-use
+  - title: GitHub Dependabot ecosystems
+    url: https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories
