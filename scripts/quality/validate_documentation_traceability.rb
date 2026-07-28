@@ -17,6 +17,13 @@ checks = {
     "G-CLAIM-SAFETY",
     "AGRIBALYSE 3.2",
     "G-AS-CLAIMS-TRANSPARENCY",
+    "Delivery Operating Model",
+  ],
+  "docs/project/delivery-operating-model.md" => [
+    "Vier Ebenen",
+    "Definition of Done",
+    "Gate-Aufnahmeregel",
+    "release_candidate",
   ],
   "docs/project/compliance/apple-compliance-control-model.md" => [
     "release_candidate",

@@ -58,6 +58,10 @@ supabase/.branches/
 # Update-Pakete (manuell entpackt)
 repo_update/
 
+# Persoenliche Arbeits- und Planungsunterlagen (lokal)
+MEIN_VORGEHEN.md
+MEIN_VORGEHEN.pdf
+
 # Flutter env (esg_app/)
 esg_app/.env
 esg_app/.env.local
