@@ -146,12 +146,21 @@ end
 improvements_by_id = improvements.each_with_object({}) do |item, index|
   index[item["id"]] = item if item["id"]
 end
+execution_positions = execution_order.each_with_index.to_h
 execution_order.each do |id|
   item = improvements_by_id[id]
   next unless item
 
   if %w[done parked dropped].include?(item["status"])
     violations << "improvement-register.yaml: execution_order includes terminal item #{id}"
+  end
+  Array(item["dependencies"]).each do |dependency|
+    next unless execution_positions.key?(dependency)
+
+    if execution_positions[dependency] >= execution_positions[id]
+      violations <<
+        "improvement-register.yaml: #{dependency} must precede dependent #{id}"
+    end
   end
 end
 
@@ -179,6 +188,33 @@ unless File.file?(feature_readme_path)
 else
   feature_readme = File.read(feature_readme_path)
   state_paths = Dir.glob(File.join(features_dir, "*", "state.yaml")).sort
+  state_features = state_paths.map { |path| File.basename(File.dirname(path)) }
+  overview_rows =
+    feature_readme.scan(/^\| \[([a-z0-9-]+)\]\(([^)]+\/state\.yaml)\) \|/)
+  overview_features = overview_rows.map(&:first)
+
+  overview_rows.each do |feature, link|
+    expected_link = "#{feature}/state.yaml"
+    unless link == expected_link
+      violations <<
+        "docs/project/features/README.md: #{feature} must link to #{expected_link}"
+    end
+  end
+  overview_features.each_with_object(Hash.new(0)) do |feature, counts|
+    counts[feature] += 1
+  end.each do |feature, count|
+    if count > 1
+      violations << "docs/project/features/README.md: duplicate feature row #{feature}"
+    end
+  end
+  (overview_features - state_features).each do |feature|
+    violations <<
+      "docs/project/features/README.md: #{feature} has no corresponding state.yaml"
+  end
+  (state_features - overview_features).each do |feature|
+    violations << "docs/project/features/README.md: missing feature row #{feature}"
+  end
+
   state_paths.each do |state_path|
     state = load_yaml(state_path)
     feature = state["feature"]
