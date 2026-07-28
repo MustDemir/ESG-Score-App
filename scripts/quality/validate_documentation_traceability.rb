@@ -15,15 +15,23 @@ checks = {
     "G-RED-FLAG",
     "G-SCORE-REPRO",
     "G-CLAIM-SAFETY",
+    "G-PROJECT-CONTROL",
     "AGRIBALYSE 3.2",
     "G-AS-CLAIMS-TRANSPARENCY",
     "Delivery Operating Model",
+    "Verbesserungsregister",
   ],
   "docs/project/delivery-operating-model.md" => [
     "Vier Ebenen",
     "Definition of Done",
     "Gate-Aufnahmeregel",
     "release_candidate",
+  ],
+  "docs/project/improvement-register.yaml" => [
+    "IMP-PROC-001",
+    "IMP-COMP-001",
+    "IMP-DEV-001",
+    "IMP-OPS-001",
   ],
   "docs/project/compliance/apple-compliance-control-model.md" => [
     "release_candidate",

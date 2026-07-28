@@ -1,0 +1,262 @@
+schema_version: "1.0"
+last_updated: 2026-07-28
+owner: Mustafa Demir
+purpose: |
+  Zentrales Register der aus der Gesamtbewertung abgeleiteten Verbesserungen.
+  Es verbindet Prozess, Compliance, Entwicklung und Betrieb mit pruefbaren
+  Akzeptanzkriterien, Evidenz und einer eindeutigen Umsetzungsreihenfolge.
+
+allowed_values:
+  layers:
+    - process
+    - compliance
+    - development
+    - operations
+  statuses:
+    - planned
+    - in_progress
+    - draft
+    - review
+    - done
+    - parked
+    - dropped
+  priorities:
+    - P0
+    - P1
+    - P2
+    - P3
+  risks:
+    - L
+    - M
+    - H
+  target_profiles:
+    - development
+    - release_candidate
+    - submission
+
+execution_order:
+  - IMP-PROC-002
+  - IMP-COMP-001
+  - IMP-COMP-002
+  - IMP-COMP-003
+  - IMP-DEV-001
+  - IMP-DEV-002
+  - IMP-OPS-001
+
+improvements:
+  - id: IMP-PROC-001
+    layer: process
+    title: Verbindliches Delivery Operating Model und geschuetzter main-Branch
+    status: done
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      Aenderungen muessen risikobasiert, nachvollziehbar und nur nach
+      reproduzierbaren Quality Gates integriert werden.
+    acceptance_criteria:
+      - Operating Model mit vier Ebenen, DoR, DoD und Gate-Aufnahmeregel ist versioniert
+      - Pull Requests erfassen Risiko, Evidenz, offene Punkte und Rollback
+      - main verlangt Pull Request und alle vier GitHub-Statuschecks
+      - Force-Push, Branch-Loeschung und Owner-Bypass sind ausgeschlossen
+    evidence:
+      - docs/project/delivery-operating-model.md
+      - .github/PULL_REQUEST_TEMPLATE.md
+      - .github/workflows/quality-gates.yml
+      - https://github.com/MustDemir/ESG-Score-App/rules/19894816
+      - https://github.com/MustDemir/ESG-Score-App/pull/7
+    verification:
+      - GitHub Ruleset Protect main ist active
+      - Post-Merge Quality-Gate-Run 30357533047 ist erfolgreich
+    dependencies: []
+    next_action: Keine; Regeln bei geaenderten GitHub-Jobnamen mitpflegen
+
+  - id: IMP-PROC-002
+    layer: process
+    title: Verbesserungsregister und Projektstatus als pruefbare SSOT
+    status: review
+    priority: P0
+    risk: M
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      Bewertungsergebnisse waren ueber README, Feature-States, Roadmap und
+      Operating Model verteilt und konnten dadurch widerspruechlich werden.
+    acceptance_criteria:
+      - Alle priorisierten Verbesserungsvorschlaege haben ID, Owner und Status
+      - Akzeptanzkriterien, Evidenz, Abhaengigkeiten und naechste Aktion sind erfasst
+      - Feature-Uebersicht entspricht den jeweiligen state.yaml-Dateien
+      - Ein lokales und in GitHub ausgefuehrtes Gate blockiert Strukturdrift
+    evidence:
+      - docs/project/improvement-register.yaml
+      - docs/project/features/README.md
+      - scripts/quality/validate_project_control.rb
+      - docs/project/gate-definitions/local/G-LOCAL-PROJECT-CONTROL.yaml
+    verification:
+      - G-PROJECT-CONTROL lokal erfolgreich
+      - Gesamte lokale Quality-Gate-Pipeline erfolgreich
+    dependencies:
+      - IMP-PROC-001
+    next_action: Nach gruenem PR und Post-Merge-CI auf done setzen
+
+  - id: IMP-COMP-001
+    layer: compliance
+    title: Reproduzierbarer Dependency- und Supply-Chain-Scan
+    status: planned
+    priority: P0
+    risk: H
+    owner: Engineering
+    target_profile: development
+    rationale: |
+      Flutter-, CocoaPods- und GitHub-Action-Abhaengigkeiten muessen auf
+      bekannte Schwachstellen, unerwartete Updates und Lizenzrisiken geprueft
+      werden.
+    acceptance_criteria:
+      - Flutter- und native iOS-Abhaengigkeiten sind inventarisiert
+      - Verwundbarkeits- und Lizenzpruefung ist lokal und in GitHub reproduzierbar
+      - Kritische Findings blockieren; Ausnahmen haben Owner und Ablaufdatum
+      - GitHub Actions sind auf gepruefte Versionen oder Commit-SHAs festgelegt
+    evidence: []
+    verification:
+      - Neues Supply-Chain-Gate mit Pass- und Fail-Nachweis
+    dependencies:
+      - IMP-PROC-002
+    next_action: Tooling und Finding-Schwellen fuer Flutter, CocoaPods und Actions festlegen
+
+  - id: IMP-COMP-002
+    layer: compliance
+    title: Risikobasierte OWASP-MASVS-Baseline fuer den iOS-MVP
+    status: planned
+    priority: P0
+    risk: H
+    owner: Engineering
+    target_profile: release_candidate
+    rationale: |
+      ADR 0008 nennt MASVS bereits als Referenz, uebersetzt die anwendbaren
+      Kontrollen aber noch nicht vollstaendig in pruefbare MVP-Nachweise.
+    acceptance_criteria:
+      - Anwendbare MASVS-Kontrollgruppen sind fuer ScanFair klassifiziert
+      - Nicht anwendbare Kontrollen sind mit Begruendung dokumentiert
+      - Automatisierbare Kontrollen haben Tests oder Gates
+      - Manuelle Device-Kontrollen haben Checkliste, Owner und Evidenzformat
+    evidence: []
+    verification:
+      - MASVS-Coverage-Matrix ohne unbegruendete Luecken
+      - Release-Candidate-Profil blockiert offene anwendbare MUST-Kontrollen
+    dependencies:
+      - IMP-COMP-001
+    next_action: MASVS-Kontrollen gegen Datenfluss, Kamera, Netzwerk und lokale Speicherung mappen
+
+  - id: IMP-COMP-003
+    layer: compliance
+    title: Apple-, Datenschutz-, Rechte- und Claim-Evidenz schliessen
+    status: in_progress
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: release_candidate
+    rationale: |
+      Die acht Apple-Gate-Gruppen sind technisch vorhanden, enthalten fuer
+      Release Candidate aber bewusst noch offene manuelle und rechtliche
+      MUST-Nachweise.
+    acceptance_criteria:
+      - Alle anwendbaren Apple-MUST-Anforderungen besitzen aktuelle Evidenz
+      - Privacy Policy, Support, Attribution und App-Metadaten sind versioniert
+      - Produkt- und ESG-Claims zeigen Methodik, Unsicherheit und Grenzen
+      - Signiertes Release-Archive besteht Build- und SDK-Integritaetspruefung
+    evidence:
+      - docs/project/compliance/apple-compliance-control-model.md
+      - docs/project/compliance/compliance-manifest.json
+      - docs/project/compliance/ios-privacy-sdk-review.json
+      - docs/privacy.md
+    verification:
+      - COMPLIANCE_PROFILE=release_candidate ohne offene anwendbare MUST-Findings
+    dependencies:
+      - IMP-COMP-001
+      - IMP-COMP-002
+    next_action: Offene Release-Evidenz pro Apple-Gate priorisieren und einzeln schliessen
+
+  - id: IMP-DEV-001
+    layer: development
+    title: Kaffee als evidence-first vertikalen Referenzfall fertigstellen
+    status: in_progress
+    priority: P1
+    risk: H
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      Ein realer Referenzfall prueft Produkt-, Rohstoff-, Herkunfts-,
+      Umwelt-, Social-, Governance- und Claim-Vertraege Ende-zu-Ende.
+    acceptance_criteria:
+      - Pilotprodukte und EANs sind festgelegt und reproduzierbar abrufbar
+      - Produkt-Rohstoff-Herkunftsbeziehungen beruhen auf geeigneter Evidenz
+      - Umwelt-, Social- und Governance-Faktoren zeigen Quelle und Confidence
+      - Ergebnis- und Detailansicht erklaeren Score, Unsicherheit und Datenluecken
+      - Derselbe Evidenzstand erzeugt denselben versionierten Score-Snapshot
+    evidence:
+      - docs/project/methodology-catalog/profiles/coffee.yaml
+      - docs/project/methodology-catalog/source-mappings/agribalyse-v3.2.yaml
+      - docs/project/data/environmental-source-assessment.yaml
+    verification:
+      - Kaffee-Fixtures und App-Tests bestehen
+      - Scoring-Safety-Gates bestehen
+    dependencies:
+      - IMP-COMP-001
+      - IMP-COMP-002
+    next_action: Pilotprodukte festlegen und belastbare Rohstoff-Herkunftslinks aufbauen
+
+  - id: IMP-DEV-002
+    layer: development
+    title: EU-Supabase, Server-Writer und read-only Flutter-Cache
+    status: planned
+    priority: P1
+    risk: H
+    owner: Engineering
+    target_profile: development
+    rationale: |
+      Externe Quelldaten und Score-Snapshots duerfen nicht durch den
+      Mobile-Client manipuliert werden; das lokale RLS-Modell braucht eine
+      kontrollierte Remote-Entsprechung.
+    acceptance_criteria:
+      - Getrenntes EU-Development-Projekt mit Region- und AVV-Evidenz existiert
+      - Migrationen sind reproduzierbar und RLS-Tests bestehen remote-nah
+      - Nur vertrauenswuerdiger Server-Writer schreibt Evidenz und Scores
+      - Flutter liest freigegebene Snapshots und verwendet einen sicheren Cache
+      - Secrets und Service-Role-Schluessel gelangen nie in die App
+    evidence:
+      - docs/project/data/data-architecture.md
+      - supabase/migrations/20260727000100_initial_data_architecture.sql
+      - supabase/tests/database/data_architecture.test.sql
+    verification:
+      - G-DATA-ARCH und G-DATA-RLS bestehen
+      - Integrations- und Offline-/Fehlerfalltests bestehen
+    dependencies:
+      - IMP-DEV-001
+    next_action: Environment-, Secret- und Datenschutzvertrag fuer das EU-Development-Projekt definieren
+
+  - id: IMP-OPS-001
+    layer: operations
+    title: Betriebs- und Release-Readiness vor TestFlight
+    status: planned
+    priority: P1
+    risk: H
+    owner: Mustafa Demir
+    target_profile: submission
+    rationale: |
+      Ein technisch fertiger Build reicht ohne Restore-, Monitoring-,
+      Incident-, Support- und Rollbacknachweise nicht fuer einen kontrollierten
+      externen Test oder App-Store-Release.
+    acceptance_criteria:
+      - Development, Staging und Production sind getrennt
+      - Backup, Restore, Migration und Rollback sind getestet
+      - Datenschutzfreundliches Crash-, API- und Datenfrische-Monitoring existiert
+      - Incident-, Support- und Datenkorrekturprozess sind dokumentiert
+      - TestFlight- und Submission-Checklisten besitzen nachvollziehbare Evidenz
+    evidence: []
+    verification:
+      - Submission-Profil und operativer Release-Drill bestehen
+    dependencies:
+      - IMP-COMP-003
+      - IMP-DEV-002
+    next_action: Erst nach stabilem Release Candidate einen Betriebs-Readiness-Schnitt planen

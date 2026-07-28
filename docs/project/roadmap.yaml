@@ -12,7 +12,7 @@ target_audience:
   secondary: Familien mit Kindern, die nachhaltig einkaufen wollen
 
 current_phase: phase-1-mvp
-last_updated: 2026-05-19
+last_updated: 2026-07-28
 
 phases:
   - id: phase-0-design
@@ -31,19 +31,20 @@ phases:
       - design_handoff_scanfair/
 
   - id: phase-1-mvp
-    title: MVP — Scan, Score, Alternativen
-    timeframe: 2026-05-19 bis 2026-06-30
+    title: Lokaler iOS-MVP — Scan, Score, Details
+    timeframe: 2026-05-19 bis zum lokal validierten Release Candidate
     status: current
     goals:
       - Flutter-Projekt aufgesetzt und buildbar
       - Barcode-Scan → OFF-Lookup → ESG-Score-Anzeige funktioniert
-      - 1 Beispielprodukt (GEPA) end-to-end durchspielbar
-      - TestFlight Build verfügbar
-      - Privacy Policy live
+      - Kaffee als evidence-first Referenzfall end-to-end durchspielbar
+      - App auf physischem iPhone lokal installierbar und testbar
+      - Privacy-, Support- und Methodiktexte lokal versioniert
     success_criteria:
       - Min. 20 reale DE-Barcodes liefern brauchbare Daten (>70% Coverage)
       - App startet, scannt, zeigt Score in <3 Sekunden
       - Keine kritischen Crashes auf iOS 17+
+      - Entwicklungs-Quality-Gates und nativer iOS-Build sind gruen
     decisions: [0001, 0002, 0003, 0004, 0005, 0007, 0008]
     risks: [RISK-001, RISK-002, RISK-003]
     out_of_scope:
@@ -52,6 +53,7 @@ phases:
       - Kassenbon-Scan
       - Community-Features
       - Gamification
+      - TestFlight-Upload und App-Store-Submission in der aktuellen lokalen Entwicklung
       - Android-Release (iOS first via TestFlight)
 
   - id: phase-2-ki-layer

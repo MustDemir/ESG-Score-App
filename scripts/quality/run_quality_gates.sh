@@ -99,6 +99,10 @@ gate_claim_safety() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate claim-safety
 }
 
+gate_project_control() {
+  cd "$REPO_ROOT" && ruby scripts/quality/validate_project_control.rb
+}
+
 gate_docs_traceability() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_documentation_traceability.rb
 }
@@ -156,6 +160,7 @@ run_gate "G-MISSING-DATA" "No positive, neutral or zero missing-data imputation"
 run_gate "G-RED-FLAG" "Non-compensatory severe-risk controls" gate_red_flag
 run_gate "G-SCORE-REPRO" "Versioned score-input reproducibility" gate_score_reproducibility
 run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
+run_gate "G-PROJECT-CONTROL" "Improvement and feature-state traceability" gate_project_control
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
 
