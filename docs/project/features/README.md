@@ -6,11 +6,11 @@
 
 ## Verfügbare Features
 
-| Feature | Status | Phase | Sprint |
-|---|---|---|---|
-| [scanner](scanner/state.yaml) | planned | phase-1-mvp | 2 |
-| [scoring](scoring/state.yaml) | planned | phase-1-mvp | 1 |
-| [results](results/state.yaml) | planned | phase-1-mvp | 2 |
+| Feature | Status | Fortschritt | Phase | Sprint |
+|---|---|---:|---|---:|
+| [scanner](scanner/state.yaml) | review | 95% | phase-1-mvp | 2 |
+| [scoring](scoring/state.yaml) | review | 95% | phase-1-mvp | 1 |
+| [results](results/state.yaml) | review | 85% | phase-1-mvp | 2 |
 
 ## Wann ein neuer Feature-State?
 
@@ -33,27 +33,27 @@
 
 ## Verbindung zu Code
 
-Aktuelle Code-Struktur (geplant für Sprint 1+):
+Aktuelle Kernstruktur:
 
 ```
 esg_app/lib/
 ├── screens/
-│   ├── scanner_screen.dart        ← feature: scanner
-│   ├── result_screen.dart         ← feature: results
+│   ├── scanner_screen.dart             ← feature: scanner
+│   ├── result_screen.dart              ← feature: results
+│   ├── detail_screen.dart              ← feature: results
 │   └── ...
 ├── services/
 │   ├── open_food_facts_service.dart  ← feature: scoring
 │   ├── esg_score_calculator.dart     ← feature: scoring
 │   └── ...
 ├── widgets/
-│   ├── score_hero.dart            ← feature: results
-│   ├── score_bars.dart            ← feature: results
-│   └── ...
+│   └── score_widgets.dart             ← feature: results
 └── models/
-    ├── product.dart               ← feature: scoring
-    └── esg_score.dart             ← feature: scoring
+    ├── product.dart                    ← feature: scoring
+    └── esg_score.dart                  ← feature: scoring
 ```
 
-State-Management (Provider vs Riverpod) — ADR 0012 noch zu schreiben.
-Folder-Konvention nach Architektur-Entscheidung evtl. anpassen
-(„clean architecture per feature folder" vs „type-based folders").
+Der Phase-1-MVP verwendet Flutter-native Zustandsverwaltung mit Constructor
+Injection gemaess ADR 0015. Die bestehende type-based Ordnerstruktur bleibt
+fuer den aktuellen Umfang bestehen; eine spaetere Umstellung braucht eine
+eigene Architekturentscheidung.

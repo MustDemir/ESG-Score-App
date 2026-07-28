@@ -1,9 +1,9 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
 status: review
-progress: 75
-current_focus: "Result-, Detail-, LowData-, NotFound- und API-Fehler-Screens implementiert"
-last_sync: "2026-07-18"
+progress: 85
+current_focus: "Result- und Detailflow auf echtem iPhone validiert; Quellen, Bilder und Accessibility werden gehaertet"
+last_sync: "2026-07-28"
 
 lade_manifest:
   pflicht:
@@ -23,16 +23,15 @@ implementation_steps:
   - S17  # Edge-States + Eco-Score-Fallback-UI
 
 code_locations:
-  - esg_app/lib/screens/result_screen.dart                 # geplant
-  - esg_app/lib/widgets/score_hero.dart                    # geplant
-  - esg_app/lib/widgets/score_bars.dart                    # geplant
-  - esg_app/lib/widgets/product_card.dart                  # geplant
-  - esg_app/lib/widgets/method_footnote.dart               # geplant
-  - esg_app/lib/widgets/edge_states/data_incomplete.dart   # geplant
-  - esg_app/lib/widgets/edge_states/not_found.dart         # geplant
+  - esg_app/lib/screens/result_screen.dart
+  - esg_app/lib/screens/detail_screen.dart
+  - esg_app/lib/screens/low_data_screen.dart
+  - esg_app/lib/screens/not_found_screen.dart
+  - esg_app/lib/screens/lookup_error_screen.dart
+  - esg_app/lib/widgets/score_widgets.dart
 test_locations:
-  - esg_app/test/screens/result_screen_test.dart           # geplant
-  - esg_app/test/widgets/score_hero_test.dart              # geplant
+  - esg_app/test/widget_test.dart
+  - esg_app/test/widgets/traceability_card_test.dart
 
 done:
   - |
@@ -51,6 +50,9 @@ done:
   - |
     2026-07-18 — Retry-faehiger LookupErrorScreen fuer Netzwerk, Timeout,
     Rate-Limit, Server- und Response-Fehler implementiert und getestet.
+  - |
+    2026-07-19 — Result- und Detailinformationen nach realem Kamera-Barcode-
+    Scan auf einem physischen iPhone erfolgreich angezeigt.
 
 decisions:
   - id: FD-R-01
@@ -60,13 +62,12 @@ decisions:
     adr_ref: "0010"
 
 open_items:
-  - Native iOS-Scanner-Adapter fehlt noch.
   - Echte Produktbilder aus OFF fehlen noch; aktuell Emoji-Platzhalter.
   - Accessibility-Pass nach erster Implementation (Screen-Reader-Labels)
 
 next_steps:
-  - Scanner-Adapter an HomeScreen anbinden
-  - Details/Quellen mit echten OFF-Feldern ausbauen
+  - Details/Quellen mit evidence-first Feldern ausbauen
+  - Echte OFF-Produktbilder mit sicherem Fallback integrieren
   - Accessibility-Pass fuer Result- und Detail-Screen
 
 cross_feature_dependencies:

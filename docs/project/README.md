@@ -18,6 +18,7 @@ docs/project/
 ├── decisions/             # ADRs (Architecture Decision Records) — append-only
 │   └── NNNN-titel.yaml
 ├── roadmap.yaml           # Phasen-Plan, Meilensteine
+├── improvement-register.yaml # Bewertete Verbesserungen, Reihenfolge und Evidenz
 ├── backlog.yaml           # Ideen, TODOs, geparkte Features
 ├── risks.yaml             # Risiko-Register
 ├── progress.yaml          # Fortschrittstracker
@@ -58,6 +59,9 @@ docs/project/
 4. **IDs nie wiederverwenden** — auch nicht nach Löschen.
 5. **Bei jedem neuen Eintrag: Datum im ISO-Format** (`YYYY-MM-DD`).
 6. **YAML ist Source of Truth.** GitHub Issues nur für aktuell aktive Arbeit.
+7. **Verbesserungen bleiben traceable.** Gesamtbewertungen werden im
+   `improvement-register.yaml` mit Owner, Status, Akzeptanzkriterien, Evidenz
+   und naechster Aktion gefuehrt.
 
 ## Schnellzugriff für Claude Code
 

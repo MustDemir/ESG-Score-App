@@ -275,6 +275,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 Diese Pakete beginnen nach der Integration bewusst bei `0%`:
 
 ```text
+N0  Compliance-/Security-Baseline        [--------------------]   0%
 N1  Kaffee-Pilotprodukte festlegen        [--------------------]   0%
 N2  Produkt -> Rohstoff -> Herkunft       [--------------------]   0%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
@@ -285,12 +286,13 @@ N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
 N8  Kalibrierung und Expertenreview       [--------------------]   0%
 ```
 
-**Umsetzungsreihenfolge:** Nach dem Merge startet M3 mit einem lokalen,
-evidence-first Kaffee-Referenzfall. Sobald Produkt-, Rohstoff-, Herkunfts- und
-Evidenzvertraege fuer diesen vertikalen Schnitt stabil sind, laufen die offenen
-M2-Arbeiten parallel: EU-Supabase, vertrauenswuerdiger Server-Writer und
-read-only Flutter-Cache. Erst danach werden WRI, ILAB und GLEIF/BRIS
-score-relevant angebunden.
+**Umsetzungsreihenfolge:** Zuerst wird N0 mit Dependency-/Supply-Chain-Scan,
+risikobasierter OWASP-MASVS-Baseline und priorisierter Apple-/Claim-Evidenz
+geschlossen. Danach wird M3 als lokaler evidence-first Kaffee-Referenzfall
+fortgesetzt. Sobald Produkt-, Rohstoff-, Herkunfts- und Evidenzvertraege fuer
+diesen vertikalen Schnitt stabil sind, laufen die offenen M2-Arbeiten parallel:
+EU-Supabase, vertrauenswuerdiger Server-Writer und read-only Flutter-Cache.
+Erst danach werden WRI, ILAB und GLEIF/BRIS score-relevant angebunden.
 
 ---
 
@@ -317,6 +319,7 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [ESG-Datenarchitektur](docs/project/data/data-architecture.md) | Provenienzmodell, Supabase-Grenze und Quellenregeln |
 | [ESG-Methodikkatalog](docs/project/methodology-catalog/README.md) | versionierter Parameterkern und Pilotprofile fuer Kaffee, Banane und Kakao |
 | [Delivery Operating Model](docs/project/delivery-operating-model.md) | verbindlicher Arbeitsrahmen fuer Prozess, Compliance, Entwicklung und Release |
+| [Verbesserungsregister](docs/project/improvement-register.yaml) | priorisierte Prozess-, Compliance-, Entwicklungs- und Betriebsverbesserungen mit Evidenz |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |
@@ -421,6 +424,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-SCORE-REPRO` | Formel-, Evidenz-, Relationship- und Fingerprint-Lineage validieren |
 | `G-CLAIM-SAFETY` | Risiko-, Proxy- und Kundenaussagen gegen unzulaessige Behauptungen pruefen |
 | `G-DATA-RLS` | Migration real abspielen, 51 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
+| `G-PROJECT-CONTROL` | Verbesserungsregister, Abhaengigkeiten und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
 | `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build und gebuendelte Privacy Manifests auf macOS/Xcode validieren |
@@ -433,12 +437,13 @@ bleiben als heuristischer MVP-Stand gekennzeichnet.
 **GitHub Actions**
 
 Die Action [Quality Gates](.github/workflows/quality-gates.yml) laeuft auf
-`main`, `feature/**`, Pull Requests nach `main` und manuell via
-`workflow_dispatch`.
+Pushes nach `main`, Pull Requests nach `main` und manuell via
+`workflow_dispatch`. Branch-Pushes ohne Pull Request erzeugen bewusst keinen
+doppelten Lauf.
 Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-quality-gate-results` sowie `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
-geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den achtzehn
+geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den neunzehn
 schnellen lokalen Gate-Gruppen laufen ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
 separater Gitleaks-Secret-Scan. Bei manuellen Laeufen kann zwischen

@@ -1,9 +1,9 @@
 feature: scanner
 title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
 status: review
-progress: 90
-current_focus: "nativer iOS-Scanner baut erfolgreich; physischer iPhone-Smoke-Test bleibt offen"
-last_sync: "2026-07-19"
+progress: 95
+current_focus: "realer iPhone-Scanflow validiert; Performance-Messung und Accessibility bleiben offen"
+last_sync: "2026-07-28"
 
 lade_manifest:
   pflicht:
@@ -42,6 +42,10 @@ done:
     manuelle Eingabe als Fallback implementiert.
   - 2026-07-19 — NSCameraUsageDescription und G-AS-CAMERA-PURPOSE aktiviert.
   - 2026-07-19 — Nativer unsigned iOS-Simulator-Build mit Xcode 26.6 PASS.
+  - |
+    2026-07-19 — Physischer iPhone-Smoke-Test erfolgreich: App installiert,
+    Kamera-Barcode-Scan durchgefuehrt und Result-/Detailinformationen im realen
+    End-to-End-Flow angezeigt.
 
 decisions:
   - id: FD-SC-01
@@ -56,13 +60,13 @@ decisions:
     adr_ref: "0015"
 
 open_items:
-  - Physischer iPhone-Smoke-Test fuer Kamera, Permission und Torch
   - "Performance-Budget: unter 500ms von Tap bis erkannter EAN auf echtem iPhone messen"
+  - Accessibility-Labels und VoiceOver-Verhalten fuer Kamera-Controls pruefen
   - Android-Scanner-Validierung bleibt gemaess Roadmap fuer Phase 3 geparkt
 
 next_steps:
-  - iPhone per USB verbinden, Developer Mode aktivieren und lokales Signing setzen
-  - Reale Lebensmittel-Barcodes scannen und End-to-End-Latenz protokollieren
+  - Reale Lebensmittel-Barcodes als Pilotkorpus festlegen
+  - End-to-End-Latenz und Kamera-Fallbacks auf dem iPhone protokollieren
 
 cross_feature_dependencies:
   - from: scanner

@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-07-27
+Letztes Update: 2026-07-28
 
 ---
 
@@ -62,20 +62,21 @@ Coverage ist **Indikator, nicht Ziel**. Ein Test der nur Coverage erzeugt ist Sc
 
 Die verbindliche Workflow-Datei ist
 [`quality-gates.yml`](../../.github/workflows/quality-gates.yml). Sie laeuft
-bei Pushes nach `main` und `feature/**`, bei Pull Requests nach `main` sowie
-manuell via `workflow_dispatch`. Aenderungen an der
+bei Pushes nach `main`, bei Pull Requests nach `main` sowie manuell via
+`workflow_dispatch`. Feature-Branch-Pushes ohne Pull Request loesen bewusst
+keinen doppelten Lauf aus. Aenderungen an der
 Repository-README loesen sie ebenfalls aus, weil `G-DOC-TRACE` diese Datei
 mitprueft.
 
 | Job | Inhalt | Ergebnis |
 |---|---|---|
-| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
+| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
 | `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 51 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt achtzehn Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
+Sie deckt neunzehn Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -98,8 +99,8 @@ Die Apple-Kontrollen verwenden drei Profile:
 - Require status checks: `Local CI quality gates`,
   `G-IOS-COMPILE native iOS build`,
   `G-DATA-RLS migration and policy tests`, `Secret scan gate`
-- Require linear history
-- Block force-pushes
+- Block force-pushes und Branch-Loeschung
+- Kein Owner-Bypass; Merge, Squash und Rebase bleiben als PR-Methode erlaubt
 
 Die produktive Quality-Gate-Action ergaenzt den Linux-Job um
 `G-IOS-COMPILE` auf einem macOS-Runner. Das Gate baut eine unsigned

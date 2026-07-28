@@ -34,6 +34,8 @@ roadmap_progress:
       progress_percent: 0
       next: testflight_submission_and_release_decision
   next_work_packages:
+    - id: N0-compliance-security-baseline
+      progress_percent: 0
     - id: N1-coffee-pilot-products
       progress_percent: 0
     - id: N2-product-commodity-origin-links
@@ -51,8 +53,10 @@ roadmap_progress:
     - id: N8-calibration-expert-review
       progress_percent: 0
   execution_order:
-    - merge_validated_integration
-    - start_local_evidence_first_coffee_vertical
+    - complete_project_control_traceability
+    - strengthen_dependency_supply_chain_and_masvs_baseline
+    - close_applicable_apple_and_claim_evidence
+    - resume_local_evidence_first_coffee_vertical
     - parallelize_m2_after_relationship_contracts_stabilize
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
