@@ -103,11 +103,13 @@ Material gaps remain:
 - two-pillar weighted average
 - regional/EU, vegan and Rainforest Alliance/UTZ branches
 - isolated Governance bonuses and warning penalty
-- upper score clamping
+- lower and upper score clamping
 - green/yellow/red/grey boundary behavior
 
-The lower clamp cannot currently be reached through public calculator behavior
-and should not be tested by exposing a private helper only for coverage.
+The lower Environmental clamp is reachable through public behavior because the
+Open Food Facts mapper accepts a negative numeric score and the calculator
+clamps it to zero. The test matrix must therefore include a negative mapped
+Environmental score without exposing a private helper.
 
 ### AUD-2026-07-28-03: Dependency Review Prerequisites
 

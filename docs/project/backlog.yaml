@@ -608,9 +608,10 @@ todos:
       - Gewichtung mit zwei verfuegbaren Saeulen.
       - Regional/EU-, Vegan- und Rainforest-Alliance/UTZ-Zweige.
       - Isolierte Governance-Boni und Datenwarnungsabzug.
-      - Oberes Clamping und Ampelgrenzen gruen/gelb/rot/grau.
-      Ein unteres Clamping ist ueber das aktuelle oeffentliche Verhalten nicht
-      erreichbar und soll nicht durch Offenlegen privater Helfer getestet werden.
+      - Unteres und oberes Clamping sowie Ampelgrenzen gruen/gelb/rot/grau.
+      Der untere Environmental-Clamp ist ueber einen negativen numerischen
+      OFF-Score oeffentlich erreichbar und muss ueber Mapper plus Calculator
+      getestet werden, ohne private Helfer offenzulegen.
       Dies ist eine Entscheidungstest-Luecke trotz gruenem Coverage-Gate.
     phase: phase-1-mvp
     priority: P1
