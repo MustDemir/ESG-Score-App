@@ -71,6 +71,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
       - name: Setup Ruby for YAML gate
         uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
@@ -136,6 +139,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
       - name: Setup Ruby
         uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
@@ -188,6 +194,9 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
 
       - name: Compile unsigned iOS simulator app
         id: ios-build
