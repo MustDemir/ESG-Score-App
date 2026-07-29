@@ -151,6 +151,25 @@ class SupplyChainGateTest < Minitest::Test
     )
   end
 
+  def test_swift_package_inspector_uses_tracked_xcode_integration
+    content = <<~PBXPROJ
+      isa = XCLocalSwiftPackageReference;
+      relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
+      productName = FlutterGeneratedPluginSwiftPackage;
+    PBXPROJ
+
+    assert(
+      SupplyChainGate::SwiftPackageInspector.flutter_integration_enabled?(
+        content,
+      ),
+    )
+    refute(
+      SupplyChainGate::SwiftPackageInspector.flutter_integration_enabled?(
+        "swift_package_manager_enabled = true;",
+      ),
+    )
+  end
+
   private
 
   def osv_report(vulnerability_id)

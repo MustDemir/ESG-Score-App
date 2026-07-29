@@ -6,6 +6,7 @@ scope:
   dart_lockfile: esg_app/pubspec.lock
   dart_package_config: esg_app/.dart_tool/package_config.json
   flutter_plugin_inventory: esg_app/.flutter-plugins-dependencies
+  ios_project_file: esg_app/ios/Runner.xcodeproj/project.pbxproj
   github_workflows: .github/workflows
   ios_dependency_model: flutter_swift_package_manager
 

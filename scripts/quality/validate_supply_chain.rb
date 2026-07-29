@@ -164,9 +164,16 @@ module SupplyChainGate
 
   class SwiftPackageInspector
     REMOTE_DECLARATION = /\.package\s*\(\s*(?:url|id)\s*:/
+    FLUTTER_PACKAGE_PATH = "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage"
 
     def self.remote_declaration_count(content)
       content.scan(REMOTE_DECLARATION).length
+    end
+
+    def self.flutter_integration_enabled?(content)
+      content.include?("isa = XCLocalSwiftPackageReference;") &&
+        content.include?("relativePath = #{FLUTTER_PACKAGE_PATH};") &&
+        content.include?("productName = FlutterGeneratedPluginSwiftPackage;")
     end
   end
 
@@ -365,10 +372,14 @@ module SupplyChainGate
     def validate_native_ios(policy, packages, package_config)
       plugin_path = absolute(policy.dig("scope", "flutter_plugin_inventory"))
       plugin_data = JSON.parse(File.read(plugin_path))
-      swift_enabled = plugin_data.dig("swift_package_manager_enabled", "ios")
+      ios_project_path = absolute(policy.dig("scope", "ios_project_file"))
+      swift_enabled = SwiftPackageInspector.flutter_integration_enabled?(
+        File.read(ios_project_path),
+      )
       expected = policy.dig("native_ios_policy", "expected_integration")
       if expected == "flutter_swift_package_manager" && swift_enabled != true
-        @violations << "iOS Flutter Swift Package Manager integration is not enabled"
+        @violations <<
+          "tracked iOS project does not enable Flutter Swift Package Manager integration"
       end
 
       podfile_lock = File.join(@repo_root, "esg_app/ios/Podfile.lock")

@@ -16,6 +16,7 @@ criteria:
   - pubspec.lock is present and every resolved Dart package is inventoried
   - known OSV vulnerabilities are absent or covered by an unexpired approved exception
   - runtime and development packages expose a recognized license text
+  - the tracked Xcode project enables Flutter Swift Package Manager integration
   - iOS Flutter plugins and native package manifests are inventoried
   - remote Swift packages and CocoaPods lockfiles fail until explicitly reviewed
   - every external GitHub Action is pinned to a full 40-character commit SHA
