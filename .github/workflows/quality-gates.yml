@@ -11,7 +11,7 @@ on:
       - 'docs/**'
       - 'supabase/**'
       - 'scripts/**'
-      - '.github/workflows/quality-gates.yml'
+      - '.github/**'
   pull_request:
     branches:
       - main
@@ -21,7 +21,10 @@ on:
       - 'docs/**'
       - 'supabase/**'
       - 'scripts/**'
-      - '.github/workflows/quality-gates.yml'
+      - '.github/**'
+  schedule:
+    # Monday 05:00 UTC; Dependabot uses the Europe/Berlin timezone separately.
+    - cron: '0 5 * * 1'
   workflow_dispatch:
     inputs:
       compliance_profile:
@@ -46,40 +49,52 @@ env:
   FLUTTER_VERSION: '3.44.0'
   CONFTEST_VERSION: '0.62.0'
   OPA_VERSION: '1.14.1'
+  OPA_LINUX_AMD64_STATIC_SHA256: '8ffbe82aa8b3259c432ad21d9919d14b89dc2ad2e866c2cec3b2e5177c72cd7c'
   SUPABASE_CLI_VERSION: '2.110.0'
+  CONFTEST_LINUX_AMD64_SHA256: '284231908e4cf66d156e5577c3eee2f67d9f2edf2521fa2309e0df1969f871e5'
   COMPLIANCE_PROFILE: ${{ inputs.compliance_profile || 'development' }}
 
 jobs:
   local-quality-gates:
     name: Local CI quality gates
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
 
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
       - name: Setup Ruby for YAML gate
-        uses: ruby/setup-ruby@v1
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
         with:
           ruby-version: '3.3'
 
       - name: Install OPA
         run: |
-          curl -L -o "$RUNNER_TEMP/opa" "https://openpolicyagent.org/downloads/v${OPA_VERSION}/opa_linux_amd64_static"
+          curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --silent --show-error \
+            -o "$RUNNER_TEMP/opa" \
+            "https://openpolicyagent.org/downloads/v${OPA_VERSION}/opa_linux_amd64_static"
+          printf '%s  %s\n' "$OPA_LINUX_AMD64_STATIC_SHA256" "$RUNNER_TEMP/opa" | sha256sum --check -
           sudo install -m 0755 "$RUNNER_TEMP/opa" /usr/local/bin/opa
           opa version
 
       - name: Install Conftest
         run: |
           mkdir -p "$RUNNER_TEMP/conftest"
-          curl -L "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" -o "$RUNNER_TEMP/conftest.tar.gz"
+          curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --silent --show-error \
+            "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
+            -o "$RUNNER_TEMP/conftest.tar.gz"
+          printf '%s  %s\n' "$CONFTEST_LINUX_AMD64_SHA256" "$RUNNER_TEMP/conftest.tar.gz" | sha256sum --check -
           tar xzf "$RUNNER_TEMP/conftest.tar.gz" -C "$RUNNER_TEMP/conftest"
           sudo install -m 0755 "$RUNNER_TEMP/conftest/conftest" /usr/local/bin/conftest
           conftest --version
@@ -96,7 +111,7 @@ jobs:
 
       - name: Upload quality gate artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: scanfair-quality-gate-results
           include-hidden-files: true
@@ -109,20 +124,79 @@ jobs:
             evidence-store/latest-gate-results.json
             docs/project/compliance/source-register.yaml
 
-  ios-compile-gate:
-    name: G-IOS-COMPILE native iOS build
-    runs-on: macos-latest
+  supply-chain-gate:
+    name: G-SUPPLY-CHAIN dependency and Action security
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
+
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        with:
+          ruby-version: '3.3'
+
+      - name: Resolve locked Flutter dependencies
+        working-directory: esg_app
+        run: flutter pub get
+
+      - name: Run reproducible supply-chain gate
+        id: supply-chain
+        run: bash scripts/quality/run_supply_chain_gate.sh
+
+      - name: Review pull-request dependency changes
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          config-file: ./.github/dependency-review-config.yml
+
+      - name: Publish supply-chain summary
+        if: always()
+        run: |
+          echo "## G-SUPPLY-CHAIN" >> "$GITHUB_STEP_SUMMARY"
+          echo "OSV, license, native iOS plugin and immutable Action validation: **${{ steps.supply-chain.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f .quality/supply-chain/dependency-inventory.json ]; then
+            jq -r '"Dart packages: **\(.dart_packages | length)**  \nNative iOS plugins: **\(.native_ios_plugins | length)**  \nPinned Action references: **\(.github_actions | length)**  \nKnown vulnerabilities: **\(.osv.reported_vulnerabilities)**"' \
+              .quality/supply-chain/dependency-inventory.json >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload supply-chain evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scanfair-supply-chain-evidence
+          include-hidden-files: true
+          path: .quality/supply-chain/**
+
+  ios-compile-gate:
+    name: G-IOS-COMPILE native iOS build
+    if: github.event_name != 'schedule'
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Enable Flutter Swift Package Manager
+        run: flutter config --enable-swift-package-manager
 
       - name: Compile unsigned iOS simulator app
         id: ios-build
@@ -136,7 +210,7 @@ jobs:
 
       - name: Upload iOS build and privacy evidence
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: scanfair-ios-simulator-app
           path: |
@@ -146,14 +220,15 @@ jobs:
 
   data-database-gate:
     name: G-DATA-RLS migration and policy tests
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v2
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
         with:
           version: ${{ env.SUPABASE_CLI_VERSION }}
           github-token: ${{ github.token }}
@@ -170,15 +245,16 @@ jobs:
 
   secret-scan:
     name: Secret scan gate
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout full history
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
 
       - name: Run gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

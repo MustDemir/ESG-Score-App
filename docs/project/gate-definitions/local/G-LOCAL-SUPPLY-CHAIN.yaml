@@ -1,0 +1,51 @@
+id: G-LOCAL-SUPPLY-CHAIN
+title: Reproducible dependency and software supply-chain validation
+status: active
+automation: AUTO
+profile: development
+owner: Engineering
+
+trigger:
+  - pull_request_to_main
+  - push_to_main
+  - manual_local_run
+  - weekly_scheduled_scan
+  - weekly_dependabot_check
+
+criteria:
+  - pubspec.lock is present and every resolved Dart package is inventoried
+  - known OSV vulnerabilities are absent or covered by an unexpired approved exception
+  - runtime and development packages expose a recognized license text
+  - the tracked Xcode project enables Flutter Swift Package Manager integration
+  - iOS Flutter plugins and native package manifests are inventoried
+  - remote Swift packages and CocoaPods lockfiles fail until explicitly reviewed
+  - every external GitHub Action is pinned to a full 40-character commit SHA
+  - every pinned Action includes its human-readable release tag as a comment
+
+artifacts:
+  - .quality/supply-chain/dependency-inventory.json
+  - .quality/supply-chain/osv-results.json
+  - .quality/logs/G-SUPPLY-CHAIN.log
+
+decision:
+  pass: No unapproved vulnerability, license, native dependency or Action reference finding
+  fail: At least one finding or a technical scanner failure exists
+
+audit:
+  policy: docs/project/compliance/supply-chain-policy.yaml
+  validator: scripts/quality/validate_supply_chain.rb
+  tests: scripts/quality/test_supply_chain_gate.rb
+  local_runner: scripts/quality/run_supply_chain_gate.sh
+  ci_workflow: .github/workflows/quality-gates.yml
+
+waiver:
+  allowed: true
+  conditions:
+    - exception is versioned in the supply-chain policy
+    - owner and reason are present
+    - approved_on and expires_on are present
+    - validity does not exceed 90 days
+  prohibited_for:
+    - technical scanner failures
+    - missing lockfile
+    - expired exceptions

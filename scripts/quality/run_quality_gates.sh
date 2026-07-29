@@ -27,6 +27,10 @@ gate_flutter_pub_get() {
   cd "$APP_DIR" && flutter pub get
 }
 
+gate_supply_chain() {
+  cd "$REPO_ROOT" && bash scripts/quality/run_supply_chain_gate.sh
+}
+
 gate_flutter_format() {
   cd "$APP_DIR" && dart format --set-exit-if-changed lib test
 }
@@ -145,6 +149,7 @@ run_gate() {
 }
 
 run_gate "G-FLT-DEPS" "Flutter dependency resolution" gate_flutter_pub_get
+run_gate "G-SUPPLY-CHAIN" "Dependency, license, iOS plugin and Action security" gate_supply_chain
 run_gate "G-FLT-FORMAT" "Dart format check" gate_flutter_format
 run_gate "G-FLT-ANALYZE" "Flutter static analysis" gate_flutter_analyze
 run_gate "G-FLT-TEST" "Flutter unit and widget tests" gate_flutter_test

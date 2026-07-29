@@ -66,17 +66,20 @@ bei Pushes nach `main`, bei Pull Requests nach `main` sowie manuell via
 `workflow_dispatch`. Feature-Branch-Pushes ohne Pull Request loesen bewusst
 keinen doppelten Lauf aus. Aenderungen an der
 Repository-README loesen sie ebenfalls aus, weil `G-DOC-TRACE` diese Datei
-mitprueft.
+mitprueft. Montags laeuft zusaetzlich nur `G-SUPPLY-CHAIN`; die teuren
+iOS-, Datenbank- und vollstaendigen App-Jobs werden im Zeitplanlauf
+uebersprungen.
 
 | Job | Inhalt | Ergebnis |
 |---|---|---|
 | `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
+| `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
 | `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 51 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt neunzehn Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
+Sie deckt zwanzig Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -85,6 +88,14 @@ Datenbanktest ist lokal ueber
 automatische Auslieferung. Das
 Profil `release_candidate` ist eine strenge lokale Freigabepruefung und fuehrt
 weder TestFlight-Upload noch App-Store-Submission aus.
+
+`G-SUPPLY-CHAIN` laedt OSV-Scanner 2.4.0 ausschliesslich ueber HTTPS und
+verifiziert die plattformspezifische SHA-256-Pruefsumme vor der Ausfuehrung.
+Das Gate inventarisiert `pubspec.lock`, installierte Lizenztexte, die
+tatsaechlichen iOS-Flutter-Plugins sowie alle externen Action-Referenzen.
+Bekannte Schwachstellen, unbekannte Lizenzen, bewegliche Action-Tags und neue
+ungepruefte native Paketquellen blockieren. Eine Ausnahme ist nur mit Owner,
+Begruendung, Freigabe- und Ablaufdatum fuer maximal 90 Tage moeglich.
 
 Die Apple-Kontrollen verwenden drei Profile:
 
@@ -101,6 +112,11 @@ Die Apple-Kontrollen verwenden drei Profile:
   `G-DATA-RLS migration and policy tests`, `Secret scan gate`
 - Block force-pushes und Branch-Loeschung
 - Kein Owner-Bypass; Merge, Squash und Rebase bleiben als PR-Methode erlaubt
+
+Der neue eigenstaendige Check `G-SUPPLY-CHAIN dependency and Action security`
+bleibt zusaetzlich im bereits erforderlichen lokalen Gate-Job eingebettet.
+Nach seinem ersten gruenen PR- und Post-Merge-Lauf wird er als fuenfter
+expliziter Required Check in das Ruleset aufgenommen.
 
 Die produktive Quality-Gate-Action ergaenzt den Linux-Job um
 `G-IOS-COMPILE` auf einem macOS-Runner. Das Gate baut eine unsigned

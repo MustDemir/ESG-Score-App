@@ -1,4 +1,4 @@
-last_updated: 2026-07-19
+last_updated: 2026-07-28
 
 # Tech-Stack-Inventar. Bei Versions-Update hier ändern.
 # Bei großen Wechseln: ADR schreiben.
@@ -65,7 +65,10 @@ dev_tools:
     purpose: Android-Build, Emulator
   - name: CocoaPods
     version: 1.16.2
-    purpose: iOS-Dependencies
+    purpose: Installierter Fallback; aktuelles iOS-Projekt nutzt Flutter Swift Package Manager
+  - name: OSV-Scanner
+    version: 2.4.0
+    purpose: Reproduzierbarer Vulnerability-Scan fuer pubspec.lock
   - name: Git
     version: bundled mit macOS
     purpose: Versionskontrolle
@@ -75,8 +78,10 @@ dev_tools:
 ci_cd:
   status: active-local-and-github-actions
   tools:
-    - GitHub Actions für Flutter-, iOS-, Compliance- und Secret-Gates
+    - GitHub Actions für Flutter-, iOS-, Compliance-, Supply-Chain- und Secret-Gates
     - Lokale Bash-Gate-Runner mit Markdown-/JSON-Evidence
+    - Dependabot fuer woechentliche pub- und GitHub-Action-Updates
+    - GitHub Dependency Review fuer neue PR-Abhaengigkeiten
 
 monitoring_logging:
   status: TBD für Phase 2

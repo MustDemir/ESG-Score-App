@@ -35,7 +35,7 @@ roadmap_progress:
       next: testflight_submission_and_release_decision
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 0
+      progress_percent: 30
     - id: N1-coffee-pilot-products
       progress_percent: 0
     - id: N2-product-commodity-origin-links
@@ -53,12 +53,32 @@ roadmap_progress:
     - id: N8-calibration-expert-review
       progress_percent: 0
   execution_order:
-    - complete_project_control_traceability
     - strengthen_dependency_supply_chain_and_masvs_baseline
     - close_applicable_apple_and_claim_evidence
     - resume_local_evidence_first_coffee_vertical
     - parallelize_m2_after_relationship_contracts_stabilize
     - activate_additional_sources_only_after_mapping_license_and_claim_review
+
+session_handoff:
+  prepared_at: 2026-07-28
+  branch: compliance/supply-chain-baseline
+  status: ready_for_pull_request
+  completed:
+    - IMP-PROC-002 nach gruenem Merge und Post-Merge-CI auf done gesetzt
+    - IMP-COMP-001 als reproduzierbare Supply-Chain-Baseline implementiert
+    - Dependabot Alerts und Security Updates im GitHub-Repository aktiviert
+    - Lokale Hauptpipeline 20/20, pgTAP 51/51 und iOS-Compile-Gate bestanden
+  next_session_start:
+    - Pull Request fuer compliance/supply-chain-baseline nach main erstellen
+    - Alle fuenf GitHub-Jobs inklusive G-SUPPLY-CHAIN pruefen und Findings beheben
+    - Nach Merge den Post-Merge-Lauf abwarten
+    - GitHub-SHA-Pinning erzwingen und G-SUPPLY-CHAIN als Required Check aufnehmen
+    - IMP-COMP-001 auf done setzen
+    - Pre-Coding-Check fuer IMP-COMP-002 OWASP-MASVS-Baseline starten
+  known_open_points:
+    - GitHub Actions kann erst nach Push und Pull Request remote validiert werden
+    - Das Release-Candidate-Profil hat weiterhin offene manuelle Apple-MUST-Evidenz
+    - Verfuegbare Dependency-Updates werden ueber einzelne reviewte PRs eingespielt
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -229,6 +249,17 @@ milestones:
       Score-Reproduzierbarkeit und sichere Kundenaussagen. Der lokale
       Migration-Replay besteht 51/51 pgTAP-Tests ohne DB-Lint-Findings.
 
+  - id: M19
+    title: Reproduzierbare Dependency- und Supply-Chain-Baseline
+    date: 2026-07-28
+    phase: phase-1-mvp
+    notes: |
+      ADR 0026 kombiniert OSV-Scanner, lokale Lizenzklassifikation,
+      iOS-Plugin-Inventar, vollstaendige GitHub-Action-SHAs, Dependabot und
+      GitHub Dependency Review. Der lokale Nachweis umfasst 59 Dart-Pakete,
+      zwei iOS-Plugins, 16 Action-Referenzen und null bekannte
+      Schwachstellen. Ausnahmen sind auf 90 Tage begrenzt.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -339,6 +370,12 @@ decisions_made:
   - adr: 0024
     title: AGRIBALYSE 3.2 als Umwelt-LCA-Quelle auf Kategorieebene
     date: 2026-07-27
+  - adr: 0025
+    title: Evidenzbasierte Traceability-Links vor ESG-Risiko-Joins
+    date: 2026-07-27
+  - adr: 0026
+    title: Reproduzierbare Dependency- und Supply-Chain-Baseline
+    date: 2026-07-28
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -348,7 +385,8 @@ weekly_log:
     summary: |
       Apple Build Integrity mit echter iOS-Bundle-Evidenz und die
       Evidence-first Datenarchitektur um einen versionierten, hierarchischen
-      ESG-Methodikkatalog erweitert.
+      ESG-Methodikkatalog sowie eine reproduzierbare Supply-Chain-Baseline
+      erweitert.
     done:
       - App-eigenes PrivacyInfo.xcprivacy in den Runner-Resources eingebunden
       - Privacy-Audit fuer App-, Flutter- und mobile_scanner-Manifests umgesetzt
@@ -375,12 +413,21 @@ weekly_log:
       - Community- und Inference-Links per Default von Score-Eingaben ausgeschlossen
       - Score-Snapshots um Confidence-, Relationship- und Red-Flag-Lineage erweitert
       - Fuenf Scoring-Safety-Gates in lokale Pipeline und GitHub Actions integriert
+      - Verbesserungsregister und Feature-Status mit G-PROJECT-CONTROL abgesichert
+      - OSV-Scanner 2.4.0 mit verifizierten Binaerdateien integriert
+      - 59 Dart-Pakete und zwei native iOS-Plugins inventarisiert
+      - Lizenztexte lokal gegen eine permissive Allowlist validiert
+      - Alle externen GitHub Actions auf vollstaendige Commit-SHAs festgelegt
+      - Dependabot fuer pub und GitHub Actions woechentlich konfiguriert
+      - GitHub Dependabot Alerts und Security Updates aktiviert
+      - GitHub Dependency Review fuer neue PR-Abhaengigkeiten integriert
+      - OPA- und Conftest-Downloads um SHA-256-Pruefung erweitert
     checks:
       - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
       - Privacy-Bundle-Audit PASS, 3 Manifests, 0 Findings
       - Technische Privacy-Teilkontrollen von G-AS-BUILD-INTEGRITY PASS
       - Release-Candidate-Gesamtcheck erwartungsgemaess FAIL, 25 offene MUST-Nachweise
-      - Development Quality Pipeline 18/18 PASS, 26 Release-Warnungen sichtbar
+      - Development Quality Pipeline 20/20 PASS, 26 Release-Warnungen sichtbar
       - Compliance-Katalog 19 Requirements, 8 Gates, 14 Quellen valide
       - OPA Policy-Tests 17/17 PASS
       - Betroffene Flutter-Service-Tests 12/12 PASS
@@ -390,13 +437,27 @@ weekly_log:
       - Methodikkatalog PASS, 26 Parameter, 4 Profile, 1 Rohmapping, Gewichte ausgesetzt
       - Flutter-Test-Suite 29/29 PASS, Line-Coverage 79.08 Prozent
       - Scoring-Safety-Gates 5/5 PASS
+      - G-PROJECT-CONTROL PASS, Post-Merge-CI 30372528843 erfolgreich
+      - G-SUPPLY-CHAIN Tests 7/7 PASS
+      - G-SUPPLY-CHAIN PASS, 59 Pakete, 2 iOS-Plugins, 0 Schwachstellen
+      - GitHub Dependabot Baseline 0 offene Alerts
+      - Flutter Dependency-Status ohne Advisory- oder Retracted-Markierung
+    learnings:
+      - OSV deckt pubspec.lock ab, CocoaPods-Lockfiles aber nicht automatisch
+      - Das aktuelle iOS-Projekt nutzt lokale Flutter-Swift-Pakete ohne Remote-Abhaengigkeiten
+      - Vollstaendige Action-SHAs verhindern bewegliche Tags; Dependabot haelt die Release-Kommentare aktuell
+      - Versionsalter und bekannte Schwachstellen muessen getrennt bewertet werden
     blockers:
+      - Supply-Chain-Branch braucht noch Pull Request, GitHub-CI und Post-Merge-Nachweis
+      - Repository-weites SHA-Pinning und der neue Required Check werden erst nach dem Merge aktiviert
       - App-Store-Privacy-Klassifikation fuer Barcode-/Netzwerkdaten bleibt offen
       - Publisher-Signaturkontinuitaet fuer gelistete binaere SDKs braucht ein signiertes Release-Archive
       - Weitere Release-Evidenz fuer Kamera, Metadata, Review, Claims, Rechte und Support fehlt
       - Remote-EU-Projekt, AVV/Region-Evidenz und Flutter-Cache-Adapter fehlen
       - Weitere Quellenmappings, Gewichte und Kalibrierung fuer 2.0-draft fehlen
     next_week:
+      - Supply-Chain-PR pruefen, mergen und IMP-COMP-001 schliessen
+      - Risikobasierte OWASP-MASVS-Baseline als IMP-COMP-002 beginnen
       - In-App-OFF-Attribution und ESG-Limitationen umsetzen
       - Privacy-/Support-Inhalte sowie versionierte App-Store-Metadaten vorbereiten
       - Kamera-Lokalisierungen und dokumentierten Device-/IPv6-Smoke-Test schliessen
@@ -572,11 +633,11 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 19
+  decisions_total: 24
   todos_open: 13
   todos_in_progress: 2
   todos_done: 8
-  milestones_reached: 18
+  milestones_reached: 19
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

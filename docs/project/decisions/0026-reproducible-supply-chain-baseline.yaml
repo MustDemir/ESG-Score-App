@@ -1,0 +1,85 @@
+id: 0026
+title: Reproducible dependency and supply-chain baseline
+date: 2026-07-28
+status: accepted
+deciders: [Mustafa]
+tags: [security, dependencies, supply-chain, github-actions, ios, licensing]
+
+context: |
+  ScanFair resolves 59 Dart packages and executes external GitHub Actions.
+  Mutable Action tags, unreviewed dependency updates and missing license or
+  vulnerability evidence create a material build and release risk. The iOS
+  project currently uses Flutter Swift Package Manager with local plugin
+  packages and has neither remote Swift packages nor a Podfile.lock.
+
+options_considered:
+  - name: Dependabot only
+    pros:
+      - low maintenance
+      - automatic update pull requests
+    cons:
+      - no reproducible local vulnerability decision
+      - no local license or Action pin validation
+      - existing vulnerable dependencies are not a PR-diff problem
+
+  - name: Hosted scanner only
+    pros:
+      - rich GitHub user interface
+    cons:
+      - local and CI decisions can diverge
+      - native iOS and Action-reference policy remain implicit
+
+  - name: Layered local and GitHub supply-chain gate
+    pros:
+      - same lockfile and policy are evaluated locally and in CI
+      - OSV covers the complete Dart lockfile
+      - GitHub Dependency Review blocks risky additions in pull requests
+      - full commit SHAs make Action execution immutable
+      - time-limited exceptions remain auditable
+    cons:
+      - scanner download requires network access
+      - dependency updates require explicit license and exception review
+
+decision: |
+  Use a layered supply-chain baseline: OSV-Scanner 2.4.0 with verified
+  binaries, local license and native-plugin inventory, immutable GitHub Action
+  references, Dependabot version updates and GitHub Dependency Review.
+
+rationale: |
+  The design keeps the development profile strict on known vulnerabilities
+  and unknown licenses without pretending that every native ecosystem is
+  already present. Unexpected remote Swift packages or CocoaPods lockfiles
+  fail closed until their lock and scan model is reviewed. Exceptions are
+  possible only with an owner, reason, approval date and a maximum 90-day
+  validity, preventing permanent silent suppressions.
+
+enforcement:
+  local:
+    - scripts/quality/run_supply_chain_gate.sh
+    - scripts/quality/validate_supply_chain.rb
+  ci:
+    - G-SUPPLY-CHAIN dependency and Action security
+    - GitHub Dependency Review on pull requests
+    - weekly Dependabot updates for pub and GitHub Actions
+  evidence:
+    - dependency inventory JSON
+    - OSV result JSON
+    - local and GitHub gate logs
+
+limitations:
+  - OSV supports pubspec.lock but does not list Podfile.lock as supported
+  - deps.dev currently returns UNKNOWN license metadata for the Dart packages
+  - license classification therefore uses the installed package license texts
+  - legal license compatibility remains a release-candidate review
+  - no remote Swift package or CocoaPods dependency exists in the current iOS build
+
+consequences:
+  - dependency and Action changes are reviewed through pull requests
+  - Action tags are retained only as comments beside immutable commit SHAs
+  - new native dependency managers require a policy update before merge
+  - OPA and Conftest downloads are checksum-verified in CI
+  - IMP-COMP-001 can move to review after local and GitHub validation
+
+supersedes: null
+superseded_by: null
+related: [0007, 0008, 0017, 0020, 0021]
