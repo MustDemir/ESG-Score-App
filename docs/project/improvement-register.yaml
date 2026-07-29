@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_updated: 2026-07-28
+last_updated: 2026-07-29
 owner: Mustafa Demir
 purpose: |
   Zentrales Register der aus der Gesamtbewertung abgeleiteten Verbesserungen.
@@ -35,7 +35,6 @@ allowed_values:
     - submission
 
 execution_order:
-  - IMP-COMP-001
   - IMP-COMP-002
   - IMP-COMP-003
   - IMP-DEV-001
@@ -104,7 +103,7 @@ improvements:
   - id: IMP-COMP-001
     layer: compliance
     title: Reproduzierbarer Dependency- und Supply-Chain-Scan
-    status: review
+    status: done
     priority: P0
     risk: H
     owner: Engineering
@@ -127,17 +126,25 @@ improvements:
       - .github/dependabot.yml
       - .github/dependency-review-config.yml
       - .github/workflows/quality-gates.yml
+      - docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+      - https://github.com/MustDemir/ESG-Score-App/pull/9
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440398821
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440723805
+      - https://github.com/MustDemir/ESG-Score-App/rules/19894816
     verification:
-      - Sieben automatisierte Pass-/Fail-Tests fuer Pins, Findings, native Pakete und Ausnahmen
+      - Elf automatisierte Pass-/Fail-Tests fuer Pins, Findings, native Pakete und Ausnahmen
       - Lokaler Scan inventarisiert 59 Dart-Pakete und 2 iOS-Plugins
       - Lokaler OSV-Scan meldet 0 bekannte Schwachstellen
       - Alle 16 Action-Referenzen verwenden volle Commit-SHAs
       - GitHub Dependabot Alerts und Security Updates sind aktiviert
       - GitHub meldet 0 offene Dependabot Alerts
       - flutter pub outdated meldet keine advisory-betroffenen oder zurueckgezogenen Pakete
+      - PR #9 und Post-Merge-Run bestehen alle fuenf GitHub-Jobs
+      - Repository-weites SHA-Pinning ist aktiviert
+      - G-SUPPLY-CHAIN ist verpflichtender main-Statuscheck
     dependencies:
       - IMP-PROC-002
-    next_action: PR-CI validieren, nach Merge GitHub-SHA-Pinning und den neuen Required Check aktivieren
+    next_action: Routinewartung ueber Dependabot und TODO-032; IMP-COMP-002 starten
 
   - id: IMP-COMP-002
     layer: compliance
