@@ -172,9 +172,36 @@ forced onto Node.js 24 by GitHub. The workflow still passes, but the Action
 must be upgraded through a separately reviewed dependency PR and repinned to
 the verified release commit.
 
+### AUD-2026-07-29-07: Transitive Action Pinning
+
+**Disposition:** remediated in PR #14
+**Priority:** P0
+**Improvement:** IMP-COMP-001
+
+After repository-wide Action SHA pinning was enabled, PR run
+`30441848323` rejected three jobs before execution. The workflow pinned
+`subosito/flutter-action` to a full commit SHA, but that composite Action
+referenced `actions/cache@v5` through a mutable tag. GitHub correctly applied
+the repository rule to the transitive reference.
+
+The remediation keeps strict SHA enforcement enabled:
+
+- the composite Flutter setup Action was removed
+- official Flutter 3.44.0 archives are selected by runner OS and architecture
+- Linux x64, macOS x64 and macOS arm64 archives have fixed SHA-256 values
+- only the downloaded archive is cached, and its checksum is verified in every
+  job before extraction
+- `actions/cache@v6.1.0` is referenced directly by full commit SHA
+- the cache-hit installer path has an automated regression test
+
+Closure requires all five PR checks to pass while repository-wide SHA pinning
+remains enabled.
+
 ## Overall Decision
 
 The supply-chain baseline is accepted and merged. Accessibility and scoring
 contract findings remain open and must be closed before the release-candidate
-profile. The audit does not block continued local development, but customer
-score claims must not expand before TODO-028 and TODO-030 are resolved.
+profile. Strict transitive Action pinning remains enabled and PR #14 must
+provide the remote closure evidence for AUD-2026-07-29-07. The audit does not
+block continued local development, but customer score claims must not expand
+before TODO-028 and TODO-030 are resolved.

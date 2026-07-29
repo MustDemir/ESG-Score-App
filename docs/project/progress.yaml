@@ -62,7 +62,7 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-07-29
   branch: quality/audit-findings-normalization
-  status: ready_for_pull_request
+  status: pull_request_open
   completed:
     - IMP-PROC-002 nach gruenem Merge und Post-Merge-CI auf done gesetzt
     - IMP-COMP-001 nach PR #9 und gruenem Post-Merge-Lauf auf done gesetzt
@@ -71,9 +71,11 @@ session_handoff:
     - Zwei automatische PR-Review-Findings mit Regressionstests geschlossen
     - Auditbericht und normalisierte Folgeaufgaben angelegt
     - Audit-Branch lokal mit 20 von 20 Quality Gates validiert
+    - Pull Request #14 erstellt und transitive Action-Pinning-Luecke reproduziert
+    - Checksum-verifizierten direkten Flutter-CI-Installer implementiert
   next_session_start:
-    - Pull Request fuer quality/audit-findings-normalization erstellen
-    - Alle fuenf GitHub-Jobs pruefen und Audit-Normalisierung mergen
+    - Alle fuenf GitHub-Jobs von Pull Request #14 pruefen
+    - Audit-Normalisierung nach geloesten Review-Threads mergen
     - TODO-032 ueber separaten Dependency-PR schliessen
     - TODO-030 mit neuer Scoring-Precedence-ADR entscheiden
     - TODO-028 Entscheidungstestmatrix umsetzen
@@ -444,6 +446,8 @@ weekly_log:
       - Repository-weites Action-SHA-Pinning aktiviert
       - G-SUPPLY-CHAIN als fuenften Required Check fuer main aktiviert
       - Auditbericht mit normalisierten A11y-, Scoring- und CI-Findings angelegt
+      - Transitive actions/cache-Tag-Referenz im Flutter-Setup erkannt
+      - Direkten Flutter-Installer mit offiziellen SHA-256-verifizierten Archiven umgesetzt
     checks:
       - Nativer iOS-Simulator-Build mit Xcode 26.6 PASS
       - Privacy-Bundle-Audit PASS, 3 Manifests, 0 Findings
@@ -460,7 +464,7 @@ weekly_log:
       - Flutter-Test-Suite 29/29 PASS, Line-Coverage 79.08 Prozent
       - Scoring-Safety-Gates 5/5 PASS
       - G-PROJECT-CONTROL PASS, Post-Merge-CI 30372528843 erfolgreich
-      - G-SUPPLY-CHAIN Tests 11/11 PASS
+      - G-SUPPLY-CHAIN Tests 12/12 PASS
       - G-SUPPLY-CHAIN PASS, 59 Pakete, 2 iOS-Plugins, 0 Schwachstellen
       - GitHub Dependabot Baseline 0 offene Alerts
       - Flutter Dependency-Status ohne Advisory- oder Retracted-Markierung
@@ -476,6 +480,7 @@ weekly_log:
       - Generierte Flutter-SPM-Metadaten sind auf Linux keine belastbare iOS-Konfigurationsevidenz
       - Action-Pins muessen aus geparstem YAML statt nur aus einer Zeilenregex inventarisiert werden
       - Offene Review-Threads blockieren main auch bei gruenen technischen Checks
+      - GitHubs SHA-Enforcement prueft auch bewegliche Referenzen innerhalb externer Composite Actions
     blockers:
       - actions/upload-artifact erzeugt eine Node-20-Deprecation und braucht einen reviewten Update-PR
       - Scoring-Precedence und Entscheidungstestmatrix sind als TODO-030 und TODO-028 offen

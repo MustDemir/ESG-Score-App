@@ -122,7 +122,9 @@ improvements:
       - docs/project/compliance/supply-chain-policy.yaml
       - docs/project/gate-definitions/local/G-LOCAL-SUPPLY-CHAIN.yaml
       - scripts/quality/run_supply_chain_gate.sh
+      - scripts/quality/install_flutter_ci.sh
       - scripts/quality/validate_supply_chain.rb
+      - scripts/quality/test_supply_chain_gate.rb
       - .github/dependabot.yml
       - .github/dependency-review-config.yml
       - .github/workflows/quality-gates.yml
@@ -132,7 +134,7 @@ improvements:
       - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440723805
       - https://github.com/MustDemir/ESG-Score-App/rules/19894816
     verification:
-      - Elf automatisierte Pass-/Fail-Tests fuer Pins, Findings, native Pakete und Ausnahmen
+      - Zwoelf automatisierte Pass-/Fail-Tests fuer Pins, Findings, native Pakete, Ausnahmen und CI-Installer
       - Lokaler Scan inventarisiert 59 Dart-Pakete und 2 iOS-Plugins
       - Lokaler OSV-Scan meldet 0 bekannte Schwachstellen
       - Alle 16 Action-Referenzen verwenden volle Commit-SHAs
@@ -142,6 +144,7 @@ improvements:
       - PR #9 und Post-Merge-Run bestehen alle fuenf GitHub-Jobs
       - Repository-weites SHA-Pinning ist aktiviert
       - G-SUPPLY-CHAIN ist verpflichtender main-Statuscheck
+      - Transitive Action-Pins werden durch GitHub erzwungen; Flutter-Archive werden vor jeder Extraktion verifiziert
     dependencies:
       - IMP-PROC-002
     next_action: Routinewartung ueber Dependabot und TODO-032; IMP-COMP-002 starten

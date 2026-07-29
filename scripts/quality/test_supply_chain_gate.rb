@@ -1,7 +1,10 @@
 #!/usr/bin/env ruby
 
 require "date"
+require "digest"
+require "fileutils"
 require "minitest/autorun"
+require "open3"
 require "tmpdir"
 require_relative "validate_supply_chain"
 
@@ -224,6 +227,42 @@ class SupplyChainGateTest < Minitest::Test
         "swift_package_manager_enabled = true;",
       ),
     )
+  end
+
+  def test_ci_flutter_installer_uses_cached_verified_sdk
+    Dir.mktmpdir do |directory|
+      flutter_bin = File.join(directory, "flutter", "bin", "flutter")
+      archive = File.join(directory, "flutter-archive", "flutter-sdk.tar.xz")
+      github_path = File.join(directory, "github-path")
+      FileUtils.mkdir_p(File.dirname(flutter_bin))
+      FileUtils.mkdir_p(File.dirname(archive))
+      File.write(
+        flutter_bin,
+        "#!/usr/bin/env bash\nprintf 'Flutter 3.44.0 - channel stable\\n'\n",
+      )
+      File.write(archive, "verified test archive")
+      FileUtils.chmod(0o755, flutter_bin)
+
+      environment = {
+        "FLUTTER_VERSION" => "3.44.0",
+        "FLUTTER_RELEASE_BASE_URL" => "https://example.invalid",
+        "FLUTTER_LINUX_X64_SHA256" => Digest::SHA256.file(archive).hexdigest,
+        "RUNNER_ARCH" => "X64",
+        "RUNNER_OS" => "Linux",
+        "RUNNER_TEMP" => directory,
+        "GITHUB_PATH" => github_path,
+      }
+      script = File.expand_path("install_flutter_ci.sh", __dir__)
+      stdout, stderr, status = Open3.capture3(
+        environment,
+        "bash",
+        script,
+      )
+
+      assert status.success?, stderr
+      assert_equal "#{directory}/flutter/bin\n", File.read(github_path)
+      assert_includes stdout, "Verified Flutter 3.44.0"
+    end
   end
 
   private

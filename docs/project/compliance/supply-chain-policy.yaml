@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: "2026-07-28"
+last_reviewed: "2026-07-29"
 owner: Engineering
 
 scope:
@@ -46,9 +46,21 @@ license_policy:
 github_actions_policy:
   require_full_length_commit_sha: true
   require_version_comment: true
+  repository_sha_pinning_enabled: true
+  transitive_references_are_enforced_by_github: true
   allowed_reference_types:
     - local
     - full_commit_sha
+
+ci_toolchain_policy:
+  flutter_version: "3.44.0"
+  release_source: https://storage.googleapis.com/flutter_infra_release/releases
+  integrity: sha256-per-os-and-architecture
+  cache_scope: verified-release-archive-only
+  installer: scripts/quality/install_flutter_ci.sh
+  note: |
+    The archive is checksum-verified on every job before extraction. Caching
+    the archive instead of the extracted SDK preserves integrity validation.
 
 native_ios_policy:
   expected_integration: flutter_swift_package_manager
@@ -84,5 +96,7 @@ references:
     url: https://dart.dev/tools/pub/security-advisories
   - title: GitHub secure use for Actions
     url: https://docs.github.com/en/actions/reference/security/secure-use
+  - title: Flutter SDK archive
+    url: https://docs.flutter.dev/install/archive
   - title: GitHub Dependabot ecosystems
     url: https://docs.github.com/en/code-security/reference/supply-chain-security/supported-ecosystems-and-repositories
