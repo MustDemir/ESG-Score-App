@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
   # Brand-Fonts (Inter + Instrument Serif) — siehe lib/theme/scanfair_typography.dart
-  google_fonts: ^6.2.1
+  google_fonts: ^8.2.0
 
   # Typed, mockable HTTP client for the Open Food Facts adapter.
   http: ^1.6.0
