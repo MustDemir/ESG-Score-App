@@ -21,11 +21,14 @@ criteria:
   - remote Swift packages and CocoaPods lockfiles fail until explicitly reviewed
   - every external GitHub Action is pinned to a full 40-character commit SHA
   - every pinned Action includes its human-readable release tag as a comment
+  - repository enforcement rejects mutable references inside composite Actions
+  - official Flutter CI archives are SHA-256 verified before every extraction
 
 artifacts:
   - .quality/supply-chain/dependency-inventory.json
   - .quality/supply-chain/osv-results.json
   - .quality/logs/G-SUPPLY-CHAIN.log
+  - scripts/quality/install_flutter_ci.sh
 
 decision:
   pass: No unapproved vulnerability, license, native dependency or Action reference finding
@@ -36,6 +39,7 @@ audit:
   validator: scripts/quality/validate_supply_chain.rb
   tests: scripts/quality/test_supply_chain_gate.rb
   local_runner: scripts/quality/run_supply_chain_gate.sh
+  ci_flutter_installer: scripts/quality/install_flutter_ci.sh
   ci_workflow: .github/workflows/quality-gates.yml
 
 waiver:

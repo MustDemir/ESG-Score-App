@@ -47,6 +47,10 @@ permissions:
 
 env:
   FLUTTER_VERSION: '3.44.0'
+  FLUTTER_RELEASE_BASE_URL: 'https://storage.googleapis.com/flutter_infra_release/releases'
+  FLUTTER_LINUX_X64_SHA256: 'e1ec95e6c550458a34de93580cb85dac24da0e9bedb9bb42811f050ac5a0c7d5'
+  FLUTTER_MACOS_X64_SHA256: '2e9efb651b333b201487c2ac213f910c717338483ca24cbf497a067b05f048e5'
+  FLUTTER_MACOS_ARM64_SHA256: '0d4d1d3f379d18aff392291be6871d63bf090a9e81078d4c4bc84e6208603dca'
   CONFTEST_VERSION: '0.62.0'
   OPA_VERSION: '1.14.1'
   OPA_LINUX_AMD64_STATIC_SHA256: '8ffbe82aa8b3259c432ad21d9919d14b89dc2ad2e866c2cec3b2e5177c72cd7c'
@@ -64,12 +68,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      - name: Restore verified Flutter SDK
+        id: flutter-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+          path: ${{ runner.temp }}/flutter-archive
+          key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ env.FLUTTER_VERSION }}-archive-v1
+
+      - name: Install verified Flutter SDK
+        run: bash scripts/quality/install_flutter_ci.sh
 
       - name: Enable Flutter Swift Package Manager
         run: flutter config --enable-swift-package-manager
@@ -132,12 +139,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      - name: Restore verified Flutter SDK
+        id: flutter-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+          path: ${{ runner.temp }}/flutter-archive
+          key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ env.FLUTTER_VERSION }}-archive-v1
+
+      - name: Install verified Flutter SDK
+        run: bash scripts/quality/install_flutter_ci.sh
 
       - name: Enable Flutter Swift Package Manager
         run: flutter config --enable-swift-package-manager
@@ -188,12 +198,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+      - name: Restore verified Flutter SDK
+        id: flutter-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+          path: ${{ runner.temp }}/flutter-archive
+          key: flutter-${{ runner.os }}-${{ runner.arch }}-${{ env.FLUTTER_VERSION }}-archive-v1
+
+      - name: Install verified Flutter SDK
+        run: bash scripts/quality/install_flutter_ci.sh
 
       - name: Enable Flutter Swift Package Manager
         run: flutter config --enable-swift-package-manager

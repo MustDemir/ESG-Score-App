@@ -1,4 +1,4 @@
-last_updated: 2026-07-19
+last_updated: 2026-07-29
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -559,3 +559,174 @@ todos:
     related: [0022, 0023, TODO-002, TODO-004]
     created: 2026-07-27
     updated: 2026-07-27
+
+  # =========================================================================
+  # AUDIT-FINDINGS 2026-07-28
+  # Vollstaendiger Auditbericht:
+  # docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+  # =========================================================================
+  - id: TODO-027
+    title: Kontrast und Semantik des Ergebnis-Flows absichern
+    description: |
+      Der normalisierte Audit bestaetigt:
+      - ink3 (#7A857F) auf Weiss liegt bei ca. 3.83:1 und unterschreitet
+        4.5:1 fuer Normaltext. Betroffen sind bodySmall und meta.
+      - trafficYellow (#D97706) auf Weiss liegt bei ca. 3.19:1 und ist fuer
+        die 72-px-Score-Zahl ausreichend. Als kleiner Text auf dem
+        alpha:0.12-Pill-Hintergrund liegt der Kontrast aber nur bei ca. 2.81:1.
+      - Material-Widgets bringen Semantik mit. Die individuellen ScoreHero-
+        und PillarBars-Darstellungen brauchen trotzdem explizite VoiceOver-
+        Werte; das Produkt-Emoji soll als dekorativ behandelt werden.
+      Positiv: Status wird nicht nur ueber Farbe kommuniziert und IconButtons
+      besitzen Tooltips sowie geeignete Trefferflaechen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    owner: Engineering
+    activation_trigger: "M6-mvp-beta-hardening: run accessibility field tests"
+    related_milestones: [M6-mvp-beta-hardening]
+    related: [R-AS-29, G-AS-REVIEW-READINESS]
+    acceptance_criteria:
+      - Relevante Text-/Hintergrundkombinationen bestehen automatisierte Kontrasttests
+      - ScoreHero und PillarBars besitzen aussagekraeftige Semantics-Tests
+      - Dekorative Produktbilder erzeugen keine irrefuehrende VoiceOver-Ausgabe
+      - VoiceOver und Dynamic Type sind auf einem physischen iPhone dokumentiert geprueft
+    verification:
+      - Flutter Widget- und Semantics-Tests
+      - Manueller R-AS-29-Review mit Device-Evidenz
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-28
+    updated: 2026-07-29
+
+  - id: TODO-028
+    title: Entscheidungsbasierte Testmatrix fuer ESGScoreCalculator ergaenzen
+    description: |
+      Bestehende Tests decken Voll-Score, fehlenden Eco-Score, Bio/Fair Trade,
+      Palmoel-Penalty und OFF-Mapping ab. Es fehlen weiterhin:
+      - Nur-E und komplett leere Saeulen.
+      - Gewichtung mit zwei verfuegbaren Saeulen.
+      - Regional/EU-, Vegan- und Rainforest-Alliance/UTZ-Zweige.
+      - Isolierte Governance-Boni und Datenwarnungsabzug.
+      - Unteres und oberes Clamping sowie Ampelgrenzen gruen/gelb/rot/grau.
+      Der untere Environmental-Clamp ist ueber einen negativen numerischen
+      OFF-Score oeffentlich erreichbar und muss ueber Mapper plus Calculator
+      getestet werden, ohne private Helfer offenzulegen.
+      Dies ist eine Entscheidungstest-Luecke trotz gruenem Coverage-Gate.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    owner: Engineering
+    related: [0010, 0011, TODO-002, TODO-012]
+    acceptance_criteria:
+      - Alle erreichbaren Entscheidungszweige der Formel v1 besitzen gezielte Tests
+      - Ampelgrenzen 40 und 70 sowie dataIncomplete sind explizit getestet
+      - Tests dokumentieren ADR-Precedence statt widerspruechliches Verhalten festzuschreiben
+      - Coverage sinkt nicht unter den aktuellen Gate-Schwellenwert
+    verification:
+      - flutter test test/services/esg_score_calculator_test.dart
+      - flutter test --coverage
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-28
+    updated: 2026-07-29
+
+  - id: TODO-029
+    title: Dependency Review unter echten PR-Bedingungen verifizieren
+    description: |
+      Die Voraussetzungen und das Laufzeitverhalten wurden in PR #9 remote
+      geprueft. Das Repository ist oeffentlich, der Owner ein persoenlicher
+      GitHub-Account und Dependency Review ist ohne GHAS verfuegbar.
+    phase: phase-1-mvp
+    priority: P2
+    effort: XS
+    status: done
+    owner: Engineering
+    activation_trigger: "PR-Review compliance/supply-chain-baseline, 5-Jobs-Check"
+    related: [0026]
+    result: |
+      PR #9 fuehrte alle fuenf Jobs inklusive Dependency Review erfolgreich aus.
+      Der Post-Merge-Lauf 30440723805 bestand ebenfalls. Ein bedingtes
+      Ueberspringen ist nicht erforderlich. Checksumfehler nach einem
+      Version-only-Bump bleiben beabsichtigtes fail-closed Verhalten.
+    evidence:
+      - https://github.com/MustDemir/ESG-Score-App/pull/9
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440398821
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440723805
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-28
+    completed: 2026-07-29
+    updated: 2026-07-29
+
+  - id: TODO-030
+    title: Scoring-Precedence zwischen ADR 0010 und ADR 0011 entscheiden
+    description: |
+      ADR 0011 erlaubt im total_score-Beispiel einen S-only-Gesamtscore.
+      ADR 0010 und die Implementierung verlangen dagegen eine E-Saeule, bevor
+      ein Gesamtwert angezeigt wird. Das konservative Verhalten bleibt.
+      ADR 0011 darf nach der Append-only-Regel nicht direkt editiert werden.
+      Eine neue ADR muss Precedence, Begruendung und Mindesttestvertrag festlegen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: S
+    status: open
+    owner: Mustafa Demir
+    related: [0010, 0011]
+    acceptance_criteria:
+      - Neue ADR entscheidet die Mindestvoraussetzung fuer einen Gesamtscore
+      - Bestehende ADRs bleiben unveraendert und werden korrekt referenziert
+      - Calculator-Tests und Methodiktexte verwenden dieselbe Precedence
+      - Kundenaussagen beschreiben fehlende E-Evidenz ohne Schaetzung
+    verification:
+      - ADR-Index und Projekt-YAML-Gate bestehen
+      - TODO-028-Testmatrix besteht
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-28
+    updated: 2026-07-29
+
+  - id: TODO-031
+    title: Score-Anzeigeformatierung fuer 0-10 zentralisieren
+    description: |
+      Die 0-100-zu-0-10-Umrechnung ist in score_widgets.dart an drei Stellen
+      dupliziert. Eine gemeinsame Presentation-Formatter-Funktion oder
+      Dart-Extension soll konsistente Rundung liefern, ohne das Domain-Modell
+      mit UI-Formatierung zu koppeln.
+    phase: phase-1-mvp
+    priority: P3
+    effort: XS
+    status: open
+    owner: Engineering
+    related: [TODO-030]
+    acceptance_criteria:
+      - Eine gemeinsame Presentation-Funktion formatiert Gesamt- und Saeulenwerte
+      - Bestehende Result- und Detaildarstellung bleibt visuell unveraendert
+      - Formatter-Grenzwerte und Null-Darstellung sind getestet
+    verification:
+      - Flutter Unit- und Widget-Tests
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-29
+
+  - id: TODO-032
+    title: Node-20-Deprecation von actions/upload-artifact abbauen
+    description: |
+      Post-Merge-Run 30440723805 meldet, dass der aktuell gepinnte
+      actions/upload-artifact-Release Node.js 20 verwendet und von GitHub
+      bereits auf Node.js 24 erzwungen wird. Den aktuellen kompatiblen Release
+      ueber einen separaten Dependency-PR pruefen und auf dessen Commit-SHA pinnen.
+    phase: phase-1-mvp
+    priority: P2
+    effort: XS
+    status: open
+    owner: Engineering
+    related: [0026, IMP-COMP-001]
+    acceptance_criteria:
+      - Offizieller Node-24-kompatibler Action-Release ist geprueft
+      - Workflow verwendet dessen vollstaendige Commit-SHA mit Versionskommentar
+      - Supply-Chain-Gate, Artifact-Uploads und alle Required Checks bestehen
+      - Post-Merge-Lauf zeigt keine Node-20-Deprecation fuer upload-artifact
+    verification:
+      - GitHub Pull-Request- und Post-Merge-Run
+    evidence:
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440723805
+    source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
+    created: 2026-07-29
