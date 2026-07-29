@@ -61,6 +61,9 @@ module SupplyChainGate
             @violations <<
               "#{location}: validity #{validity_days} days exceeds 0..#{maximum_days}"
           end
+          if approved_on > @today
+            @violations << "#{location}: approved_on #{approved_on} is in the future"
+          end
           if expires_on < @today
             @violations << "#{location}: expired on #{expires_on}"
           end
@@ -76,7 +79,8 @@ module SupplyChainGate
   end
 
   class ActionReferenceValidator
-    ACTION_LINE = /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?\s*(?:#\s*(.+))?$/
+    ACTION_LINE =
+      /^\s*(?:-\s*)?["']?uses["']?\s*:\s*["']?([^"'#\s]+)["']?\s*(?:#\s*(.+))?$/
     FULL_SHA = /\A[0-9a-f]{40}\z/
     VERSION_COMMENT = /\Av\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\b/
 
@@ -97,15 +101,24 @@ module SupplyChainGate
       end
 
       workflow_paths.each do |path|
-        File.readlines(path, chomp: true).each_with_index do |line, index|
-          match = ACTION_LINE.match(line)
-          next unless match
+        yaml_references = workflow_references(path, violations)
+        source_entries = source_reference_entries(path)
+        entries_by_reference = source_entries.group_by { |entry| entry["reference"] }
 
-          reference = match[1]
-          comment = match[2].to_s.strip
+        yaml_references.each do |reference|
+          entry = entries_by_reference.fetch(reference, []).shift
+          unless entry
+            violations <<
+              "#{relative(path)}: uses reference #{reference.inspect} must be on " \
+              "a dedicated YAML line with its release comment"
+            next
+          end
+
+          comment = entry["version_comment"]
+          index = entry["line"]
           entry = {
             "workflow" => relative(path),
-            "line" => index + 1,
+            "line" => index,
             "reference" => reference,
           }
           @references << entry
@@ -119,7 +132,7 @@ module SupplyChainGate
           end
 
           action, separator, revision = reference.rpartition("@")
-          location = "#{relative(path)}:#{index + 1}"
+          location = "#{relative(path)}:#{index}"
           unless separator == "@" && action.include?("/") && FULL_SHA.match?(revision)
             unless @exception_registry.approved?("action_reference", reference)
               violations << "#{location}: external action must use a full commit SHA: #{reference}"
@@ -139,6 +152,46 @@ module SupplyChainGate
     end
 
     private
+
+    def workflow_references(path, violations)
+      document = YAML.safe_load(File.read(path), aliases: true)
+      collect_uses_references(document)
+    rescue Psych::SyntaxError => error
+      violations << "#{relative(path)}: invalid workflow YAML: #{error.message}"
+      []
+    end
+
+    def collect_uses_references(node)
+      case node
+      when Hash
+        node.flat_map do |key, value|
+          if key.to_s == "uses"
+            value.is_a?(String) ? [value] : []
+          else
+            collect_uses_references(value)
+          end
+        end
+      when Array
+        node.flat_map { |value| collect_uses_references(value) }
+      else
+        []
+      end
+    end
+
+    def source_reference_entries(path)
+      entries = []
+      File.readlines(path, chomp: true).each_with_index do |line, index|
+        match = ACTION_LINE.match(line)
+        next unless match
+
+        entries << {
+          "line" => index + 1,
+          "reference" => match[1],
+          "version_comment" => match[2].to_s.strip,
+        }
+      end
+      entries
+    end
 
     def relative(path)
       Pathname(path).relative_path_from(Pathname(Dir.pwd)).to_s

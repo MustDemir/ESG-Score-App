@@ -55,6 +55,44 @@ class SupplyChainGateTest < Minitest::Test
     end
   end
 
+  def test_quoted_uses_key_cannot_bypass_action_pinning
+    Dir.mktmpdir do |directory|
+      File.write(
+        File.join(directory, "workflow.yml"),
+        "steps:\n  - \"uses\": actions/checkout@v7\n",
+      )
+      registry = SupplyChainGate::ExceptionRegistry.new(
+        base_policy,
+        today: Date.new(2026, 7, 28),
+      )
+      validator = SupplyChainGate::ActionReferenceValidator.new(
+        directory,
+        exception_registry: registry,
+      )
+
+      assert_match(/full commit SHA/, validator.validate.join("\n"))
+    end
+  end
+
+  def test_inline_uses_mapping_is_detected_and_fails_closed
+    Dir.mktmpdir do |directory|
+      File.write(
+        File.join(directory, "workflow.yml"),
+        "steps:\n  - { \"uses\": \"actions/checkout@v7\" }\n",
+      )
+      registry = SupplyChainGate::ExceptionRegistry.new(
+        base_policy,
+        today: Date.new(2026, 7, 28),
+      )
+      validator = SupplyChainGate::ActionReferenceValidator.new(
+        directory,
+        exception_registry: registry,
+      )
+
+      assert_match(/dedicated YAML line/, validator.validate.join("\n"))
+    end
+  end
+
   def test_known_vulnerability_without_exception_fails
     registry = SupplyChainGate::ExceptionRegistry.new(
       base_policy,
@@ -109,6 +147,24 @@ class SupplyChainGateTest < Minitest::Test
     )
 
     assert_match(/expired/, registry.violations.join("\n"))
+    refute registry.approved?("vulnerability", "GHSA-test-0001")
+  end
+
+  def test_future_dated_exception_is_rejected
+    exception = {
+      "id" => "GHSA-test-0001",
+      "kind" => "vulnerability",
+      "owner" => "Engineering",
+      "reason" => "Pre-entered exception",
+      "approved_on" => "2026-07-29",
+      "expires_on" => "2026-08-15",
+    }
+    registry = SupplyChainGate::ExceptionRegistry.new(
+      base_policy([exception]),
+      today: Date.new(2026, 7, 28),
+    )
+
+    assert_match(/future/, registry.violations.join("\n"))
     refute registry.approved?("vulnerability", "GHSA-test-0001")
   end
 
