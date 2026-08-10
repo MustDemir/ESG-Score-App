@@ -62,7 +62,8 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-10
   branch: quality/scoring-accessibility-masvs
-  status: validated_local
+  status: pull_request_open
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/16
   completed:
     - ADR 0027 entscheidet Environmental-Evidenz als Gesamtscore-Voraussetzung
     - TODO-028 mit 39 gezielten Calculator- und Mapper-Tests geschlossen
@@ -71,9 +72,11 @@ session_handoff:
     - G-MASVS mit Development- und blockierendem Release-Candidate-Profil integriert
     - Physische MASVS-Release-Checkliste mit Owner und Evidenzformat angelegt
     - Gesamte lokale Quality-Gate-Pipeline mit 21 von 21 Gates validiert
+    - Branch quality/scoring-accessibility-masvs zu origin gepusht
+    - Draft Pull Request 16 gegen main erstellt
+    - GitHub Quality-Gates Run 42 mit allen fuenf Jobs erfolgreich abgeschlossen
   next_session_start:
-    - Branch nach expliziter Freigabe pushen und Pull Request erstellen
-    - GitHub-Quality-Gates und Review-Threads nach dem Push pruefen
+    - Pull Request 16 nach dem aktualisierten CI-Lauf reviewen und in main mergen
     - Physische VoiceOver-/Dynamic-Type- und MASVS-Device-Evidenz terminieren
     - Danach Kaffee-Referenzfall und evidenzbasierte Datenquellen fortsetzen
   known_open_points:
