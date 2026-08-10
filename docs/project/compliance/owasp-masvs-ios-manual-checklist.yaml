@@ -1,0 +1,79 @@
+schema_version: "1.0"
+baseline_ref: SCANFAIR-IOS-MASVS@1.0
+owner: Release owner
+evidence_format:
+  directory_pattern: evidence-store/manual/masvs/{build_id}/
+  required_metadata: [build_id, app_version, commit_sha, device_model, ios_version, tester, tested_at, result, attachments]
+  result_values: [pass, fail, not_run]
+
+checks:
+  - id: MASVS-IOS-01
+    control_ids: [MASVS-STORAGE-2]
+    profile: release_candidate
+    status: not_run
+    title: Release-build storage, backup and logging inspection
+    procedure:
+      - Exercise scan, manual barcode, result, detail and error flows in a release build.
+      - Inspect device container, backup classification and captured device logs.
+      - Confirm that camera frames, response bodies and future credentials are not retained or logged.
+    acceptance: No sensitive or unnecessary transient data is retained in files, caches, backups or logs.
+    evidence_file: MASVS-IOS-01-storage-and-logging.md
+
+  - id: MASVS-IOS-02
+    control_ids: [MASVS-NETWORK-1]
+    profile: release_candidate
+    status: not_run
+    title: TLS and server-trust observation
+    procedure:
+      - Observe all release-build traffic during successful, retry and error flows.
+      - Confirm HTTPS-only traffic to documented endpoints and rejection of an invalid certificate.
+      - Record endpoint, TLS result, test setup and screenshots or command output.
+    acceptance: No cleartext request occurs and invalid server trust is rejected.
+    evidence_file: MASVS-IOS-02-network-tls.md
+
+  - id: MASVS-IOS-03
+    control_ids: [MASVS-CODE-1]
+    profile: release_candidate
+    status: not_run
+    title: Minimum supported iOS decision and oldest-device test
+    procedure:
+      - Review the deployment target against the current Apple-supported iOS population and ScanFair threat model.
+      - Record the accepted minimum iOS version and rationale.
+      - Run the core scan flow on the oldest supported iOS version or raise the deployment target.
+    acceptance: The minimum version is explicitly approved and the core flow passes on the oldest supported version.
+    evidence_file: MASVS-IOS-03-minimum-ios.md
+
+  - id: MASVS-IOS-04
+    control_ids: [MASVS-CODE-2]
+    profile: release_candidate
+    status: not_run
+    title: Security update response exercise
+    procedure:
+      - Document how a critical vulnerable version is identified, withdrawn and replaced through the App Store.
+      - Define the trigger for adding a server-driven minimum-supported-version check.
+    acceptance: Owner, communication path and emergency update steps are actionable.
+    evidence_file: MASVS-IOS-04-security-update-response.md
+
+  - id: MASVS-IOS-05
+    control_ids: [MASVS-PRIVACY-1]
+    profile: release_candidate
+    status: not_run
+    title: Camera minimization, denial and revocation test
+    procedure:
+      - Deny camera permission and verify that manual barcode entry remains usable.
+      - Grant, use and revoke permission; verify recovery without hidden capture.
+      - Confirm through network observation that camera frames are not transmitted.
+    acceptance: Camera access is user initiated, purpose limited, recoverable and no frame is stored or transmitted.
+    evidence_file: MASVS-IOS-05-camera-privacy.md
+
+  - id: MASVS-IOS-06
+    control_ids: [MASVS-PRIVACY-2, MASVS-PRIVACY-3]
+    profile: release_candidate
+    status: not_run
+    title: Privacy disclosure consistency review
+    procedure:
+      - Compare runtime behavior, dependency inventory, privacy manifest, public privacy policy and App Store privacy answers.
+      - Review unavoidable network metadata observed by Open Food Facts, including purpose, retention, identifiability and disclosure.
+      - Verify an in-app privacy link and describe Open Food Facts requests and camera processing accurately.
+    acceptance: No unnecessary identifier is sent and all privacy disclosures are complete, consistent and accessible before release candidacy.
+    evidence_file: MASVS-IOS-06-privacy-disclosures.md

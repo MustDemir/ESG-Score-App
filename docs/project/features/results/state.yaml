@@ -1,9 +1,9 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
 status: review
-progress: 85
-current_focus: "Result- und Detailflow auf echtem iPhone validiert; Quellen, Bilder und Accessibility werden gehaertet"
-last_sync: "2026-07-28"
+progress: 90
+current_focus: "Result- und Detailflow auf echtem iPhone validiert; physische Accessibility-Evidenz und Quellen werden gehaertet"
+last_sync: "2026-08-10"
 
 lade_manifest:
   pflicht:
@@ -32,6 +32,8 @@ code_locations:
 test_locations:
   - esg_app/test/widget_test.dart
   - esg_app/test/widgets/traceability_card_test.dart
+  - esg_app/test/widgets/score_accessibility_test.dart
+  - esg_app/test/theme/scanfair_contrast_test.dart
 
 done:
   - |
@@ -53,6 +55,10 @@ done:
   - |
     2026-07-19 — Result- und Detailinformationen nach realem Kamera-Barcode-
     Scan auf einem physischen iPhone erfolgreich angezeigt.
+  - |
+    2026-08-10 — Kontrasttokens gehaertet, ScoreHero und PillarBars mit
+    expliziter Semantik versehen, Produkt-Emoji aus dem Semantikbaum entfernt
+    und Ergebnis-Komponenten bei 200 Prozent Textskalierung getestet.
 
 decisions:
   - id: FD-R-01
@@ -63,12 +69,12 @@ decisions:
 
 open_items:
   - Echte Produktbilder aus OFF fehlen noch; aktuell Emoji-Platzhalter.
-  - Accessibility-Pass nach erster Implementation (Screen-Reader-Labels)
+  - VoiceOver- und Dynamic-Type-Pruefung auf physischem iPhone dokumentieren.
 
 next_steps:
   - Details/Quellen mit evidence-first Feldern ausbauen
   - Echte OFF-Produktbilder mit sicherem Fallback integrieren
-  - Accessibility-Pass fuer Result- und Detail-Screen
+  - Physische Accessibility-Evidenz fuer Result- und Detail-Screen erfassen
 
 cross_feature_dependencies:
   - from: scoring

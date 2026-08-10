@@ -29,7 +29,7 @@ abstract final class ScanFairTokens {
   // ---------------------------------------------------------------------------
   static const Color ink1 = Color(0xFF1A2622);
   static const Color ink2 = Color(0xFF4A5650);
-  static const Color ink3 = Color(0xFF7A857F);
+  static const Color ink3 = Color(0xFF66716B);
   static const Color inkOnDark = Color(0xFFFBFAF6);
   static const Color inkOnGreen = Color(0xFFFFFFFF);
 
@@ -71,7 +71,7 @@ abstract final class ScanFairTokens {
   // siehe ADR 0011 (ESG-Score-Formel) fuer Schwellwerte
   // ---------------------------------------------------------------------------
   static const Color trafficGreen = Color(0xFF0F7B5C); // 7.0-10
-  static const Color trafficYellow = Color(0xFFD97706); // 4.0-6.9
+  static const Color trafficYellow = Color(0xFFA64B08); // 4.0-6.9
   static const Color trafficRed = Color(0xFFC2410C); // 0-3.9   · "Vermeiden"
 
   // ---------------------------------------------------------------------------

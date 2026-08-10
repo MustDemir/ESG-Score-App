@@ -36,9 +36,11 @@ class ProductSummaryCard extends StatelessWidget {
                 color: ScanFairTokens.green50,
                 borderRadius: BorderRadius.circular(ScanFairTokens.radiusLg),
               ),
-              child: Text(
-                product.imageEmoji,
-                style: TextStyle(fontSize: compact ? 24 : 34),
+              child: ExcludeSemantics(
+                child: Text(
+                  product.imageEmoji,
+                  style: TextStyle(fontSize: compact ? 24 : 34),
+                ),
               ),
             ),
             const SizedBox(width: ScanFairTokens.space3),
@@ -79,56 +81,76 @@ class ScoreHero extends StatelessWidget {
         ? null
         : (score.total! / 10).toStringAsFixed(1);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(ScanFairTokens.space5),
-      decoration: BoxDecoration(
-        color: ScanFairTokens.bgCard,
-        borderRadius: BorderRadius.circular(ScanFairTokens.radiusXl),
-        border: Border.all(color: ScanFairTokens.border),
-        boxShadow: ScanFairTokens.shadowSm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 72,
-            height: 5,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(ScanFairTokens.radiusPill),
-            ),
+    final semanticsLabel = displayScore == null
+        ? 'Kein ESG-Gesamtscore verfügbar'
+        : 'ESG-Gesamtscore $displayScore von 10';
+
+    return Semantics(
+      container: true,
+      label:
+          '$semanticsLabel. ${score.verdictLabel}. '
+          'Datenvollständigkeit ${(score.dataCompleteness * 100).round()} Prozent. '
+          '${score.tagline}',
+      child: ExcludeSemantics(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(ScanFairTokens.space5),
+          decoration: BoxDecoration(
+            color: ScanFairTokens.bgCard,
+            borderRadius: BorderRadius.circular(ScanFairTokens.radiusXl),
+            border: Border.all(color: ScanFairTokens.border),
+            boxShadow: ScanFairTokens.shadowSm,
           ),
-          const SizedBox(height: ScanFairTokens.space4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                displayScore ?? '—',
-                style: ScanFairTypography.scoreNumber.copyWith(color: color),
+              Container(
+                width: 72,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(
+                    ScanFairTokens.radiusPill,
+                  ),
+                ),
               ),
-              const SizedBox(width: ScanFairTokens.space2),
-              Padding(
-                padding: const EdgeInsets.only(bottom: ScanFairTokens.space2),
-                child: Text('/10', style: textTheme.titleMedium),
+              const SizedBox(height: ScanFairTokens.space4),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.end,
+                spacing: ScanFairTokens.space2,
+                runSpacing: ScanFairTokens.space1,
+                children: [
+                  Text(
+                    displayScore ?? '—',
+                    style: ScanFairTypography.scoreNumber.copyWith(
+                      color: color,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: ScanFairTokens.space2,
+                    ),
+                    child: Text('/10', style: textTheme.titleMedium),
+                  ),
+                ],
               ),
+              const SizedBox(height: ScanFairTokens.space2),
+              Wrap(
+                spacing: ScanFairTokens.space2,
+                runSpacing: ScanFairTokens.space2,
+                children: [
+                  _Pill(label: score.verdictLabel, color: color),
+                  _Pill(
+                    label: 'Daten ${(score.dataCompleteness * 100).round()}%',
+                    color: ScanFairTokens.ink3,
+                  ),
+                ],
+              ),
+              const SizedBox(height: ScanFairTokens.space3),
+              Text(score.tagline, style: textTheme.bodyMedium),
             ],
           ),
-          const SizedBox(height: ScanFairTokens.space2),
-          Wrap(
-            spacing: ScanFairTokens.space2,
-            runSpacing: ScanFairTokens.space2,
-            children: [
-              _Pill(label: score.verdictLabel, color: color),
-              _Pill(
-                label: 'Daten ${(score.dataCompleteness * 100).round()}%',
-                color: ScanFairTokens.ink3,
-              ),
-            ],
-          ),
-          const SizedBox(height: ScanFairTokens.space3),
-          Text(score.tagline, style: textTheme.bodyMedium),
-        ],
+        ),
       ),
     );
   }
@@ -463,51 +485,67 @@ class _PillarBar extends StatelessWidget {
     final progress = value == null ? 0.0 : value / 100;
     final textTheme = Theme.of(context).textTheme;
 
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(ScanFairTokens.radiusMd),
-          ),
-          child: Text(
-            shortLabel,
-            style: textTheme.titleSmall?.copyWith(color: color),
-          ),
-        ),
-        const SizedBox(width: ScanFairTokens.space3),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+    final spokenValue = value == null
+        ? 'Keine Daten'
+        : '${(value / 10).toStringAsFixed(1)} von 10';
+
+    return Semantics(
+      container: true,
+      label: label,
+      value: spokenValue,
+      child: ExcludeSemantics(
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(ScanFairTokens.radiusMd),
+              ),
+              child: Text(
+                shortLabel,
+                style: textTheme.titleSmall?.copyWith(color: color),
+              ),
+            ),
+            const SizedBox(width: ScanFairTokens.space3),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: Text(label, style: textTheme.titleSmall)),
-                  Text(
-                    value == null
-                        ? 'Keine Daten'
-                        : '${(value / 10).toStringAsFixed(1)}/10',
-                    style: textTheme.bodySmall,
+                  Row(
+                    children: [
+                      Expanded(child: Text(label, style: textTheme.titleSmall)),
+                      Flexible(
+                        child: Text(
+                          value == null
+                              ? 'Keine Daten'
+                              : '${(value / 10).toStringAsFixed(1)}/10',
+                          textAlign: TextAlign.end,
+                          style: textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: ScanFairTokens.space2),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(
+                      ScanFairTokens.radiusPill,
+                    ),
+                    child: LinearProgressIndicator(
+                      minHeight: 8,
+                      value: progress,
+                      backgroundColor: ScanFairTokens.bgAlt,
+                      color: value == null ? ScanFairTokens.ink3 : color,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: ScanFairTokens.space2),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(ScanFairTokens.radiusPill),
-                child: LinearProgressIndicator(
-                  minHeight: 8,
-                  value: progress,
-                  backgroundColor: ScanFairTokens.bgAlt,
-                  color: value == null ? ScanFairTokens.ink3 : color,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

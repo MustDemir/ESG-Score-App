@@ -16,7 +16,7 @@
   /* ---------- Foreground / Text ---------- */
   --sf-ink-1:        #1A2622;   /* primary text — dunkles Forest-Slate */
   --sf-ink-2:        #4A5650;   /* secondary */
-  --sf-ink-3:        #7A857F;   /* tertiary / muted */
+  --sf-ink-3:        #66716B;   /* tertiary / muted; WCAG AA on warm surfaces */
   --sf-ink-on-dark:  #FBFAF6;
   --sf-ink-on-green: #FFFFFF;
 
@@ -48,7 +48,7 @@
   /* ---------- Ampel-Score (Hausarbeit: Grün/Gelb/Rot) ---------- */
   /* Hybrid-System: Ampelfarbe + 0–10 Zahl */
   --sf-traffic-green:  #0F7B5C; /* 7.0 – 10  · "Empfehlung" */
-  --sf-traffic-yellow: #D97706; /* 4.0 – 6.9 · "Mit Bedacht" */
+  --sf-traffic-yellow: #A64B08; /* 4.0 – 6.9 · "Mit Bedacht"; AA for pill text */
   --sf-traffic-red:    #C2410C; /* 0   – 3.9 · "Vermeiden" */
 
   /* ---------- Status ---------- */

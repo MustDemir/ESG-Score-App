@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_updated: 2026-07-29
+last_updated: 2026-08-10
 owner: Mustafa Demir
 purpose: |
   Zentrales Register der aus der Gesamtbewertung abgeleiteten Verbesserungen.
@@ -35,7 +35,6 @@ allowed_values:
     - submission
 
 execution_order:
-  - IMP-COMP-002
   - IMP-COMP-003
   - IMP-DEV-001
   - IMP-DEV-002
@@ -152,7 +151,7 @@ improvements:
   - id: IMP-COMP-002
     layer: compliance
     title: Risikobasierte OWASP-MASVS-Baseline fuer den iOS-MVP
-    status: planned
+    status: done
     priority: P0
     risk: H
     owner: Engineering
@@ -165,13 +164,21 @@ improvements:
       - Nicht anwendbare Kontrollen sind mit Begruendung dokumentiert
       - Automatisierbare Kontrollen haben Tests oder Gates
       - Manuelle Device-Kontrollen haben Checkliste, Owner und Evidenzformat
-    evidence: []
+    evidence:
+      - docs/project/compliance/owasp-masvs-ios-baseline.yaml
+      - docs/project/compliance/owasp-masvs-ios-manual-checklist.yaml
+      - docs/project/gate-definitions/local/G-LOCAL-MASVS.yaml
+      - scripts/quality/validate_masvs_baseline.rb
+      - scripts/quality/test_masvs_gate.rb
+      - scripts/quality/run_quality_gates.sh
     verification:
-      - MASVS-Coverage-Matrix ohne unbegruendete Luecken
-      - Release-Candidate-Profil blockiert offene anwendbare MUST-Kontrollen
+      - 24 MASVS-2.1-Kontrollen sind genau einmal erfasst; 9 anwendbar und 15 mit Aktivierungstrigger nicht anwendbar
+      - Fuenf Validator-Selbsttests bestehen, einschliesslich fehlender Kontrolle und Release-Candidate-Blockade
+      - Development-Profil besteht mit sichtbaren offenen Release-Nachweisen
+      - Release-Candidate-Profil blockiert offene anwendbare MUST-Kontrollen und manuelle Checks
     dependencies:
       - IMP-COMP-001
-    next_action: MASVS-Kontrollen gegen Datenfluss, Kamera, Netzwerk und lokale Speicherung mappen
+    next_action: Baseline bei neuen Capabilities reklassifizieren und die manuellen Checks vor jedem Release Candidate ausfuehren
 
   - id: IMP-COMP-003
     layer: compliance

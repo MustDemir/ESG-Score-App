@@ -31,6 +31,13 @@ gate_supply_chain() {
   cd "$REPO_ROOT" && bash scripts/quality/run_supply_chain_gate.sh
 }
 
+gate_masvs() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_masvs_gate.rb &&
+    ruby scripts/quality/validate_masvs_baseline.rb \
+      --profile "${COMPLIANCE_PROFILE:-development}"
+}
+
 gate_flutter_format() {
   cd "$APP_DIR" && dart format --set-exit-if-changed lib test
 }
@@ -150,6 +157,7 @@ run_gate() {
 
 run_gate "G-FLT-DEPS" "Flutter dependency resolution" gate_flutter_pub_get
 run_gate "G-SUPPLY-CHAIN" "Dependency, license, iOS plugin and Action security" gate_supply_chain
+run_gate "G-MASVS" "Risk-based OWASP MASVS iOS baseline" gate_masvs
 run_gate "G-FLT-FORMAT" "Dart format check" gate_flutter_format
 run_gate "G-FLT-ANALYZE" "Flutter static analysis" gate_flutter_analyze
 run_gate "G-FLT-TEST" "Flutter unit and widget tests" gate_flutter_test

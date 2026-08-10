@@ -1,6 +1,6 @@
 schema_version: "1.0"
-last_verified: 2026-07-27
-next_review_due: 2026-08-26
+last_verified: 2026-08-10
+next_review_due: 2026-09-09
 review_owner: Release owner
 
 sources:
@@ -74,6 +74,13 @@ sources:
     version: current-web
     normative_weight: SHOULD
     scope: iOS interaction, accessibility and visual conventions
+  - id: OWASP-MASVS
+    authority: OWASP Foundation
+    title: Mobile Application Security Verification Standard
+    url: https://mas.owasp.org/MASVS/
+    version: "2.1.0"
+    normative_weight: RISK_BASED_SECURITY_BASELINE
+    scope: iOS mobile application security and privacy verification
   - id: EU-GDPR
     authority: European Union
     title: General Data Protection Regulation

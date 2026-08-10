@@ -3,7 +3,7 @@ title: "ESG-Score-Calculator + OFF-Integration"
 status: review
 progress: 95
 current_focus: "Methodikkatalog v2 und quellenbezogene Parametermappings"
-last_sync: "2026-07-27"
+last_sync: "2026-08-10"
 
 lade_manifest:
   pflicht:
@@ -87,6 +87,11 @@ done:
   - |
     2026-07-27 — G-LINK-INTEGRITY, G-MISSING-DATA, G-RED-FLAG,
     G-SCORE-REPRO und G-CLAIM-SAFETY als blockierende lokale Gates integriert.
+  - |
+    2026-08-10 — ADR 0027 schliesst die Precedence-Luecke: Ein Gesamtscore
+    benoetigt Environmental-Evidenz, waehrend S/G separat sichtbar bleiben.
+    Eine 39-Faelle-Testmatrix deckt Saeulenkombinationen, Zweige, Clamping,
+    nicht-endliche Eingaben und Ampelgrenzen ab.
 
 decisions:
   - id: FD-SCO-01
@@ -119,6 +124,11 @@ decisions:
     date: "2026-07-27"
     rationale: "Produkt-, Rohstoff-, Herkunfts- und Unternehmensbezug getrennt pruefen"
     adr_ref: "0025"
+  - id: FD-SCO-07
+    decision: Environmental-Evidenz ist Voraussetzung fuer einen Gesamt-ESG-Score
+    date: "2026-08-10"
+    rationale: "Fehlende E-Evidenz darf nicht durch Social- oder Governance-Signale ersetzt werden"
+    adr_ref: "0027"
 
 open_items:
   - Methodik-Seite (App + Web) muss vor Launch geschrieben sein

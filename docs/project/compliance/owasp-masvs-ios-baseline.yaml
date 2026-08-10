@@ -1,0 +1,341 @@
+schema_version: "1.0"
+baseline_id: SCANFAIR-IOS-MASVS
+version: "1.0"
+last_verified: 2026-08-10
+owner: Engineering
+
+standard:
+  name: OWASP Mobile Application Security Verification Standard
+  version: "2.1.0"
+  source_ref: OWASP-MASVS
+  url: https://mas.owasp.org/MASVS/
+  control_count: 24
+  note: MASVS 2.x uses risk-based testing profiles instead of the former L1/L2/R levels.
+
+scope:
+  platform: ios
+  app_phase: phase-1-mvp
+  minimum_ios_version: "13.0"
+  network_endpoints:
+    - host: world.openfoodfacts.org
+      developer_controlled: false
+      purpose: Public product and sustainability data lookup
+  processed_data:
+    - kind: barcode
+      classification: non_sensitive_product_identifier
+      persisted_on_device: false
+    - kind: public_product_data
+      classification: public_external_data
+      persisted_on_device: false
+    - kind: camera_frames
+      classification: transient_sensor_data
+      persisted_on_device: false
+      transmitted: false
+  capabilities:
+    intentional_sensitive_local_storage: false
+    custom_cryptography_or_keys: false
+    accounts_or_local_authentication: false
+    developer_controlled_remote_endpoint: false
+    ipc_deep_links_or_extensions: false
+    webviews: false
+    sensitive_user_data_in_ui: false
+    tamper_sensitive_assets_or_entitlements: false
+    personal_data_management: false
+
+profiles:
+  development:
+    decision: block_schema_and_automated_findings
+    open_must_controls: warn
+  release_candidate:
+    decision: block_open_applicable_must_controls
+    manual_evidence: required
+  submission:
+    decision: block_open_applicable_must_controls
+    manual_evidence: required
+
+controls:
+  - id: MASVS-STORAGE-1
+    group: MASVS-STORAGE
+    objective: Protect intentionally stored sensitive data.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The current MVP does not persist account data, scan history, camera frames, credentials or other sensitive data on the device.
+    activation_trigger: Add local persistence, accounts, scan history, credentials or user-generated data.
+    evidence: [docs/project/data/data-architecture.md, esg_app/pubspec.yaml]
+
+  - id: MASVS-STORAGE-2
+    group: MASVS-STORAGE
+    objective: Prevent unintended disclosure through logs, backups, caches or platform features.
+    applicability: applicable
+    requirement: MUST
+    status: partial
+    verification: HYBRID
+    release_blocking: true
+    rationale: Camera frames are transient and product data is public, but release builds still require verification that logs and platform storage do not retain unintended data.
+    evidence: [esg_app/ios/Runner/Info.plist, esg_app/ios/Runner/PrivacyInfo.xcprivacy]
+    manual_check_ids: [MASVS-IOS-01]
+
+  - id: MASVS-CRYPTO-1
+    group: MASVS-CRYPTO
+    objective: Use current strong cryptography according to established practice.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The app implements no application-layer cryptography; TLS transport is assessed under MASVS-NETWORK.
+    activation_trigger: Add application-layer encryption, hashing, signatures, encrypted local storage or protected payloads.
+    evidence: [esg_app/pubspec.yaml, docs/project/decisions/0008-security-baseline.yaml]
+
+  - id: MASVS-CRYPTO-2
+    group: MASVS-CRYPTO
+    objective: Manage cryptographic keys securely throughout their lifecycle.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: No application-managed cryptographic keys exist in the current client.
+    activation_trigger: Add client-held keys, encrypted storage, signing, authentication tokens requiring Keychain storage or key rotation.
+    evidence: [esg_app/pubspec.yaml, docs/project/decisions/0008-security-baseline.yaml]
+
+  - id: MASVS-AUTH-1
+    group: MASVS-AUTH
+    objective: Use secure remote authentication and authorization protocols.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The MVP has no accounts, sessions or authenticated backend access.
+    activation_trigger: Connect Supabase authentication or any authenticated API.
+    evidence: [docs/project/compliance/compliance-manifest.json, docs/project/data/data-architecture.md]
+
+  - id: MASVS-AUTH-2
+    group: MASVS-AUTH
+    objective: Implement local authentication using secure platform mechanisms.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The MVP has no local PIN, Face ID, Touch ID or protected local session.
+    activation_trigger: Add biometric or local-PIN access control.
+    evidence: [docs/project/compliance/compliance-manifest.json, esg_app/pubspec.yaml]
+
+  - id: MASVS-AUTH-3
+    group: MASVS-AUTH
+    objective: Require additional authentication for sensitive operations.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: Scanning and viewing public product data are not sensitive account operations.
+    activation_trigger: Add payments, account deletion, data export, profile changes or other sensitive operations.
+    evidence: [docs/project/compliance/compliance-manifest.json, docs/MVP-REQUIREMENTS.md]
+
+  - id: MASVS-NETWORK-1
+    group: MASVS-NETWORK
+    objective: Secure all network traffic using current transport-security practice.
+    applicability: applicable
+    requirement: MUST
+    status: partial
+    verification: HYBRID
+    release_blocking: true
+    rationale: Product requests use HTTPS and iOS ATS defaults; a release build still needs observed traffic and certificate-validation evidence.
+    evidence: [esg_app/lib/services/open_food_facts_service.dart, esg_app/ios/Runner/Info.plist]
+    manual_check_ids: [MASVS-IOS-02]
+
+  - id: MASVS-NETWORK-2
+    group: MASVS-NETWORK
+    objective: Pin the identity of remote endpoints controlled by the developer.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The only live endpoint is operated by Open Food Facts and is not under ScanFair control; pinning a third-party certificate would create availability and rotation risk.
+    activation_trigger: Connect a ScanFair-controlled API or Supabase project and complete a pinning threat-model decision.
+    evidence: [esg_app/lib/services/open_food_facts_service.dart, docs/project/data/data-architecture.md]
+
+  - id: MASVS-PLATFORM-1
+    group: MASVS-PLATFORM
+    objective: Use platform IPC mechanisms securely.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The iOS target declares no custom URL schemes, universal links, app groups, extensions or application IPC surface.
+    activation_trigger: Add deep links, share extensions, app groups, universal links or other IPC.
+    evidence: [esg_app/ios/Runner/Info.plist, esg_app/ios/Runner.xcodeproj/project.pbxproj]
+
+  - id: MASVS-PLATFORM-2
+    group: MASVS-PLATFORM
+    objective: Configure and use WebViews securely.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: ScanFair has no WebView dependency or embedded browser surface.
+    activation_trigger: Add a WebView, HTML rendering engine or JavaScript bridge.
+    evidence: [esg_app/pubspec.yaml]
+
+  - id: MASVS-PLATFORM-3
+    group: MASVS-PLATFORM
+    objective: Prevent unintended disclosure of sensitive data through the user interface.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The MVP displays public product data and no account, credential, payment or private-history information.
+    activation_trigger: Display account data, private scan history, credentials, payment data or notifications containing personal data.
+    evidence: [docs/project/data/data-architecture.md, docs/project/compliance/compliance-manifest.json]
+
+  - id: MASVS-CODE-1
+    group: MASVS-CODE
+    objective: Require a sufficiently current mobile platform version.
+    applicability: applicable
+    requirement: MUST
+    status: open
+    verification: HYBRID
+    release_blocking: true
+    rationale: The tracked deployment target is iOS 13.0; the release owner must make and document a threat-model and device-support decision before release candidacy.
+    evidence: [esg_app/ios/Runner.xcodeproj/project.pbxproj, docs/project/stack.yaml]
+    manual_check_ids: [MASVS-IOS-03]
+
+  - id: MASVS-CODE-2
+    group: MASVS-CODE
+    objective: Provide a response path for security-critical app updates.
+    applicability: applicable
+    requirement: SHOULD
+    status: open
+    verification: MANUAL
+    release_blocking: false
+    rationale: The low-risk public-data MVP can use App Store updates, but a documented emergency update and minimum-supported-version mechanism should precede account or sensitive-data features.
+    evidence: [docs/project/decisions/0008-security-baseline.yaml]
+    manual_check_ids: [MASVS-IOS-04]
+
+  - id: MASVS-CODE-3
+    group: MASVS-CODE
+    objective: Ship software components without known vulnerabilities.
+    applicability: applicable
+    requirement: MUST
+    status: pass
+    verification: AUTO
+    release_blocking: true
+    rationale: Locked Dart and native iOS dependencies are inventoried and scanned by the reproducible supply-chain gate.
+    evidence: [docs/project/compliance/supply-chain-policy.yaml, scripts/quality/run_supply_chain_gate.sh, esg_app/pubspec.lock]
+
+  - id: MASVS-CODE-4
+    group: MASVS-CODE
+    objective: Validate and safely handle all untrusted input.
+    applicability: applicable
+    requirement: MUST
+    status: pass
+    verification: AUTO
+    release_blocking: true
+    rationale: Manual/scanned barcodes are constrained to 8-14 digits, remote responses are type-checked, malformed responses fail closed and non-finite score inputs are rejected.
+    evidence: [esg_app/lib/services/open_food_facts_service.dart, esg_app/lib/data_sources/open_food_facts_product_mapper.dart, esg_app/test/services/open_food_facts_service_test.dart, esg_app/test/services/esg_score_calculator_test.dart]
+
+  - id: MASVS-RESILIENCE-1
+    group: MASVS-RESILIENCE
+    objective: Detect an untrusted or compromised runtime platform where the threat model requires it.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The app holds no secrets, premium entitlements, protected transactions or sensitive local data whose security depends on jailbreak detection.
+    activation_trigger: Add protected accounts, payments, secrets, regulated personal data or high-value offline decisions.
+    evidence: [docs/project/decisions/0008-security-baseline.yaml, docs/project/data/data-architecture.md]
+
+  - id: MASVS-RESILIENCE-2
+    group: MASVS-RESILIENCE
+    objective: Apply anti-tampering measures where manipulated app behavior creates material harm.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: Current results are public-data guidance, not authorization, payment, certification or a protected entitlement.
+    activation_trigger: Add premium entitlements, trusted offline assertions, payments or security-critical client decisions.
+    evidence: [docs/project/decisions/0008-security-baseline.yaml, docs/ESG-SCORING-MODELL-v1.md]
+
+  - id: MASVS-RESILIENCE-3
+    group: MASVS-RESILIENCE
+    objective: Resist static analysis where the threat model justifies it.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The client contains no embedded secrets or proprietary authorization material; scoring transparency is an explicit product requirement.
+    activation_trigger: Add client-held secrets or security-critical proprietary logic after a documented threat model.
+    evidence: [docs/project/decisions/0008-security-baseline.yaml, README.md]
+
+  - id: MASVS-RESILIENCE-4
+    group: MASVS-RESILIENCE
+    objective: Resist dynamic analysis where the threat model justifies it.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: Dynamic-analysis resistance is not proportionate for the current public-data, no-account MVP.
+    activation_trigger: Add protected transactions, client-held secrets, premium entitlements or regulated sensitive data.
+    evidence: [docs/project/decisions/0008-security-baseline.yaml, docs/project/data/data-architecture.md]
+
+  - id: MASVS-PRIVACY-1
+    group: MASVS-PRIVACY
+    objective: Minimize access to sensitive data and device resources.
+    applicability: applicable
+    requirement: MUST
+    status: partial
+    verification: HYBRID
+    release_blocking: true
+    rationale: Camera is the only requested sensitive device resource and is used only during user-initiated barcode scanning; denial and revocation behavior still need release-device evidence.
+    evidence: [esg_app/ios/Runner/Info.plist, esg_app/ios/Runner/PrivacyInfo.xcprivacy, docs/project/compliance/compliance-manifest.json]
+    manual_check_ids: [MASVS-IOS-05]
+
+  - id: MASVS-PRIVACY-2
+    group: MASVS-PRIVACY
+    objective: Prevent unnecessary identification and tracking of the user.
+    applicability: applicable
+    requirement: MUST
+    status: partial
+    verification: HYBRID
+    release_blocking: true
+    rationale: The MVP has no account, advertising identifier, analytics SDK, location access or tracking domain, but the external product endpoint necessarily observes network metadata such as an IP address and its retention and disclosure still require review.
+    evidence: [esg_app/pubspec.yaml, esg_app/ios/Runner/PrivacyInfo.xcprivacy, docs/project/compliance/compliance-manifest.json]
+    manual_check_ids: [MASVS-IOS-06]
+
+  - id: MASVS-PRIVACY-3
+    group: MASVS-PRIVACY
+    objective: Transparently disclose data collection, use, storage and sharing.
+    applicability: applicable
+    requirement: MUST
+    status: partial
+    verification: HYBRID
+    release_blocking: true
+    rationale: Local privacy documentation and an iOS privacy manifest exist, but the final public policy, in-app link and App Store privacy answers are intentionally open.
+    evidence: [docs/privacy.md, esg_app/ios/Runner/PrivacyInfo.xcprivacy, docs/project/compliance/compliance-manifest.json]
+    manual_check_ids: [MASVS-IOS-06]
+
+  - id: MASVS-PRIVACY-4
+    group: MASVS-PRIVACY
+    objective: Give users control over personal data and privacy choices.
+    applicability: not_applicable
+    requirement: NOT_APPLICABLE
+    status: not_applicable
+    verification: NONE
+    release_blocking: false
+    rationale: The MVP creates no account, personal profile, private scan history or consent-based personal-data store; camera access remains controllable through iOS settings.
+    activation_trigger: Add accounts, personal scan history, consented analytics, profiles or other persisted personal data.
+    evidence: [docs/project/compliance/compliance-manifest.json, docs/project/data/data-architecture.md]

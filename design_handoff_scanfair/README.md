@@ -175,11 +175,11 @@ Vollständige Definitionen in `tokens.css` (im Bundle).
 
 ### Colors
 - **Backgrounds:** `--sf-bg #FBFAF6` (warm off-white) · `--sf-bg-alt #F4F2EB` (sand) · `--sf-bg-card #FFFFFF` · `--sf-bg-deep #0E1B17` (forest-tinted slate).
-- **Ink:** `#1A2622` / `#4A5650` / `#7A857F`.
+- **Ink:** `#1A2622` / `#4A5650` / `#66716B`.
 - **Borders:** `#E5E2D8` · `#EFEDE5` (soft) · `#C7C3B6` (strong).
 - **Brand Forest Green:** 50 `#E8F2EE` · 100 `#C5DFD3` · 200 `#8FC2A8` · 400 `#3D9B76` · **500 `#0F7B5C` ⭐ Primary** · 600 `#0A6248` · 700 `#074A36` · 900 `#042A1E`.
 - **Pillar-Farben:** E `#0F7B5C` · S `#C97B5C` (Clay) · G `#4F46E5` (Indigo).
-- **Ampel:** Green `#0F7B5C` (≥7.0) · Yellow `#D97706` (4.0–6.9) · Red `#C2410C` (<4.0).
+- **Ampel:** Green `#0F7B5C` (≥7.0) · Yellow `#A64B08` (4.0–6.9) · Red `#C2410C` (<4.0).
 - **Status:** Success `#DCFCE7`/`#15803D` · Warning `#FEF3C7`/`#B45309` · Danger `#FEE2E2`/`#991B1B`.
 
 ### Typography

@@ -582,7 +582,7 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: in_progress
     owner: Engineering
     activation_trigger: "M6-mvp-beta-hardening: run accessibility field tests"
     related_milestones: [M6-mvp-beta-hardening]
@@ -595,9 +595,16 @@ todos:
     verification:
       - Flutter Widget- und Semantics-Tests
       - Manueller R-AS-29-Review mit Device-Evidenz
+    completed_parts:
+      - ink3 und trafficYellow bestehen automatisierte 4.5-zu-1-Kontrasttests auf ihren relevanten Flaechen
+      - ScoreHero und E/S/G-Saeulen besitzen explizite, getestete Screenreader-Zusammenfassungen
+      - Produkt-Emoji ist dekorativ und aus dem Semantikbaum ausgeschlossen
+      - Score-Komponenten bestehen einen Layouttest bei 200 Prozent Textskalierung
+    remaining_parts:
+      - VoiceOver und Dynamic Type auf einem physischen iPhone pruefen und Evidenz ablegen
     source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
     created: 2026-07-28
-    updated: 2026-07-29
+    updated: 2026-08-10
 
   - id: TODO-028
     title: Entscheidungsbasierte Testmatrix fuer ESGScoreCalculator ergaenzen
@@ -616,7 +623,7 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: done
     owner: Engineering
     related: [0010, 0011, TODO-002, TODO-012]
     acceptance_criteria:
@@ -627,9 +634,17 @@ todos:
     verification:
       - flutter test test/services/esg_score_calculator_test.dart
       - flutter test --coverage
+    result: |
+      39 gezielte Calculator- und Mapper-Faelle decken Precedence, alle
+      verfuegbaren Saeulenkombinationen, Social-/Governance-Zweige,
+      Clamping, nicht-endliche Eingaben und Ampelgrenzen ab.
+    evidence:
+      - esg_app/test/services/esg_score_calculator_test.dart
+      - docs/project/decisions/0027-environmental-score-precedence.yaml
     source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
     created: 2026-07-28
-    updated: 2026-07-29
+    completed: 2026-08-10
+    updated: 2026-08-10
 
   - id: TODO-029
     title: Dependency Review unter echten PR-Bedingungen verifizieren
@@ -669,9 +684,9 @@ todos:
     phase: phase-1-mvp
     priority: P1
     effort: S
-    status: open
+    status: done
     owner: Mustafa Demir
-    related: [0010, 0011]
+    related: [0010, 0011, 0027]
     acceptance_criteria:
       - Neue ADR entscheidet die Mindestvoraussetzung fuer einen Gesamtscore
       - Bestehende ADRs bleiben unveraendert und werden korrekt referenziert
@@ -680,9 +695,17 @@ todos:
     verification:
       - ADR-Index und Projekt-YAML-Gate bestehen
       - TODO-028-Testmatrix besteht
+    result: |
+      ADR 0027 legt Environmental-Evidenz als Voraussetzung fuer den
+      Gesamtscore fest. S und G bleiben bei fehlendem E separat sichtbar;
+      fehlende Saeulen werden weder imputiert noch als Null gewertet.
+    evidence:
+      - docs/project/decisions/0027-environmental-score-precedence.yaml
+      - esg_app/test/services/esg_score_calculator_test.dart
     source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
     created: 2026-07-28
-    updated: 2026-07-29
+    completed: 2026-08-10
+    updated: 2026-08-10
 
   - id: TODO-031
     title: Score-Anzeigeformatierung fuer 0-10 zentralisieren

@@ -42,11 +42,13 @@ docs/project/
 │   ├── scanner/state.yaml
 │   ├── scoring/state.yaml
 │   └── results/state.yaml
-├── compliance/            # Externe-Regeln-Mapping (z.B. Apple App Review)
-│   └── apple-review-relevance.md
+├── compliance/            # Apple-, DSGVO-, Supply-Chain- und MASVS-Mapping
+│   ├── apple-review-relevance.md
+│   └── owasp-masvs-ios-baseline.yaml
 ├── requirements/          # Compliance-Anforderungen (R-AS-NN, R-DSGVO-NN, ...)
-├── gate-definitions/      # 7-Attribute-Gate-Specs (Master-Thesis-Pattern)
-│   └── apple/
+├── gate-definitions/      # Pruefbare Apple- und lokale Gate-Spezifikationen
+│   ├── apple/
+│   └── local/
 ├── policies/              # Rego-Policies (Conftest)
 │   └── apple/
 └── spikes/                # Spike-Reports (z.B. OFF-API-Coverage)
