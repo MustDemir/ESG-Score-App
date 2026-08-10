@@ -74,8 +74,15 @@ sichtbar.
 | Governance | 20% | heuristischer MVP | Datenvollstaendigkeit und Produkttransparenz |
 
 ```text
-Gesamt-Score = (E x 0.50) + (S x 0.30) + (G x 0.20)
+Gesamt-Score = Summe(verfuegbare Saeule x Gewicht) / Summe(verfuegbare Gewichte)
+Voraussetzung: Environmental-Evidenz ist vorhanden.
 ```
+
+Social und Governance bleiben bei fehlender Environmental-Evidenz separat
+sichtbar. Fehlende Saeulen werden nicht geschaetzt, nicht als Null behandelt
+und nicht durch andere Saeulen ersetzt. Diese Precedence ist in
+[ADR 0027](docs/project/decisions/0027-environmental-score-precedence.yaml)
+verbindlich festgelegt.
 
 **Ampel-Logik**
 
@@ -257,8 +264,8 @@ M2  Backend- und Datenanbindung           [########------------]  40%
 M3  Kaffee als Referenzfall               [####----------------]  20%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
-M6  MVP-Beta und Product Hardening        [#############-------]  65%
-M7  App-Store-Release-Candidate           [#######-------------]  35%
+M6  MVP-Beta und Product Hardening        [##############------]  70%
+M7  App-Store-Release-Candidate           [########------------]  40%
 M8  TestFlight, Submission und Release    [--------------------]   0%
 ```
 
@@ -269,8 +276,8 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | M3 | Kaffeeprofil, Parameterkatalog und erstes AGRIBALYSE-Rohmapping | verifizierte Pilotprodukte, Rohstoff-/Herkunftslinks und reproduzierbare Detailerklaerung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
-| M6 | realer iPhone-Scanflow, Fehlerzustaende, Tests und 79% Coverage | Offline/History-Entscheidung, Accessibility, Lokalisierung und Feldtest |
-| M7 | acht Apple-Gate-Gruppen, iOS-Compile und Privacy-Bundle-Audit | alle offenen Release-Evidenzen und signiertes Release-Archive |
+| M6 | realer iPhone-Scanflow, Fehlerzustaende, Tests, Kontrast- und Semantikchecks | Offline/History-Entscheidung, physische Accessibility-Evidenz, Lokalisierung und Feldtest |
+| M7 | acht Apple-Gate-Gruppen, MASVS-2.1-Baseline, iOS-Compile und Privacy-Bundle-Audit | offene Apple-/MASVS-Release-Evidenzen und signiertes Release-Archive |
 | M8 | bewusst noch nicht begonnen | TestFlight, App-Store-Submission und Releaseentscheidung |
 
 ### Naechste Arbeitspakete
@@ -278,7 +285,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 Diese Pakete beginnen nach der Integration bewusst bei `0%`:
 
 ```text
-N0  Compliance-/Security-Baseline        [######--------------]  30%
+N0  Compliance-/Security-Baseline        [##############------]  70%
 N1  Kaffee-Pilotprodukte festlegen        [--------------------]   0%
 N2  Produkt -> Rohstoff -> Herkunft       [--------------------]   0%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
@@ -289,9 +296,9 @@ N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
 N8  Kalibrierung und Expertenreview       [--------------------]   0%
 ```
 
-**Umsetzungsreihenfolge:** Zuerst wird N0 mit Dependency-/Supply-Chain-Scan,
-risikobasierter OWASP-MASVS-Baseline und priorisierter Apple-/Claim-Evidenz
-geschlossen. Danach wird M3 als lokaler evidence-first Kaffee-Referenzfall
+**Umsetzungsreihenfolge:** N0 besitzt jetzt den Dependency-/Supply-Chain-Scan
+und die risikobasierte OWASP-MASVS-Baseline; offen sind die priorisierten
+manuellen Apple-, MASVS- und Claim-Evidenzen. Danach wird M3 als lokaler evidence-first Kaffee-Referenzfall
 fortgesetzt. Sobald Produkt-, Rohstoff-, Herkunfts- und Evidenzvertraege fuer
 diesen vertikalen Schnitt stabil sind, laufen die offenen M2-Arbeiten parallel:
 EU-Supabase, vertrauenswuerdiger Server-Writer und read-only Flutter-Cache.
@@ -324,6 +331,7 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [Delivery Operating Model](docs/project/delivery-operating-model.md) | verbindlicher Arbeitsrahmen fuer Prozess, Compliance, Entwicklung und Release |
 | [Verbesserungsregister](docs/project/improvement-register.yaml) | priorisierte Prozess-, Compliance-, Entwicklungs- und Betriebsverbesserungen mit Evidenz |
 | [Supply-Chain-Policy](docs/project/compliance/supply-chain-policy.yaml) | OSV-, Lizenz-, native iOS-, Action-Pin- und Ausnahmevorgaben |
+| [OWASP-MASVS-iOS-Baseline](docs/project/compliance/owasp-masvs-ios-baseline.yaml) | risikobasierte Klassifikation aller 24 MASVS-2.1-Kontrollen mit Release-Profil |
 | [Design-Synthese](docs/DESIGN-SYNTHESIS.md) | Unterschiede zwischen altem Konzeptstand und neuen ScanFair-Prototypen |
 | [Developer-Handoff](design_handoff_scanfair/README.md) | Vollständiges Paket für Claude Code: Tokens, Daten, Komponenten, Screens |
 | [Pitch](docs/PITCH.md) | Projektargumentation und fachlicher Kontext |

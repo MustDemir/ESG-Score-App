@@ -1,0 +1,94 @@
+id: 0027
+title: Environmental evidence is required for an aggregate ESG score
+date: 2026-08-10
+status: accepted
+deciders: [Mustafa]
+tags: [scoring, esg, data-quality, transparency, methodology]
+
+context: |
+  ADR 0010 requires the app to withhold an aggregate score when the
+  Environmental pillar is unavailable. ADR 0011 contains a conflicting
+  example in which a Social-only result becomes the aggregate score. The
+  implemented calculator follows ADR 0010, but the precedence and minimum test
+  contract were not documented explicitly.
+
+  An aggregate value based only on Social or Governance signals could be read
+  as a complete ESG assessment even though the primary Environmental evidence
+  is missing. At the same time, verified Social and Governance signals remain
+  useful and should stay visible as separate, non-aggregate information.
+
+options_considered:
+  - name: Any available pillar may produce the aggregate score
+    pros:
+      - maximizes the number of scans with a numeric result
+      - matches the conflicting example in ADR 0011
+    cons:
+      - a Social-only or Governance-only value can look like a complete ESG score
+      - weakens the transparency-first behavior from ADR 0010
+      - makes missing Environmental evidence easy to overlook
+
+  - name: Environmental evidence is required
+    pros:
+      - preserves the conservative behavior already implemented
+      - prevents Social or Governance signals from standing in for missing E evidence
+      - keeps missing-data handling understandable and testable
+    cons:
+      - some products show no aggregate score even when S or G signals exist
+      - an Environmental-only aggregate still needs a visible completeness indicator
+
+  - name: Environmental plus at least one additional pillar is required
+    pros:
+      - every aggregate score represents at least two ESG dimensions
+    cons:
+      - changes current behavior and reduces MVP score availability further
+      - requires a separately validated methodology change rather than clarification
+
+decision: |
+  Environmental evidence is a mandatory prerequisite for an aggregate ScanFair
+  ESG score in formula 1.0. If Environmental is missing, state is
+  `dataIncomplete`, total is null, and available Social and Governance pillars
+  remain visible only as separate signals.
+
+  If Environmental is present, the aggregate score is the normalized weighted
+  average of all available pillars. Missing S or G pillars are omitted from the
+  numerator and denominator, and data completeness remains visible. No missing
+  pillar receives a positive, neutral or zero substitute value.
+
+  This newer, scope-specific decision takes precedence over the Social-only
+  aggregate example in ADR 0011. ADR 0010 and ADR 0011 remain unchanged as
+  historical decision records.
+
+rationale: |
+  The decision minimizes unsupported customer claims and aligns formula 1.0
+  with the existing app behavior, the transparency-first fallback, and the
+  methodology control that missing data must not be imputed. It clarifies the
+  contract without changing production behavior or incrementing the formula
+  version.
+
+minimum_test_contract:
+  - Environmental-only input produces a total with one-third completeness
+  - Environmental plus one available pillar uses normalized available weights
+  - Social and/or Governance without Environmental produces no total
+  - completely empty input produces no total and grey status
+  - lower and upper reachable inputs are clamped to 0 and 100
+  - traffic-light boundaries 40 and 70 are explicit
+
+customer_communication:
+  missing_environmental: |
+    No aggregate score is shown. Available Social and Governance signals may be
+    displayed with a clear incomplete-data explanation and without estimation.
+  partial_with_environmental: |
+    A numeric score may be shown together with the exact data-completeness value
+    and the missing pillars.
+
+consequences:
+  - Calculator behavior remains unchanged, but its decision paths require tests
+  - Formula version remains 1.0 because this records existing production behavior
+  - Methodology and customer-facing explanations must use the same precedence
+  - Any later change to a two-pillar minimum requires a new methodology decision
+
+supersedes: null
+superseded_by: null
+clarifies: [0010, 0011]
+related: [0010, 0011, 0022, 0023, 0025]
+related_todos: [TODO-028, TODO-030]

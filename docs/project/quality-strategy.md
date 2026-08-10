@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-07-28
+Letztes Update: 2026-08-10
 
 ---
 
@@ -45,6 +45,7 @@ Letztes Update: 2026-07-28
 | Subject Links und Score-Sicherheit | Link-, Missing-Data-, Red-Flag-, Reproduzierbarkeits- und Claim-Regeln | `G-LINK-INTEGRITY` bis `G-CLAIM-SAFETY` |
 | Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
 | Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
+| Mobile Security | MASVS-2.1-Matrix + Repositorychecks + Device-Checkliste | `G-MASVS` |
 
 ### Coverage-Gates
 
@@ -72,14 +73,14 @@ uebersprungen.
 
 | Job | Inhalt | Ergebnis |
 |---|---|---|
-| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance-Artefakte |
+| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
 | `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 51 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt zwanzig Engineering-, Schema-, Policy-, Evidence-, Scoring-Safety-
+Sie deckt einundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -103,6 +104,15 @@ Die Apple-Kontrollen verwenden drei Profile:
   Release-Evidenz bleibt als Warnung sichtbar.
 - `release_candidate`: jede anwendbare offene MUST-Evidenz blockiert.
 - `submission`: wie Release Candidate plus finale manuelle Attestation.
+
+`G-MASVS` verwendet dieselben Profile. Im Development-Profil blockieren
+unvollstaendige Klassifikation, widerspruechliche Scope-Annahmen und
+automatisierbare Security-Findings. Offene manuelle MUST-Nachweise bleiben
+sichtbare Warnungen. `release_candidate` und `submission` blockieren dagegen
+jede offene anwendbare MUST-Kontrolle sowie fehlende Device-Evidenz. Die
+Baseline klassifiziert alle 24 MASVS-2.1-Kontrollen; nicht anwendbare
+Kontrollen besitzen einen Reaktivierungs-Trigger, damit neue Auth-, Storage-,
+WebView- oder Backend-Funktionen eine erneute Bewertung erzwingen.
 
 ### Branch-Protection auf `main` (GitHub Settings)
 
@@ -149,6 +159,7 @@ In dieser Reihenfolge abarbeiten:
 ```
 [ ] CI grün auf main
 [ ] COMPLIANCE_PROFILE=release_candidate ohne Findings
+[ ] MASVS-Release-Device-Checkliste vollständig mit Evidenz
 [ ] Evidence-Hash-Chain verifiziert
 [ ] flutter test --coverage zeigt >=70%
 [ ] flutter analyze sauber

@@ -406,9 +406,12 @@ class OpenFoodFactsProductMapper {
   }
 
   static double? _double(Object? value) {
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value);
-    return null;
+    final parsed = switch (value) {
+      num() => value.toDouble(),
+      String() => double.tryParse(value),
+      _ => null,
+    };
+    return parsed?.isFinite == true ? parsed : null;
   }
 
   static Map<String, Object?>? _mapFromPaths(

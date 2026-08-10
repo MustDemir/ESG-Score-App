@@ -10,7 +10,7 @@
 |---|---|---:|---|---:|
 | [scanner](scanner/state.yaml) | review | 95% | phase-1-mvp | 2 |
 | [scoring](scoring/state.yaml) | review | 95% | phase-1-mvp | 1 |
-| [results](results/state.yaml) | review | 85% | phase-1-mvp | 2 |
+| [results](results/state.yaml) | review | 90% | phase-1-mvp | 2 |
 
 ## Wann ein neuer Feature-State?
 

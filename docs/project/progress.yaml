@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W31
-last_updated: 2026-07-29
+current_week: 2026-W33
+last_updated: 2026-08-10
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -25,17 +25,17 @@ roadmap_progress:
       progress_percent: 15
       next: calibrate_weights_normalization_and_red_flag_handling
     - id: M6-mvp-beta-hardening
-      progress_percent: 65
-      next: decide_offline_history_and_run_accessibility_localization_field_tests
+      progress_percent: 70
+      next: decide_offline_history_and_capture_physical_accessibility_localization_field_evidence
     - id: M7-app-store-release-candidate
-      progress_percent: 35
-      next: close_release_evidence_and_validate_signed_archive
+      progress_percent: 40
+      next: close_apple_and_masvs_release_evidence_and_validate_signed_archive
     - id: M8-submission-release
       progress_percent: 0
       next: testflight_submission_and_release_decision
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 40
+      progress_percent: 70
     - id: N1-coffee-pilot-products
       progress_percent: 0
     - id: N2-product-commodity-origin-links
@@ -60,29 +60,29 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-07-29
-  branch: quality/audit-findings-normalization
+  prepared_at: 2026-08-10
+  branch: quality/scoring-accessibility-masvs
   status: pull_request_open
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/16
   completed:
-    - IMP-PROC-002 nach gruenem Merge und Post-Merge-CI auf done gesetzt
-    - IMP-COMP-001 nach PR #9 und gruenem Post-Merge-Lauf auf done gesetzt
-    - Repository-weites Action-SHA-Pinning aktiviert
-    - G-SUPPLY-CHAIN als fuenften Required Check fuer main aktiviert
-    - Zwei automatische PR-Review-Findings mit Regressionstests geschlossen
-    - Auditbericht und normalisierte Folgeaufgaben angelegt
-    - Audit-Branch lokal mit 20 von 20 Quality Gates validiert
-    - Pull Request #14 erstellt und transitive Action-Pinning-Luecke reproduziert
-    - Checksum-verifizierten direkten Flutter-CI-Installer implementiert
+    - ADR 0027 entscheidet Environmental-Evidenz als Gesamtscore-Voraussetzung
+    - TODO-028 mit 39 gezielten Calculator- und Mapper-Tests geschlossen
+    - Automatisierte Kontrast-, Semantik- und 200-Prozent-Textskalierungschecks ergaenzt
+    - Alle 24 OWASP-MASVS-2.1-Kontrollen risikobasiert fuer den iOS-MVP klassifiziert
+    - G-MASVS mit Development- und blockierendem Release-Candidate-Profil integriert
+    - Physische MASVS-Release-Checkliste mit Owner und Evidenzformat angelegt
+    - Gesamte lokale Quality-Gate-Pipeline mit 21 von 21 Gates validiert
+    - Branch quality/scoring-accessibility-masvs zu origin gepusht
+    - Draft Pull Request 16 gegen main erstellt
+    - GitHub Quality-Gates Run 42 mit allen fuenf Jobs erfolgreich abgeschlossen
   next_session_start:
-    - Alle fuenf GitHub-Jobs von Pull Request #14 pruefen
-    - Audit-Normalisierung nach geloesten Review-Threads mergen
-    - TODO-032 ueber separaten Dependency-PR schliessen
-    - TODO-030 mit neuer Scoring-Precedence-ADR entscheiden
-    - TODO-028 Entscheidungstestmatrix umsetzen
-    - Pre-Coding-Check fuer IMP-COMP-002 OWASP-MASVS-Baseline starten
+    - Pull Request 16 nach dem aktualisierten CI-Lauf reviewen und in main mergen
+    - Physische VoiceOver-/Dynamic-Type- und MASVS-Device-Evidenz terminieren
+    - Danach Kaffee-Referenzfall und evidenzbasierte Datenquellen fortsetzen
   known_open_points:
     - Node-20-Deprecation fuer actions/upload-artifact ist als TODO-032 offen
-    - Accessibility- und Scoring-Audit-Findings TODO-027, TODO-028 und TODO-030 sind offen
+    - TODO-027 bleibt bis zur physischen VoiceOver-/Dynamic-Type-Evidenz in_progress
+    - MASVS meldet sechs offene oder partielle anwendbare MUST-Kontrollen vor Release Candidate
     - Das Release-Candidate-Profil hat weiterhin offene manuelle Apple-MUST-Evidenz
     - Verfuegbare Dependency-Updates werden ueber einzelne reviewte PRs eingespielt
 
@@ -277,6 +277,19 @@ milestones:
       Action-SHA-Pinning ist aktiv und G-SUPPLY-CHAIN ist verpflichtender
       main-Statuscheck.
 
+  - id: M21
+    title: Scoring-Precedence, Ergebnis-Accessibility und MASVS-Baseline
+    date: 2026-08-10
+    phase: phase-1-mvp
+    notes: |
+      ADR 0027 und 39 gezielte Calculator-Faelle schliessen die
+      Scoring-Precedence und Entscheidungstestmatrix. Automatisierte
+      Kontrast-, Semantik- und Textskalierungschecks haerten den Result-Flow.
+      Alle 24 MASVS-2.1-Kontrollen sind risikobasiert klassifiziert;
+      G-MASVS besteht im Development-Profil und blockiert offene anwendbare
+      MUST-Nachweise im Release-Candidate-Profil. Die lokale Gesamtpipeline
+      besteht 21/21 Gates bei 69 Flutter-Tests und 81.11 Prozent Coverage.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -393,11 +406,44 @@ decisions_made:
   - adr: 0026
     title: Reproduzierbare Dependency- und Supply-Chain-Baseline
     date: 2026-07-28
+  - adr: 0027
+    title: Environmental-Evidenz als Voraussetzung fuer den Gesamt-ESG-Score
+    date: 2026-08-10
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W33
+    summary: |
+      Scoring-Precedence, entscheidungsbasierte Calculator-Tests,
+      automatisierte Ergebnis-Accessibility und eine risikobasierte
+      OWASP-MASVS-2.1-Baseline fuer den iOS-MVP umgesetzt.
+    done:
+      - ADR 0027 als append-only Precedence-Entscheidung angelegt
+      - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
+      - ScoreHero und PillarBars mit expliziten Screenreader-Werten versehen
+      - Kontrast fuer tertiaeren Text und gelben Status-Pill auf WCAG-AA-Niveau angehoben
+      - 200-Prozent-Textskalierung ohne Layout-Overflow abgesichert
+      - 24 MASVS-Kontrollen auf 9 anwendbare und 15 begruendet nicht anwendbare Kontrollen abgebildet
+      - G-MASVS mit fuenf Validator-Selbsttests und manueller iOS-Evidenzcheckliste integriert
+    checks:
+      - Scoring-Testmatrix 39/39 PASS
+      - Accessibility- und Kontrasttests 6/6 PASS
+      - MASVS-Validator-Selbsttests 5/5 PASS
+      - G-LOCAL-MASVS Development-Profil PASS mit sieben sichtbaren Release-Warnungen
+      - Flutter Analyze PASS ohne Befunde
+      - Flutter-Test-Suite 69/69 PASS, Line-Coverage 81.11 Prozent
+      - Development Quality Pipeline 21/21 PASS
+    blockers:
+      - Physische VoiceOver- und Dynamic-Type-Evidenz fehlt noch
+      - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
+      - Apple- und Claim-Release-Evidenz bleibt getrennt offen
+    next_week:
+      - Vollstaendige lokale Quality-Gate-Pipeline und GitHub-PR-Checks abschliessen
+      - Physische Accessibility- und MASVS-Release-Checks planen
+      - Kaffee-Referenzfall mit verifizierten Produkt-Rohstoff-Herkunftslinks fortsetzen
+
   - week: 2026-W31
     summary: |
       Apple Build Integrity mit echter iOS-Bundle-Evidenz und die
@@ -670,13 +716,13 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 24
-  todos_open: 9
-  todos_in_progress: 3
-  todos_done: 18
+  decisions_total: 25
+  todos_open: 6
+  todos_in_progress: 4
+  todos_done: 20
   todos_parked: 1
   todos_review: 1
-  milestones_reached: 20
+  milestones_reached: 21
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

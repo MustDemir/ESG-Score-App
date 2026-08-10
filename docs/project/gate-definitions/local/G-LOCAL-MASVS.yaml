@@ -1,0 +1,46 @@
+id: G-LOCAL-MASVS
+title: Risk-based OWASP MASVS baseline validation for the iOS MVP
+status: active
+automation: HYBRID
+profile: development
+owner: Engineering
+
+trigger:
+  - pull_request_to_main
+  - push_to_main
+  - manual_local_run
+  - release_candidate_review
+
+criteria:
+  - all 24 OWASP MASVS 2.1 controls are classified exactly once
+  - every non-applicable control has a concrete rationale and activation trigger
+  - declared absent capabilities remain absent from dependencies and iOS configuration
+  - HTTPS, ATS, input validation, dependency security and privacy declarations pass automated checks
+  - every applicable hybrid or manual control maps to an owned evidence checklist
+  - release_candidate and submission profiles block open applicable MUST controls
+
+artifacts:
+  - .quality/masvs/masvs-baseline-report.json
+  - .quality/masvs/masvs-baseline-report.md
+  - docs/project/compliance/owasp-masvs-ios-baseline.yaml
+  - docs/project/compliance/owasp-masvs-ios-manual-checklist.yaml
+
+decision:
+  development_pass: Schema, applicability assumptions and automated repository checks pass; open release evidence is reported.
+  release_candidate_pass: Development checks pass and every applicable MUST control plus its required manual evidence is complete.
+  fail: Classification drift, unsupported assumptions, automated findings or profile-specific blockers exist.
+
+audit:
+  validator: scripts/quality/validate_masvs_baseline.rb
+  tests: scripts/quality/test_masvs_gate.rb
+  runner: scripts/quality/run_quality_gates.sh
+  ci_workflow: .github/workflows/quality-gates.yml
+
+waiver:
+  allowed: false
+  rationale: Reclassify the control with documented risk ownership instead of bypassing the baseline.
+
+sources:
+  - docs/project/compliance/source-register.yaml#OWASP-MASVS
+  - https://mas.owasp.org/MASVS/
+  - https://mas.owasp.org/checklists/
