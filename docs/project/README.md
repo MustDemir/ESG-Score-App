@@ -31,6 +31,7 @@ docs/project/
 ├── definition-of-done.yaml # Verbindliche Checks pro Task-Typ
 ├── session-start-protocol.md # Wiedereinstieg in neue Claude-Sessions
 ├── audits/                # Dated audit reports with scope and evidence
+├── accessibility/         # VoiceOver language and terminology policy
 ├── implementation-plan.yaml # 22-Schritte-Plan in 5 Blöcken (Sprint 0 → Phase 2)
 ├── workflows/             # Strukturierte Arbeits-Rituale (Trigger-Phrasen-basiert)
 │   ├── README.md

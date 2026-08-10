@@ -2,8 +2,8 @@ feature: scanner
 title: "Barcode-Scanner — Kamera-Capture + EAN-Erkennung"
 status: review
 progress: 95
-current_focus: "realer iPhone-Scanflow validiert; Performance-Messung und Accessibility bleiben offen"
-last_sync: "2026-07-28"
+current_focus: "realer iPhone-Scanflow, Permission-Fallback und VoiceOver validiert; Performance-Messung bleibt offen"
+last_sync: "2026-08-10"
 
 lade_manifest:
   pflicht:
@@ -46,6 +46,13 @@ done:
     2026-07-19 — Physischer iPhone-Smoke-Test erfolgreich: App installiert,
     Kamera-Barcode-Scan durchgefuehrt und Result-/Detailinformationen im realen
     End-to-End-Flow angezeigt.
+  - |
+    2026-08-10 — Entzogene und wiederhergestellte Kameraberechtigung auf dem
+    physischen iPhone validiert: stabiler Fehlerzustand, manuelle Eingabe und
+    erneuter Live-Scan erfolgreich.
+  - |
+    2026-08-10 — VoiceOver-Fokusreihenfolge der Scanner-Controls und stabiler
+    Flow bei aktivierter iOS-Option Bewegung reduzieren validiert.
 
 decisions:
   - id: FD-SC-01
@@ -61,7 +68,6 @@ decisions:
 
 open_items:
   - "Performance-Budget: unter 500ms von Tap bis erkannter EAN auf echtem iPhone messen"
-  - Accessibility-Labels und VoiceOver-Verhalten fuer Kamera-Controls pruefen
   - Android-Scanner-Validierung bleibt gemaess Roadmap fuer Phase 3 geparkt
 
 next_steps:

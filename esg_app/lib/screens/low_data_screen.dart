@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../accessibility/semantic_terminology.dart';
 import '../models/esg_score.dart';
 import '../models/product.dart';
 import '../theme/scanfair_tokens.dart';
@@ -23,34 +24,44 @@ class LowDataScreen extends StatelessWidget {
         children: [
           ProductSummaryCard(product: product),
           const SizedBox(height: ScanFairTokens.space4),
-          Container(
-            padding: const EdgeInsets.all(ScanFairTokens.space5),
-            decoration: BoxDecoration(
-              color: ScanFairTokens.warningBg,
-              borderRadius: BorderRadius.circular(ScanFairTokens.radiusXl),
-              border: Border.all(
-                color: ScanFairTokens.warningFg.withValues(alpha: 0.25),
-              ),
+          Semantics(
+            container: true,
+            attributedLabel: ScanFairSemanticTerminology.annotate(
+              'Datengrundlage zu dünn. Wir geben hier keinen Score. '
+              'Der Eco-Score fehlt oder ist als unbekannt markiert. '
+              'Vorhandene Signale bleiben sichtbar und werden nicht geschätzt.',
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Datengrundlage zu dünn',
-                  style: ScanFairTypography.eyebrow,
+            child: ExcludeSemantics(
+              child: Container(
+                padding: const EdgeInsets.all(ScanFairTokens.space5),
+                decoration: BoxDecoration(
+                  color: ScanFairTokens.warningBg,
+                  borderRadius: BorderRadius.circular(ScanFairTokens.radiusXl),
+                  border: Border.all(
+                    color: ScanFairTokens.warningFg.withValues(alpha: 0.25),
+                  ),
                 ),
-                const SizedBox(height: ScanFairTokens.space3),
-                Text(
-                  'Wir geben hier keinen Score.',
-                  style: textTheme.displaySmall,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Datengrundlage zu dünn',
+                      style: ScanFairTypography.eyebrow,
+                    ),
+                    const SizedBox(height: ScanFairTokens.space3),
+                    Text(
+                      'Wir geben hier keinen Score.',
+                      style: textTheme.displaySmall,
+                    ),
+                    const SizedBox(height: ScanFairTokens.space3),
+                    Text(
+                      'Der Eco-Score fehlt oder ist als unbekannt markiert. '
+                      'Vorhandene Signale bleiben sichtbar, werden aber nicht geschätzt.',
+                      style: textTheme.bodyMedium,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: ScanFairTokens.space3),
-                Text(
-                  'Der Eco-Score fehlt oder ist als unknown markiert. '
-                  'Vorhandene Signale bleiben sichtbar, werden aber nicht geschätzt.',
-                  style: textTheme.bodyMedium,
-                ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: ScanFairTokens.space4),

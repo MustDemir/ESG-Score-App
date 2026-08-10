@@ -2,6 +2,7 @@ import 'package:esg_app/models/esg_score.dart';
 import 'package:esg_app/models/product.dart';
 import 'package:esg_app/widgets/score_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -16,9 +17,9 @@ void main() {
 
     expect(
       find.bySemanticsLabel(
-        'ESG-Gesamtscore 7.4 von 10. Positive Signale. '
+        'E S G-Gesamtscore 7.4 von 10. Positive Signale. '
         'Datenvollständigkeit 100 Prozent. '
-        'Starke ESG-Signale mit nachvollziehbarer Datenbasis.',
+        'Starke E S G-Signale mit nachvollziehbarer Datenbasis.',
       ),
       findsOneWidget,
     );
@@ -36,9 +37,19 @@ void main() {
       ),
     );
 
+    final environmental = tester.getSemantics(
+      find.bySemanticsLabel('Environmental'),
+    );
+    expect(environmental.value, '7.6 von 10');
     expect(
-      tester.getSemantics(find.bySemanticsLabel('Environmental')).value,
-      '7.6 von 10',
+      (environmental.attributedLabel.attributes.single as LocaleStringAttribute)
+          .locale,
+      const Locale('en'),
+    );
+    expect(
+      (environmental.attributedValue.attributes.single as LocaleStringAttribute)
+          .locale,
+      const Locale('de'),
     );
     expect(
       tester.getSemantics(find.bySemanticsLabel('Social')).value,

@@ -25,8 +25,8 @@ roadmap_progress:
       progress_percent: 15
       next: calibrate_weights_normalization_and_red_flag_handling
     - id: M6-mvp-beta-hardening
-      progress_percent: 70
-      next: decide_offline_history_and_capture_physical_accessibility_localization_field_evidence
+      progress_percent: 80
+      next: localize_dynamic_data_decide_offline_history_and_run_field_test
     - id: M7-app-store-release-candidate
       progress_percent: 40
       next: close_apple_and_masvs_release_evidence_and_validate_signed_archive
@@ -61,27 +61,30 @@ roadmap_progress:
 
 session_handoff:
   prepared_at: 2026-08-10
-  branch: quality/scoring-accessibility-masvs
+  branch: quality/ios-device-evidence
   status: pull_request_open
-  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/16
+  pull_request: 17
   completed:
-    - ADR 0027 entscheidet Environmental-Evidenz als Gesamtscore-Voraussetzung
-    - TODO-028 mit 39 gezielten Calculator- und Mapper-Tests geschlossen
-    - Automatisierte Kontrast-, Semantik- und 200-Prozent-Textskalierungschecks ergaenzt
-    - Alle 24 OWASP-MASVS-2.1-Kontrollen risikobasiert fuer den iOS-MVP klassifiziert
-    - G-MASVS mit Development- und blockierendem Release-Candidate-Profil integriert
-    - Physische MASVS-Release-Checkliste mit Owner und Evidenzformat angelegt
-    - Gesamte lokale Quality-Gate-Pipeline mit 21 von 21 Gates validiert
-    - Branch quality/scoring-accessibility-masvs zu origin gepusht
-    - Draft Pull Request 16 gegen main erstellt
-    - GitHub Quality-Gates Run 42 mit allen fuenf Jobs erfolgreich abgeschlossen
+    - Pull Request 16 mit Scoring-, Accessibility- und MASVS-Baseline in main gemergt
+    - Reale Kamera, Permission-Entzug, manueller Fallback und erneuter Scan auf physischem iPhone validiert
+    - Dynamic Type mit groesster Accessibility-Schriftgroesse ohne gemeldeten Layoutfehler geprueft
+    - Deutscher VoiceOver-App-Kontext und vollstaendiger Low-Data-Hinweis validiert
+    - Environmental, Social und Governance mit englischer Aussprache und deutschen Werten validiert
+    - Zentralen Semantik-Terminologiekatalog mit wiederverwendbaren Widgets implementiert
+    - Technische OFF-Feldnamen in Score-Details durch deutsche Quellenbeschreibungen ersetzt
+    - Flutter Analyze ohne Befund und Flutter-Test-Suite 74 von 74 PASS
+    - Development Quality Pipeline mit 21 von 21 Gates und 81.76 Prozent Line-Coverage PASS
+    - Direkter Xcode-Release-Build streng signaturgeprueft, installiert und gestartet
+    - Katalogbasierte Aussprache fuer ScanFair, ESG, Open Food Facts und E/S/G auf physischem iPhone bestaetigt
+    - Scanner-Fokusreihenfolge und Reduce Motion auf physischem iPhone PASS; TODO-027 geschlossen
   next_session_start:
-    - Pull Request 16 nach dem aktualisierten CI-Lauf reviewen und in main mergen
-    - Physische VoiceOver-/Dynamic-Type- und MASVS-Device-Evidenz terminieren
+    - Branch quality/ios-device-evidence committen, pushen und per Pull Request integrieren
     - Danach Kaffee-Referenzfall und evidenzbasierte Datenquellen fortsetzen
   known_open_points:
     - Node-20-Deprecation fuer actions/upload-artifact ist als TODO-032 offen
-    - TODO-027 bleibt bis zur physischen VoiceOver-/Dynamic-Type-Evidenz in_progress
+    - Release-Candidate-Accessibility wird trotz geschlossenem Development-TODO erneut auditiert
+    - TODO-033 haelt die sprachsichere Darstellung dynamischer externer Produktdaten fest
+    - Flutter-CLI-Release-Signatur wich vom erfolgreich verifizierten direkten Xcode-Release-Build ab
     - MASVS meldet sechs offene oder partielle anwendbare MUST-Kontrollen vor Release Candidate
     - Das Release-Candidate-Profil hat weiterhin offene manuelle Apple-MUST-Evidenz
     - Verfuegbare Dependency-Updates werden ueber einzelne reviewte PRs eingespielt
@@ -418,7 +421,9 @@ weekly_log:
     summary: |
       Scoring-Precedence, entscheidungsbasierte Calculator-Tests,
       automatisierte Ergebnis-Accessibility und eine risikobasierte
-      OWASP-MASVS-2.1-Baseline fuer den iOS-MVP umgesetzt.
+      OWASP-MASVS-2.1-Baseline fuer den iOS-MVP umgesetzt. Den realen
+      iPhone-Flow einschliesslich Berechtigungs-Fallback, Dynamic Type und
+      gemischter VoiceOver-Aussprache validiert.
     done:
       - ADR 0027 als append-only Precedence-Entscheidung angelegt
       - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
@@ -427,21 +432,25 @@ weekly_log:
       - 200-Prozent-Textskalierung ohne Layout-Overflow abgesichert
       - 24 MASVS-Kontrollen auf 9 anwendbare und 15 begruendet nicht anwendbare Kontrollen abgebildet
       - G-MASVS mit fuenf Validator-Selbsttests und manueller iOS-Evidenzcheckliste integriert
+      - Deutschen App-Locale-Kontext und zentralen Semantik-Terminologiekatalog implementiert
+      - Technische OFF-Feldnamen in der Datenansicht durch deutsche Quellenbeschreibungen ersetzt
+      - Signierten Xcode-Release-Build auf physischem iPhone installiert und die katalogbasierte Aussprache gegengeprueft
+      - Scanner-Fokusreihenfolge und Reduce Motion physisch validiert; TODO-027 geschlossen
     checks:
       - Scoring-Testmatrix 39/39 PASS
-      - Accessibility- und Kontrasttests 6/6 PASS
+      - Accessibility- und Terminologietests 10/10 PASS
       - MASVS-Validator-Selbsttests 5/5 PASS
       - G-LOCAL-MASVS Development-Profil PASS mit sieben sichtbaren Release-Warnungen
       - Flutter Analyze PASS ohne Befunde
-      - Flutter-Test-Suite 69/69 PASS, Line-Coverage 81.11 Prozent
+      - Flutter-Test-Suite 74/74 PASS, Line-Coverage 81.76 Prozent
       - Development Quality Pipeline 21/21 PASS
+      - Xcode-Release-Build, strikte Codesign-Pruefung, Installation und Start PASS
     blockers:
-      - Physische VoiceOver- und Dynamic-Type-Evidenz fehlt noch
+      - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
       - Apple- und Claim-Release-Evidenz bleibt getrennt offen
     next_week:
-      - Vollstaendige lokale Quality-Gate-Pipeline und GitHub-PR-Checks abschliessen
-      - Physische Accessibility- und MASVS-Release-Checks planen
+      - Accessibility-Branch committen, pushen und per Pull Request integrieren
       - Kaffee-Referenzfall mit verifizierten Produkt-Rohstoff-Herkunftslinks fortsetzen
 
   - week: 2026-W31

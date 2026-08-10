@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../accessibility/semantic_terminology.dart';
 import '../models/esg_relationship.dart';
 import '../models/esg_score.dart';
 import '../models/product.dart';
@@ -87,10 +88,11 @@ class ScoreHero extends StatelessWidget {
 
     return Semantics(
       container: true,
-      label:
-          '$semanticsLabel. ${score.verdictLabel}. '
-          'Datenvollständigkeit ${(score.dataCompleteness * 100).round()} Prozent. '
-          '${score.tagline}',
+      attributedLabel: ScanFairSemanticTerminology.annotate(
+        '$semanticsLabel. ${score.verdictLabel}. '
+        'Datenvollständigkeit ${(score.dataCompleteness * 100).round()} Prozent. '
+        '${score.tagline}',
+      ),
       child: ExcludeSemantics(
         child: Container(
           width: double.infinity,
@@ -169,21 +171,21 @@ class PillarBars extends StatelessWidget {
         child: Column(
           children: [
             _PillarBar(
-              label: 'Environmental',
+              termId: SemanticTermId.environmental,
               shortLabel: 'E',
               pillar: score.environmental,
               color: ScanFairColors.pillarE,
             ),
             const Divider(height: ScanFairTokens.space5),
             _PillarBar(
-              label: 'Social',
+              termId: SemanticTermId.social,
               shortLabel: 'S',
               pillar: score.social,
               color: ScanFairColors.pillarS,
             ),
             const Divider(height: ScanFairTokens.space5),
             _PillarBar(
-              label: 'Governance',
+              termId: SemanticTermId.governance,
               shortLabel: 'G',
               pillar: score.governance,
               color: ScanFairColors.pillarG,
@@ -213,7 +215,7 @@ class SecondaryInfoCard extends StatelessWidget {
           children: [
             Text(product.secondaryTitle, style: textTheme.titleMedium),
             const SizedBox(height: ScanFairTokens.space1),
-            Text(
+            TerminologyText(
               'Begleithinweis · kein ESG-Score',
               style: ScanFairTypography.meta,
             ),
@@ -230,7 +232,7 @@ class SecondaryInfoCard extends StatelessWidget {
             const SizedBox(height: ScanFairTokens.space3),
             Text(product.secondaryLabel, style: textTheme.titleSmall),
             const SizedBox(height: ScanFairTokens.space1),
-            Text(product.secondaryFacts, style: textTheme.bodySmall),
+            TerminologyText(product.secondaryFacts, style: textTheme.bodySmall),
           ],
         ),
       ),
@@ -245,7 +247,7 @@ class MethodFootnote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
+    return TerminologyText(
       'Daten: ${score.sources.join(', ')}. Formel ${ESGScore.formulaVersion}. '
       'Fehlende Daten werden nicht geschätzt. Orientierung, keine '
       'Zertifizierung.',
@@ -288,7 +290,7 @@ class DataProvenanceCard extends StatelessWidget {
                       const Icon(Icons.dataset_outlined, size: 20),
                       const SizedBox(width: ScanFairTokens.space2),
                       Expanded(
-                        child: Text(
+                        child: TerminologyText(
                           '${source.name} · ${source.datasetLicense}\n'
                           '${source.attribution}',
                           style: textTheme.bodySmall,
@@ -441,10 +443,12 @@ class FactorExpansionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = pillar.label;
+
     return Card(
       child: ExpansionTile(
         initiallyExpanded: pillar.pillar == ScorePillar.environmental,
-        title: Text(pillar.label),
+        title: TerminologyText(label),
         subtitle: Text('${(pillar.value / 10).toStringAsFixed(1)} / 10'),
         children: pillar.factors.map((factor) {
           return ListTile(
@@ -457,8 +461,8 @@ class FactorExpansionTile extends StatelessWidget {
                   ? ScanFairTokens.green500
                   : ScanFairTokens.warningFg,
             ),
-            title: Text(factor.label),
-            subtitle: Text('${factor.value} · ${factor.source}'),
+            title: TerminologyText(factor.label),
+            subtitle: TerminologyText('${factor.value} · ${factor.source}'),
           );
         }).toList(),
       ),
@@ -468,19 +472,20 @@ class FactorExpansionTile extends StatelessWidget {
 
 class _PillarBar extends StatelessWidget {
   const _PillarBar({
-    required this.label,
+    required this.termId,
     required this.shortLabel,
     required this.pillar,
     required this.color,
   });
 
-  final String label;
+  final SemanticTermId termId;
   final String shortLabel;
   final PillarScore? pillar;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
+    final label = ScanFairSemanticTerminology.definition(termId).displayText;
     final value = pillar?.value;
     final progress = value == null ? 0.0 : value / 100;
     final textTheme = Theme.of(context).textTheme;
@@ -489,62 +494,60 @@ class _PillarBar extends StatelessWidget {
         ? 'Keine Daten'
         : '${(value / 10).toStringAsFixed(1)} von 10';
 
-    return Semantics(
+    return TerminologySemantics(
       container: true,
       label: label,
       value: spokenValue,
-      child: ExcludeSemantics(
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(ScanFairTokens.radiusMd),
-              ),
-              child: Text(
-                shortLabel,
-                style: textTheme.titleSmall?.copyWith(color: color),
-              ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(ScanFairTokens.radiusMd),
             ),
-            const SizedBox(width: ScanFairTokens.space3),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text(label, style: textTheme.titleSmall)),
-                      Flexible(
-                        child: Text(
-                          value == null
-                              ? 'Keine Daten'
-                              : '${(value / 10).toStringAsFixed(1)}/10',
-                          textAlign: TextAlign.end,
-                          style: textTheme.bodySmall,
-                        ),
+            child: Text(
+              shortLabel,
+              style: textTheme.titleSmall?.copyWith(color: color),
+            ),
+          ),
+          const SizedBox(width: ScanFairTokens.space3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(child: Text(label, style: textTheme.titleSmall)),
+                    Flexible(
+                      child: Text(
+                        value == null
+                            ? 'Keine Daten'
+                            : '${(value / 10).toStringAsFixed(1)}/10',
+                        textAlign: TextAlign.end,
+                        style: textTheme.bodySmall,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: ScanFairTokens.space2),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(
-                      ScanFairTokens.radiusPill,
                     ),
-                    child: LinearProgressIndicator(
-                      minHeight: 8,
-                      value: progress,
-                      backgroundColor: ScanFairTokens.bgAlt,
-                      color: value == null ? ScanFairTokens.ink3 : color,
-                    ),
+                  ],
+                ),
+                const SizedBox(height: ScanFairTokens.space2),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(
+                    ScanFairTokens.radiusPill,
                   ),
-                ],
-              ),
+                  child: LinearProgressIndicator(
+                    minHeight: 8,
+                    value: progress,
+                    backgroundColor: ScanFairTokens.bgAlt,
+                    color: value == null ? ScanFairTokens.ink3 : color,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

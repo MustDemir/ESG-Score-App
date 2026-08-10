@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../accessibility/semantic_terminology.dart';
 import '../models/esg_score.dart';
 import '../models/product.dart';
 import '../services/esg_score_calculator.dart';
@@ -136,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                Text('ScanFair', style: textTheme.titleLarge),
+                TerminologyText('ScanFair', style: textTheme.titleLarge),
                 const Spacer(),
                 CircleAvatar(
                   backgroundColor: ScanFairTokens.green50,

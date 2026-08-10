@@ -27,6 +27,23 @@ void main() {
     expect(find.text('Bio Edelbitter Schokolade'), findsOneWidget);
   });
 
+  testWidgets('App declares German as its supported locale', (tester) async {
+    await tester.pumpWidget(buildDemoApp());
+    await tester.pumpAndSettle();
+
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    final context = tester.element(find.text('ScanFair').first);
+
+    expect(app.locale, const Locale('de'));
+    expect(app.supportedLocales, const [Locale('de')]);
+    expect(Localizations.localeOf(context), const Locale('de'));
+
+    final localeSemantics = tester.widget<Semantics>(
+      find.byKey(const ValueKey('app-locale-semantics')),
+    );
+    expect(localeSemantics.localeForSubtree, const Locale('de'));
+  });
+
   testWidgets('Scan action opens result screen for GEPA demo product', (
     tester,
   ) async {
@@ -58,17 +75,30 @@ void main() {
   });
 
   testWidgets('Manual barcode can open low-data state', (tester) async {
-    await tester.pumpWidget(buildDemoApp());
-    await tester.pumpAndSettle();
+    final semantics = tester.ensureSemantics();
+    try {
+      await tester.pumpWidget(buildDemoApp());
+      await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField), '4025500287955');
-    await tester.tap(find.byTooltip('Barcode prüfen'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), '4025500287955');
+      await tester.tap(find.byTooltip('Barcode prüfen'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Datengrundlage'), findsOneWidget);
-    expect(find.text('Wir geben hier keinen Score.'), findsOneWidget);
+      expect(find.text('Datengrundlage'), findsOneWidget);
+      expect(find.text('Wir geben hier keinen Score.'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(
+          'Datengrundlage zu dünn. Wir geben hier keinen Score. '
+          'Der Eco-Score fehlt oder ist als unbekannt markiert. '
+          'Vorhandene Signale bleiben sichtbar und werden nicht geschätzt.',
+        ),
+        findsOneWidget,
+      );
+    } finally {
+      semantics.dispose();
+    }
   });
 
   testWidgets('Manual barcode can open not-found state', (tester) async {

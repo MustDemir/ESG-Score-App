@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../accessibility/semantic_terminology.dart';
 import '../services/product_lookup_failure.dart';
 import '../theme/scanfair_tokens.dart';
 
@@ -34,7 +35,7 @@ class LookupErrorScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: ScanFairTokens.space3),
-              Text(
+              TerminologyText(
                 failure.message,
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
