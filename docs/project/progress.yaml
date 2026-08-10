@@ -62,8 +62,8 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-10
   branch: quality/ios-device-evidence
-  status: locally_validated_ready_for_commit
-  pull_request: null
+  status: pull_request_open
+  pull_request: 17
   completed:
     - Pull Request 16 mit Scoring-, Accessibility- und MASVS-Baseline in main gemergt
     - Reale Kamera, Permission-Entzug, manueller Fallback und erneuter Scan auf physischem iPhone validiert
