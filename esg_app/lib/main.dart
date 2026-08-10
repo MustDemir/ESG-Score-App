@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
 import 'screens/scanner_screen.dart';
 import 'services/esg_score_calculator.dart';
@@ -33,6 +34,18 @@ class ScanFairApp extends StatelessWidget {
     return MaterialApp(
       title: 'ScanFair',
       debugShowCheckedModeBanner: false,
+      locale: const Locale('de'),
+      supportedLocales: const [Locale('de')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      builder: (context, child) => Semantics(
+        key: const ValueKey('app-locale-semantics'),
+        localeForSubtree: const Locale('de'),
+        child: child ?? const SizedBox.shrink(),
+      ),
       theme: ScanFairTheme.light,
       home: HomeScreen(
         repository: repository,

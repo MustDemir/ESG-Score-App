@@ -264,7 +264,7 @@ M2  Backend- und Datenanbindung           [########------------]  40%
 M3  Kaffee als Referenzfall               [####----------------]  20%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
-M6  MVP-Beta und Product Hardening        [##############------]  70%
+M6  MVP-Beta und Product Hardening        [################----]  80%
 M7  App-Store-Release-Candidate           [########------------]  40%
 M8  TestFlight, Submission und Release    [--------------------]   0%
 ```
@@ -276,7 +276,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | M3 | Kaffeeprofil, Parameterkatalog und erstes AGRIBALYSE-Rohmapping | verifizierte Pilotprodukte, Rohstoff-/Herkunftslinks und reproduzierbare Detailerklaerung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
-| M6 | realer iPhone-Scanflow, Fehlerzustaende, Tests, Kontrast- und Semantikchecks | Offline/History-Entscheidung, physische Accessibility-Evidenz, Lokalisierung und Feldtest |
+| M6 | realer iPhone-Scanflow, Permission-Fallbacks, Dynamic Type, VoiceOver-Sprachwechsel und Fokusreihenfolge sowie Reduce Motion | dynamische Datenlokalisierung, Offline/History-Entscheidung und Feldtest |
 | M7 | acht Apple-Gate-Gruppen, MASVS-2.1-Baseline, iOS-Compile und Privacy-Bundle-Audit | offene Apple-/MASVS-Release-Evidenzen und signiertes Release-Archive |
 | M8 | bewusst noch nicht begonnen | TestFlight, App-Store-Submission und Releaseentscheidung |
 
@@ -303,6 +303,10 @@ fortgesetzt. Sobald Produkt-, Rohstoff-, Herkunfts- und Evidenzvertraege fuer
 diesen vertikalen Schnitt stabil sind, laufen die offenen M2-Arbeiten parallel:
 EU-Supabase, vertrauenswuerdiger Server-Writer und read-only Flutter-Cache.
 Erst danach werden WRI, ILAB und GLEIF/BRIS score-relevant angebunden.
+
+Die Regeln fuer deutsche, englische und buchstabierte VoiceOver-Begriffe sind
+in der [VoiceOver language and terminology policy](docs/project/accessibility/voiceover-language-policy.md)
+zentral dokumentiert und automatisiert getestet.
 
 ---
 
@@ -423,6 +427,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | --- | --- |
 | `G-FLT-DEPS` | Flutter Dependencies reproduzierbar aufloesen |
 | `G-SUPPLY-CHAIN` | Lockfile, OSV-Findings, Lizenzen, native iOS-Plugins und unveraenderliche Action-SHAs pruefen |
+| `G-MASVS` | Risikobasierte OWASP-MASVS-2.1-Baseline und offene Device-Evidenz pruefen |
 | `G-FLT-FORMAT` | Format-Drift blocken |
 | `G-FLT-ANALYZE` | Statische Analyse mit `--fatal-infos` |
 | `G-FLT-TEST` | Unit- und Widget-Tests mit Coverage |
@@ -460,7 +465,7 @@ Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
 geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
-zwanzig schnellen lokalen Gate-Gruppen laufen ein sichtbarer
+einundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
 Supply-Chain-/Dependency-Review-Job, ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
 separater Gitleaks-Secret-Scan. Dependabot prueft `pub` und GitHub Actions

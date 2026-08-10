@@ -10,7 +10,7 @@
 |---|---|---:|---|---:|
 | [scanner](scanner/state.yaml) | review | 95% | phase-1-mvp | 2 |
 | [scoring](scoring/state.yaml) | review | 95% | phase-1-mvp | 1 |
-| [results](results/state.yaml) | review | 90% | phase-1-mvp | 2 |
+| [results](results/state.yaml) | review | 95% | phase-1-mvp | 2 |
 
 ## Wann ein neuer Feature-State?
 
@@ -37,6 +37,8 @@ Aktuelle Kernstruktur:
 
 ```
 esg_app/lib/
+├── accessibility/
+│   └── semantic_terminology.dart       ← feature: results, shared semantics
 ├── screens/
 │   ├── scanner_screen.dart             ← feature: scanner
 │   ├── result_screen.dart              ← feature: results

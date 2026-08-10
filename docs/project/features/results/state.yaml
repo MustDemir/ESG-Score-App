@@ -1,8 +1,8 @@
 feature: results
 title: "S3 Result-Screen + Edge-States"
 status: review
-progress: 90
-current_focus: "Result- und Detailflow auf echtem iPhone validiert; physische Accessibility-Evidenz und Quellen werden gehaertet"
+progress: 95
+current_focus: "Result- und Detailflow inklusive gemischter VoiceOver-Sprachen validiert; dynamische Quelldaten werden als Naechstes lokalisiert"
 last_sync: "2026-08-10"
 
 lade_manifest:
@@ -59,6 +59,11 @@ done:
     2026-08-10 — Kontrasttokens gehaertet, ScoreHero und PillarBars mit
     expliziter Semantik versehen, Produkt-Emoji aus dem Semantikbaum entfernt
     und Ergebnis-Komponenten bei 200 Prozent Textskalierung getestet.
+  - |
+    2026-08-10 — Deutscher App-Kontext, Low-Data-Hinweis, Dynamic Type und
+    englische E/S/G-Aussprache auf einem physischen iPhone validiert. Zentraler
+    Semantik-Terminologiekatalog und vier Katalogtests ergaenzt; der daraus
+    erzeugte signierte Build wurde erneut auf dem iPhone gegengeprueft.
 
 decisions:
   - id: FD-R-01
@@ -69,12 +74,12 @@ decisions:
 
 open_items:
   - Echte Produktbilder aus OFF fehlen noch; aktuell Emoji-Platzhalter.
-  - VoiceOver- und Dynamic-Type-Pruefung auf physischem iPhone dokumentieren.
+  - Externe Produktwerte und rohe OFF-Tags sprachsicher lokalisieren.
 
 next_steps:
   - Details/Quellen mit evidence-first Feldern ausbauen
   - Echte OFF-Produktbilder mit sicherem Fallback integrieren
-  - Physische Accessibility-Evidenz fuer Result- und Detail-Screen erfassen
+  - VoiceOver-Datenansicht mit realen Pilotprodukten pruefen
 
 cross_feature_dependencies:
   - from: scoring

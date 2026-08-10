@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../accessibility/semantic_terminology.dart';
 import '../theme/scanfair_tokens.dart';
 
 typedef ScannerViewportBuilder =
@@ -311,7 +312,7 @@ class ScannerErrorView extends StatelessWidget {
                             ),
                       ),
                       const SizedBox(height: ScanFairTokens.space2),
-                      Text(
+                      TerminologyText(
                         message,
                         textAlign: TextAlign.center,
                         style: const TextStyle(color: ScanFairTokens.green100),

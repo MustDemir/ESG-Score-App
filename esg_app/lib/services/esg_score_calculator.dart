@@ -99,7 +99,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Fair-Trade-Signal',
           value: '+25',
-          source: 'Open Food Facts labels_tags',
+          source: 'Open Food Facts · Kennzeichnungen',
           available: true,
           evidenceIds: _evidenceIds(product, 'labels'),
         ),
@@ -112,7 +112,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Bio-Siegel',
           value: '+20',
-          source: 'Open Food Facts labels_tags',
+          source: 'Open Food Facts · Kennzeichnungen',
           available: true,
           evidenceIds: _evidenceIds(product, 'labels'),
         ),
@@ -125,7 +125,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Vegan/Vegetarisch',
           value: '+10',
-          source: 'Open Food Facts labels_tags',
+          source: 'Open Food Facts · Kennzeichnungen',
           available: true,
           evidenceIds: _evidenceIds(product, 'labels'),
         ),
@@ -144,7 +144,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Regionale/EU-Herkunft',
           value: '+15',
-          source: 'Open Food Facts origins_tags',
+          source: 'Open Food Facts · Herkunft',
           available: true,
           evidenceIds: _evidenceIds(product, 'origin'),
         ),
@@ -157,7 +157,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Sozial-/Anbaustandard',
           value: '+20',
-          source: 'Open Food Facts labels_tags',
+          source: 'Open Food Facts · Kennzeichnungen',
           available: true,
           evidenceIds: _evidenceIds(product, 'labels'),
         ),
@@ -171,7 +171,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Palmöl ohne RSPO-Signal',
           value: '-15',
-          source: 'ingredients_text',
+          source: 'Open Food Facts · Zutaten',
           available: true,
           evidenceIds: _evidenceIds(product, 'ingredients'),
         ),
@@ -212,7 +212,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Datenqualität',
           value: '+20',
-          source: 'Open Food Facts data_quality_tags',
+          source: 'Open Food Facts · Datenqualität',
           available: true,
           evidenceIds: _evidenceIds(product, 'data_quality'),
         ),
@@ -225,7 +225,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Marke eindeutig',
           value: '+10',
-          source: 'Open Food Facts brands',
+          source: 'Open Food Facts · Marke',
           available: true,
           evidenceIds: _evidenceIds(product, 'brand'),
         ),
@@ -239,7 +239,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Zutatenliste vorhanden',
           value: '+10',
-          source: 'Open Food Facts ingredients_text',
+          source: 'Open Food Facts · Zutaten',
           available: true,
           evidenceIds: _evidenceIds(product, 'ingredients'),
         ),
@@ -252,7 +252,7 @@ class ESGScoreCalculator {
         ScoreFactor(
           label: 'Datenwarnung',
           value: '-10',
-          source: 'Open Food Facts data_quality_warnings_tags',
+          source: 'Open Food Facts · Datenwarnungen',
           available: true,
           evidenceIds: _evidenceIds(product, 'data_quality_warnings'),
         ),
