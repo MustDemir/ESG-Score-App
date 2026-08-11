@@ -61,6 +61,7 @@ class OpenFoodFactsProductMapper {
     );
     final ingredientsText = _nullableString(product['ingredients_text']);
     final brand = _string(product['brands'], fallback: 'Unbekannte Marke');
+    final nutritionFacts = _nutritionFacts(product);
     final evidence = <ESGEvidence>[];
 
     void addEvidence({
@@ -365,6 +366,8 @@ class OpenFoodFactsProductMapper {
       ecoscoreScore: environmentalScore,
       co2Total: co2Total,
       ingredientsText: ingredientsText,
+      nutritionSourceLabel: 'Open Food Facts',
+      nutritionFacts: nutritionFacts,
       packagingTags: packagingTags,
       originTags: originTags,
       labelsTags: labelsTags,
@@ -412,6 +415,46 @@ class OpenFoodFactsProductMapper {
       _ => null,
     };
     return parsed?.isFinite == true ? parsed : null;
+  }
+
+  static String _nutritionFacts(Map<String, Object?> product) {
+    final parts = <String>[];
+    final nutritionGrade = _nullableString(
+      product['nutrition_grades'] ?? product['nutriscore_grade'],
+    )?.toUpperCase();
+    if (nutritionGrade != null && RegExp(r'^[A-E]$').hasMatch(nutritionGrade)) {
+      parts.add('Nutri-Score $nutritionGrade');
+    }
+
+    final nutriments = product['nutriments'];
+    final nutrientMap = nutriments is Map
+        ? Map<String, Object?>.from(nutriments)
+        : const <String, Object?>{};
+    final sugarsPer100g = _double(nutrientMap['sugars_100g']);
+    if (sugarsPer100g != null && sugarsPer100g >= 0) {
+      final unit = _nullableString(nutrientMap['sugars_unit']) ?? 'g';
+      parts.add('Zucker ${_formatNumber(sugarsPer100g)} $unit/100 g');
+    }
+
+    final novaGroup = _novaGroup(
+      product['nova_group'] ?? product['nova_groups'],
+    );
+    if (novaGroup != null) parts.add('NOVA $novaGroup');
+
+    return parts.isEmpty
+        ? 'Keine belastbaren Nährwertangaben verfügbar.'
+        : parts.join(' · ');
+  }
+
+  static int? _novaGroup(Object? value) {
+    if (value is List && value.isNotEmpty) return _novaGroup(value.first);
+    final parsed = _double(value)?.round();
+    return parsed != null && parsed >= 1 && parsed <= 4 ? parsed : null;
+  }
+
+  static String _formatNumber(double value) {
+    final text = value.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
+    return text.replaceAll('.', ',');
   }
 
   static Map<String, Object?>? _mapFromPaths(

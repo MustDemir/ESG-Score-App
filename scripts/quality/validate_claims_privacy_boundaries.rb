@@ -11,6 +11,16 @@ class ClaimsPrivacyBoundaryValidator
   PROFILES = %w[development external_beta remote_backend release_candidate].freeze
   GATES = %w[claims privacy all].freeze
   SHA256_PATTERN = /\A[0-9a-f]{64}\z/.freeze
+  UNRESOLVED_PROCESSING_MARKERS = %w[
+    missing
+    pending
+    prohibited_until
+    release_blocker
+    requires_confirmation
+    requires_provider_confirmation
+    requires_review
+    unknown
+  ].freeze
 
   attr_reader :violations
 
@@ -323,21 +333,26 @@ class ClaimsPrivacyBoundaryValidator
     end
 
     network = activities.find { |activity| activity["id"] == "PRV-003" } || {}
-    unless network["personal_data_assessment"].to_s.include?("ip_address") &&
-           network["retention"].to_s.include?("unknown_release_blocker")
-      violations << "#{label}: direct lookup must expose IP and provider-retention uncertainty"
+    unless network["personal_data_assessment"].to_s.include?("ip_address")
+      violations << "#{label}: direct lookup must expose possible IP-address processing"
+    end
+    if @profile == "development" && !network["retention"].to_s.include?("unknown_release_blocker")
+      violations << "#{label}: development inventory must expose provider-retention uncertainty"
     end
   end
 
   def validate_privacy_runtime(inventory)
     features = inventory.fetch("current_feature_state", {})
     enabled = %w[camera_enabled direct_open_food_facts_lookup_enabled]
-    disabled = %w[remote_backend_enabled accounts_enabled analytics_enabled tracking_enabled location_enabled crash_reporting_sdk_enabled user_generated_content_enabled]
+    disabled = %w[accounts_enabled analytics_enabled tracking_enabled location_enabled crash_reporting_sdk_enabled user_generated_content_enabled]
     enabled.each do |field|
       violations << "privacy feature state: #{field} must be true" unless features[field] == true
     end
     disabled.each do |field|
       violations << "privacy feature state: #{field} must be false" unless features[field] == false
+    end
+    if %w[development external_beta].include?(@profile) && features["remote_backend_enabled"] != false
+      violations << "privacy feature state: remote_backend_enabled must be false for #{@profile}"
     end
 
     scanner = read("esg_app/lib/screens/scanner_screen.dart")
@@ -389,6 +404,7 @@ class ClaimsPrivacyBoundaryValidator
     validate_privacy_review(inventory, "public_privacy_disclosure", "privacy_disclosure_review", "approved", label)
     validate_privacy_review(inventory, "app_privacy_details", "app_privacy_details", "completed", label)
     validate_dpia_evidence(inventory, label)
+    validate_enabled_processing_activities(inventory, label)
 
     privacy = read("docs/privacy.md")
     if privacy.match?(/Entwurf|Stub/i)
@@ -404,6 +420,20 @@ class ClaimsPrivacyBoundaryValidator
     validate_privacy_review(inventory, "remote_legal_basis", "legal_review", "approved", label)
     validate_privacy_review(inventory, "processor_contracts", "processor_review", "approved", label)
     validate_privacy_review(inventory, "rights_operations", "rights_verification", "verified", label)
+  end
+
+  def validate_enabled_processing_activities(inventory, label)
+    Array(inventory["processing_activities"]).each do |activity|
+      next unless activity["enabled"] == true
+
+      %w[region legal_basis_status retention deletion].each do |field|
+        value = activity[field].to_s.downcase
+        marker = UNRESOLVED_PROCESSING_MARKERS.find { |candidate| value.include?(candidate) }
+        next unless marker
+
+        violations << "#{label}: #{activity['id']} #{field} remains unresolved (#{marker})"
+      end
+    end
   end
 
   def validate_privacy_review(inventory, review_name, contract_name, expected_status, label)
