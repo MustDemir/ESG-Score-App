@@ -28,14 +28,14 @@ roadmap_progress:
       progress_percent: 80
       next: localize_dynamic_data_decide_offline_history_and_run_field_test
     - id: M7-app-store-release-candidate
-      progress_percent: 40
-      next: close_apple_and_masvs_release_evidence_and_validate_signed_archive
+      progress_percent: 45
+      next: close_apple_masvs_claim_privacy_release_evidence_and_validate_signed_archive
     - id: M8-submission-release
       progress_percent: 0
       next: testflight_submission_and_release_decision
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 70
+      progress_percent: 75
     - id: N1-coffee-pilot-products
       progress_percent: 100
     - id: N2-product-commodity-origin-links
@@ -62,27 +62,44 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-11
   session_closed_at: null
-  branch: compliance/data-license-composition
-  status: next_02_in_review
-  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/19
+  branch: compliance/claims-privacy-boundaries
+  status: next_03_in_review
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/20
   git_state:
     committed: true
     pushed: true
     commits:
-      - 7b84349 feat: enforce source-partitioned data licensing
-    reason: NEXT-02 ist lokal validiert, auf GitHub gepusht und als Draft Pull Request 19 gegen main eroeffnet
+      - 497ab23 feat: enforce claim and privacy boundaries
+    reason: NEXT-03 ist lokal validiert, auf GitHub gepusht und als Draft Pull Request 20 gegen main eroeffnet
   latest_validation:
-    executed_at: "2026-08-11T09:47:24Z"
-    development_quality_gates: 22/22 PASS
-    flutter_tests: 91/91 PASS
-    flutter_line_coverage: 84.93 percent
+    executed_at: "2026-08-11T12:04:51Z"
+    development_quality_gates: 24/24 PASS
+    flutter_tests: 93/93 PASS
+    flutter_line_coverage: 84.89 percent
     database_migration_replay: PASS
     database_pgtap: 71/71 PASS
     database_lint: PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
-    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE and G-DATA-LICENSE
+    claims_privacy_gate_self_tests: 15/15 PASS
+    claims_development_profile: PASS
+    privacy_development_profile: PASS
+    claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
+    privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
+    ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
+    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE and G-PRIVACY-BOUNDARY
   completed:
+    - Pull Request 19 mit Datenlizenz-Komposition in main gemergt; Post-Merge-CI 31483893887 mit allen fuenf Jobs gruen
+    - Claim-Inventar fuer App, App Store und Webseite mit Umwelt-, Social-, Governance-, Nutrition-, Health- und Limitation-Klassen versioniert
+    - Nährwert-Hinweis auf neutrale Quellenfakten ohne Health-Score, Fortschrittsbalken oder Nutzenversprechen reduziert
+    - Privacy-Dateninventar fuer sieben aktuelle und geplante Verarbeitungsvorgaenge erstellt
+    - Aktuellen Direct-OFF-Datenfluss, geplante Remote-Grenze und DPIA-Entscheidungsweg dokumentiert
+    - Datenschutzerklaerung um IP-/Netzwerkmetadaten, echte Runtime-Retention und deaktivierte Zukunftsfunktionen korrigiert
+    - ADR 0031 mit fail-closed Development-, External-Beta-, Remote- und Release-Profilen akzeptiert
+    - G-CLAIM-GOVERNANCE und G-PRIVACY-BOUNDARY mit typisierter und SHA-256-gebundener Review-Evidenz integriert
+    - 15 positive und negative Gate-Selbsttestassertions sowie zwei neue Nährwert-Widgettests bestanden
+    - Development Quality Pipeline 24/24, Flutter 93/93 und 84.89 Prozent Coverage bestanden
+    - Nativer unsigned iOS-Simulator-Build und Audit von drei Privacy Manifests ohne Verstoß bestanden
     - Pull Request 18 mit Kaffee-Referenzfall und Gap-Control in main gemergt; Post-Merge-CI 31470631999 gruen
     - OFF-Rechte fuer Datenbank, Inhalte und Bilder auf ODbL-1.0, DbCL-1.0 und CC-BY-SA-3.0 korrigiert und getrennt
     - Produced Work, Derivative Database und Collective Database konservativ bewertet
@@ -108,8 +125,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Pull Request 19 und seine GitHub Required Checks reviewen und anschließend in main integrieren
-    - Danach NEXT-03 Claim- und Privacy-P0-Grenzen ausarbeiten
+    - NEXT-03 logisch committen, pushen und als Pull Request gegen main reviewen
+    - Nach gruenem Post-Merge-Lauf NEXT-04 Backend-Threat-Model beginnen
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -126,7 +143,7 @@ session_handoff:
           - Post-Merge-main ist grün
       - sequence: 2
         id: NEXT-02-data-license-composition
-        status: validated_local_pending_integration
+        status: completed
         focus: OFF-ODbL und Lizenzkomposition entscheiden
         suggested_branch: compliance/data-license-composition
         exit_criteria:
@@ -135,8 +152,9 @@ session_handoff:
           - GAP-003 und IMP-COMP-005 besitzen prüfbare Evidenz
       - sequence: 3
         id: NEXT-03-claims-and-privacy-boundaries
+        status: in_review
         focus: Umwelt-/Health-Claims und Privacy-Datenfluss ausarbeiten
-        suggested_branch: compliance/claims-privacy-boundaries
+        branch: compliance/claims-privacy-boundaries
         exit_criteria:
           - Claim-Inventar und Health-Grenze versioniert
           - Datentyp-, Zweck-, Empfänger- und Retention-Matrix erstellt
@@ -222,6 +240,7 @@ session_handoff:
     - Verfuegbare Dependency-Updates werden ueber einzelne reviewte PRs eingespielt
     - Kaffee-Pilotbeziehungen aktivieren noch keine Umwelt-, Social- oder Governance-Risikofaktoren
     - Gap-Audit identifiziert vier P0-Grenzen vor Release Candidate oder Remote-Kombinationsdatenbank
+    - Claim- und Privacy-Development-Gates sind gruen, aber oeffentliche Aktivierung bleibt bis Kalibrierung und qualifiziertem Rechts-/Fach-/DPIA-Review rot
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -463,6 +482,17 @@ milestones:
       71 pgTAP-Tests beweisen die Quellenbarriere. Remote-Aktivierung bleibt
       bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung blockiert.
 
+  - id: M25
+    title: Claim- und Privacy-Aktivierungsgrenzen lokal durchsetzbar
+    date: 2026-08-11
+    phase: phase-1-mvp
+    notes: |
+      ADR 0031, versionierte Claim- und Privacy-Inventare sowie zwei neue Gates
+      trennen lokalen Fortschritt von externer Freigabe. Die Nährwertanzeige
+      enthält keinen Health-Score oder Fortschrittsbalken. Typed Evidence und
+      SHA-256-Bindung verhindern Scheinfreigaben; Release Candidate bleibt bis
+      Kalibrierung, Rechts-, Fach-, App-Privacy- und DPIA-Review blockiert.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -591,6 +621,9 @@ decisions_made:
   - adr: 0030
     title: Quellengetrennte Datenlizenz-Komposition vor Remote-Aktivierung
     date: 2026-08-11
+  - adr: 0031
+    title: Fail-closed Claim- und Privacy-Grenzen vor externer Aktivierung
+    date: 2026-08-11
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -607,6 +640,8 @@ weekly_log:
       sowie Lifecycle-Gap-Control-System ergänzt.
       Die OFF-Lizenzkomposition ist nun konservativ klassifiziert, technisch
       quellengetrennt und durch ein profilbasiertes Gate abgesichert.
+      Claim- und Privacy-Inventare, neutrale Nährwertgrenze und zwei
+      profilbasierte Aktivierungsgates sind lokal validiert.
     done:
       - ADR 0027 als append-only Precedence-Entscheidung angelegt
       - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
@@ -628,6 +663,10 @@ weekly_log:
       - SQL-Trigger fuer eine ausschliessliche OFF-Produktcache-Partition umgesetzt
       - In-App-Attribution um Lizenzklassen und Lizenz-URIs erweitert
       - G-DATA-LICENSE mit Development-, Remote- und Release-Candidate-Profil integriert
+      - Claim-Inventar fuer App-, Store- und Webseitenoberflaechen versioniert
+      - Health-Balken durch neutralen Nährwert-Hinweis ohne Score ersetzt
+      - Privacy-Datenmatrix, aktueller/geplanter Datenfluss und DPIA-Pfad erstellt
+      - G-CLAIM-GOVERNANCE und G-PRIVACY-BOUNDARY mit Hash-Evidenz integriert
     checks:
       - Scoring-Testmatrix 39/39 PASS
       - Accessibility- und Terminologietests 10/10 PASS
@@ -644,14 +683,19 @@ weekly_log:
       - Flutter-Test-Suite 91/91 PASS, Line-Coverage 84.93 Prozent
       - Supabase-Migration-Replay, pgTAP 71/71 und DB-Lint PASS
       - Remote-Datenlizenzprofil erwartungsgemaess FAIL mit acht Aktivierungsblockern
+      - Claim-/Privacy-Gate-Selbsttests 15/15 PASS
+      - Flutter-Test-Suite 93/93 PASS, Line-Coverage 84.89 Prozent
+      - Development Quality Pipeline 24/24 PASS
+      - G-IOS-COMPILE und gebuendelter Privacy-Manifest-Audit PASS mit null Verstoessen
     blockers:
       - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
       - Apple- und Claim-Release-Evidenz bleibt getrennt offen
       - Remote-Backend bleibt bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung blockiert
+      - External Beta und Release bleiben bis Claim-Kalibrierung, Rechts-/Fachreview, App Privacy und DPIA-Evidenz blockiert
     next_week:
-      - Lizenzkompositionsstand committen, pushen, reviewen und mergen
-      - Danach Claim- und Privacy-Grenzen schließen
+      - Claim-/Privacy-Stand committen, pushen, reviewen und mergen
+      - Danach NEXT-04 Backend-Threat-Model und EU-Supabase-Umgebungsvertrag beginnen
 
   - week: 2026-W31
     summary: |
@@ -925,13 +969,13 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 25
-  todos_open: 6
-  todos_in_progress: 4
+  decisions_total: 26
+  todos_open: 5
+  todos_in_progress: 5
   todos_done: 20
   todos_parked: 1
   todos_review: 1
-  milestones_reached: 24
+  milestones_reached: 25
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1
