@@ -7,9 +7,15 @@ policy_checks:
   - Improvement register schema, IDs, status and dependencies are valid
   - Completed and review items reference available evidence
   - Current execution order references active improvement items
+  - Lifecycle gaps use valid maturity, priority, profile and closure contracts
+  - P0 and P1 gaps map to known improvements, risks and primary sources
+  - Full lifecycle gap review is not overdue
   - Feature overview matches each feature state.yaml
 evidence_required:
   - docs/project/improvement-register.yaml
+  - docs/project/gap-register.yaml
+  - docs/project/methodology/gap-analysis-process.md
+  - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
   - docs/project/features/README.md
   - docs/project/features/scanner/state.yaml
   - docs/project/features/scoring/state.yaml
@@ -32,6 +38,8 @@ links:
 sources:
   - docs/project/methodology/conventions.md
   - docs/project/methodology/progress-tracking.md
+  - docs/project/methodology/gap-analysis-process.md
 notes: |
-  Blocks drift between the assessed improvement roadmap and the repo-native
-  feature status model without interpreting product or regulatory decisions.
+  Blocks drift between lifecycle gaps, the assessed improvement roadmap and
+  the repo-native feature status model without claiming to automate legal,
+  scientific or release approval.

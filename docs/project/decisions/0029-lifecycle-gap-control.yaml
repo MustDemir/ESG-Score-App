@@ -1,0 +1,69 @@
+id: 0029
+title: Repo-native lifecycle gap control with maturity and evidence closure
+date: 2026-08-10
+status: accepted
+deciders: [Mustafa]
+tags: [methodology, governance, risk, quality-gates, release-readiness]
+
+context: |
+  The Product Engineering Handbook covers the disciplines required for
+  ScanFair, but a handbook alone does not reveal or close missing, partial,
+  stale or documented-but-not-operational capabilities. The project needs a
+  repeatable way to evaluate product, methodology, data, legal, privacy,
+  security, quality, operations and release maturity without turning every
+  non-deterministic question into an automated gate.
+
+options_considered:
+  - name: Review the handbook informally when a problem appears
+    pros: [no additional artifacts]
+    cons:
+      - gaps remain dependent on memory and individual sessions
+      - no owner, target profile or closure evidence is enforced
+  - name: Adopt a generic external release checklist
+    pros: [quick initial coverage]
+    cons:
+      - weak connection to ScanFair evidence, scoring and data relationships
+      - checklist completion can be mistaken for scientific or legal validity
+  - name: Use a repo-native lifecycle gap register with maturity and control mappings
+    pros:
+      - connects findings to risks, improvements, sources and release profiles
+      - keeps historical audits separate from live remediation status
+      - can validate structure without automating human legal or scientific approval
+      - preserves context across AI-assisted development sessions
+    cons:
+      - requires recurring review and register maintenance
+      - cannot itself prove legal compliance or scientific validity
+
+decision: Use a repo-native lifecycle gap register with maturity and evidence closure
+rationale: |
+  The ScanFair Lifecycle Gap Analysis evaluates twelve disciplines across
+  eight lifecycle phases and rates capabilities from zero to five. P0 and P1
+  findings require an owner, target profile, trigger, closure criteria and a
+  mapping to the improvement register. G-PROJECT-CONTROL validates structure,
+  cross-links, review freshness and closed-gap evidence while legal,
+  scientific, methodology and release decisions remain human-accountable.
+
+implementation:
+  method:
+    - docs/project/methodology/gap-analysis-process.md
+    - docs/project/methodology/product-engineering-handbook.md
+  source_of_truth:
+    - docs/project/gap-register.yaml
+    - docs/project/improvement-register.yaml
+    - docs/project/risks.yaml
+  evidence:
+    - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+  enforcement:
+    - scripts/quality/validate_project_control.rb
+    - docs/project/gate-definitions/local/G-LOCAL-PROJECT-CONTROL.yaml
+
+consequences:
+  - A full gap review is required at phase changes and at least quarterly.
+  - Capability triggers such as account, payment, UGC, analytics, location and AI must be classified before coding.
+  - Development PASS remains separate from release-candidate and submission readiness.
+  - Overdue full reviews and invalid P0/P1 mappings block project control.
+  - Qualified external review is still required for legal and scientific closure.
+
+supersedes: null
+superseded_by: null
+related: [0007, 0009, 0020, 0021, 0022, 0026]

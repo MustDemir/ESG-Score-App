@@ -1,4 +1,4 @@
-last_updated: 2026-05-19
+last_updated: 2026-08-10
 
 # Bewertung:
 #   likelihood: L (low) | M (medium) | H (high)
@@ -34,13 +34,14 @@ risks:
       - Top-100-DE-Produkte selbst manuell pflegen (Hybrid-Strategie)
       - Eco-Score-Fallback: bei "unknown" nicht 0 zeigen sondern transparenter
         Hinweis "Daten unvollständig"
-    related_todos: [TODO-001]
+    related_todos: [TODO-001, TODO-011]
+    related_gaps: [GAP-007]
     related_decisions: [0003]
     related_spikes: [off-api-2026-05-19.md]
     status: mitigated
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-05-19
+    updated: 2026-08-10
 
   - id: RISK-002
     title: Apple Developer Account Verifizierung verzögert TestFlight
@@ -51,15 +52,14 @@ risks:
       Apple-Verifizierung dauert 24-48h, bei Business-Accounts auch 1-2 Wochen.
       Verzögert TestFlight-Launch falls erst spät beantragt.
     mitigation: |
-      Account am 2026-05-19 gekauft. Verifizierung läuft. Restrisiko:
-      Verzögerung bis Verifizierung durch. Mitigation: Sprint 0/1 läuft
-      unabhängig vom Account weiter (Code, Tests, Theme). TestFlight wird
-      erst in Sprint 3 gebraucht.
+      Account wurde gekauft und verifiziert. Signing, Installation und Start
+      auf dem physischen iPhone wurden erfolgreich nachgewiesen. TestFlight
+      bleibt bewusst außerhalb des aktuellen Entwicklungsumfangs.
     related_todos: [TODO-003]
-    status: mitigated
+    status: closed
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-05-19
+    updated: 2026-08-10
 
   - id: RISK-003
     title: ESG-Score-Formel nicht wissenschaftlich fundiert
@@ -71,13 +71,18 @@ risks:
       werden — Glaubwürdigkeitsproblem, mögliche rechtliche Risiken
       (irreführende Werbung).
     mitigation: |
-      Eco-Score von OFF als wissenschaftliche Basis nutzen (peer-reviewed).
-      Methodik transparent dokumentieren (im App-Footer + Webseite).
-      Disclaimers richtig formulieren ("Schätzung", nicht "Bewertung").
+      Methodik v1.0 bleibt als heuristischer MVP gekennzeichnet. Methodik
+      2.0-draft ist nicht score-aktiv; Missing-Data-, Red-Flag-,
+      Reproducibility- und Claim-Safety-Gates verhindern Scheingenauigkeit.
+      Offen bleiben Referenzkorpus, Normalisierung, Gewichtung,
+      Sensitivitätsanalyse und unabhängiges Fachreview.
     related_todos: [TODO-002]
+    related_gaps: [GAP-001]
+    related_improvements: [IMP-DEV-003]
     status: open
     owner: Mustafa
     created: 2026-05-19
+    updated: 2026-08-10
 
   - id: RISK-004
     title: Solo-Founder-Burnout / Time-to-MVP überschritten
@@ -106,28 +111,152 @@ risks:
       Auftragsverarbeitungsverträge mit Supabase → Abmahnrisiko,
       App-Store-Ablehnung.
     mitigation: |
-      Privacy Policy schreiben (TODO-008).
-      Supabase-AVV unterzeichnen (kostenlos verfügbar).
-      Datenminimierung: nur speichern was wirklich nötig ist.
-      Tracking auf null reduzieren in MVP.
+      Aktueller lokaler MVP verwendet kein Konto, kein Analytics-SDK und kein
+      Remote-Supabase-Projekt. RLS, Privacy Manifest und SDK-Audit bestehen.
+      Vor Remote-Backend oder externer Beta bleiben Datenfluss,
+      Rechtsgrundlagen, AVV, Retention, Betroffenenrechte, Incident und
+      DPIA-Entscheidung zu operationalisieren.
     related_todos: [TODO-008]
+    related_gaps: [GAP-004]
+    related_improvements: [IMP-COMP-006]
     status: open
     owner: Mustafa
     created: 2026-05-19
+    updated: 2026-08-10
 
   - id: RISK-006
-    title: Open Food Facts Lizenz (CC BY-SA) limitiert kommerzielle Nutzung
-    likelihood: L
-    impact: M
-    score: 2
+    title: ODbL-Kompositionspflichten kollidieren mit weiteren Datenquellen
+    likelihood: M
+    impact: H
+    score: 6
     description: |
-      CC BY-SA fordert dass abgeleitete Daten ebenfalls CC BY-SA lizenziert
-      werden. Bei späterem B2B-Vertrieb (IDEA-007) könnte das Problem werden.
+      Die Open-Food-Facts-Datenbank steht unter ODbL mit Attribution und
+      Share-Alike. Das Kombinieren in einer Datenbank mit proprietären oder
+      inkompatibel lizenzierten Daten kann Offenlegungspflichten oder eine
+      unzulässige Datenbankkomposition erzeugen.
     mitigation: |
-      In MVP unkritisch — wir nutzen Daten nur, geben keine raus.
-      Bei Phase 4 (B2B): juristische Beratung, evtl. Datenquelle wechseln
-      oder Hybrid-Modell.
+      Quellen und Evidenz werden getrennt inventarisiert. Vor dem Remote-Cache
+      werden Produced Work, Derivative Database und Collective Database
+      rechtlich bewertet und als logische oder physische Trennungsarchitektur
+      festgelegt. Attribution und Exportgrenzen werden getestet.
     related_decisions: [0003]
-    status: accepted
+    related_gaps: [GAP-003]
+    related_improvements: [IMP-COMP-005]
+    status: open
     owner: Mustafa
     created: 2026-05-19
+    updated: 2026-08-10
+
+  - id: RISK-007
+    title: Umwelt-, Nachhaltigkeits- oder Health-Aussage ist irreführend oder unzulässig
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Score, Ampel, Kaufempfehlung oder Health-Hinweis können von Nutzern als
+      stärkere Produkt- oder Gesundheitsaussage verstanden werden, als Daten
+      und Methodik tragen. Ab 27. September 2026 verschärft die Umsetzung der
+      Richtlinie (EU) 2024/825 den Rahmen für Umweltaussagen zusätzlich.
+    mitigation: |
+      Claim-Inventar, evidenzgebundene Formulierungen, technische Claim-Safety,
+      EU-Health-Claims-Prüfung und qualifiziertes Rechts-/Fachreview vor
+      öffentlicher Aktivierung.
+    related_gaps: [GAP-002, GAP-013]
+    related_improvements: [IMP-COMP-004]
+    status: open
+    owner: Mustafa
+    created: 2026-08-10
+
+  - id: RISK-008
+    title: Remote-Writer oder Adminpfad manipuliert Evidenz und Scores
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Ein öffentlich erreichbarer Serverpfad kann durch fehlerhafte
+      Autorisierung, Replay, manipulierte Quellantworten, fehlende Rate Limits
+      oder kompromittierte Secrets falsche Evidenz und Scores publizieren.
+    mitigation: |
+      End-to-End-Threat-Model vor Implementierung, serverseitige
+      Vertrauensgrenzen, Idempotenz, Input Validation, Audit Trail, Rate Limits,
+      Secret Rotation und risikobasierter Security-Test.
+    related_gaps: [GAP-005]
+    related_improvements: [IMP-COMP-007, IMP-DEV-002]
+    status: open
+    owner: Engineering
+    created: 2026-08-10
+
+  - id: RISK-009
+    title: Provider-Ausfall, Datenalter oder fehlender Betriebsprozess erzeugt falsche Nutzerinformation
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      OFF, Backend oder weitere Quellen können langsam, nicht verfügbar,
+      schema-inkompatibel oder veraltet sein. Ohne SLO, Monitoring,
+      Stale-Data-Anzeige, Korrektur und Rollback bleibt ein falscher Score
+      möglicherweise unentdeckt oder aktiv.
+    mitigation: |
+      Reliability-Budgets, Provider-Failure-Tests, Datenfrischeanzeige,
+      Monitoring, Alerts, Score-Sperre, versionierte Korrektur sowie
+      Backup-/Restore- und Incident-Drills.
+    related_gaps: [GAP-006, GAP-009, GAP-013]
+    related_improvements: [IMP-DEV-004, IMP-OPS-001]
+    status: open
+    owner: Engineering
+    created: 2026-08-10
+
+  - id: RISK-010
+    title: Apple-, EU-, OWASP- oder Provider-Regeln ändern sich unbemerkt
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Lebende Plattformregeln und Datenproviderbedingungen können bestehende
+      Requirements, Gates, Metadaten oder Lizenzentscheidungen überholen.
+    mitigation: |
+      Versioniertes Quellenregister, 30-Tage-Review bis Release,
+      quartalsweiser Lifecycle-Gap-Audit und Release-Blockade bei überfälliger
+      anwendbarer Primärquelle.
+    related_gaps: [GAP-011]
+    related_improvements: [IMP-PROC-003]
+    status: open
+    owner: Release owner
+    created: 2026-08-10
+
+  - id: RISK-011
+    title: Verlust kritischer Accounts, Zertifikate, Domains oder Recovery-Codes
+    likelihood: L
+    impact: H
+    score: 3
+    description: |
+      Als Solo-Owner kann der Verlust eines Apple-, GitHub-, Domain-, Backend-
+      oder 2FA-Zugangs Entwicklung, Support oder Release dauerhaft blockieren.
+    mitigation: |
+      Konto- und Rollenregister ohne Secrets, sichere Recovery-Verfahren,
+      Ablaufmonitoring, Least Privilege, Break-glass und getesteter
+      Rotations-/Recovery-Drill.
+    related_gaps: [GAP-010]
+    related_improvements: [IMP-OPS-002]
+    status: open
+    owner: Mustafa
+    created: 2026-08-10
+
+  - id: RISK-012
+    title: Selection Bias und unkalibrierte Proxies erzeugen systematisch falsche Rankings
+    likelihood: M
+    impact: H
+    score: 6
+    description: |
+      Kuratierte OFF-Produkte, Kategorieproxies und Länder-/Rohstoffrisiken
+      können reale Marktdeckung oder Produktleistung verzerrt darstellen.
+      Technisch reproduzierbar bedeutet nicht wissenschaftlich valide.
+    mitigation: |
+      Vorab festgelegtes Produktkorpus, Coverage-Messung ohne OFF-Search,
+      Gold- und Grenzfälle, Sensitivitätsanalyse, Proxy-/Bias-Review und
+      unabhängige ESG-/LCA-/Social-Fachprüfung.
+    related_gaps: [GAP-001, GAP-007]
+    related_improvements: [IMP-DEV-003, IMP-DEV-004]
+    status: open
+    owner: Mustafa
+    created: 2026-08-10

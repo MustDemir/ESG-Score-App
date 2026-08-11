@@ -20,6 +20,8 @@ checks = {
     "AGRIBALYSE 3.2",
     "G-AS-CLAIMS-TRANSPARENCY",
     "Delivery Operating Model",
+    "Product Engineering Handbook",
+    "Lifecycle Gap Analysis",
     "Verbesserungsregister",
   ],
   "docs/project/delivery-operating-model.md" => [
@@ -30,9 +32,24 @@ checks = {
   ],
   "docs/project/improvement-register.yaml" => [
     "IMP-PROC-001",
+    "IMP-PROC-003",
     "IMP-COMP-001",
+    "IMP-COMP-004",
     "IMP-DEV-001",
+    "IMP-DEV-003",
     "IMP-OPS-001",
+  ],
+  "docs/project/gap-register.yaml" => [
+    "GAP-001",
+    "GAP-014",
+    "maturity_current",
+    "closure_criteria",
+  ],
+  "docs/project/methodology/gap-analysis-process.md" => [
+    "Zwölf Prüffelder",
+    "Acht Lifecycle-Phasen",
+    "External Horizon Scan",
+    "Closure und Regression",
   ],
   "docs/project/compliance/supply-chain-policy.yaml" => [
     "OSV-Scanner",
@@ -75,7 +92,7 @@ checks.each do |relative_path, markers|
     next
   end
 
-  content = File.binread(path)
+  content = File.read(path, encoding: "UTF-8")
   markers.each do |marker|
     marker_count += 1
     unless content.include?(marker)

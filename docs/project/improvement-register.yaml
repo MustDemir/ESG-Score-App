@@ -35,10 +35,18 @@ allowed_values:
     - submission
 
 execution_order:
-  - IMP-COMP-003
+  - IMP-PROC-003
+  - IMP-COMP-004
+  - IMP-COMP-005
+  - IMP-COMP-006
+  - IMP-COMP-007
   - IMP-DEV-001
+  - IMP-DEV-003
   - IMP-DEV-002
+  - IMP-DEV-004
+  - IMP-COMP-003
   - IMP-OPS-001
+  - IMP-OPS-002
 
 improvements:
   - id: IMP-PROC-001
@@ -98,6 +106,36 @@ improvements:
     dependencies:
       - IMP-PROC-001
     next_action: Keine; Register und Validator bei neuen Statusfeldern gemeinsam pflegen
+
+  - id: IMP-PROC-003
+    layer: process
+    title: Wiederholbare Lifecycle-Gap-Analyse und Compliance-Horizon-Review
+    status: in_progress
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      Ein umfangreiches Handbuch kann blinde Flecken nicht allein verhindern.
+      Fehlende, partielle, nicht operationalisierte und veraltete Kontrollen
+      muessen systematisch gefunden, priorisiert und bis zur Evidenz verfolgt
+      werden.
+    acceptance_criteria:
+      - Zwölf Prüffelder, acht Lifecycle-Phasen und Reifegrad 0 bis 5 sind versioniert
+      - Gap-Register besitzt Owner, Priorität, Zielprofil, Trigger und Closure-Kriterien
+      - P0- und P1-Gaps sind auf Improvements und Risiken rückverfolgbar
+      - Überfällige Full- und Compliance-Source-Reviews werden maschinell erkannt
+      - Capability-Trigger für Account, Payment, UGC, Analytics, Standort und AI sind Teil von DoR und DoD
+    evidence:
+      - docs/project/methodology/gap-analysis-process.md
+      - docs/project/gap-register.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - G-PROJECT-CONTROL validiert Gap-Struktur und Cross-Links
+      - Vollständiger Audit wird bei Phasenwechsel und mindestens quartalsweise wiederholt
+    dependencies:
+      - IMP-PROC-002
+    next_action: IMP-COMP-004 beginnen und Full-/Source-Review-Faelligkeiten im laufenden Gate-Betrieb ueberwachen
 
   - id: IMP-COMP-001
     layer: compliance
@@ -196,6 +234,7 @@ improvements:
       - Alle anwendbaren Apple-MUST-Anforderungen besitzen aktuelle Evidenz
       - Privacy Policy, Support, Attribution und App-Metadaten sind versioniert
       - Produkt- und ESG-Claims zeigen Methodik, Unsicherheit und Grenzen
+      - Accessibility Nutrition Labels entsprechen einem vollständigen Common-Task-Audit
       - Signiertes Release-Archive besteht Build- und SDK-Integritaetspruefung
     evidence:
       - docs/project/compliance/apple-compliance-control-model.md
@@ -207,7 +246,130 @@ improvements:
     dependencies:
       - IMP-COMP-001
       - IMP-COMP-002
-    next_action: Offene Release-Evidenz pro Apple-Gate priorisieren und einzeln schliessen
+      - IMP-COMP-004
+      - IMP-COMP-005
+      - IMP-COMP-006
+    next_action: Nach Claims-, Lizenz- und Privacy-Grundentscheidungen offene Release-Evidenz pro Apple-Gate einzeln schliessen
+
+  - id: IMP-COMP-004
+    layer: compliance
+    title: Umwelt-, Nachhaltigkeits- und Health-Claim-Governance
+    status: planned
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: release_candidate
+    rationale: |
+      Score, Ampel, Einkaufsorientierung und Health-Hinweis koennen als
+      kommerzielle Umwelt-, Nachhaltigkeits-, Nutrition- oder Health-Aussage
+      verstanden werden. Technische Evidenz und Disclaimer ersetzen keine
+      fachliche und rechtliche Zulässigkeitspruefung.
+    acceptance_criteria:
+      - Claim-Inventar umfasst App, App Store, Webseite und Marketing
+      - Claims sind nach Umwelt, Nachhaltigkeit, Social, Governance, Nutrition und Health klassifiziert
+      - Jede Aussage ist an spezifische Evidenz, Methodikversion und Confidence gebunden
+      - EU-Richtlinie 2024/825 und Health-Claims-Regelwerk sind auf Anwendbarkeit geprüft
+      - Qualifiziertes Rechts- und Fachreview ist vor öffentlicher Aktivierung dokumentiert
+    evidence:
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/compliance/source-register.yaml
+      - docs/project/gate-definitions/local/G-CLAIM-SAFETY.yaml
+    verification:
+      - G-CLAIM-SAFETY blockiert nicht belegte oder zu starke In-App-Claims
+      - Manuelles Release-Review bestätigt App-, Store- und Marketing-Claims
+    dependencies:
+      - IMP-PROC-003
+    next_action: Versioniertes Claim-Inventar und Rechts-/Fachreview-Template erstellen
+
+  - id: IMP-COMP-005
+    layer: compliance
+    title: Datenlizenz-Komposition und produktive Trennungsarchitektur
+    status: planned
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      OFF steht unter ODbL mit Attribution und Share-Alike. Eine kombinierte
+      Datenbank mit proprietären oder anders lizenzierten Quellen kann
+      Pflichten oder Inkompatibilitäten auslösen, die vor dem Remote-Backend
+      technisch und rechtlich entschieden werden muessen.
+    acceptance_criteria:
+      - Database-, Content- und Bildrechte sind je Quelle getrennt inventarisiert
+      - Produced Work, Derivative Database und Collective Database sind bewertet
+      - Inkompatible Datensätze werden logisch oder physisch getrennt
+      - Attribution, Export, Share-Alike und Löschung sind als Datenvertrag testbar
+      - Rechtsreview und ADR bestimmen die Produktionsarchitektur
+    evidence:
+      - docs/project/data/source-register.yaml
+      - docs/project/compliance/source-register.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - G-DATA-ARCH validiert Lizenzklasse und erlaubte Speichergrenze
+      - Architekturreview bestätigt die Remote-Datenbank vor Provisionierung
+    dependencies:
+      - IMP-PROC-003
+    next_action: ODbL-Kompositionsszenarien mit dem geplanten Supabase-Schema bewerten
+
+  - id: IMP-COMP-006
+    layer: compliance
+    title: Datenschutz-Betriebsmodell und Data-Protection-Readiness
+    status: planned
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: release_candidate
+    rationale: |
+      RLS und Privacy Manifest kontrollieren technische Teile, aber ein
+      Remote- oder Beta-Betrieb braucht zusätzlich Datenfluss,
+      Rechtsgrundlagen, Aufbewahrung, Betroffenenrechte, AVV,
+      Incident-Verfahren und eine dokumentierte DPIA-Entscheidung.
+    acceptance_criteria:
+      - Dateninventar und Datenfluss sind vollständig und versioniert
+      - Rechtsgrundlage, Zweck, Empfänger, Region und Löschfrist sind je Datentyp dokumentiert
+      - AVV und Drittparteienprüfung sind abgeschlossen
+      - Auskunft, Export, Löschung und Incident-Ablauf sind getestet
+      - DPIA-Erforderlichkeitsentscheidung und Privacy Policy sind reviewt
+    evidence:
+      - docs/project/compliance/dsgvo-relevance.md
+      - docs/project/compliance/source-register.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - Privacy- und Release-Candidate-Gates besitzen keine offene anwendbare MUST-Evidenz
+      - Datenfluss und App Store Privacy Details stimmen mit dem Build und Backend überein
+    dependencies:
+      - IMP-PROC-003
+    next_action: Datentyp-, Zweck-, Empfänger- und Retention-Matrix für MVP und geplanten Cache erstellen
+
+  - id: IMP-COMP-007
+    layer: compliance
+    title: End-to-End-Threat-Model und Backend-Abuse-Sicherheitsprüfung
+    status: planned
+    priority: P1
+    risk: H
+    owner: Engineering
+    target_profile: development
+    rationale: |
+      MASVS deckt die Mobile-App ab. Der geplante Server-Writer und Adminpfad
+      brauchen eigene Trust Boundaries, Abuse Cases, Rate Limits,
+      Manipulationsschutz und einen risikobasierten Security-Test.
+    acceptance_criteria:
+      - Systemdatenfluss und Trust Boundaries sind diagrammiert
+      - Assets, Angreifer, Bedrohungen und Abuse Cases sind priorisiert
+      - AuthN/AuthZ, Input Validation, Rate Limits, Replay- und Kostenmissbrauch sind getestet
+      - Secret Rotation, Audit Trail und Break-glass-Zugriff sind dokumentiert
+      - Bedarf und Scope eines unabhängigen Penetrationstests sind entschieden
+    evidence:
+      - docs/project/compliance/owasp-masvs-ios-baseline.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - Threat-Model-Review vor Implementierung des Remote-Writers
+      - Security-Tests und G-DATA-RLS bestehen gegen die Zielarchitektur
+    dependencies:
+      - IMP-PROC-003
+      - IMP-COMP-001
+      - IMP-COMP-002
+    next_action: Trust-Boundary-Diagramm und priorisierte Abuse-Case-Liste vor IMP-DEV-002 erstellen
 
   - id: IMP-DEV-001
     layer: development
@@ -230,13 +392,17 @@ improvements:
       - docs/project/methodology-catalog/profiles/coffee.yaml
       - docs/project/methodology-catalog/source-mappings/agribalyse-v3.2.yaml
       - docs/project/data/environmental-source-assessment.yaml
+      - docs/project/data/coffee-pilot-products.yaml
+      - docs/project/decisions/0028-product-scoped-commodity-origin.yaml
+      - esg_app/lib/data_sources/coffee_pilot_catalog.dart
+      - supabase/migrations/20260810000100_context_scoped_traceability.sql
     verification:
       - Kaffee-Fixtures und App-Tests bestehen
       - Scoring-Safety-Gates bestehen
     dependencies:
       - IMP-COMP-001
       - IMP-COMP-002
-    next_action: Pilotprodukte festlegen und belastbare Rohstoff-Herkunftslinks aufbauen
+    next_action: Kontextuelle Umwelt- und Social-Quellen gegen die produktgebundenen Herkunftslinks mappen
 
   - id: IMP-DEV-002
     layer: development
@@ -265,7 +431,70 @@ improvements:
       - Integrations- und Offline-/Fehlerfalltests bestehen
     dependencies:
       - IMP-DEV-001
+      - IMP-COMP-005
+      - IMP-COMP-006
+      - IMP-COMP-007
     next_action: Environment-, Secret- und Datenschutzvertrag fuer das EU-Development-Projekt definieren
+
+  - id: IMP-DEV-003
+    layer: development
+    title: Wissenschaftliche Score-Kalibrierung und unabhängiges Fachreview
+    status: planned
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: release_candidate
+    rationale: |
+      Safety Controls verhindern offensichtliche Fehlberechnung, beweisen aber
+      weder inhaltliche Validität noch belastbare Gewichtung oder faire
+      Produktergebnisse.
+    acceptance_criteria:
+      - Gold-, Grenz-, Missing-Data- und Red-Flag-Korpus ist versioniert
+      - Normalisierung, Gewichte, Confidence und Unsicherheit sind begründet
+      - Sensitivitäts-, Stabilitäts- und Ranking-Regressionstests bestehen
+      - ESG-, LCA- und Social-/Human-Rights-Fachreview ist dokumentiert
+      - Methodikaktivierung erfolgt nur über neue Version, ADR und Claim-Review
+    evidence:
+      - docs/project/methodology-catalog/README.md
+      - docs/project/methodology-catalog/scoring-controls.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - Externer Review und reproduzierbarer Kalibrierungsreport liegen vor
+      - G-METHOD-CATALOG und alle Scoring-Safety-Gates bestehen mit publizierter Version
+    dependencies:
+      - IMP-DEV-001
+      - IMP-COMP-004
+    next_action: Referenzkorpus, Reviewrollen und Kalibrierungsprotokoll definieren
+
+  - id: IMP-DEV-004
+    layer: development
+    title: Beta-Readiness für Performance, Reliability und repräsentative Feldtests
+    status: planned
+    priority: P1
+    risk: H
+    owner: Engineering
+    target_profile: release_candidate
+    rationale: |
+      Funktionale Tests allein zeigen nicht, ob ScanFair bei realen Barcodes,
+      langsamen Netzen, langen externen Texten, Datenalterung und
+      Provider-Ausfällen schnell, verständlich und zuverlässig bleibt.
+    acceptance_criteria:
+      - Start-, Scan-to-Result-, API- und Datenfrische-SLOs sind definiert
+      - Offline-, Slow-Network-, Rate-Limit-, Schema-Drift- und Provider-Ausfalltests bestehen
+      - Repräsentatives, vorab festgelegtes Barcode-Korpus reduziert Selection Bias
+      - Nutzertest misst Aufgabenabschluss, Verständnis, Vertrauen und Fehlinterpretation
+      - Dynamische Daten und Cache-Status sind lokalisiert und VoiceOver-sicher
+    evidence:
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/spikes/off-api-2026-05-19.md
+      - docs/project/accessibility/voiceover-language-policy.md
+    verification:
+      - Performance-/Reliability-Report und Feldtestbericht sind reviewt
+      - Release-Candidate-Smoke-Matrix besteht auf unterstützten iPhone-/iOS-Kombinationen
+    dependencies:
+      - IMP-DEV-002
+      - IMP-DEV-003
+    next_action: Messgrößen, Geräte-/Netzmatrix und repräsentatives Barcode-Korpus festlegen
 
   - id: IMP-OPS-001
     layer: operations
@@ -284,6 +513,8 @@ improvements:
       - Backup, Restore, Migration und Rollback sind getestet
       - Datenschutzfreundliches Crash-, API- und Datenfrische-Monitoring existiert
       - Incident-, Support- und Datenkorrekturprozess sind dokumentiert
+      - Fehlerhafte Quellen oder Scores können gesperrt, korrigiert und versioniert neu berechnet werden
+      - Nutzer und Hersteller besitzen einen nachvollziehbaren Melde- und Einspruchsweg
       - TestFlight- und Submission-Checklisten besitzen nachvollziehbare Evidenz
     evidence: []
     verification:
@@ -291,4 +522,30 @@ improvements:
     dependencies:
       - IMP-COMP-003
       - IMP-DEV-002
+      - IMP-DEV-004
     next_action: Erst nach stabilem Release Candidate einen Betriebs-Readiness-Schnitt planen
+
+  - id: IMP-OPS-002
+    layer: operations
+    title: Business Continuity für Accounts, Zertifikate, Domains und Secrets
+    status: planned
+    priority: P1
+    risk: H
+    owner: Mustafa Demir
+    target_profile: submission
+    rationale: |
+      Das Produkt darf nicht durch Verlust eines einzelnen Apple-, GitHub-,
+      Domain-, Backend- oder 2FA-Zugangs dauerhaft unwartbar werden.
+    acceptance_criteria:
+      - Kritische Accounts, Rollen, Recovery-Wege und Ablaufdaten sind inventarisiert
+      - 2FA-, Zertifikats-, Domain- und Secret-Recovery ist sicher hinterlegt
+      - Rotation und mindestens ein Recovery-Drill sind protokolliert
+      - Least Privilege, Break-glass und Owner-Nachfolge sind dokumentiert
+    evidence:
+      - docs/project/failure-modes.yaml
+      - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+    verification:
+      - Business-Continuity-Checkliste und Recovery-Drill bestehen vor Submission
+    dependencies:
+      - IMP-PROC-003
+    next_action: Kritische Konto- und Credential-Kategorien ohne geheime Werte inventarisieren
