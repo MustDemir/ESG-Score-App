@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-08-10
+Letztes Update: 2026-08-11
 
 ## Aktive ADRs
 
@@ -12,7 +12,7 @@ Letztes Update: 2026-08-10
 |---|---|---|---|---|---|
 | [0001](0001-flutter-frontend.yaml) | Flutter als Frontend-Framework | accepted | 2026-05-19 | frontend, architecture, mobile | — |
 | [0002](0002-supabase-backend.yaml) | Supabase (EU-Frankfurt) als Backend | accepted | 2026-05-19 | backend, database, auth, dsgvo | 0003 |
-| [0003](0003-open-food-facts.yaml) | Open Food Facts als primäre Produktdatenquelle | accepted | 2026-05-19 | data, api, dsgvo, licensing | 0002 |
+| [0003](0003-open-food-facts.yaml) | Open Food Facts als primäre Produktdatenquelle | superseded | 2026-05-19 | data, api, dsgvo, licensing | 0002, 0030 |
 | [0004](0004-no-ai-phase-1.yaml) | Kein KI-/LLM-Layer in Phase 1 (MVP) | accepted | 2026-05-19 | ai, scope, mvp | 0002, 0005 |
 | [0005](0005-reject-argonos.yaml) | ArgonOS (ChapsVision) als KI-Plattform abgelehnt | rejected | 2026-05-19 | ai, evaluation, enterprise | 0004 |
 | [0006](0006-monetization-via-membership.yaml) | Monetarisierung via Membership (Freemium + ScanFair+) | accepted | 2026-05-19 | monetization, business-model, ai, strategy | 0002, 0004 |
@@ -37,6 +37,7 @@ Letztes Update: 2026-08-10
 | [0027](0027-environmental-score-precedence.yaml) | Environmental-Evidenz als Voraussetzung fuer den Gesamt-ESG-Score | accepted | 2026-08-10 | scoring, esg, data-quality, transparency, methodology | 0010, 0011, 0022, 0023, 0025 |
 | [0028](0028-product-scoped-commodity-origin.yaml) | Produktgebundene Rohstoff-Herkunftsbeziehungen | accepted | 2026-08-10 | data, traceability, scoring, context, coffee | 0022, 0023, 0025, 0027 |
 | [0029](0029-lifecycle-gap-control.yaml) | Repo-native Lifecycle-Gap-Kontrolle mit Reifegrad und Evidence Closure | accepted | 2026-08-10 | methodology, governance, risk, quality-gates, release-readiness | 0007, 0009, 0020, 0021, 0022, 0026 |
+| [0030](0030-data-license-composition.yaml) | Quellengetrennte Datenlizenz-Komposition vor Remote-Aktivierung | accepted | 2026-08-11 | data, licensing, odbl, architecture, quality-gates, supabase | 0002, 0020, 0022, 0024, 0025, 0029 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -52,7 +53,7 @@ Letztes Update: 2026-08-10
 | accepted | 25 |
 | rejected | 1 |
 | proposed | 0 |
-| superseded | 1 |
+| superseded | 2 |
 | deprecated | 0 |
 
 ## Tags-Index (häufigste)
@@ -60,14 +61,14 @@ Letztes Update: 2026-08-10
 - **architecture** → 0001, 0014, 0015, 0016, 0022
 - **scanner / ios** → 0017
 - **backend / database** → 0002, 0022
-- **data / api** → 0003, 0016, 0022, 0024, 0025, 0028
+- **data / api** → 0003, 0016, 0022, 0024, 0025, 0028, 0030
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
 - **ci-cd / testing** → 0007, 0020, 0021, 0026, 0029
 - **security / dsgvo** → 0008, 0026
 - **methodology** → 0009, 0011, 0023, 0025, 0028, 0029
 - **scoring / esg** → 0010, 0011, 0023, 0025, 0027, 0028
-- **compliance / governance** → 0009, 0029
+- **compliance / governance** → 0009, 0029, 0030
 
 ## Wartung
 

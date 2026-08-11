@@ -9,6 +9,7 @@ checks = {
     "G-IOS-COMPILE",
     "G-CMP-SCHEMA",
     "G-DATA-ARCH",
+    "G-DATA-LICENSE",
     "G-METHOD-CATALOG",
     "G-LINK-INTEGRITY",
     "G-MISSING-DATA",
@@ -71,6 +72,14 @@ checks = {
     "ESGEvidence",
     "retrieval channel",
     "traceability_relationships",
+    "license-composition-policy.yaml",
+    "G-DATA-LICENSE",
+  ],
+  "docs/project/data/license-composition-policy.yaml" => [
+    "produced_work",
+    "derivative_database",
+    "collective_database_candidate",
+    "enforce_cached_product_license_boundary",
   ],
   "docs/project/methodology-catalog/README.md" => [
     "2.0-draft",

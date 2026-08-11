@@ -290,10 +290,26 @@ class DataProvenanceCard extends StatelessWidget {
                       const Icon(Icons.dataset_outlined, size: 20),
                       const SizedBox(width: ScanFairTokens.space2),
                       Expanded(
-                        child: TerminologyText(
-                          '${source.name} · ${source.datasetLicense}\n'
-                          '${source.attribution}',
-                          style: textTheme.bodySmall,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TerminologyText(
+                              '${source.name}\n'
+                              'Datenquellen-Lizenz: ${source.datasetLicense}\n'
+                              '${source.contentLicense == null ? '' : 'Inhalte: ${source.contentLicense}\n'}'
+                              '${source.imageLicense == null ? '' : 'Produktbilder: ${source.imageLicense}\n'}'
+                              '${source.attribution}'
+                              '${source.publicUseNotice == null ? '' : '\n${source.publicUseNotice}'}',
+                              style: textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: ScanFairTokens.space1),
+                            Text(
+                              'Lizenz: ${source.databaseLicenseUrl}'
+                              '${source.contentLicenseUrl == null ? '' : '\nInhaltslizenz: ${source.contentLicenseUrl}'}'
+                              '${source.imageLicenseUrl == null ? '' : '\nBildlizenz: ${source.imageLicenseUrl}'}',
+                              style: ScanFairTypography.meta,
+                            ),
+                          ],
                         ),
                       ),
                     ],

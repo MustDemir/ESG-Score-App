@@ -62,26 +62,36 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-11
   session_closed_at: null
-  branch: feature/coffee-reference-case
-  status: integration_validated_remote_green
-  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/18
+  branch: compliance/data-license-composition
+  status: next_02_in_review
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/19
   git_state:
     committed: true
     pushed: true
     commits:
-      - f826acd feat: add evidence-first coffee reference case
-      - 2d2d6d0 docs: establish lifecycle gap control
-      - 62d9f63 fix: harden coffee fallback and context isolation
-    reason: Vier PR-Review-Findings sind behoben; lokale Gates und alle fuenf GitHub Required Checks sind gruen
+      - 7b84349 feat: enforce source-partitioned data licensing
+    reason: NEXT-02 ist lokal validiert, auf GitHub gepusht und als Draft Pull Request 19 gegen main eroeffnet
   latest_validation:
-    executed_at: "2026-08-11T07:35:06Z"
-    development_quality_gates: 21/21 PASS
-    flutter_tests: 89/89 PASS
-    flutter_line_coverage: 82.57 percent
+    executed_at: "2026-08-11T09:47:24Z"
+    development_quality_gates: 22/22 PASS
+    flutter_tests: 91/91 PASS
+    flutter_line_coverage: 84.93 percent
     database_migration_replay: PASS
-    database_pgtap: 55/55 PASS
+    database_pgtap: 71/71 PASS
     database_lint: PASS
+    data_license_gate_self_tests: 8/8 PASS with 31 assertions
+    data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
+    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE and G-DATA-LICENSE
   completed:
+    - Pull Request 18 mit Kaffee-Referenzfall und Gap-Control in main gemergt; Post-Merge-CI 31470631999 gruen
+    - OFF-Rechte fuer Datenbank, Inhalte und Bilder auf ODbL-1.0, DbCL-1.0 und CC-BY-SA-3.0 korrigiert und getrennt
+    - Produced Work, Derivative Database und Collective Database konservativ bewertet
+    - ADR 0030 und maschinenlesbaren Lizenzkompositionsvertrag erstellt
+    - SQL-Trigger beschraenkt public.cached_products auf die OFF-Lizenzpartition
+    - In-App-Datenherkunft zeigt Datenbank-, Inhalts- und Bildlizenz samt URIs getrennt
+    - G-DATA-LICENSE mit Development-, Remote- und Release-Candidate-Profil integriert
+    - Remote-Profil blockiert bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung belegt sind
+    - GAP-003 auf Reifegrad 3 und IMP-COMP-005 auf in_progress gesetzt
     - Pull Request 17 mit VoiceOver-Lokalisierung und iPhone-Evidenz in main gemergt
     - Drei Kaffee-Pilot-GTINs live ueber Open Food Facts bestaetigt
     - Offizielle GEPA-Deklaration mit URL und SHA-256 als getrennte Evidenzquelle registriert
@@ -98,8 +108,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Kaffee- und Governance-Inkremente logisch getrennt committen, pushen und per Pull Request integrieren
-    - Danach Claim-, Lizenz- und Privacy-P0-Grenzen vor weiteren Remote-Datenintegrationen schließen
+    - Pull Request 19 und seine GitHub Required Checks reviewen und anschließend in main integrieren
+    - Danach NEXT-03 Claim- und Privacy-P0-Grenzen ausarbeiten
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -107,6 +117,7 @@ session_handoff:
     sessions:
       - sequence: 1
         id: NEXT-01-integrate-current-baseline
+        status: completed
         focus: Aktuellen Kaffee- und Gap-Control-Stand integrieren
         branch: feature/coffee-reference-case
         exit_criteria:
@@ -115,6 +126,7 @@ session_handoff:
           - Post-Merge-main ist grün
       - sequence: 2
         id: NEXT-02-data-license-composition
+        status: validated_local_pending_integration
         focus: OFF-ODbL und Lizenzkomposition entscheiden
         suggested_branch: compliance/data-license-composition
         exit_criteria:
@@ -200,6 +212,7 @@ session_handoff:
       - Datenkorrektur, Rücknahme, Monitoring und Provider-Fallback
       - repräsentative Coverage-, Fach-, Rechts- und Nutzervalidierung
   known_open_points:
+    - Datenlizenz-Remote-Profil bleibt bis qualifiziertem Rechtsreview, Share-Alike-Export und Korrektur/Loeschung rot
     - Node-20-Deprecation fuer actions/upload-artifact ist als TODO-032 offen
     - Release-Candidate-Accessibility wird trotz geschlossenem Development-TODO erneut auditiert
     - TODO-033 haelt die sprachsichere Darstellung dynamischer externer Produktdaten fest
@@ -439,6 +452,17 @@ milestones:
       Projekt-Control-Gate validiert Gap-IDs, Reifegrad, Zielprofil,
       Improvement-/Risiko-/Quellenlinks, Review-Fälligkeit und Closure-Evidenz.
 
+  - id: M24
+    title: Datenlizenz-Komposition lokal durchsetzbar
+    date: 2026-08-11
+    phase: phase-1-mvp
+    notes: |
+      ADR 0030, der maschinenlesbare Lizenzvertrag und G-DATA-LICENSE
+      klassifizieren Produced Work, Derivative Database und Collective
+      Database konservativ. PostgreSQL beschraenkt den Produktcache auf OFF;
+      71 pgTAP-Tests beweisen die Quellenbarriere. Remote-Aktivierung bleibt
+      bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung blockiert.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -564,6 +588,9 @@ decisions_made:
   - adr: 0029
     title: Repo-native Lifecycle-Gap-Kontrolle mit Reifegrad und Evidence Closure
     date: 2026-08-10
+  - adr: 0030
+    title: Quellengetrennte Datenlizenz-Komposition vor Remote-Aktivierung
+    date: 2026-08-11
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -578,6 +605,8 @@ weekly_log:
       gemischter VoiceOver-Aussprache validiert. Drei Kaffee-Pilotprodukte,
       produktgebundene Herkunft und ein repo-natives Product-Engineering-
       sowie Lifecycle-Gap-Control-System ergänzt.
+      Die OFF-Lizenzkomposition ist nun konservativ klassifiziert, technisch
+      quellengetrennt und durch ein profilbasiertes Gate abgesichert.
     done:
       - ADR 0027 als append-only Precedence-Entscheidung angelegt
       - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
@@ -594,6 +623,11 @@ weekly_log:
       - 14 Gaps in Claim-Recht, Lizenzkomposition, Privacy, Methodik, Security, Beta und Betrieb priorisiert
       - Risiken, Definition of Done, Improvements und Primärquellen aktualisiert
       - G-PROJECT-CONTROL um Gap-Reifegrad, Cross-Links und Review-Fälligkeit erweitert
+      - ADR 0030 und maschinenlesbaren Datenlizenz-Kompositionsvertrag erstellt
+      - OFF-Datenbank-, Inhalts- und Bildrechte getrennt auf ODbL, DbCL und CC BY-SA 3.0 abgebildet
+      - SQL-Trigger fuer eine ausschliessliche OFF-Produktcache-Partition umgesetzt
+      - In-App-Attribution um Lizenzklassen und Lizenz-URIs erweitert
+      - G-DATA-LICENSE mit Development-, Remote- und Release-Candidate-Profil integriert
     checks:
       - Scoring-Testmatrix 39/39 PASS
       - Accessibility- und Terminologietests 10/10 PASS
@@ -605,13 +639,19 @@ weekly_log:
       - Supabase-Migration-Replay, pgTAP 55/55 und DB-Lint PASS
       - Xcode-Release-Build, strikte Codesign-Pruefung, Installation und Start PASS
       - G-PROJECT-CONTROL mit 16 Improvements und 14 Lifecycle-Gaps PASS
+      - Datenlizenz-Gate-Selbsttests 8/8 PASS mit 31 Assertions
+      - Development Quality Pipeline 22/22 PASS
+      - Flutter-Test-Suite 91/91 PASS, Line-Coverage 84.93 Prozent
+      - Supabase-Migration-Replay, pgTAP 71/71 und DB-Lint PASS
+      - Remote-Datenlizenzprofil erwartungsgemaess FAIL mit acht Aktivierungsblockern
     blockers:
       - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
       - Apple- und Claim-Release-Evidenz bleibt getrennt offen
+      - Remote-Backend bleibt bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung blockiert
     next_week:
-      - Kaffee- und Gap-Control-Baseline logisch getrennt committen, pushen, reviewen und mergen
-      - Danach ODbL-Lizenzkomposition sowie Claim- und Privacy-Grenzen schließen
+      - Lizenzkompositionsstand committen, pushen, reviewen und mergen
+      - Danach Claim- und Privacy-Grenzen schließen
 
   - week: 2026-W31
     summary: |
@@ -891,7 +931,7 @@ stats:
   todos_done: 20
   todos_parked: 1
   todos_review: 1
-  milestones_reached: 21
+  milestones_reached: 24
   risks_open: 3
   risks_mitigated: 2
   risks_accepted: 1

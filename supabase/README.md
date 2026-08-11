@@ -17,14 +17,16 @@ supabase stop
 
 `db reset --local` recreates the local database and applies every migration.
 Do not run `db reset --linked` against a non-disposable remote project.
-The 51-test pgTAP suite verifies table structure, RLS activation, fact,
+The 71-test pgTAP suite verifies table structure, RLS activation, fact,
 methodology and traceability write denial, relationship eligibility
-constraints, draft-method visibility and owner-only scan behavior.
+constraints, draft-method visibility, owner-only scan behavior and the OFF
+license-partition boundary.
 
 Without Docker, the static gates remain available:
 
 ```bash
 ruby scripts/quality/validate_data_architecture.rb
+ruby scripts/quality/validate_data_license_composition.rb --profile development
 ruby scripts/quality/validate_methodology_catalog.rb
 ruby scripts/quality/validate_scoring_safety.rb --gate link-integrity
 ```
@@ -49,6 +51,11 @@ required Apple privacy review are available.
 - Open Food Facts data keeps source, attribution and ODbL metadata.
 - AGRIBALYSE data keeps version 3.2, Etalab-2.0 attribution and OFF as its
   current retrieval channel.
+- Database, content and image rights are stored separately per source.
+- `cached_products` accepts only the `off-odbl` partition; other raw datasets
+  require dedicated stores.
+- Remote activation fails `G-DATA-LICENSE` until share-alike export,
+  correction/deletion and qualified legal review are complete.
 
 ## Rollback
 

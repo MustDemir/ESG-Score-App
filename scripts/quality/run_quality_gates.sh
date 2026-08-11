@@ -86,6 +86,25 @@ gate_data_architecture() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_data_architecture.rb
 }
 
+gate_data_license() {
+  local data_license_profile="${DATA_LICENSE_PROFILE:-}"
+  if [ -z "$data_license_profile" ]; then
+    case "${COMPLIANCE_PROFILE:-development}" in
+      release_candidate|submission)
+        data_license_profile="release_candidate"
+        ;;
+      *)
+        data_license_profile="development"
+        ;;
+    esac
+  fi
+
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_data_license_gate.rb &&
+    ruby scripts/quality/validate_data_license_composition.rb \
+      --profile "$data_license_profile"
+}
+
 gate_methodology_catalog() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_methodology_catalog.rb
 }
@@ -167,6 +186,7 @@ run_gate "G-REG-UNIT" "Rego policy unit tests" gate_rego_unit_tests
 run_gate "G-CMP-APPLE" "Conftest compliance gates with evidence log" gate_app_compliance
 run_gate "G-CMP-EVIDENCE" "Compliance evidence hash-chain verification" gate_evidence_chain
 run_gate "G-DATA-ARCH" "ESG data schema, RLS and license validation" gate_data_architecture
+run_gate "G-DATA-LICENSE" "ODbL composition and source separation" gate_data_license
 run_gate "G-METHOD-CATALOG" "ESG methodology catalog validation" gate_methodology_catalog
 run_gate "G-LINK-INTEGRITY" "Evidence-backed subject-link integrity" gate_link_integrity
 run_gate "G-MISSING-DATA" "No positive, neutral or zero missing-data imputation" gate_missing_data

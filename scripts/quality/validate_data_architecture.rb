@@ -90,6 +90,14 @@ else
     "relationship context constraint" =>
       "traceability_relationships_context_check",
     "GEPA declaration source" => "'gepa-product-declarations'",
+    "separate content license" => "content_license",
+    "separate image license" => "image_license",
+    "license storage partition" => "license_partition",
+    "source cache policy" => "raw_cache_policy",
+    "OFF DbCL license" => "'dbcl-1.0'",
+    "OFF image license" => "'cc-by-sa-3.0'",
+    "OFF cache boundary trigger" =>
+      "enforce_cached_product_license_boundary",
   }
   required_markers.each do |name, marker|
     violations << "Missing #{name}" unless sql.include?(marker)

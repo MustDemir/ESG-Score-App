@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_updated: 2026-08-10
+last_updated: 2026-08-11
 owner: Mustafa Demir
 purpose: |
   Zentrales Register der aus der Gesamtbewertung abgeleiteten Verbesserungen.
@@ -284,7 +284,7 @@ improvements:
   - id: IMP-COMP-005
     layer: compliance
     title: Datenlizenz-Komposition und produktive Trennungsarchitektur
-    status: planned
+    status: in_progress
     priority: P0
     risk: H
     owner: Mustafa Demir
@@ -304,12 +304,19 @@ improvements:
       - docs/project/data/source-register.yaml
       - docs/project/compliance/source-register.yaml
       - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/audits/2026-08-11-data-license-composition-assessment.md
+      - docs/project/data/license-composition-policy.yaml
+      - docs/project/decisions/0030-data-license-composition.yaml
+      - docs/project/gate-definitions/local/G-DATA-LICENSE.yaml
+      - supabase/migrations/20260811000100_data_license_composition.sql
     verification:
       - G-DATA-ARCH validiert Lizenzklasse und erlaubte Speichergrenze
-      - Architekturreview bestätigt die Remote-Datenbank vor Provisionierung
+      - G-DATA-LICENSE Development-Profil validiert Quellentrennung und Attribution
+      - Negative Gate-Tests beweisen, dass Remote ohne Review, Export und Loeschung blockiert
+      - Architektur- und Rechtsreview bestätigen die Remote-Datenbank vor Provisionierung
     dependencies:
       - IMP-PROC-003
-    next_action: ODbL-Kompositionsszenarien mit dem geplanten Supabase-Schema bewerten
+    next_action: Qualifiziertes Rechtsreview beauftragen und danach Share-Alike-Export sowie Korrektur/Loeschung implementieren
 
   - id: IMP-COMP-006
     layer: compliance

@@ -1,0 +1,217 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-11
+owner: Mustafa Demir
+status: accepted_for_local_development
+
+purpose: |
+  Maschinenlesbarer Vertrag fuer die Trennung, Attribution und spaetere
+  Freigabe von Open-Food-Facts-Daten und weiteren ScanFair-Quellen. Die
+  Klassifikation ist eine konservative Engineering-Risikobewertung und keine
+  Rechtsberatung.
+
+legal_review:
+  status: pending
+  required_before:
+    - remote_backend_activation
+    - external_beta
+    - app_store_release_candidate
+  reviewer_requirement: qualified_data_licensing_counsel
+  evidence_requirement: repository_attestation_with_reviewer_role_date_scope_and_document_hash
+  evidence: null
+
+evidence_contracts:
+  remote_activation:
+    evidence_type: remote_backend_activation
+    required_values:
+      status: approved
+    required_fields:
+      - schema_version
+      - recorded_at
+      - approved_by_role
+      - scope
+      - artifact_sha256
+    digest_field: artifact_sha256
+  legal_review:
+    evidence_type: data_license_legal_review
+    required_values:
+      decision: approved
+      reviewer_role: qualified_data_licensing_counsel
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - scope
+      - document_sha256
+    digest_field: document_sha256
+  share_alike_export:
+    evidence_type: share_alike_export_verification
+    required_values:
+      status: verified
+    required_fields:
+      - schema_version
+      - verified_at
+      - verified_by_role
+      - scope
+      - artifact_sha256
+    digest_field: artifact_sha256
+  correction_and_deletion:
+    evidence_type: correction_deletion_verification
+    required_values:
+      status: verified
+    required_fields:
+      - schema_version
+      - verified_at
+      - verified_by_role
+      - scope
+      - artifact_sha256
+    digest_field: artifact_sha256
+  image_reuse_review:
+    evidence_type: image_reuse_legal_review
+    required_values:
+      decision: approved
+      reviewer_role: qualified_data_licensing_counsel
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - scope
+      - document_sha256
+    digest_field: document_sha256
+
+enforcement_profiles:
+  development:
+    remote_backend_must_be_disabled: true
+    legal_review_may_be_pending: true
+    design_controls_must_be_tested: true
+  remote_backend:
+    remote_backend_must_be_enabled: true
+    legal_review_must_be_approved: true
+    export_and_deletion_must_be_implemented: true
+  release_candidate:
+    inherits: remote_backend
+    in_app_attribution_must_be_verified: true
+    image_reuse_must_be_reviewed: true
+
+source_contracts:
+  open-food-facts:
+    database_license: ODbL-1.0
+    database_license_url: https://opendatacommons.org/licenses/odbl/1-0/
+    contents_license: DbCL-1.0
+    contents_license_url: https://opendatacommons.org/licenses/dbcl/1-0/
+    image_license: CC-BY-SA-3.0
+    image_license_url: https://creativecommons.org/licenses/by-sa/3.0/
+    attribution: Open Food Facts contributors
+    license_partition: off-odbl
+    raw_cache_policy: isolated_source_only
+    public_redistribution_policy: odbl_share_alike
+  agribalyse:
+    database_license: Etalab-2.0
+    contents_license: Etalab-2.0
+    image_license: not_applicable
+    attribution: Source ADEME, AGRIBALYSE v3.2
+    license_partition: agribalyse-etalab
+    raw_cache_policy: dedicated_store_required
+    public_redistribution_policy: attribution_required
+  gepa-product-declarations:
+    database_license: Proprietary-publication
+    contents_license: Proprietary-publication
+    image_license: prohibited_without_separate_permission
+    attribution: GEPA - The Fair Trade Company
+    license_partition: gepa-restricted
+    raw_cache_policy: forbidden
+    public_redistribution_policy: prohibited
+
+composition_scenarios:
+  direct_off_api_result:
+    conservative_classification: produced_work
+    current_status: allowed
+    conditions:
+      - result_keeps_field_level_provenance
+      - in_app_odbl_attribution_is_visible
+      - no_local_raw_database_is_conveyed
+  off_raw_or_normalized_cache:
+    conservative_classification: derivative_database
+    current_status: blocked_for_remote_backend
+    conditions:
+      - dedicated_off_license_partition
+      - odbl_attribution_and_license_notice
+      - share_alike_distribution_path
+      - machine_readable_export_or_alteration_file
+      - deletion_and_refresh_process
+      - qualified_legal_review
+  source_partitioned_evidence_index:
+    conservative_classification: collective_database_candidate
+    current_status: local_schema_only
+    conditions:
+      - source_records_remain_independent
+      - source_and_license_partition_are_mandatory
+      - no_external_raw_product_payload_enters_off_cache
+      - no_restricted_source_content_is_redistributed
+      - qualified_legal_review_before_remote_activation
+  score_snapshot_and_result_ui:
+    conservative_classification: produced_work_candidate
+    current_status: allowed_for_local_mvp
+    conditions:
+      - source_evidence_and_formula_version_remain_traceable
+      - off_attribution_is_associated_with_the_result
+      - snapshot_does_not_redistribute_raw_source_payloads
+      - public_classification_is_confirmed_by_legal_review
+
+architecture_contract:
+  remote_backend:
+    enabled: false
+    activation_decision: blocked_pending_next_03_next_04_and_legal_review
+    activation_evidence: null
+  off_cache:
+    table: public.cached_products
+    allowed_sources:
+      - open-food-facts
+    license_partition: off-odbl
+    external_source_policy: dedicated_store_required
+    database_trigger_required: enforce_cached_product_license_boundary
+  normalized_evidence:
+    table: public.product_evidence
+    model: source_partitioned_collective_index
+    raw_payloads_allowed: false
+    source_id_required: true
+    license_metadata_join_required: true
+  images:
+    persistent_remote_cache_allowed: false
+    runtime_display_source: open_food_facts_image_url
+    attribution_required_when_displayed: true
+    separate_permission_required_for_proprietary_images: true
+    reuse_review_status: pending
+    reuse_review_evidence: null
+  attribution:
+    off_notice: |
+      Enthaelt Informationen aus Open Food Facts, die unter der Open Database
+      License (ODbL) v1.0 verfuegbar sind. Open Food Facts contributors.
+    database_license_url_required: true
+    contents_and_image_license_must_be_separate: true
+  share_alike_export:
+    status: design_only
+    implementation_evidence: null
+    required_before_remote_backend: true
+    required_output: machine_readable_off_partition_or_alteration_file
+  correction_and_deletion:
+    status: design_only
+    implementation_evidence: null
+    required_before_remote_backend: true
+    scope:
+      - source_partition_refresh
+      - source_record_withdrawal
+      - score_snapshot_invalidation
+
+release_blocks:
+  - remote_backend_enabled_without_approved_legal_review
+  - external_product_payload_in_public_cached_products
+  - missing_off_attribution_or_license_url
+  - missing_machine_readable_share_alike_export
+  - missing_source_correction_and_deletion_process
+  - persistent_product_image_cache_without_separate_license_review
+
+primary_sources:
+  - https://openfoodfacts.github.io/documentation/docs/Product-Opener/api/tutorials/license-be-on-the-legal-side/
+  - https://openfoodfacts.github.io/documentation/docs/Product-Opener/api/tutorials/creating-a-local-cache-of-open-food-facts-data/
+  - https://opendatacommons.org/licenses/odbl/1-0/
+  - https://opendatacommons.org/licenses/dbcl/1-0/
+  - https://creativecommons.org/licenses/by-sa/3.0/
+  - https://www.etalab.gouv.fr/wp-content/uploads/2018/11/open-licence.pdf

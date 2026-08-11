@@ -30,7 +30,8 @@ im Speicher. Es findet noch keine Cloud-Speicherung des Scan-Verlaufs statt.
 Aktuell keine Tracking-SDKs. Crashlogs nur bei expliziter Opt-In-Zustimmung.
 
 ## Drittanbieter
-- **Open Food Facts** — Datenbank: ODbL; Produktbilder: CC BY-SA; Frankreich
+- **Open Food Facts** — Datenbank: ODbL 1.0; Inhalte: DbCL 1.0;
+  Produktbilder: CC BY-SA 3.0; Frankreich
 - **Supabase** — technisch vorbereitet, im aktuellen MVP nicht verbunden
 - **Apple** — Bei iOS-Nutzung (App Store, TestFlight, Sign-In)
 

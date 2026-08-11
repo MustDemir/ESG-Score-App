@@ -1,0 +1,75 @@
+id: 0030
+title: Source-partitioned data-license composition before remote activation
+date: 2026-08-11
+status: accepted
+deciders: [Mustafa]
+tags: [data, licensing, odbl, architecture, quality-gates, supabase]
+
+context: |
+  Open Food Facts separates rights in its database, individual contents and
+  product images. ODbL share-alike duties can apply to a publicly used
+  Derivative Database and require attribution for a publicly used Produced
+  Work. Open Food Facts also instructs cache implementers not to mix OFF data
+  with external product data. ScanFair plans to combine OFF, AGRIBALYSE and
+  restricted source declarations, but no remote Supabase project is active.
+
+options_considered:
+  - name: One combined product cache for every source
+    pros: [simple reads, few tables]
+    cons:
+      - unclear Derivative Database boundary
+      - risk of ODbL share-alike reaching incompatible source content
+      - conflicts with current OFF cache guidance
+  - name: No caching and only direct API calls
+    pros: [smallest immediate licensing surface]
+    cons:
+      - no reproducible evidence snapshots
+      - weak outage, correction and audit behavior
+      - does not support the planned multi-source backend
+  - name: Source-partitioned stores plus a provenance-only integration layer
+    pros:
+      - raw OFF product data remains isolated
+      - restricted publications are not redistributed
+      - score results can retain source-level attribution and lineage
+      - remote activation can be blocked until export and legal review exist
+    cons:
+      - additional storage and operational processes
+      - Collective Database and Produced Work classification still needs legal review
+
+decision: Source-partitioned stores plus a provenance-only integration layer
+rationale: |
+  ScanFair applies the most conservative practical classification: an OFF raw
+  or normalized cache is treated as a Derivative Database, the source-separated
+  evidence index as a Collective Database candidate and the result UI or score
+  snapshot as a Produced Work candidate. The current generic product cache is
+  restricted to OFF. Other raw source datasets require dedicated stores.
+  Remote activation and release remain blocked until machine-readable
+  share-alike export, correction/deletion and qualified legal review are proven.
+
+implementation:
+  contract: docs/project/data/license-composition-policy.yaml
+  database:
+    - Database, content and image rights are stored separately.
+    - public.cached_products accepts only the OFF license partition.
+    - External raw product datasets require dedicated source stores.
+    - Restricted publications contribute factual assertions and provenance only.
+  application:
+    - Result details show database, content and image licenses separately.
+    - OFF attribution and the ODbL license URI remain associated with the result.
+  quality_gate:
+    id: G-DATA-LICENSE
+    profiles:
+      - development
+      - remote_backend
+      - release_candidate
+
+consequences:
+  - Local direct-API development can continue without a remote cache.
+  - A green development pipeline is not a legal approval for public use.
+  - Future WRI, ILAB, GLEIF and BRIS integrations need their own source partitions.
+  - Remote Supabase work must fail the license gate until legal, export and deletion evidence exists.
+  - Product-image persistence remains prohibited until separately reviewed.
+
+supersedes: 0003
+superseded_by: null
+related: [0002, 0020, 0022, 0024, 0025, 0029]

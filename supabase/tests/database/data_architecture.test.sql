@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(55);
+select plan(71);
 
 select has_table('public', 'data_sources', 'data_sources table exists');
 select has_table('public', 'cached_products', 'cached_products table exists');
@@ -71,6 +71,54 @@ select has_column(
   'context_entity_id',
   'commodity-origin relationship records product context'
 );
+select has_column(
+  'public',
+  'data_sources',
+  'content_license',
+  'data source records content license separately'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'image_license',
+  'data source records image license separately'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'database_license_url',
+  'data source records database license URL'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'content_license_url',
+  'data source records content license URL'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'image_license_url',
+  'data source records image license URL'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'license_partition',
+  'data source records its license partition'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'raw_cache_policy',
+  'data source records its raw cache policy'
+);
+select has_column(
+  'public',
+  'data_sources',
+  'public_redistribution_policy',
+  'data source records its redistribution policy'
+);
 
 select is(
   (
@@ -130,6 +178,110 @@ select results_eq(
   $$,
   array['ODbL-1.0'::text],
   'Open Food Facts license is registered'
+);
+
+select results_eq(
+  $$
+    select content_license
+    from public.data_sources
+    where id = 'open-food-facts'
+  $$,
+  array['DbCL-1.0'::text],
+  'Open Food Facts content license is registered'
+);
+
+select results_eq(
+  $$
+    select database_license_url
+    from public.data_sources
+    where id = 'open-food-facts'
+  $$,
+  array['https://opendatacommons.org/licenses/odbl/1-0/'::text],
+  'Open Food Facts ODbL URL is registered'
+);
+
+select results_eq(
+  $$
+    select image_license
+    from public.data_sources
+    where id = 'open-food-facts'
+  $$,
+  array['CC-BY-SA-3.0'::text],
+  'Open Food Facts image license is registered'
+);
+
+select results_eq(
+  $$
+    select license_partition
+    from public.data_sources
+    where id = 'open-food-facts'
+  $$,
+  array['off-odbl'::text],
+  'Open Food Facts uses a dedicated license partition'
+);
+
+select results_eq(
+  $$
+    select raw_cache_policy
+    from public.data_sources
+    where id = 'agribalyse'
+  $$,
+  array['dedicated_store_required'::text],
+  'AGRIBALYSE requires a dedicated raw-data store'
+);
+
+select results_eq(
+  $$
+    select raw_cache_policy
+    from public.data_sources
+    where id = 'gepa-product-declarations'
+  $$,
+  array['forbidden'::text],
+  'GEPA raw publication caching is forbidden'
+);
+
+select lives_ok(
+  $$
+    insert into public.cached_products (
+      source_id,
+      barcode,
+      payload,
+      payload_sha256,
+      fetched_at,
+      expires_at
+    ) values (
+      'open-food-facts',
+      '12345678',
+      '{"product_name":"ODbL fixture"}'::jsonb,
+      repeat('a', 64),
+      timezone('utc', now()),
+      timezone('utc', now()) + interval '1 day'
+    )
+  $$,
+  'OFF payload can enter the isolated product cache'
+);
+
+select throws_ok(
+  $$
+    insert into public.cached_products (
+      source_id,
+      barcode,
+      payload,
+      payload_sha256,
+      fetched_at,
+      expires_at
+    ) values (
+      'agribalyse',
+      '87654321',
+      '{"name":"external fixture"}'::jsonb,
+      repeat('b', 64),
+      timezone('utc', now()),
+      timezone('utc', now()) + interval '1 day'
+    )
+  $$,
+  '23514',
+  'external product data requires a dedicated license store',
+  'external raw data cannot enter the OFF product cache'
 );
 
 select results_eq(

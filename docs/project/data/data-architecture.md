@@ -143,10 +143,27 @@ handling remains deferred until calibration and expert review.
 
 ## License boundary
 
-Open Food Facts database data is ODbL-licensed and requires attribution and
-share-alike handling. AGRIBALYSE 3.2 uses Etalab Open Licence 2.0 and requires
-ADEME attribution. Sources remain logically separated and the retrieval
-channel is explicit, avoiding a combined anonymous dataset.
+Open Food Facts database data is ODbL-1.0, individual contents use DbCL-1.0
+and product images use CC-BY-SA-3.0. ScanFair conservatively classifies the
+result UI as a Produced Work, an OFF raw or normalized cache as a Derivative
+Database and the source-partitioned evidence index as a Collective Database
+candidate. The result retains attribution and license URIs.
+
+`public.cached_products` is the isolated `off-odbl` partition. A database
+trigger rejects AGRIBALYSE, GEPA and every other external product source from
+that table. Future raw datasets require dedicated stores. The normalized
+evidence layer may retain source-specific factual rows and provenance but no
+foreign raw payloads. Persistent remote product-image caching remains
+disabled pending separate review.
+
+AGRIBALYSE 3.2 uses Etalab Open Licence 2.0 and requires ADEME attribution.
+GEPA publications remain restricted: only extracted factual declarations and
+provenance are retained. The full contract is machine-readable in
+`license-composition-policy.yaml` and enforced by `G-DATA-LICENSE`.
+
+The development profile passes only while no remote backend is active. Remote
+activation and release candidate profiles require machine-readable ODbL
+share-alike export, correction/deletion processes and qualified legal review.
 GEPA product publications are treated as proprietary source publications.
 ScanFair stores only extracted factual declarations and provenance for the
 local pilot, does not redistribute the document and labels the statements as
@@ -158,8 +175,10 @@ manufacturer declarations rather than independent audit evidence.
 2. Add ILAB commodity-country risk as contextual, non-accusatory evidence.
 3. Resolve brand to legal entity through GLEIF/BRIS-compatible identifiers.
 4. Calibrate GHG normalization and missing-data behavior with test products.
-5. Create a dedicated EU development project and retain DPA/region evidence.
-6. Add a server-side cache writer and a read-only Flutter cache adapter.
+5. Complete qualified data-license review and implement partition export and
+   correction/deletion before remote activation.
+6. Create a dedicated EU development project and retain DPA/region evidence.
+7. Add a server-side cache writer and a read-only Flutter cache adapter.
 
 ## Primary references
 
