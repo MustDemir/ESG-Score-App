@@ -1,0 +1,47 @@
+id: G-PRIVACY-BOUNDARY
+name: Actual-data-flow and privacy activation boundary
+dimension: compliance
+lifecycle_phase: architecture-and-release
+trigger: Pull request, SDK or permission change, external beta, remote backend or release
+policy_checks:
+  - Data type, purpose, necessity, recipient, region and retention are versioned
+  - Camera frames stay on device and no ScanFair cloud history is active
+  - Direct Open Food Facts requests disclose network-metadata uncertainty
+  - Planned backend, accounts, analytics, tracking and location remain disabled by default
+  - Beta and remote activation require matching privacy, DPIA, processor and rights evidence
+evidence_required:
+  - docs/project/compliance/privacy-data-inventory.yaml
+  - docs/project/compliance/privacy-data-flow.md
+  - docs/privacy.md
+  - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
+  - scripts/quality/test_claims_privacy_gate.rb
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - GAP-004
+    - IMP-COMP-006
+    - R-AS-01
+    - R-AS-02
+    - R-DSGVO-01
+  related_adrs:
+    - 0017
+    - 0021
+    - 0031
+sources:
+  - EU-GDPR
+  - EDPB-DPIA-WP248
+  - BFDI-DPIA
+  - APPLE-APP-PRIVACY
+  - APPLE-APP-PRIVACY-DETAILS
+notes: |
+  Development PASS proves that documentation matches the local MVP, not that
+  a beta or backend is privacy-approved. Strict profiles require qualified,
+  typed and hash-bound evidence and reject status-only attestations.

@@ -48,8 +48,11 @@ docs/project/
 │   ├── scanner/state.yaml
 │   ├── scoring/state.yaml
 │   └── results/state.yaml
-├── compliance/            # Apple-, DSGVO-, Supply-Chain- und MASVS-Mapping
+├── compliance/            # Apple-, DSGVO-, Claim-, Privacy-, Supply-Chain- und MASVS-Mapping
 │   ├── apple-review-relevance.md
+│   ├── claim-inventory.yaml
+│   ├── privacy-data-inventory.yaml
+│   ├── privacy-data-flow.md
 │   └── owasp-masvs-ios-baseline.yaml
 ├── requirements/          # Compliance-Anforderungen (R-AS-NN, R-DSGVO-NN, ...)
 ├── gate-definitions/      # Pruefbare Apple- und lokale Gate-Spezifikationen
@@ -89,6 +92,9 @@ prüft dieses Modell wiederholt auf blinde Flecken. Der aktuelle Befund liegt im
 Die aktuelle OFF-/ODbL-Entscheidung und ihre Remote-Blocker sind im
 [Data-License Composition Assessment](audits/2026-08-11-data-license-composition-assessment.md)
 festgehalten.
+Claim-, Nährwert- und Privacy-Aktivierungsgrenzen mit verbleibender Rechts-,
+Fach- und DPIA-Evidenz stehen im
+[Claims and Privacy Boundary Assessment](audits/2026-08-11-claims-privacy-boundaries-assessment.md).
 
 ## Schnellzugriff für Claude Code
 

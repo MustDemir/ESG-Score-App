@@ -15,10 +15,8 @@ class ScanFairProduct {
     this.ecoscoreScore,
     this.co2Total,
     this.ingredientsText,
-    this.secondaryTitle = 'Gesundheit',
-    this.secondaryLabel = 'zur Information',
-    this.secondaryFacts = 'Zusatzhinweis, kein Teil des ESG-Scores.',
-    this.secondaryPosition = 5,
+    this.nutritionSourceLabel = 'Produktdatenquelle',
+    this.nutritionFacts = 'Keine belastbaren Nährwertangaben verfügbar.',
     this.packagingTags = const [],
     this.originTags = const [],
     this.labelsTags = const [],
@@ -38,10 +36,8 @@ class ScanFairProduct {
   final double? ecoscoreScore;
   final double? co2Total;
   final String? ingredientsText;
-  final String secondaryTitle;
-  final String secondaryLabel;
-  final String secondaryFacts;
-  final double secondaryPosition;
+  final String nutritionSourceLabel;
+  final String nutritionFacts;
   final List<String> packagingTags;
   final List<String> originTags;
   final List<String> labelsTags;

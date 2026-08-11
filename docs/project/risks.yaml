@@ -1,4 +1,4 @@
-last_updated: 2026-08-10
+last_updated: 2026-08-11
 
 # Bewertung:
 #   likelihood: L (low) | M (medium) | H (high)
@@ -107,22 +107,23 @@ risks:
     impact: H
     score: 6
     description: |
-      Ohne saubere Privacy Policy, Cookie-Banner-Äquivalent,
-      Auftragsverarbeitungsverträge mit Supabase → Abmahnrisiko,
-      App-Store-Ablehnung.
+      Eine Abweichung zwischen realem Datenfluss, Datenschutzerklärung, Apple
+      App Privacy Details, Rechtsgrundlage oder Provider-Verträgen kann zu
+      Datenschutzverstößen und App-Store-Ablehnung führen.
     mitigation: |
       Aktueller lokaler MVP verwendet kein Konto, kein Analytics-SDK und kein
-      Remote-Supabase-Projekt. RLS, Privacy Manifest und SDK-Audit bestehen.
-      Vor Remote-Backend oder externer Beta bleiben Datenfluss,
-      Rechtsgrundlagen, AVV, Retention, Betroffenenrechte, Incident und
-      DPIA-Entscheidung zu operationalisieren.
+      Remote-Supabase-Projekt. Dateninventar, aktueller/geplanter Datenfluss,
+      Privacy Manifest, SDK-Audit und G-PRIVACY-BOUNDARY bestehen im
+      Development-Profil. Externe Beta und Remote-Backend bleiben bis
+      qualifiziertem Rechts-/DPIA-Review, App Privacy, AVV, Retention,
+      Betroffenenrechten, Löschung und Incident-Prozess blockiert.
     related_todos: [TODO-008]
     related_gaps: [GAP-004]
     related_improvements: [IMP-COMP-006]
     status: open
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-08-10
+    updated: 2026-08-11
 
   - id: RISK-006
     title: ODbL-Kompositionspflichten kollidieren mit weiteren Datenquellen
@@ -159,14 +160,17 @@ risks:
       und Methodik tragen. Ab 27. September 2026 verschärft die Umsetzung der
       Richtlinie (EU) 2024/825 den Rahmen für Umweltaussagen zusätzlich.
     mitigation: |
-      Claim-Inventar, evidenzgebundene Formulierungen, technische Claim-Safety,
-      EU-Health-Claims-Prüfung und qualifiziertes Rechts-/Fachreview vor
-      öffentlicher Aktivierung.
+      Versioniertes Claim-Inventar, neutrale Nährwertanzeige ohne Health-Score,
+      evidenzgebundene Formulierungen sowie G-CLAIM-SAFETY und
+      G-CLAIM-GOVERNANCE sind umgesetzt. Öffentliche Aktivierung bleibt bis
+      Kalibrierung, EU-Health-Claims-Prüfung und qualifiziertem Rechts-/Fachreview
+      mit Hash-Evidenz blockiert.
     related_gaps: [GAP-002, GAP-013]
     related_improvements: [IMP-COMP-004]
     status: open
     owner: Mustafa
     created: 2026-08-10
+    updated: 2026-08-11
 
   - id: RISK-008
     title: Remote-Writer oder Adminpfad manipuliert Evidenz und Scores

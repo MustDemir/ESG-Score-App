@@ -1,0 +1,43 @@
+id: G-CLAIM-GOVERNANCE
+name: Versioned consumer-claim and nutrition boundary
+dimension: compliance
+lifecycle_phase: product-and-release
+trigger: Pull request, result-copy change, scoring change, public beta or release
+policy_checks:
+  - App, App Store and website claims are inventoried by claim class
+  - Every claim is bound to evidence, methodology version and confidence rule
+  - Generic environmental, absolute ESG and unsupported human-rights claims are prohibited
+  - Nutrition information has no health score, benefit wording or progress indicator
+  - External activation requires typed, hash-bound legal and subject-matter review evidence
+evidence_required:
+  - docs/project/compliance/claim-inventory.yaml
+  - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
+  - scripts/quality/test_claims_privacy_gate.rb
+  - .quality/quality-gate-report.md
+decision: block
+owner: Mustafa
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - GAP-002
+    - IMP-COMP-004
+    - R-AS-27
+  related_adrs:
+    - 0021
+    - 0027
+    - 0031
+sources:
+  - EU-ECGT-2024-825
+  - DE-UWG-EMP-CO
+  - EU-NHCR-1924-2006
+  - EU-HEALTH-CLAIMS-REGISTER
+  - APPLE-ARG
+notes: |
+  Development PASS validates the conservative inventory and runtime boundary;
+  it is not legal or scientific approval. External-beta and release profiles
+  fail closed until the reviewed claim set and typed hash evidence are present.

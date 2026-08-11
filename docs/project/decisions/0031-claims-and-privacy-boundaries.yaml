@@ -1,0 +1,74 @@
+id: 0031
+title: Fail-closed claim and privacy boundaries before external activation
+date: 2026-08-11
+status: accepted
+deciders: [Mustafa]
+tags: [compliance, claims, privacy, nutrition, app-store, quality-gates]
+
+context: |
+  ScanFair displays an ESG score, traffic-light signals and a separate food
+  information card. Those elements can create explicit or implied commercial
+  environmental, sustainability, nutrition or health claims. The iOS MVP also
+  sends a scanned barcode directly to Open Food Facts, exposing request network
+  metadata even though ScanFair has no account, analytics or remote backend.
+  Existing controls covered claim safety and Apple privacy declarations but did
+  not bind the complete public claim set and actual data flow to typed evidence.
+
+options_considered:
+  - name: Treat disclaimers and App Store declarations as sufficient
+    pros: [low implementation effort]
+    cons:
+      - no complete inventory of explicit and implied claims
+      - no proof that declarations match runtime data flow
+      - no controlled legal, domain or DPIA activation decision
+  - name: Remove every ESG and nutrition presentation until final review
+    pros: [smallest public claim surface]
+    cons:
+      - prevents local usability and methodology development
+      - does not create the evidence process required for later release
+  - name: Keep local development with strict activation profiles
+    pros:
+      - local product work can continue with visible limitations
+      - unsafe health presentation is removed immediately
+      - beta, remote and release activation fail closed on typed evidence
+      - runtime behavior, documentation and Apple declarations remain comparable
+    cons:
+      - qualified legal and subject-matter reviews remain external dependencies
+      - more versioned artifacts must be maintained with every feature change
+
+decision: Keep local development with strict activation profiles
+rationale: |
+  Regulatory conservatism should prevent unsupported public activation without
+  blocking evidence-producing local engineering. ScanFair therefore separates
+  a green development boundary from legal or scientific approval. The food
+  companion card is reduced to neutral source facts named Nährwert-Hinweis and
+  has no score, progress bar, beneficial wording or individual advice. Claims
+  and privacy data flows are inventoried. External beta, remote backend and
+  release profiles require typed, repository-bound and SHA-256-verified review
+  evidence; status labels or arbitrary placeholder files cannot pass.
+
+implementation:
+  claims:
+    inventory: docs/project/compliance/claim-inventory.yaml
+    gate: G-CLAIM-GOVERNANCE
+    profiles: [development, external_beta, release_candidate]
+  privacy:
+    inventory: docs/project/compliance/privacy-data-inventory.yaml
+    data_flow: docs/project/compliance/privacy-data-flow.md
+    gate: G-PRIVACY-BOUNDARY
+    profiles: [development, external_beta, remote_backend, release_candidate]
+  application:
+    - Nutrition card presents factual source information only.
+    - No nutrition or health score, rank or progress indicator is rendered.
+    - Camera images remain on device and runtime products remain volatile.
+
+consequences:
+  - Development PASS is explicitly not a legal, scientific or App Store approval.
+  - Public ESG scores remain blocked until calibration and claim review are approved.
+  - External beta remains blocked until privacy, DPIA and App Privacy evidence exists.
+  - Remote backend remains blocked until separate processor, rights and security controls pass.
+  - Every new claim, SDK, data type, purpose, recipient or retention change must update the inventories.
+
+supersedes: null
+superseded_by: null
+related: [0013, 0017, 0021, 0023, 0027, 0029, 0030]

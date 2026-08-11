@@ -205,7 +205,6 @@ class SecondaryInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
-    final position = (product.secondaryPosition / 10).clamp(0.0, 1.0);
 
     return Card(
       child: Padding(
@@ -213,26 +212,21 @@ class SecondaryInfoCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(product.secondaryTitle, style: textTheme.titleMedium),
+            Text('Nährwert-Hinweis', style: textTheme.titleMedium),
             const SizedBox(height: ScanFairTokens.space1),
             TerminologyText(
-              'Begleithinweis · kein ESG-Score',
+              'Fakten aus der angegebenen Produktdatenquelle · kein Score',
               style: ScanFairTypography.meta,
             ),
             const SizedBox(height: ScanFairTokens.space3),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(ScanFairTokens.radiusPill),
-              child: LinearProgressIndicator(
-                minHeight: 10,
-                value: position,
-                backgroundColor: ScanFairTokens.bgAlt,
-                color: ScanFairTokens.green500,
-              ),
-            ),
-            const SizedBox(height: ScanFairTokens.space3),
-            Text(product.secondaryLabel, style: textTheme.titleSmall),
+            Text(product.nutritionSourceLabel, style: textTheme.titleSmall),
             const SizedBox(height: ScanFairTokens.space1),
-            TerminologyText(product.secondaryFacts, style: textTheme.bodySmall),
+            TerminologyText(product.nutritionFacts, style: textTheme.bodySmall),
+            const SizedBox(height: ScanFairTokens.space3),
+            TerminologyText(
+              'Keine medizinische oder individuelle Ernährungsberatung.',
+              style: ScanFairTypography.meta,
+            ),
           ],
         ),
       ),

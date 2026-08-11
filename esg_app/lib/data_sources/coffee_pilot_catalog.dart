@@ -101,10 +101,8 @@ class CoffeePilotCatalog {
       ecoscoreScore: product.ecoscoreScore,
       co2Total: product.co2Total,
       ingredientsText: product.ingredientsText,
-      secondaryTitle: product.secondaryTitle,
-      secondaryLabel: product.secondaryLabel,
-      secondaryFacts: product.secondaryFacts,
-      secondaryPosition: product.secondaryPosition,
+      nutritionSourceLabel: product.nutritionSourceLabel,
+      nutritionFacts: product.nutritionFacts,
       packagingTags: product.packagingTags,
       originTags: product.originTags,
       labelsTags: product.labelsTags,
@@ -138,7 +136,8 @@ class CoffeePilotCatalog {
         'missing-environmental-score',
         'pilot-source-fallback',
       ],
-      secondaryFacts: 'Keine belastbaren Gesundheitsdaten im Pilotdatensatz.',
+      nutritionSourceLabel: 'Kaffee-Pilotdatensatz',
+      nutritionFacts: 'Keine belastbaren Nährwertangaben im Pilotdatensatz.',
     );
   }
 

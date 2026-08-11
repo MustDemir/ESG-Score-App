@@ -34,6 +34,9 @@ void main() {
               {'id': 'en:cocoa', 'text': 'Cocoa'},
             ],
             'ingredients_text': 'cocoa, sugar',
+            'nutrition_grades': 'd',
+            'nutriments': {'sugars_100g': 47, 'sugars_unit': 'g'},
+            'nova_group': 4,
             'origins_tags': ['en:ghana'],
             'labels_tags': ['en:organic'],
             'schema_version': 1004,
@@ -53,6 +56,11 @@ void main() {
     expect(product.ecoscoreGrade, 'b');
     expect(product.ecoscoreScore, 72);
     expect(product.co2Total, 3.4);
+    expect(product.nutritionSourceLabel, 'Open Food Facts');
+    expect(
+      product.nutritionFacts,
+      'Nutri-Score D · Zucker 47 g/100 g · NOVA 4',
+    );
     expect(product.evidence, isNotEmpty);
     expect(
       product.dataSources.map((source) => source.id),
@@ -100,6 +108,14 @@ void main() {
       capturedRequest.url.queryParameters['fields'],
       contains('product_name'),
     );
+    expect(
+      capturedRequest.url.queryParameters['fields'],
+      contains('nutriments'),
+    );
+    expect(
+      capturedRequest.url.queryParameters['fields'],
+      contains('nova_group'),
+    );
   });
 
   test('keeps compatibility with legacy ecoscore fields', () async {
@@ -131,6 +147,11 @@ void main() {
     expect(
       product.evidenceFor('co2_total').single.source.id,
       'open-food-facts',
+    );
+    expect(product.nutritionSourceLabel, 'Open Food Facts');
+    expect(
+      product.nutritionFacts,
+      'Keine belastbaren Nährwertangaben verfügbar.',
     );
   });
 

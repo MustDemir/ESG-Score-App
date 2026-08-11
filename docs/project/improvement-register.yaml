@@ -254,7 +254,7 @@ improvements:
   - id: IMP-COMP-004
     layer: compliance
     title: Umwelt-, Nachhaltigkeits- und Health-Claim-Governance
-    status: planned
+    status: in_progress
     priority: P0
     risk: H
     owner: Mustafa Demir
@@ -274,12 +274,19 @@ improvements:
       - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
       - docs/project/compliance/source-register.yaml
       - docs/project/gate-definitions/local/G-CLAIM-SAFETY.yaml
+      - docs/project/audits/2026-08-11-claims-privacy-boundaries-assessment.md
+      - docs/project/compliance/claim-inventory.yaml
+      - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
+      - docs/project/gate-definitions/local/G-CLAIM-GOVERNANCE.yaml
+      - scripts/quality/test_claims_privacy_gate.rb
+      - esg_app/test/widgets/nutrition_information_card_test.dart
     verification:
       - G-CLAIM-SAFETY blockiert nicht belegte oder zu starke In-App-Claims
-      - Manuelles Release-Review bestätigt App-, Store- und Marketing-Claims
+      - G-CLAIM-GOVERNANCE Development-Profil und Gate-Selbsttests bestehen
+      - External-Beta- und Release-Profile blockieren bis Rechts- und Fachreview
     dependencies:
       - IMP-PROC-003
-    next_action: Versioniertes Claim-Inventar und Rechts-/Fachreview-Template erstellen
+    next_action: Score kalibrieren, Webseiten-Snapshot inventarisieren und qualifiziertes Rechts-/Fachreview mit Hash-Evidenz beauftragen
 
   - id: IMP-COMP-005
     layer: compliance
@@ -321,7 +328,7 @@ improvements:
   - id: IMP-COMP-006
     layer: compliance
     title: Datenschutz-Betriebsmodell und Data-Protection-Readiness
-    status: planned
+    status: in_progress
     priority: P0
     risk: H
     owner: Mustafa Demir
@@ -341,12 +348,20 @@ improvements:
       - docs/project/compliance/dsgvo-relevance.md
       - docs/project/compliance/source-register.yaml
       - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/audits/2026-08-11-claims-privacy-boundaries-assessment.md
+      - docs/project/compliance/privacy-data-inventory.yaml
+      - docs/project/compliance/privacy-data-flow.md
+      - docs/privacy.md
+      - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
+      - docs/project/gate-definitions/local/G-PRIVACY-BOUNDARY.yaml
+      - scripts/quality/test_claims_privacy_gate.rb
     verification:
-      - Privacy- und Release-Candidate-Gates besitzen keine offene anwendbare MUST-Evidenz
-      - Datenfluss und App Store Privacy Details stimmen mit dem Build und Backend überein
+      - G-PRIVACY-BOUNDARY Development-Profil und Gate-Selbsttests bestehen
+      - External-Beta-, Remote- und Release-Profile blockieren offene Evidenz
+      - Datenfluss und App Store Privacy Details stimmen vor Freigabe mit Build und Backend überein
     dependencies:
       - IMP-PROC-003
-    next_action: Datentyp-, Zweck-, Empfänger- und Retention-Matrix für MVP und geplanten Cache erstellen
+    next_action: Provider-Rollen, Rechtsgrundlagen und DPIA qualifiziert prüfen; danach App Privacy, AVV, Rechte-, Lösch- und Incident-Prozesse operationalisieren
 
   - id: IMP-COMP-007
     layer: compliance

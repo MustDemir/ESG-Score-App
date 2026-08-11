@@ -129,6 +129,34 @@ gate_claim_safety() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_scoring_safety.rb --gate claim-safety
 }
 
+gate_claim_governance() {
+  local profile="${CLAIM_GOVERNANCE_PROFILE:-}"
+  if [ -z "$profile" ]; then
+    case "${COMPLIANCE_PROFILE:-development}" in
+      release_candidate|submission) profile="release_candidate" ;;
+      *) profile="development" ;;
+    esac
+  fi
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_claims_privacy_gate.rb --gate claims &&
+    ruby scripts/quality/validate_claims_privacy_boundaries.rb \
+      --gate claims --profile "$profile"
+}
+
+gate_privacy_boundary() {
+  local profile="${PRIVACY_BOUNDARY_PROFILE:-}"
+  if [ -z "$profile" ]; then
+    case "${COMPLIANCE_PROFILE:-development}" in
+      release_candidate|submission) profile="release_candidate" ;;
+      *) profile="development" ;;
+    esac
+  fi
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_claims_privacy_gate.rb --gate privacy &&
+    ruby scripts/quality/validate_claims_privacy_boundaries.rb \
+      --gate privacy --profile "$profile"
+}
+
 gate_project_control() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_project_control.rb
 }
@@ -193,6 +221,8 @@ run_gate "G-MISSING-DATA" "No positive, neutral or zero missing-data imputation"
 run_gate "G-RED-FLAG" "Non-compensatory severe-risk controls" gate_red_flag
 run_gate "G-SCORE-REPRO" "Versioned score-input reproducibility" gate_score_reproducibility
 run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
+run_gate "G-CLAIM-GOVERNANCE" "Versioned claims and nutrition boundary" gate_claim_governance
+run_gate "G-PRIVACY-BOUNDARY" "Actual data-flow and privacy activation boundary" gate_privacy_boundary
 run_gate "G-PROJECT-CONTROL" "Gap, improvement and feature-state traceability" gate_project_control
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
