@@ -16,6 +16,8 @@ checks = {
     "G-RED-FLAG",
     "G-SCORE-REPRO",
     "G-CLAIM-SAFETY",
+    "G-CLAIM-GOVERNANCE",
+    "G-PRIVACY-BOUNDARY",
     "G-PROJECT-CONTROL",
     "G-SUPPLY-CHAIN",
     "AGRIBALYSE 3.2",
@@ -62,6 +64,22 @@ checks = {
   ],
   "docs/project/compliance/source-register.yaml" => [
     "APPLE-ARG",
+    "EDPB-DPIA-WP248",
+    "DE-UWG-EMP-CO",
+  ],
+  "docs/project/compliance/claim-inventory.yaml" => [
+    "Nährwert-Hinweis",
+    "website_marketing",
+    "blocked_pending_methodology_legal_and_domain_review",
+  ],
+  "docs/project/compliance/privacy-data-inventory.yaml" => [
+    "request_network_metadata",
+    "remote_backend_enabled: false",
+    "screening_required_before_activation",
+  ],
+  "docs/project/compliance/privacy-data-flow.md" => [
+    "Current Data Flow",
+    "DPIA Decision Path",
   ],
   "esg_app/README.md" => [
     "flutter run",

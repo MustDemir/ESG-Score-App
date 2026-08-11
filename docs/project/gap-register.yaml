@@ -76,17 +76,18 @@ gaps:
     domain: legal_claims
     title: Verbraucherrechtliche Kontrolle von Umwelt-, Nachhaltigkeits- und Health-Claims
     gap_type: partial
-    status: open
+    status: in_progress
     priority: P0
     target_profile: release_candidate
-    maturity_current: 1
+    maturity_current: 3
     maturity_target: 4
     owner: Mustafa Demir
     trigger: Vor öffentlicher Beta, Marketing oder App-Store-Submission
     concern: |
-      Technische Claim-Safety existiert, aber es fehlt ein rechtlich und
-      fachlich freigegebenes Claim-Inventar für Score, Ampelfarben,
-      Umweltbehauptungen und den separaten Health-Hinweis.
+      Claim-Inventar, neutrale Nährwertgrenze und profilbasiertes Gate sind
+      umgesetzt. Öffentliche Aktivierung bleibt blockiert, bis Score und
+      Ampelfarben kalibriert sowie alle App-, Store- und Webseitenclaims
+      rechtlich und fachlich freigegeben sind.
     closure_criteria:
       - Alle In-App- und Marketing-Claims sind inventarisiert und klassifiziert
       - Jede Umwelt- oder Nachhaltigkeitsaussage besitzt spezifische, aktuelle Evidenz
@@ -101,8 +102,16 @@ gaps:
     source_refs:
       - APPLE-ARG
       - EU-ECGT-2024-825
+      - DE-UWG-EMP-CO
       - EU-NHCR-1924-2006
       - EU-HEALTH-CLAIMS-REGISTER
+    implementation_evidence:
+      - docs/project/audits/2026-08-11-claims-privacy-boundaries-assessment.md
+      - docs/project/compliance/claim-inventory.yaml
+      - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
+      - docs/project/gate-definitions/local/G-CLAIM-GOVERNANCE.yaml
+      - scripts/quality/validate_claims_privacy_boundaries.rb
+      - esg_app/test/widgets/nutrition_information_card_test.dart
 
   - id: GAP-003
     domain: data_licensing
@@ -149,17 +158,19 @@ gaps:
     domain: privacy
     title: Datenschutz-Betriebsmodell für Remote-Backend und externe Beta
     gap_type: documented_not_operational
-    status: open
+    status: in_progress
     priority: P0
     target_profile: release_candidate
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Mustafa Demir
     trigger: Vor Remote-Speicherung, Accounts, TestFlight oder Analytics
     concern: |
-      Datenschutzanforderungen und RLS sind teilweise modelliert. Datenfluss,
-      Rechtsgrundlagen, Aufbewahrung, Betroffenenrechte, AVV, Löschung,
-      Incident und DPIA-Entscheidung sind noch nicht als Betriebsprozess belegt.
+      Aktueller und geplanter Datenfluss, Datentypen, Zwecke, Empfänger,
+      Regionen, Retention und DPIA-Entscheidungsweg sind versioniert und im
+      Development-Profil geprüft. Vor externer Beta oder Remote-Aktivierung
+      fehlen qualifizierte Rechts-/DPIA-Prüfung, Provider-Rollen, AVV,
+      App-Privacy-Freigabe sowie getestete Rechte-, Lösch- und Incident-Prozesse.
     closure_criteria:
       - Dateninventar und End-to-End-Datenfluss sind versioniert
       - Rechtsgrundlage, Zweck, Empfänger, Region und Aufbewahrung sind je Datentyp festgelegt
@@ -174,8 +185,17 @@ gaps:
       - RISK-005
     source_refs:
       - EU-GDPR
+      - EDPB-DPIA-WP248
+      - BFDI-DPIA
       - APPLE-APP-PRIVACY
       - APPLE-APP-PRIVACY-DETAILS
+    implementation_evidence:
+      - docs/project/audits/2026-08-11-claims-privacy-boundaries-assessment.md
+      - docs/project/compliance/privacy-data-inventory.yaml
+      - docs/project/compliance/privacy-data-flow.md
+      - docs/privacy.md
+      - docs/project/gate-definitions/local/G-PRIVACY-BOUNDARY.yaml
+      - scripts/quality/validate_claims_privacy_boundaries.rb
 
   - id: GAP-005
     domain: security

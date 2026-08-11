@@ -1,0 +1,272 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-11
+owner: Mustafa Demir
+status: accepted_for_local_development
+
+purpose: |
+  Versioned inventory and activation contract for explicit and implied
+  environmental, sustainability, social, governance, nutrition and health
+  claims across ScanFair product surfaces. This is a conservative engineering
+  control and not a legal approval.
+
+public_activation:
+  enabled: false
+  claim_set_release_status: blocked_pending_methodology_legal_and_domain_review
+  required_before:
+    - external_beta
+    - app_store_release_candidate
+    - public_marketing
+
+enforcement_profiles:
+  development:
+    public_activation_must_be_disabled: true
+    pending_reviews_allowed: true
+    unsafe_runtime_phrases_prohibited: true
+  external_beta:
+    public_activation_must_be_enabled: true
+    legal_review_must_be_approved: true
+    domain_review_must_be_approved: true
+    claim_set_must_be_approved: true
+  release_candidate:
+    inherits: external_beta
+    app_store_and_marketing_scope_must_be_complete: true
+
+reviews:
+  legal:
+    status: pending
+    reviewer_requirement: qualified_consumer_and_food_claims_counsel
+    evidence: null
+  subject_matter:
+    status: pending
+    reviewer_requirement: qualified_esg_lca_and_nutrition_reviewers
+    evidence: null
+
+evidence_contracts:
+  legal_review:
+    evidence_type: claims_legal_review
+    required_values:
+      decision: approved
+      reviewer_role: qualified_consumer_and_food_claims_counsel
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - scope
+      - claim_inventory_sha256
+      - document_path
+      - document_sha256
+    digest_fields:
+      - claim_inventory_sha256
+      - document_sha256
+  subject_matter_review:
+    evidence_type: claims_subject_matter_review
+    required_values:
+      decision: approved
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewer_roles
+      - scope
+      - claim_inventory_sha256
+      - document_path
+      - document_sha256
+    digest_fields:
+      - claim_inventory_sha256
+      - document_sha256
+
+scope_contract:
+  required_surfaces:
+    - app_runtime
+    - app_store
+    - website_marketing
+  required_claim_classes:
+    - environmental
+    - sustainability
+    - social
+    - governance
+    - nutrition
+    - health
+    - limitation
+  implied_claim_inputs:
+    - color
+    - scale
+    - icon
+    - product_name
+    - brand_name
+
+health_boundary:
+  display_title: Nährwert-Hinweis
+  presentation: neutral_source_information_only
+  score_or_progress_indicator_allowed: false
+  medical_or_individual_advice_allowed: false
+  beneficial_characterization_allowed_without_authorized_claim: false
+  eu_register_check_required_for_health_claim: true
+  source_and_retrieval_context_required: true
+  required_disclosure: Keine medizinische oder individuelle Ernährungsberatung.
+  prohibited_runtime_terms:
+    - Gesundheit
+    - gesund
+    - nährstoffreich
+    - ausgewogen
+    - natürlich süß
+    - gut für
+    - schützt vor
+
+prohibited_claim_classes:
+  - id: absolute_esg_compliance
+    examples:
+      - ESG-compliant
+      - garantiert ESG-konform
+      - zertifiziert nachhaltig
+  - id: unqualified_generic_environmental
+    examples:
+      - umweltfreundlich
+      - grün
+      - klimafreundlich
+      - klimaneutral
+      - gut für die Umwelt
+  - id: unsupported_human_rights_outcome
+    examples:
+      - frei von Kinderarbeit
+      - frei von Zwangsarbeit
+      - garantiert fair
+  - id: unauthorized_health_or_nutrition_benefit
+    examples:
+      - gesund
+      - nährstoffreich
+      - ausgewogen
+      - stärkt die Gesundheit
+
+claims:
+  - id: CLM-APP-001
+    surface: app_runtime
+    element: product_name
+    text: ScanFair
+    claim_classes: [sustainability, social]
+    explicit_or_implied: implied
+    current_status: brand_use_with_required_context
+    release_status: pending_legal_review
+    evidence_refs:
+      - docs/project/methodology-catalog/scoring-controls.yaml
+    methodology_version: "1.0"
+    confidence_rule: no_standalone_product_conclusion
+
+  - id: CLM-APP-002
+    surface: app_runtime
+    element: aggregate_score
+    text_pattern: ESG-Gesamtscore {value} von 10
+    claim_classes: [sustainability, environmental, social, governance]
+    explicit_or_implied: explicit
+    current_status: development_only
+    release_status: blocked_pending_calibration_and_review
+    evidence_refs:
+      - docs/ESG-SCORING-MODELL-v1.md
+      - docs/project/decisions/0011-esg-score-formel.yaml
+    methodology_version: "1.0"
+    confidence_rule: complete_e_s_g_input_required
+
+  - id: CLM-APP-003
+    surface: app_runtime
+    element: traffic_light_and_verdict
+    text_pattern: Positive Signale | Gemischte Signale | Kritische Signale
+    claim_classes: [sustainability]
+    explicit_or_implied: implied
+    current_status: development_only
+    release_status: blocked_pending_calibration_and_review
+    evidence_refs:
+      - docs/project/decisions/0011-esg-score-formel.yaml
+    methodology_version: "1.0"
+    confidence_rule: same_as_aggregate_score
+
+  - id: CLM-APP-004
+    surface: app_runtime
+    element: pillar_scores
+    text_pattern: Environment | Social | Governance/Transparenz
+    claim_classes: [environmental, social, governance]
+    explicit_or_implied: explicit
+    current_status: development_only
+    release_status: blocked_pending_calibration_and_review
+    evidence_refs:
+      - docs/ESG-SCORING-MODELL-v1.md
+      - docs/project/methodology-catalog/parameters.yaml
+    methodology_version: "1.0"
+    confidence_rule: pillar_specific_evidence_required
+
+  - id: CLM-APP-005
+    surface: app_runtime
+    element: missing_data_disclosure
+    text_pattern: Daten unvollständig | Wir zeigen nur belegte Signale
+    claim_classes: [limitation]
+    explicit_or_implied: explicit
+    current_status: required_safety_disclosure
+    release_status: required
+    evidence_refs:
+      - docs/project/methodology-catalog/scoring-controls.yaml
+    methodology_version: "2.0-draft"
+    confidence_rule: always_visible_when_score_is_withheld
+
+  - id: CLM-APP-006
+    surface: app_runtime
+    element: certification_disclosure
+    text: Orientierung, keine Zertifizierung.
+    claim_classes: [limitation]
+    explicit_or_implied: explicit
+    current_status: required_safety_disclosure
+    release_status: required
+    evidence_refs:
+      - docs/project/gate-definitions/local/G-CLAIM-SAFETY.yaml
+    methodology_version: "1.0"
+    confidence_rule: always_visible_with_score
+
+  - id: CLM-APP-007
+    surface: app_runtime
+    element: nutrition_information
+    text: Nährwert-Hinweis
+    claim_classes: [nutrition, health, limitation]
+    explicit_or_implied: explicit
+    current_status: neutral_information_only
+    release_status: pending_food_law_review
+    evidence_refs:
+      - docs/project/compliance/claim-inventory.yaml
+    methodology_version: not_applicable
+    confidence_rule: source_facts_only_no_benefit_or_health_score
+
+  - id: CLM-STORE-001
+    surface: app_store
+    element: subtitle
+    text: ESG-Score beim Einkauf
+    claim_classes: [sustainability, environmental, social, governance]
+    explicit_or_implied: explicit
+    current_status: draft_metadata
+    release_status: blocked_pending_calibration_and_review
+    evidence_refs:
+      - docs/project/compliance/compliance-manifest.json
+    methodology_version: "1.0"
+    confidence_rule: must_match_reviewed_runtime_claim_set
+
+  - id: CLM-WEB-001
+    surface: website_marketing
+    element: scanfair_product_page
+    text: repository_external_content_requires_snapshot_before_release
+    claim_classes: [sustainability, environmental, social, governance, nutrition, health]
+    explicit_or_implied: explicit_and_implied
+    current_status: not_snapshotted
+    release_status: blocked_pending_inventory_snapshot_and_review
+    evidence_refs: []
+    methodology_version: unknown
+    confidence_rule: no_public_activation_without_repository_snapshot
+
+release_blocks:
+  - public_activation_enabled_without_approved_claim_set
+  - score_or_traffic_light_published_without_calibration
+  - generic_environmental_claim_without_clear_same-medium_qualification
+  - health_or_nutrition_benefit_without_authorized_wording_and_conditions
+  - website_or_app_store_claim_missing_from_inventory
+  - legal_or_subject_matter_review_without_typed_hashed_evidence
+
+primary_sources:
+  - EU-ECGT-2024-825
+  - DE-UWG-EMP-CO
+  - EU-NHCR-1924-2006
+  - EU-HEALTH-CLAIMS-REGISTER
+  - APPLE-ARG
+  - APPLE-APP-PRIVACY-DETAILS

@@ -95,6 +95,20 @@ sources:
     version: consolidated-current
     normative_weight: MUST
     scope: Personal-data processing where applicable
+  - id: EDPB-DPIA-WP248
+    authority: European Data Protection Board
+    title: Guidelines on Data Protection Impact Assessment WP248 rev.01
+    url: https://www.edpb.europa.eu/endorsed-wp29-guidelines_en
+    version: WP248-rev.01
+    normative_weight: AUTHORITATIVE_GUIDANCE
+    scope: DPIA high-risk criteria and decision process
+  - id: BFDI-DPIA
+    authority: German Federal Commissioner for Data Protection
+    title: Datenschutz-Folgenabschaetzung
+    url: https://www.bfdi.bund.de/DE/Fachthemen/Inhalte/Technik/Datenschutz-Folgenabschaetzungen.html
+    version: current-web
+    normative_weight: AUTHORITATIVE_GUIDANCE
+    scope: German DPIA applicability and process guidance
   - id: EU-ECGT-2024-825
     authority: European Union
     title: Directive (EU) 2024/825 on empowering consumers for the green transition
@@ -102,6 +116,13 @@ sources:
     version: applies-from-2026-09-27
     normative_weight: CONDITIONAL_MUST
     scope: Consumer-facing environmental and sustainability claims
+  - id: DE-UWG-EMP-CO
+    authority: Germany
+    title: German implementation of Directive EU 2024/825 in the UWG
+    url: https://www.bmj.de/SharedDocs/Gesetzgebungsverfahren/DE/2024_AendG_UWG_EmpCo.html
+    version: applies-from-2026-09-27
+    normative_weight: CONDITIONAL_MUST
+    scope: German consumer-facing environmental and sustainability claims
   - id: EU-NHCR-1924-2006
     authority: European Union
     title: Regulation (EC) No 1924/2006 on nutrition and health claims made on foods

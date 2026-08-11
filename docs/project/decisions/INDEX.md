@@ -38,6 +38,7 @@ Letztes Update: 2026-08-11
 | [0028](0028-product-scoped-commodity-origin.yaml) | Produktgebundene Rohstoff-Herkunftsbeziehungen | accepted | 2026-08-10 | data, traceability, scoring, context, coffee | 0022, 0023, 0025, 0027 |
 | [0029](0029-lifecycle-gap-control.yaml) | Repo-native Lifecycle-Gap-Kontrolle mit Reifegrad und Evidence Closure | accepted | 2026-08-10 | methodology, governance, risk, quality-gates, release-readiness | 0007, 0009, 0020, 0021, 0022, 0026 |
 | [0030](0030-data-license-composition.yaml) | Quellengetrennte Datenlizenz-Komposition vor Remote-Aktivierung | accepted | 2026-08-11 | data, licensing, odbl, architecture, quality-gates, supabase | 0002, 0020, 0022, 0024, 0025, 0029 |
+| [0031](0031-claims-and-privacy-boundaries.yaml) | Fail-closed Claim- und Privacy-Grenzen vor externer Aktivierung | accepted | 2026-08-11 | compliance, claims, privacy, nutrition, app-store, quality-gates | 0013, 0017, 0021, 0023, 0027, 0029, 0030 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -50,7 +51,7 @@ Letztes Update: 2026-08-11
 
 | Status | Anzahl |
 |---|---|
-| accepted | 25 |
+| accepted | 26 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 2 |
@@ -68,7 +69,7 @@ Letztes Update: 2026-08-11
 - **security / dsgvo** → 0008, 0026
 - **methodology** → 0009, 0011, 0023, 0025, 0028, 0029
 - **scoring / esg** → 0010, 0011, 0023, 0025, 0027, 0028
-- **compliance / governance** → 0009, 0029, 0030
+- **compliance / governance** → 0009, 0029, 0030, 0031
 
 ## Wartung
 

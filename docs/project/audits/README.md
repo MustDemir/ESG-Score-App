@@ -27,3 +27,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-07-28 | [Code quality, accessibility and CI audit](2026-07-28-code-quality-accessibility-ci-audit.md) | Scoring, result UI, supply-chain CI and documentation consistency |
 | 2026-08-10 | [Product Engineering Gap Analysis](2026-08-10-product-engineering-gap-analysis.md) | Twelve disciplines from product discovery through scientific, legal, operational and App Store readiness |
 | 2026-08-11 | [Data-License Composition Assessment](2026-08-11-data-license-composition-assessment.md) | OFF/ODbL classification, source separation, gate profiles and remote activation blockers |
+| 2026-08-11 | [Claims and Privacy Boundary Assessment](2026-08-11-claims-privacy-boundaries-assessment.md) | Claim inventory, neutral nutrition boundary, privacy data flow, DPIA path and activation gates |

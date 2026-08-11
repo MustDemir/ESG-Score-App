@@ -1,0 +1,398 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-11
+owner: Mustafa Demir
+status: accepted_for_local_development
+
+purpose: |
+  Versioned data-type, purpose, recipient, region and retention contract for
+  the current local iOS MVP and planned remote capabilities. Legal bases are
+  candidates pending qualified review and are not legal advice.
+
+controller:
+  name: Mustafa Demir
+  contact: business.demir@gmail.com
+  postal_address_status: missing_release_blocker
+
+current_feature_state:
+  remote_backend_enabled: false
+  accounts_enabled: false
+  analytics_enabled: false
+  tracking_enabled: false
+  location_enabled: false
+  crash_reporting_sdk_enabled: false
+  user_generated_content_enabled: false
+  camera_enabled: true
+  direct_open_food_facts_lookup_enabled: true
+
+enforcement_profiles:
+  development:
+    remote_backend_must_be_disabled: true
+    current_data_flow_must_match_code: true
+    pending_qualified_reviews_allowed: true
+  external_beta:
+    direct_lookup_review_must_be_approved: true
+    public_privacy_disclosure_must_be_approved: true
+    app_privacy_details_must_be_completed: true
+    dpia_screening_must_be_approved: true
+  remote_backend:
+    remote_backend_must_be_enabled: true
+    legal_basis_review_must_be_approved: true
+    processor_contracts_must_be_approved: true
+    retention_and_rights_must_be_operational: true
+    dpia_screening_must_be_approved: true
+  release_candidate:
+    inherits: external_beta
+    remote_backend_controls_apply_when_enabled: true
+
+reviews:
+  direct_lookup_roles_and_legal_basis:
+    status: pending
+    reviewer_requirement: qualified_data_protection_counsel
+    evidence: null
+  public_privacy_disclosure:
+    status: pending
+    reviewer_requirement: qualified_data_protection_counsel
+    evidence: null
+  app_privacy_details:
+    status: pending
+    evidence: null
+  remote_legal_basis:
+    status: pending
+    reviewer_requirement: qualified_data_protection_counsel
+    evidence: null
+  processor_contracts:
+    status: not_applicable_remote_disabled
+    evidence: null
+  rights_operations:
+    status: design_only
+    evidence: null
+
+evidence_contracts:
+  legal_review:
+    evidence_type: privacy_legal_review
+    required_values:
+      decision: approved
+      reviewer_role: qualified_data_protection_counsel
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - scope
+      - privacy_inventory_sha256
+      - document_path
+      - document_sha256
+    digest_fields: [privacy_inventory_sha256, document_sha256]
+  privacy_disclosure_review:
+    evidence_type: privacy_disclosure_review
+    required_values:
+      decision: approved
+      reviewer_role: qualified_data_protection_counsel
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - privacy_policy_url
+      - scope
+      - privacy_inventory_sha256
+      - document_path
+      - document_sha256
+    digest_fields: [privacy_inventory_sha256, document_sha256]
+  app_privacy_details:
+    evidence_type: app_store_privacy_details
+    required_values:
+      status: completed
+    required_fields:
+      - schema_version
+      - recorded_at
+      - recorded_by_role
+      - scope
+      - privacy_inventory_sha256
+      - artifact_path
+      - artifact_sha256
+    digest_fields: [privacy_inventory_sha256, artifact_sha256]
+  dpia_screening:
+    evidence_type: dpia_screening
+    required_values:
+      decision_status: approved
+    required_fields:
+      - schema_version
+      - assessed_at
+      - assessed_by_role
+      - scope
+      - decision
+      - criteria
+      - privacy_inventory_sha256
+      - document_path
+      - document_sha256
+    digest_fields: [privacy_inventory_sha256, document_sha256]
+  processor_review:
+    evidence_type: processor_contract_review
+    required_values:
+      status: approved
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewed_by_role
+      - processors
+      - regions
+      - contract_path
+      - contract_sha256
+    digest_fields: [contract_sha256]
+  rights_verification:
+    evidence_type: data_subject_rights_verification
+    required_values:
+      status: verified
+    required_fields:
+      - schema_version
+      - verified_at
+      - verified_by_role
+      - tested_rights
+      - retention_rules
+      - artifact_path
+      - artifact_sha256
+    digest_fields: [artifact_sha256]
+
+processing_activities:
+  - id: PRV-001
+    enabled: true
+    data_type: live_camera_frames
+    data_subject: device_user_and_incidental_surroundings
+    personal_data_assessment: potentially_personal_on_device
+    source: iPhone_camera
+    purpose: local_barcode_detection
+    necessity: required_for_camera_scan_optional_manual_fallback_exists
+    processing_location: device_only
+    recipients: []
+    region: device_local
+    legal_basis_candidate: no_off_device_processing_by_scanfair
+    legal_basis_status: qualified_review_pending
+    retention: volatile_frame_processing_only
+    deletion: automatic_after_frame_processing
+    apple_data_type: not_collected_off_device
+    linked_to_user: false
+    tracking: false
+    safeguards:
+      - returnImage_false
+      - no_frame_persistence
+      - camera_stops_after_scan_or_lifecycle_pause
+
+  - id: PRV-002
+    enabled: true
+    data_type: decoded_barcode_and_runtime_recent_product_list
+    data_subject: device_user
+    personal_data_assessment: product_identifier_not_personal_alone_but_usage_context_may_be_personal
+    source: camera_or_manual_entry
+    purpose: requested_product_lookup_and_runtime_navigation
+    necessity: required_for_primary_app_function
+    processing_location: device_and_direct_off_request
+    recipients:
+      - Open Food Facts
+    region: OFF_infrastructure_region_requires_provider_confirmation
+    legal_basis_candidate: GDPR_Art_6_1_b_or_f_pending_qualified_review
+    legal_basis_status: pending
+    retention: maximum_10_product_objects_until_app_process_ends
+    deletion: automatic_on_process_end_no_scanfair_cloud_history
+    apple_data_type: product_interaction_candidate_if_retained_off_device
+    linked_to_user: false_in_current_scanfair_architecture
+    tracking: false
+    safeguards:
+      - no_account_identifier
+      - no_device_identifier_added
+      - no_persistent_scan_history
+
+  - id: PRV-003
+    enabled: true
+    data_type: request_network_metadata
+    data_subject: device_user
+    personal_data_assessment: personal_data_possible_including_ip_address
+    source: HTTPS_request_to_OFF
+    purpose: transport_security_abuse_prevention_and_request_delivery
+    necessity: inherent_in_direct_network_request
+    processing_location: device_network_and_OFF_infrastructure
+    recipients:
+      - Open Food Facts
+      - network_infrastructure_providers
+    region: provider_controlled_requires_confirmation
+    legal_basis_candidate: GDPR_Art_6_1_b_or_f_pending_qualified_review
+    legal_basis_status: pending
+    retention: provider_retention_unknown_release_blocker
+    deletion: provider_process_requires_review
+    apple_data_type: disclose_if_retained_beyond_real_time_request
+    linked_to_user: provider_dependent
+    tracking: prohibited_by_scanfair_contract
+    safeguards:
+      - HTTPS
+      - no_advertising_identifier
+      - explicit_user_agent_without_user_identifier
+
+  - id: PRV-004
+    enabled: true
+    data_type: public_product_response_and_evidence
+    data_subject: none_expected
+    personal_data_assessment: non_personal_product_data
+    source: Open Food Facts
+    purpose: product_information_and_local_score_calculation
+    necessity: required_for_primary_app_function
+    processing_location: device_memory
+    recipients: []
+    region: device_local_after_response
+    legal_basis_candidate: not_applicable_to_non_personal_product_data
+    legal_basis_status: not_applicable
+    retention: runtime_memory_only
+    deletion: automatic_on_process_end
+    apple_data_type: not_user_data
+    linked_to_user: false
+    tracking: false
+    safeguards:
+      - source_provenance
+      - license_attribution
+      - no_remote_scanfair_cache
+
+  - id: PRV-005
+    enabled: false
+    data_type: analytics_crash_and_diagnostic_events
+    data_subject: device_user
+    personal_data_assessment: personal_data_possible
+    source: application_runtime
+    purpose: not_active
+    necessity: not_established
+    processing_location: not_active
+    recipients: []
+    region: not_active
+    legal_basis_candidate: separate_activation_decision_required
+    legal_basis_status: prohibited_until_review
+    retention: none_by_scanfair
+    deletion: not_applicable
+    apple_data_type: diagnostics_or_usage_data_if_activated
+    linked_to_user: prohibited_by_default
+    tracking: prohibited
+    safeguards:
+      - feature_disabled
+      - no_analytics_or_crash_sdk
+
+  - id: PRV-006
+    enabled: false
+    data_type: account_profile_scan_history_and_preferences
+    data_subject: future_account_user
+    personal_data_assessment: personal_data
+    source: future_user_and_app_events
+    purpose: not_active
+    necessity: not_established
+    processing_location: planned_remote_backend
+    recipients:
+      - planned_Supabase_processor
+    region: EU_region_required_before_activation
+    legal_basis_candidate: contract_or_consent_or_legitimate_interest_requires_purpose_specific_review
+    legal_basis_status: prohibited_until_review
+    retention: prohibited_until_schedule_is_approved
+    deletion: account_and_record_deletion_must_be_tested_before_activation
+    apple_data_type: identifiers_product_interaction_and_other_usage_data_candidate
+    linked_to_user: true_if_activated
+    tracking: prohibited
+    safeguards:
+      - feature_disabled
+      - no_remote_project_connected
+
+  - id: PRV-007
+    enabled: false
+    data_type: source_partitioned_remote_product_cache_and_access_logs
+    data_subject: backend_request_user_for_access_logs_only
+    personal_data_assessment: product_cache_non_personal_access_logs_may_be_personal
+    source: planned_server_writer_and_client_requests
+    purpose: resilience_reproducibility_and_product_lookup
+    necessity: pending_architecture_review
+    processing_location: planned_EU_Supabase
+    recipients:
+      - planned_Supabase_processor
+    region: EU_region_required_before_activation
+    legal_basis_candidate: GDPR_Art_6_1_f_candidate_requires_LIA
+    legal_basis_status: prohibited_until_review
+    retention: product_cache_source_defined_access_logs_schedule_pending
+    deletion: source_withdrawal_and_log_deletion_process_required
+    apple_data_type: product_interaction_or_diagnostics_candidate_for_logs
+    linked_to_user: must_remain_false_for_product_cache
+    tracking: prohibited
+    safeguards:
+      - remote_backend_disabled
+      - source_partitioning
+      - server_writer_only
+      - no_service_role_in_app
+
+data_flow_contract:
+  current_path:
+    - camera_frame_processed_on_device
+    - decoded_barcode_held_in_memory
+    - barcode_sent_by_HTTPS_to_OFF_on_user_request
+    - OFF_product_response_mapped_in_memory
+    - score_calculated_on_device
+    - recent_products_limited_to_runtime_memory
+  prohibited_current_paths:
+    - camera_frame_uploaded
+    - scan_history_persisted_by_scanfair
+    - account_or_device_identifier_attached_to_lookup
+    - analytics_or_advertising_event_sent
+    - location_collected
+    - remote_scanfair_backend_contacted
+
+retention_contract:
+  current_runtime_recent_products:
+    maximum_records: 10
+    storage: volatile_memory
+    expiry: app_process_end
+  camera_frames:
+    storage: none
+    expiry: after_frame_processing
+  remote_personal_data:
+    status: prohibited_until_versioned_schedule_and_verified_deletion
+
+data_subject_rights:
+  current_scanfair_server_records: none
+  contact_channel: business.demir@gmail.com
+  provider_request_boundary: OFF_and_platform_provider_records_require_provider_process_review
+  remote_required_before_activation:
+    - access
+    - correction
+    - deletion
+    - restriction
+    - portability_where_applicable
+    - objection
+
+dpia:
+  current_scope:
+    preliminary_decision: not_required_current_local_scope_pending_qualified_confirmation
+    rationale:
+      - no_account_or_persistent_user_profile
+      - no_special_category_data_requested
+      - no_location_tracking
+      - no_large_scale_or_systematic_monitoring
+      - no_solely_automated_legal_or_similarly_significant_decision
+    evidence: null
+  remote_or_beta_scope:
+    preliminary_decision: screening_required_before_activation
+    decision_status: pending
+    criteria_to_reassess:
+      - systematic_evaluation_or_scoring_of_people
+      - automated_decision_with_legal_or_similar_effect
+      - systematic_monitoring
+      - sensitive_or_highly_personal_data
+      - large_scale_processing
+      - matching_or_combining_personal_datasets
+      - vulnerable_data_subjects_including_children
+      - innovative_technology_or_organizational_solution
+      - processing_preventing_exercise_of_right_or_service
+    evidence: null
+
+remote_release_blocks:
+  - remote_backend_enabled_without_approved_legal_basis_and_LIA_where_applicable
+  - processor_started_without_DPA_region_and_subprocessor_review
+  - unknown_or_unbounded_personal_data_retention
+  - rights_or_incident_process_not_tested
+  - dpia_screening_missing_or_unapproved
+  - privacy_policy_or_app_store_details_do_not_match_actual_build
+  - analytics_tracking_accounts_or_location_enabled_without_separate_activation_control
+
+primary_sources:
+  - EU-GDPR
+  - EDPB-DPIA-WP248
+  - BFDI-DPIA
+  - APPLE-APP-PRIVACY
+  - APPLE-APP-PRIVACY-DETAILS
+  - APPLE-ARG
