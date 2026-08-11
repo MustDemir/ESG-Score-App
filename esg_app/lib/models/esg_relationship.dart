@@ -98,6 +98,7 @@ class ESGRelationship {
     required this.retrievedAt,
     this.evidenceIds = const [],
     bool scoreEligible = false,
+    this.contextEntity,
     this.observedAt,
     this.validFrom,
     this.validTo,
@@ -112,6 +113,12 @@ class ESGRelationship {
                      assertionClass == ESGAssertionClass.declared)),
          'Score-eligible relationships need evidence, sufficient confidence, '
          'and a measured, verified, or declared assertion.',
+       ),
+       assert(
+         !scoreEligible ||
+             type != ESGRelationshipType.commodityHasOrigin ||
+             contextEntity != null,
+         'Score-eligible commodity origins need a product context.',
        );
 
   final String id;
@@ -124,6 +131,7 @@ class ESGRelationship {
   final String sourceRecordId;
   final List<String> evidenceIds;
   final bool _scoreEligibleRequested;
+  final ESGEntity? contextEntity;
   final DateTime retrievedAt;
   final DateTime? observedAt;
   final DateTime? validFrom;
@@ -139,7 +147,13 @@ class ESGRelationship {
           assertionClass == ESGAssertionClass.declared);
 
   bool get supportsContextualRisk =>
-      type == ESGRelationshipType.commodityHasOrigin && scoreEligible;
+      type == ESGRelationshipType.commodityHasOrigin &&
+      scoreEligible &&
+      contextEntity != null;
+
+  bool supportsContextualRiskFor(String productEntityId) {
+    return supportsContextualRisk && contextEntity!.id == productEntityId;
+  }
 
   Map<String, Object?> toMap() {
     return {
@@ -153,6 +167,7 @@ class ESGRelationship {
       'source_record_id': sourceRecordId,
       'evidence_ids': evidenceIds,
       'score_eligible': scoreEligible,
+      'context_entity_id': contextEntity?.id,
       'retrieved_at': retrievedAt.toUtc().toIso8601String(),
       'observed_at': observedAt?.toUtc().toIso8601String(),
       'valid_from': validFrom?.toUtc().toIso8601String(),

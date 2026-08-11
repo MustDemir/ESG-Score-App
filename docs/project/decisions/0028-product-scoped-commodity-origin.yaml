@@ -1,0 +1,61 @@
+id: 0028
+title: Product-scoped commodity origin relationships
+date: 2026-08-10
+status: accepted
+deciders: [Mustafa]
+tags: [data, traceability, scoring, context, coffee]
+
+context: |
+  ADR 0025 requires a product-to-commodity link and a commodity-to-origin
+  link before contextual country risk can be joined. A global edge such as
+  coffee-to-Colombia is insufficient because another coffee product may use
+  beans from Uganda or several countries. Without product context, a valid
+  origin declaration could leak into unrelated scanned products.
+
+options_considered:
+  - name: Treat commodity-origin as a global relationship
+    pros: [simple graph]
+    cons:
+      - cannot distinguish origins of two products containing the same commodity
+      - creates false contextual risk joins
+  - name: Create a synthetic commodity entity per product
+    pros: [keeps binary edges]
+    cons:
+      - duplicates the commodity identity
+      - breaks canonical commodity identifiers and cross-source mappings
+  - name: Add an explicit product context to the commodity-origin assertion
+    pros:
+      - retains canonical commodity and country entities
+      - binds the assertion to the scanned GTIN
+      - can be enforced in Dart, PostgreSQL and quality gates
+    cons:
+      - relationship queries must include context_entity_id
+
+decision: Add explicit product context to score-eligible commodity-origin links
+rationale: |
+  The context preserves the global identity graph while preventing evidence
+  from one product from being reused for another. A score-eligible
+  commodity_has_origin relationship must reference a product entity through
+  context_entity_id. Unscoped relationships may remain as non-score-active
+  background information.
+
+implementation:
+  app:
+    - ESGRelationship carries an optional contextEntity.
+    - Score-eligible commodity origins require contextEntity.
+    - ScanFairProduct only accepts origins whose context matches its GTIN.
+  database:
+    - traceability_relationships.context_entity_id references an entity.
+    - constraints and a trigger require product context for eligible origins.
+    - the read policy also requires a published context entity.
+  pilot:
+    - all coffee origin declarations are scoped to their pilot GTIN.
+
+consequences:
+  - Contextual country-risk adapters must provide a matching GTIN context.
+  - Existing unscoped origin hints remain score-ineligible.
+  - Methodology 2.0 remains draft and no new risk factor is activated.
+
+supersedes: null
+superseded_by: null
+related: [0022, 0023, 0025, 0027]

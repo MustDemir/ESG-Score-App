@@ -6,11 +6,14 @@ trigger: Pull request, feature push, local quality run
 policy_checks:
   - Every relationship has source, record, evidence, assertion class and confidence
   - Commodity-country risk requires commodity and commodity-origin links
+  - Score-eligible commodity origin is scoped to the scanned GTIN product
   - Product origin is not silently applied to every commodity
   - Legal-entity assessment requires an explicit responsible-entity link
 evidence_required:
   - docs/project/methodology-catalog/scoring-controls.yaml
   - supabase/migrations/20260727000400_traceability_relationships.sql
+  - supabase/migrations/20260810000100_context_scoped_traceability.sql
+  - docs/project/data/coffee-pilot-products.yaml
   - .quality/quality-gate-report.md
 decision: block
 owner: Mustafa
@@ -28,6 +31,7 @@ links:
     - 0022
     - 0023
     - 0025
+    - 0028
 sources:
   - docs/project/data/data-architecture.md
   - docs/project/methodology-catalog/scoring-controls.yaml

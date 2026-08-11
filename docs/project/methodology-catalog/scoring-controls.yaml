@@ -3,7 +3,7 @@ control_set_id: scoring-safety-controls
 methodology_version: 2.0-draft
 status: draft
 active_in_formula: false
-updated_at: "2026-07-27"
+updated_at: "2026-08-10"
 
 purpose: |
   Prevent unsupported product claims and non-reproducible scores while the
@@ -52,6 +52,9 @@ link_integrity:
   contextual_commodity_country_risk_requires:
     - contains_commodity
     - commodity_has_origin
+  contextual_origin_requires_context_entity: true
+  contextual_origin_context_type: product
+  contextual_origin_must_match_scanned_gtin: true
   legal_entity_governance_requires:
     - marketed_by_brand
     - responsible_legal_entity

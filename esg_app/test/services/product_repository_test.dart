@@ -29,4 +29,26 @@ void main() {
     expect(alternative, isNotNull);
     expect(alternative!.barcode, isNot(product.barcode));
   });
+
+  test('coffee pilot repository provides a declared local fallback', () async {
+    final pilotRepository = CoffeePilotProductRepository(source: repository);
+
+    final product = await pilotRepository.findByBarcode('4013320225196');
+
+    expect(product, isNotNull);
+    expect(product!.name, contains('Kolumbien'));
+    expect(product.hasScoreEligibleCommodityOrigin, isTrue);
+    expect(pilotRepository.recentProducts().single.barcode, product.barcode);
+  });
+
+  test(
+    'coffee pilot repository does not synthesize unknown products',
+    () async {
+      final pilotRepository = CoffeePilotProductRepository(source: repository);
+
+      final product = await pilotRepository.findByBarcode('0000000000000');
+
+      expect(product, isNull);
+    },
+  );
 }

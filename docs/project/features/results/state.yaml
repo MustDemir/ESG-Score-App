@@ -64,6 +64,10 @@ done:
     englische E/S/G-Aussprache auf einem physischen iPhone validiert. Zentraler
     Semantik-Terminologiekatalog und vier Katalogtests ergaenzt; der daraus
     erzeugte signierte Build wurde erneut auf dem iPhone gegengeprueft.
+  - |
+    2026-08-10 — Die Datenansicht trennt nun Rohstoffherkunft von allgemeiner
+    Produktherkunft. Kaffee-Pilotlinks zeigen Herstellerangabe, mittlere
+    Sicherheit und Quelle, ohne daraus bereits einen Risikowert abzuleiten.
 
 decisions:
   - id: FD-R-01

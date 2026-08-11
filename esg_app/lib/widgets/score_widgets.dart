@@ -330,7 +330,10 @@ class TraceabilityCard extends StatelessWidget {
     final commodities = product
         .relationshipsOfType(ESGRelationshipType.containsCommodity)
         .toList(growable: false);
-    final origins = product
+    final commodityOrigins = product
+        .relationshipsOfType(ESGRelationshipType.commodityHasOrigin)
+        .toList(growable: false);
+    final productOrigins = product
         .relationshipsOfType(ESGRelationshipType.hasProductOrigin)
         .toList(growable: false);
     final legalEntities = product
@@ -354,10 +357,19 @@ class TraceabilityCard extends StatelessWidget {
             const Divider(height: ScanFairTokens.space4),
             _TraceabilityRow(
               icon: Icons.public_outlined,
-              label: 'Produktherkunft',
-              relationships: origins,
-              missingLabel: 'Keine Herkunft belegt',
+              label: 'Rohstoffherkunft',
+              relationships: commodityOrigins,
+              missingLabel: 'Keine Rohstoffherkunft belegt',
             ),
+            if (productOrigins.isNotEmpty) ...[
+              const Divider(height: ScanFairTokens.space4),
+              _TraceabilityRow(
+                icon: Icons.inventory_2_outlined,
+                label: 'Allgemeine Produktherkunft',
+                relationships: productOrigins,
+                missingLabel: 'Keine Produktherkunft belegt',
+              ),
+            ],
             const Divider(height: ScanFairTokens.space4),
             _TraceabilityRow(
               icon: Icons.corporate_fare_outlined,
@@ -365,7 +377,9 @@ class TraceabilityCard extends StatelessWidget {
               relationships: legalEntities,
               missingLabel: 'Rechtsträger noch nicht aufgelöst',
             ),
-            if (commodities.isNotEmpty || origins.isNotEmpty) ...[
+            if (commodities.isNotEmpty ||
+                commodityOrigins.isNotEmpty ||
+                productOrigins.isNotEmpty) ...[
               const SizedBox(height: ScanFairTokens.space3),
               Text(
                 product.hasScoreEligibleCommodityOrigin
@@ -401,10 +415,11 @@ class _TraceabilityRow extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final values = relationships
         .map((entry) => entry.to.displayName)
+        .toSet()
         .join(', ');
-    final hasEligibleRelationship = relationships.any(
-      (entry) => entry.scoreEligible,
-    );
+    final eligibleRelationships = relationships
+        .where((entry) => entry.scoreEligible)
+        .toList(growable: false);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -423,9 +438,9 @@ class _TraceabilityRow extends StatelessWidget {
               ),
               if (relationships.isNotEmpty)
                 Text(
-                  hasEligibleRelationship
-                      ? 'belegt'
-                      : 'Hinweis · noch nicht score-aktiv',
+                  eligibleRelationships.isEmpty
+                      ? 'Hinweis · noch nicht score-aktiv'
+                      : _evidenceSummary(eligibleRelationships),
                   style: ScanFairTypography.meta,
                 ),
             ],
@@ -433,6 +448,44 @@ class _TraceabilityRow extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  static String _evidenceSummary(List<ESGRelationship> relationships) {
+    final assertionClasses = relationships
+        .map((entry) => entry.assertionClass)
+        .toSet();
+    final confidences = relationships.map((entry) => entry.confidence).toSet();
+    final sources = relationships.map((entry) => entry.source.name).toSet();
+    final assertion = assertionClasses.length == 1
+        ? _assertionLabel(assertionClasses.single)
+        : 'mehrere Nachweisarten';
+    final confidence = confidences.length == 1
+        ? _confidenceLabel(confidences.single)
+        : 'gemischte Sicherheit';
+    final source = sources.length == 1 ? sources.single : 'mehrere Quellen';
+    return 'belegt · $assertion · $confidence · $source';
+  }
+
+  static String _assertionLabel(ESGAssertionClass assertionClass) {
+    return switch (assertionClass) {
+      ESGAssertionClass.measured => 'Messwert',
+      ESGAssertionClass.verified => 'verifiziert',
+      ESGAssertionClass.declared => 'Herstellerangabe',
+      ESGAssertionClass.modeled => 'modelliert',
+      ESGAssertionClass.categoryAverage => 'Kategoriewert',
+      ESGAssertionClass.communityReported => 'Community-Hinweis',
+      ESGAssertionClass.inferred => 'abgeleitet',
+      ESGAssertionClass.unknown => 'unklar',
+    };
+  }
+
+  static String _confidenceLabel(ESGConfidence confidence) {
+    return switch (confidence) {
+      ESGConfidence.high => 'hohe Sicherheit',
+      ESGConfidence.medium => 'mittlere Sicherheit',
+      ESGConfidence.low => 'niedrige Sicherheit',
+      ESGConfidence.unknown => 'Sicherheit unbekannt',
+    };
   }
 }
 

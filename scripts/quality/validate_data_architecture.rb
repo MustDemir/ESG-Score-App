@@ -86,6 +86,10 @@ else
       "traceability_relationships_score_eligible_check",
     "relationship snapshot lineage" => "relationship_ids",
     "red-flag snapshot lineage" => "red_flag_evidence_ids",
+    "product-scoped relationship context" => "context_entity_id",
+    "relationship context constraint" =>
+      "traceability_relationships_context_check",
+    "GEPA declaration source" => "'gepa-product-declarations'",
   }
   required_markers.each do |name, marker|
     violations << "Missing #{name}" unless sql.include?(marker)
@@ -113,6 +117,17 @@ if File.exist?(source_register_path)
   )
   violations << "OFF ODbL license missing in source register" unless (
     off&.dig("license", "database") == "ODbL-1.0"
+  )
+  gepa = sources.find do |source|
+    source["id"] == "gepa-product-declarations"
+  end
+  violations << "GEPA declaration source is not active" unless (
+    gepa && gepa["status"] == "active"
+  )
+  violations << "GEPA declaration redistribution boundary missing" unless (
+    gepa&.dig("license", "redistribution_allowed") == false &&
+      gepa&.dig("license", "stored_content") ==
+        "extracted_factual_assertions_and_provenance_only"
   )
 else
   violations << "Missing ESG data source register"

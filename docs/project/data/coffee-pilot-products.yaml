@@ -1,0 +1,117 @@
+schema_version: 1
+pilot_id: coffee-reference-case
+pilot_version: "1.0"
+methodology_version: 2.0-draft
+status: validated_fixture
+active_in_formula: false
+last_verified_at: "2026-08-10T14:54:03Z"
+owner: ScanFair
+
+purpose: |
+  Reproducible local reference set for testing product identity, coffee
+  commodity assignment and product-scoped commodity origin. The fixture does
+  not activate methodology 2.0 weights or contextual risk scores.
+
+safeguards:
+  - Open Food Facts country tags describe markets, not commodity origin.
+  - GEPA origin declarations are manufacturer statements, not independent audits.
+  - Every commodity-origin relationship is scoped to its GTIN product entity.
+  - Missing environmental evidence blocks the overall ESG score.
+  - Child-labor, forced-labor, water and deforestation risk joins remain inactive.
+
+sources:
+  open_food_facts:
+    source_id: open-food-facts
+    endpoint: https://world.openfoodfacts.org/api/v3/product/{gtin}.json
+    license: ODbL-1.0
+    attribution: Open Food Facts contributors
+    role: product_identity_and_community_fields
+  gepa_product_declarations:
+    source_id: gepa-product-declarations
+    record_id: gepa-price-list-2025-04
+    record_url: https://wug.gepa-shop.de/media/wysiwyg/pdf/Preisliste_04_2025_web.pdf
+    record_sha256: 74cc6607847090f5fb923f89b5a07e5542ec81a334ac9eef73876a4b28e6b150
+    publication_valid_from: "2025-04-01"
+    rights: proprietary_publication
+    storage_rule: extracted_factual_assertions_and_provenance_only
+    role: responsible_operator_product_and_origin_declaration
+
+products:
+  - gtin: "4013320225196"
+    article_number: "4430901"
+    expected_name: Bio Café Kolumbien PUR, gemahlen
+    commodity: coffee
+    origin_countries: [CO]
+    declaration:
+      assertion_class: declared
+      confidence: medium
+      score_eligible_relationships: true
+      source_record_id: "price-list-2025-04:4430901"
+    open_food_facts_snapshot:
+      result: product_found
+      product_name: Bio Café Kolumbien Pur
+      brands: Gepa
+      market_country_tags: ["en:spain"]
+      ecoscore_grade: unknown
+      nutriscore_grade: unknown
+      last_modified_t: 1779646723
+      retrieved_at: "2026-08-10T14:43:00Z"
+    score_expectation:
+      overall_state: data_incomplete
+      overall_score: null
+      contextual_risk_active: false
+
+  - gtin: "4013320114865"
+    article_number: "1860901"
+    expected_name: Bio Café Maliba, gemahlen
+    commodity: coffee
+    origin_countries: [UG]
+    declaration:
+      assertion_class: declared
+      confidence: medium
+      score_eligible_relationships: true
+      source_record_id: "price-list-2025-04:1860901"
+    open_food_facts_snapshot:
+      result: product_found
+      product_name: Maliba Kaffee Pulver
+      brands: Gepa
+      market_country_tags: ["en:germany"]
+      ecoscore_grade: unknown
+      nutriscore_grade: unknown
+      last_modified_t: 1709382083
+      retrieved_at: "2026-08-10T14:44:00Z"
+    score_expectation:
+      overall_state: data_incomplete
+      overall_score: null
+      contextual_risk_active: false
+
+  - gtin: "4013320110539"
+    article_number: "8900907"
+    expected_name: Bio Café Sereno, gemahlen
+    commodity: coffee
+    origin_countries: [GT, NI]
+    declaration:
+      assertion_class: declared
+      confidence: medium
+      score_eligible_relationships: true
+      source_record_id: "price-list-2025-04:8900907"
+    open_food_facts_snapshot:
+      result: product_found
+      product_name: Café Bio Sereno mild und entkoffeiniert von Gepa bei Aldi
+      brands: null
+      market_country_tags: ["en:france", "en:germany"]
+      ecoscore_grade: unknown
+      nutriscore_grade: unknown
+      last_modified_t: 1671188603
+      retrieved_at: "2026-08-10T14:45:00Z"
+    score_expectation:
+      overall_state: data_incomplete
+      overall_score: null
+      contextual_risk_active: false
+
+verification:
+  flutter_catalog: esg_app/lib/data_sources/coffee_pilot_catalog.dart
+  flutter_tests: esg_app/test/data_sources/coffee_pilot_catalog_test.dart
+  database_migration: supabase/migrations/20260810000100_context_scoped_traceability.sql
+  database_tests: supabase/tests/database/data_architecture.test.sql
+  gate: G-LINK-INTEGRITY

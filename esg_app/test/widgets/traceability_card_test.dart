@@ -1,3 +1,4 @@
+import 'package:esg_app/data_sources/coffee_pilot_catalog.dart';
 import 'package:esg_app/models/esg_evidence.dart';
 import 'package:esg_app/models/esg_relationship.dart';
 import 'package:esg_app/models/product.dart';
@@ -61,5 +62,40 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Rechtsträger noch nicht aufgelöst'), findsOneWidget);
+  });
+
+  testWidgets('shows declared coffee origins with source and confidence', (
+    tester,
+  ) async {
+    const catalog = CoffeePilotCatalog();
+    final product = catalog.enrichOrCreate(barcode: '4013320110539')!;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            child: TraceabilityCard(product: product),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Kaffee'), findsOneWidget);
+    expect(find.text('Rohstoffherkunft'), findsOneWidget);
+    expect(find.text('Guatemala, Nicaragua'), findsOneWidget);
+    expect(
+      find.text(
+        'belegt · Herstellerangabe · mittlere Sicherheit · '
+        'GEPA Produktangaben',
+      ),
+      findsNWidgets(2),
+    );
+    expect(
+      find.text(
+        'Rohstoff und Herkunft sind für kontextuelle '
+        'Risikodaten freigegeben.',
+      ),
+      findsOneWidget,
+    );
   });
 }

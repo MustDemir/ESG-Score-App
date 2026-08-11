@@ -64,6 +64,7 @@ void main() {
       sourceRecordId: 'verified-origin-record',
       evidenceIds: const ['verified:origin'],
       scoreEligible: true,
+      contextEntity: product,
       retrievedAt: retrievedAt,
     );
     final scanFairProduct = ScanFairProduct(
@@ -78,9 +79,76 @@ void main() {
 
     expect(scanFairProduct.hasScoreEligibleCommodityOrigin, isTrue);
     expect(commodityOrigin.supportsContextualRisk, isTrue);
+    expect(commodityOrigin.supportsContextualRiskFor(product.id), isTrue);
     expect(
       commodityOrigin.toMap()['relationship_type'],
       'commodity_has_origin',
+    );
+    expect(commodityOrigin.toMap()['context_entity_id'], product.id);
+  });
+
+  test('origin from another product cannot complete the chain', () {
+    const otherProduct = ESGEntity(
+      id: 'gtin:4013320225196',
+      type: ESGEntityType.product,
+      displayName: 'Anderes Produkt',
+    );
+    final containsCommodity = ESGRelationship(
+      id: 'relationship:contains-cocoa',
+      from: product,
+      to: commodity,
+      type: ESGRelationshipType.containsCommodity,
+      assertionClass: ESGAssertionClass.verified,
+      confidence: ESGConfidence.high,
+      source: ESGDataSource.localDemo,
+      sourceRecordId: 'verified-product-record',
+      evidenceIds: const ['verified:commodity'],
+      scoreEligible: true,
+      retrievedAt: retrievedAt,
+    );
+    final otherProductOrigin = ESGRelationship(
+      id: 'relationship:other-product-origin',
+      from: commodity,
+      to: country,
+      type: ESGRelationshipType.commodityHasOrigin,
+      assertionClass: ESGAssertionClass.verified,
+      confidence: ESGConfidence.high,
+      source: ESGDataSource.localDemo,
+      sourceRecordId: 'verified-origin-record',
+      evidenceIds: const ['verified:origin'],
+      scoreEligible: true,
+      contextEntity: otherProduct,
+      retrievedAt: retrievedAt,
+    );
+    final scanFairProduct = ScanFairProduct(
+      barcode: '4000417025005',
+      name: 'Testprodukt',
+      brand: 'Testmarke',
+      category: 'Schokolade',
+      imageEmoji: '□',
+      productType: ProductType.food,
+      relationships: [containsCommodity, otherProductOrigin],
+    );
+
+    expect(scanFairProduct.hasScoreEligibleCommodityOrigin, isFalse);
+  });
+
+  test('score-eligible commodity origin requires product context', () {
+    expect(
+      () => ESGRelationship(
+        id: 'relationship:unbound-origin',
+        from: commodity,
+        to: country,
+        type: ESGRelationshipType.commodityHasOrigin,
+        assertionClass: ESGAssertionClass.declared,
+        confidence: ESGConfidence.medium,
+        source: ESGDataSource.localDemo,
+        sourceRecordId: 'declared-origin-record',
+        evidenceIds: const ['declared:origin'],
+        scoreEligible: true,
+        retrievedAt: retrievedAt,
+      ),
+      throwsAssertionError,
     );
   });
 
