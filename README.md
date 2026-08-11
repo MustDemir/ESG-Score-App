@@ -423,6 +423,10 @@ bash scripts/quality/run_supply_chain_gate.sh
 bash scripts/quality/run_ios_build_gate.sh
 bash scripts/quality/run_data_database_gate.sh
 
+# Lizenzarchitektur: lokal gruen, Remote-Profil bleibt bis zur Freigabe rot
+DATA_LICENSE_PROFILE=development bash scripts/quality/run_quality_gates.sh
+ruby scripts/quality/validate_data_license_composition.rb --profile remote_backend
+
 # Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
 COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
 ```
@@ -443,6 +447,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-CMP-APPLE` | Acht Apple-Entscheidungs-Gates via Conftest auswerten |
 | `G-CMP-EVIDENCE` | SHA-256-Evidence-Chain vollstaendig verifizieren |
 | `G-DATA-ARCH` | Supabase-Migration, RLS, Client-Rechte und Datenlizenzen pruefen |
+| `G-DATA-LICENSE` | ODbL-Komposition, Quellen-Trennung, Attribution und Remote-Freigabegrenzen pruefen |
 | `G-METHOD-CATALOG` | Parameter, Profile, Vererbung, Claims und ausgesetzte Gewichtung validieren |
 | `G-LINK-INTEGRITY` | Produkt-, Rohstoff-, Herkunfts- und Rechtstraegerlinks auf Evidenz und Confidence pruefen |
 | `G-MISSING-DATA` | Positive, neutrale oder Null-Imputation bei fehlenden Daten verbieten |
@@ -471,7 +476,7 @@ Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
 geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
-einundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
+zweiundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
 Supply-Chain-/Dependency-Review-Job, ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
 separater Gitleaks-Secret-Scan. Dependabot prueft `pub` und GitHub Actions

@@ -1,7 +1,7 @@
 id: 0003
 title: Open Food Facts als primäre Produktdatenquelle
 date: 2026-05-19
-status: accepted
+status: superseded
 deciders: [Mustafa]
 tags: [data, api, dsgvo, licensing]
 
@@ -54,5 +54,5 @@ consequences:
   - Plan B definieren falls DE-Coverage <70%
 
 supersedes: null
-superseded_by: null
+superseded_by: 0030
 related: [0002]

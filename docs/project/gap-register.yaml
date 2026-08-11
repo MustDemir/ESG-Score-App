@@ -107,18 +107,19 @@ gaps:
   - id: GAP-003
     domain: data_licensing
     title: Lizenzarchitektur für die Kombination von OFF und weiteren Datenquellen
-    gap_type: partial
-    status: open
+    gap_type: documented_not_operational
+    status: in_progress
     priority: P0
     target_profile: development
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Mustafa Demir
     trigger: Vor Aufbau eines kombinierten Remote-Produkt- und Evidenzcaches
     concern: |
-      Quellen und Lizenzen werden einzeln geführt. Die ODbL-Auswirkung auf
-      eine kombinierte Datenbank mit proprietären oder anders lizenzierten
-      Quellen ist noch nicht verbindlich bewertet und technisch getrennt.
+      Die konservative ODbL-Klassifikation, Quellenpartition und das
+      Development-Gate sind umgesetzt. Vor einem Remote-Backend fehlen noch
+      operativer Share-Alike-Export, Korrektur/Loeschung und das qualifizierte
+      Rechtsreview der Produced-Work-, Derivative- und Collective-Grenzen.
     closure_criteria:
       - Database-, Content- und Bildlizenzen sind getrennt klassifiziert
       - Produced-Work-, Derivative-Database- und Collective-Database-Szenario ist geprüft
@@ -132,6 +133,17 @@ gaps:
       - RISK-006
     source_refs:
       - OFF-LICENSE
+      - ODC-ODBL
+      - ODC-DBCL
+      - CC-BY-SA-3
+      - ETALAB-OL-2
+    implementation_evidence:
+      - docs/project/audits/2026-08-11-data-license-composition-assessment.md
+      - docs/project/data/license-composition-policy.yaml
+      - docs/project/decisions/0030-data-license-composition.yaml
+      - docs/project/gate-definitions/local/G-DATA-LICENSE.yaml
+      - supabase/migrations/20260811000100_data_license_composition.sql
+      - scripts/quality/validate_data_license_composition.rb
 
   - id: GAP-004
     domain: privacy

@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-08-10
+Letztes Update: 2026-08-11
 
 ---
 
@@ -113,6 +113,13 @@ jede offene anwendbare MUST-Kontrolle sowie fehlende Device-Evidenz. Die
 Baseline klassifiziert alle 24 MASVS-2.1-Kontrollen; nicht anwendbare
 Kontrollen besitzen einen Reaktivierungs-Trigger, damit neue Auth-, Storage-,
 WebView- oder Backend-Funktionen eine erneute Bewertung erzwingen.
+
+`G-DATA-LICENSE` trennt ebenfalls Profile. `development` besteht nur bei
+deaktiviertem Remote-Backend und technisch gepruefter OFF-Quellentrennung.
+`remote_backend` und `release_candidate` blockieren, solange qualifiziertes
+Rechtsreview, maschinenlesbarer Share-Alike-Export sowie Korrektur- und
+Loeschprozesse fehlen. Ein lokales PASS ist daher keine Lizenzfreigabe fuer
+eine oeffentliche Datenbank.
 
 ### Branch-Protection auf `main` (GitHub Settings)
 

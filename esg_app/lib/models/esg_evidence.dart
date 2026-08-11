@@ -18,6 +18,12 @@ class ESGDataSource {
     required this.attribution,
     required this.sourceUrl,
     required this.termsUrl,
+    required this.databaseLicenseUrl,
+    this.contentLicense,
+    this.contentLicenseUrl,
+    this.imageLicense,
+    this.imageLicenseUrl,
+    this.publicUseNotice,
     this.apiVersion,
   });
 
@@ -28,6 +34,14 @@ class ESGDataSource {
     attribution: 'Open Food Facts contributors',
     sourceUrl: 'https://world.openfoodfacts.org',
     termsUrl: 'https://world.openfoodfacts.org/terms-of-use',
+    databaseLicenseUrl: 'https://opendatacommons.org/licenses/odbl/1-0/',
+    contentLicense: 'DbCL-1.0',
+    contentLicenseUrl: 'https://opendatacommons.org/licenses/dbcl/1-0/',
+    imageLicense: 'CC-BY-SA-3.0',
+    imageLicenseUrl: 'https://creativecommons.org/licenses/by-sa/3.0/',
+    publicUseNotice:
+        'Enthält Informationen aus Open Food Facts, die unter der '
+        'Open Database License (ODbL) v1.0 verfügbar sind.',
     apiVersion: 'v3',
   );
 
@@ -42,6 +56,13 @@ class ESGDataSource {
     termsUrl:
         'https://doc.agribalyse.fr/documentation/utiliser-agribalyse/'
         'precautions-et-conditions-dusage',
+    databaseLicenseUrl:
+        'https://www.etalab.gouv.fr/wp-content/uploads/2018/11/'
+        'open-licence.pdf',
+    contentLicense: 'Etalab-2.0',
+    contentLicenseUrl:
+        'https://www.etalab.gouv.fr/wp-content/uploads/2018/11/'
+        'open-licence.pdf',
     apiVersion: '3.2',
   );
 
@@ -52,6 +73,9 @@ class ESGDataSource {
     attribution: 'GEPA - The Fair Trade Company',
     sourceUrl: 'https://www.gepa-shop.de',
     termsUrl: 'https://www.gepa-shop.de/agb',
+    databaseLicenseUrl: 'https://www.gepa-shop.de/agb',
+    contentLicense: 'Proprietary-publication',
+    contentLicenseUrl: 'https://www.gepa-shop.de/agb',
     apiVersion: 'price-list-2025-04',
   );
 
@@ -62,6 +86,9 @@ class ESGDataSource {
     attribution: 'ScanFair development fixtures',
     sourceUrl: 'https://github.com/MustDemir/ESG-Score-App',
     termsUrl: 'https://github.com/MustDemir/ESG-Score-App',
+    databaseLicenseUrl: 'https://github.com/MustDemir/ESG-Score-App',
+    contentLicense: 'Project-internal',
+    contentLicenseUrl: 'https://github.com/MustDemir/ESG-Score-App',
   );
 
   final String id;
@@ -70,6 +97,12 @@ class ESGDataSource {
   final String attribution;
   final String sourceUrl;
   final String termsUrl;
+  final String databaseLicenseUrl;
+  final String? contentLicense;
+  final String? contentLicenseUrl;
+  final String? imageLicense;
+  final String? imageLicenseUrl;
+  final String? publicUseNotice;
   final String? apiVersion;
 }
 

@@ -36,7 +36,7 @@ docs/project/
 ├── session-start-protocol.md # Wiedereinstieg in neue Claude-Sessions
 ├── audits/                # Dated audit reports with scope and evidence
 ├── accessibility/         # VoiceOver language and terminology policy
-├── data/                  # Quellenregister, Datenarchitektur und Pilot-Fixtures
+├── data/                  # Quellenregister, Datenarchitektur, Lizenzvertrag und Pilot-Fixtures
 ├── implementation-plan.yaml # 22-Schritte-Plan in 5 Blöcken (Sprint 0 → Phase 2)
 ├── workflows/             # Strukturierte Arbeits-Rituale (Trigger-Phrasen-basiert)
 │   ├── README.md
@@ -86,6 +86,9 @@ Die [ScanFair Lifecycle Gap Analysis](methodology/gap-analysis-process.md)
 prüft dieses Modell wiederholt auf blinde Flecken. Der aktuelle Befund liegt im
 [Gap-Register](gap-register.yaml) und im datierten
 [Product Engineering Gap Audit](audits/2026-08-10-product-engineering-gap-analysis.md).
+Die aktuelle OFF-/ODbL-Entscheidung und ihre Remote-Blocker sind im
+[Data-License Composition Assessment](audits/2026-08-11-data-license-composition-assessment.md)
+festgehalten.
 
 ## Schnellzugriff für Claude Code
 

@@ -135,17 +135,18 @@ risks:
       inkompatibel lizenzierten Daten kann Offenlegungspflichten oder eine
       unzulässige Datenbankkomposition erzeugen.
     mitigation: |
-      Quellen und Evidenz werden getrennt inventarisiert. Vor dem Remote-Cache
-      werden Produced Work, Derivative Database und Collective Database
-      rechtlich bewertet und als logische oder physische Trennungsarchitektur
-      festgelegt. Attribution und Exportgrenzen werden getestet.
-    related_decisions: [0003]
+      OFF-Rohdaten bleiben in einer technisch erzwungenen ODbL-Partition;
+      externe Rohquellen brauchen eigene Speicher. Produced Work, Derivative
+      Database und Collective Database sind konservativ klassifiziert.
+      G-DATA-LICENSE blockiert Remote-Aktivierung bis Share-Alike-Export,
+      Korrektur/Loeschung und qualifiziertes Rechtsreview belegt sind.
+    related_decisions: [0030]
     related_gaps: [GAP-003]
     related_improvements: [IMP-COMP-005]
     status: open
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-08-10
+    updated: 2026-08-11
 
   - id: RISK-007
     title: Umwelt-, Nachhaltigkeits- oder Health-Aussage ist irreführend oder unzulässig
