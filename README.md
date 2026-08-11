@@ -261,7 +261,7 @@ als technische Fertigstellung.
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
 M2  Backend- und Datenanbindung           [########------------]  40%
-M3  Kaffee als Referenzfall               [####----------------]  20%
+M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
 M6  MVP-Beta und Product Hardening        [################----]  80%
@@ -272,8 +272,8 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, Migrationen und 51 pgTAP-Tests | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
-| M3 | Kaffeeprofil, Parameterkatalog und erstes AGRIBALYSE-Rohmapping | verifizierte Pilotprodukte, Rohstoff-/Herkunftslinks und reproduzierbare Detailerklaerung |
+| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, Migrationen und 55 pgTAP-Tests | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
+| M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
 | M6 | realer iPhone-Scanflow, Permission-Fallbacks, Dynamic Type, VoiceOver-Sprachwechsel und Fokusreihenfolge sowie Reduce Motion | dynamische Datenlokalisierung, Offline/History-Entscheidung und Feldtest |
@@ -282,12 +282,12 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 
 ### Naechste Arbeitspakete
 
-Diese Pakete beginnen nach der Integration bewusst bei `0%`:
+Die Pakete werden erst bei nachweisbarer Implementierung fortgeschrieben:
 
 ```text
 N0  Compliance-/Security-Baseline        [##############------]  70%
-N1  Kaffee-Pilotprodukte festlegen        [--------------------]   0%
-N2  Produkt -> Rohstoff -> Herkunft       [--------------------]   0%
+N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
+N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
 N4  Server-Writer und Flutter-Cache       [--------------------]   0%
 N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
@@ -298,11 +298,14 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 
 **Umsetzungsreihenfolge:** N0 besitzt jetzt den Dependency-/Supply-Chain-Scan
 und die risikobasierte OWASP-MASVS-Baseline; offen sind die priorisierten
-manuellen Apple-, MASVS- und Claim-Evidenzen. Danach wird M3 als lokaler evidence-first Kaffee-Referenzfall
-fortgesetzt. Sobald Produkt-, Rohstoff-, Herkunfts- und Evidenzvertraege fuer
-diesen vertikalen Schnitt stabil sind, laufen die offenen M2-Arbeiten parallel:
-EU-Supabase, vertrauenswuerdiger Server-Writer und read-only Flutter-Cache.
-Erst danach werden WRI, ILAB und GLEIF/BRIS score-relevant angebunden.
+manuellen Apple-, MASVS- und Claim-Evidenzen. N1 und N2 des lokalen
+evidence-first Kaffee-Referenzfalls sind abgeschlossen. Die produktgebundenen
+Herkunfts- und Evidenzvertraege sind jetzt stabil. Bevor die offenen
+M2-Arbeiten mit EU-Supabase, vertrauenswuerdigem Server-Writer und read-only
+Flutter-Cache beginnen, werden noch Lizenzkomposition, Privacy-Datenfluss und
+Backend-Threat-Model geschlossen. Erst danach werden WRI, ILAB und GLEIF/BRIS
+kontrolliert angebunden; score-relevant werden sie erst nach Kalibrierung und
+Fachreview.
 
 Die Regeln fuer deutsche, englische und buchstabierte VoiceOver-Begriffe sind
 in der [VoiceOver language and terminology policy](docs/project/accessibility/voiceover-language-policy.md)
@@ -333,6 +336,9 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 | [ESG-Datenarchitektur](docs/project/data/data-architecture.md) | Provenienzmodell, Supabase-Grenze und Quellenregeln |
 | [ESG-Methodikkatalog](docs/project/methodology-catalog/README.md) | versionierter Parameterkern und Pilotprofile fuer Kaffee, Banane und Kakao |
 | [Delivery Operating Model](docs/project/delivery-operating-model.md) | verbindlicher Arbeitsrahmen fuer Prozess, Compliance, Entwicklung und Release |
+| [Product Engineering Handbook](docs/project/methodology/product-engineering-handbook.md) | praktisches Gesamthandbuch zu Disziplinen, Methoden, Branches, Tests, DevSecOps und Reifepfad |
+| [Lifecycle Gap Analysis](docs/project/methodology/gap-analysis-process.md) | systematische Suche nach fehlenden, partiellen, veralteten und noch nicht operationalisierten Fähigkeiten |
+| [Gap-Register](docs/project/gap-register.yaml) | priorisierte P0-P2-Lücken mit Reifegrad, Owner, Trigger, Closure-Kriterien und Control-Mapping |
 | [Verbesserungsregister](docs/project/improvement-register.yaml) | priorisierte Prozess-, Compliance-, Entwicklungs- und Betriebsverbesserungen mit Evidenz |
 | [Supply-Chain-Policy](docs/project/compliance/supply-chain-policy.yaml) | OSV-, Lizenz-, native iOS-, Action-Pin- und Ausnahmevorgaben |
 | [OWASP-MASVS-iOS-Baseline](docs/project/compliance/owasp-masvs-ios-baseline.yaml) | risikobasierte Klassifikation aller 24 MASVS-2.1-Kontrollen mit Release-Profil |
@@ -366,7 +372,7 @@ implementiert.
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Layout und Stil im MVP-Smoke-Test bestaetigt |
 | Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Dreizehn Supabase-Tabellen reproduzierbar; 51 pgTAP-Tests und DB-Lint bestanden, Remote noch nicht verbunden |
+| Datenbank | Dreizehn Supabase-Tabellen reproduzierbar; 55 pgTAP-Tests und DB-Lint bestanden, Remote noch nicht verbunden |
 | Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
 | Supply Chain | 59 Dart-Pakete, 2 iOS-Plugins und 16 Action-Referenzen inventarisiert; OSV meldet 0 bekannte Schwachstellen |
 | Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
@@ -443,8 +449,8 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-RED-FLAG` | Nicht-kompensierbare Regeln fuer bestaetigte schwere Risiken pruefen |
 | `G-SCORE-REPRO` | Formel-, Evidenz-, Relationship- und Fingerprint-Lineage validieren |
 | `G-CLAIM-SAFETY` | Risiko-, Proxy- und Kundenaussagen gegen unzulaessige Behauptungen pruefen |
-| `G-DATA-RLS` | Migration real abspielen, 51 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
-| `G-PROJECT-CONTROL` | Verbesserungsregister, Abhaengigkeiten und Feature-Status gegen Drift pruefen |
+| `G-DATA-RLS` | Migration real abspielen, 55 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
+| `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
 | `G-IOS-COMPILE` | Nativen unsigned iOS-Simulator-Build und gebuendelte Privacy Manifests auf macOS/Xcode validieren |

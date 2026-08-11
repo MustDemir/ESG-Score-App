@@ -10,8 +10,8 @@ import 'theme/scanfair_theme.dart';
 void main() {
   runApp(
     ScanFairApp(
-      repository: OpenFoodFactsProductRepository(
-        service: OpenFoodFactsService(),
+      repository: CoffeePilotProductRepository(
+        source: OpenFoodFactsProductRepository(service: OpenFoodFactsService()),
       ),
     ),
   );

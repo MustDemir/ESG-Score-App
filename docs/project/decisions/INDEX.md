@@ -35,6 +35,8 @@ Letztes Update: 2026-08-10
 | [0025](0025-evidence-backed-traceability-links.yaml) | Evidenzbasierte Traceability-Links vor ESG-Risiko-Joins | accepted | 2026-07-27 | data, traceability, scoring, confidence, claims | 0022, 0023, 0024 |
 | [0026](0026-reproducible-supply-chain-baseline.yaml) | Reproduzierbare Dependency- und Supply-Chain-Baseline | accepted | 2026-07-28 | security, dependencies, supply-chain, github-actions, ios, licensing | 0007, 0008, 0017, 0020, 0021 |
 | [0027](0027-environmental-score-precedence.yaml) | Environmental-Evidenz als Voraussetzung fuer den Gesamt-ESG-Score | accepted | 2026-08-10 | scoring, esg, data-quality, transparency, methodology | 0010, 0011, 0022, 0023, 0025 |
+| [0028](0028-product-scoped-commodity-origin.yaml) | Produktgebundene Rohstoff-Herkunftsbeziehungen | accepted | 2026-08-10 | data, traceability, scoring, context, coffee | 0022, 0023, 0025, 0027 |
+| [0029](0029-lifecycle-gap-control.yaml) | Repo-native Lifecycle-Gap-Kontrolle mit Reifegrad und Evidence Closure | accepted | 2026-08-10 | methodology, governance, risk, quality-gates, release-readiness | 0007, 0009, 0020, 0021, 0022, 0026 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -47,7 +49,7 @@ Letztes Update: 2026-08-10
 
 | Status | Anzahl |
 |---|---|
-| accepted | 23 |
+| accepted | 25 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 1 |
@@ -58,14 +60,14 @@ Letztes Update: 2026-08-10
 - **architecture** → 0001, 0014, 0015, 0016, 0022
 - **scanner / ios** → 0017
 - **backend / database** → 0002, 0022
-- **data / api** → 0003, 0016, 0022, 0024, 0025
+- **data / api** → 0003, 0016, 0022, 0024, 0025, 0028
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
-- **ci-cd / testing** → 0007, 0020, 0021, 0026
+- **ci-cd / testing** → 0007, 0020, 0021, 0026, 0029
 - **security / dsgvo** → 0008, 0026
-- **methodology** → 0009, 0011, 0023, 0025
-- **scoring / esg** → 0010, 0011, 0023, 0025, 0027
-- **compliance** → 0009
+- **methodology** → 0009, 0011, 0023, 0025, 0028, 0029
+- **scoring / esg** → 0010, 0011, 0023, 0025, 0027, 0028
+- **compliance / governance** → 0009, 0029
 
 ## Wartung
 

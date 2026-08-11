@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(51);
+select plan(55);
 
 select has_table('public', 'data_sources', 'data_sources table exists');
 select has_table('public', 'cached_products', 'cached_products table exists');
@@ -64,6 +64,12 @@ select has_column(
   'score_snapshots',
   'red_flag_evidence_ids',
   'score snapshot records red-flag lineage'
+);
+select has_column(
+  'public',
+  'traceability_relationships',
+  'context_entity_id',
+  'commodity-origin relationship records product context'
 );
 
 select is(
@@ -414,6 +420,12 @@ values
     timestamptz '2026-07-27T00:00:00Z'
   ),
   (
+    'country:GH',
+    'country',
+    'Ghana',
+    timestamptz '2026-07-27T00:00:00Z'
+  ),
+  (
     'legal_entity:draft-company',
     'legal_entity',
     'Draft company',
@@ -440,6 +452,13 @@ values
     'scanfair_commodity',
     'cocoa',
     'ScanFair',
+    true
+  ),
+  (
+    'country:GH',
+    'iso_3166_1_alpha_2',
+    'GH',
+    'ISO',
     true
   ),
   (
@@ -509,6 +528,106 @@ select throws_ok(
   'inferred low-confidence relationship cannot be score-eligible'
 );
 
+select throws_ok(
+  $$
+    insert into public.traceability_relationships (
+      from_entity_id,
+      to_entity_id,
+      relationship_type,
+      assertion_class,
+      confidence,
+      source_id,
+      source_record_id,
+      evidence_ids,
+      score_eligible,
+      retrieved_at
+    )
+    values (
+      'commodity:cocoa',
+      'country:GH',
+      'commodity_has_origin',
+      'declared',
+      'medium',
+      'gepa-product-declarations',
+      'missing-context',
+      array['gepa:test:origin-gh'],
+      true,
+      timestamptz '2026-08-10T00:00:00Z'
+    )
+  $$,
+  '23514',
+  'new row for relation "traceability_relationships" violates check constraint "traceability_relationships_context_check"',
+  'score-eligible commodity origin requires product context'
+);
+
+select throws_ok(
+  $$
+    insert into public.traceability_relationships (
+      from_entity_id,
+      to_entity_id,
+      relationship_type,
+      assertion_class,
+      confidence,
+      source_id,
+      source_record_id,
+      evidence_ids,
+      score_eligible,
+      context_entity_id,
+      retrieved_at
+    )
+    values (
+      'commodity:cocoa',
+      'country:GH',
+      'commodity_has_origin',
+      'declared',
+      'medium',
+      'gepa-product-declarations',
+      'wrong-context-type',
+      array['gepa:test:origin-gh'],
+      true,
+      'legal_entity:draft-company',
+      timestamptz '2026-08-10T00:00:00Z'
+    )
+  $$,
+  '23514',
+  'context_entity_id must reference a product entity',
+  'commodity origin context must reference a product entity'
+);
+
+select lives_ok(
+  $$
+    insert into public.traceability_relationships (
+      from_entity_id,
+      to_entity_id,
+      relationship_type,
+      assertion_class,
+      confidence,
+      source_id,
+      source_record_id,
+      evidence_ids,
+      score_eligible,
+      context_entity_id,
+      retrieved_at,
+      published_at
+    )
+    values (
+      'commodity:cocoa',
+      'country:GH',
+      'commodity_has_origin',
+      'declared',
+      'medium',
+      'gepa-product-declarations',
+      'valid-product-context',
+      array['gepa:test:origin-gh'],
+      true,
+      'gtin:4000417025005',
+      timestamptz '2026-08-10T00:00:00Z',
+      timestamptz '2026-08-10T00:00:00Z'
+    )
+  $$,
+  'declared product-scoped commodity origin is accepted'
+);
+
 set local role anon;
 
 select results_eq(
@@ -567,7 +686,11 @@ select results_eq(
     from public.traceability_entities
     order by id
   $$,
-  array['commodity:cocoa'::text, 'gtin:4000417025005'::text],
+  array[
+    'commodity:cocoa'::text,
+    'country:GH'::text,
+    'gtin:4000417025005'::text
+  ],
   'anon sees only published traceability entities'
 );
 
@@ -575,9 +698,9 @@ select results_eq(
   $$
     select identifier_value
     from public.traceability_entity_identifiers
-    order by identifier_value
+    order by lower(identifier_value), identifier_value
   $$,
-  array['4000417025005'::text, 'cocoa'::text],
+  array['4000417025005'::text, 'cocoa'::text, 'GH'::text],
   'anon sees identifiers of published entities only'
 );
 
@@ -587,7 +710,7 @@ select results_eq(
     from public.traceability_relationships
     order by relationship_type
   $$,
-  array['contains_commodity'::text],
+  array['commodity_has_origin'::text, 'contains_commodity'::text],
   'anon sees published traceability relationships only'
 );
 

@@ -74,6 +74,13 @@ sources:
     version: current-web
     normative_weight: SHOULD
     scope: iOS interaction, accessibility and visual conventions
+  - id: APPLE-ACCESSIBILITY-LABELS
+    authority: Apple
+    title: Accessibility Nutrition Labels
+    url: https://developer.apple.com/help/app-store-connect/manage-app-accessibility/overview-of-accessibility-nutrition-labels
+    version: current-web
+    normative_weight: SHOULD_BECOMING_REQUIRED
+    scope: Common-task accessibility evaluation and App Store product-page declarations
   - id: OWASP-MASVS
     authority: OWASP Foundation
     title: Mobile Application Security Verification Standard
@@ -88,6 +95,34 @@ sources:
     version: consolidated-current
     normative_weight: MUST
     scope: Personal-data processing where applicable
+  - id: EU-ECGT-2024-825
+    authority: European Union
+    title: Directive (EU) 2024/825 on empowering consumers for the green transition
+    url: https://eur-lex.europa.eu/eli/dir/2024/825/oj
+    version: applies-from-2026-09-27
+    normative_weight: CONDITIONAL_MUST
+    scope: Consumer-facing environmental and sustainability claims
+  - id: EU-NHCR-1924-2006
+    authority: European Union
+    title: Regulation (EC) No 1924/2006 on nutrition and health claims made on foods
+    url: https://eur-lex.europa.eu/eli/reg/2006/1924/oj
+    version: consolidated-current
+    normative_weight: CONDITIONAL_MUST
+    scope: Nutrition and health claims in commercial communications
+  - id: EU-HEALTH-CLAIMS-REGISTER
+    authority: European Commission
+    title: EU Register of Nutrition and Health Claims
+    url: https://food.ec.europa.eu/food-safety/labelling-and-nutrition/nutrition-and-health-claims/eu-register-health-claims_en
+    version: current-web
+    normative_weight: CONDITIONAL_MUST
+    scope: Permitted, authorised and non-authorised health claims and conditions
+  - id: EU-PEF
+    authority: European Commission
+    title: Recommendation on Environmental Footprint methods
+    url: https://environment.ec.europa.eu/document/download/cb899bd7-bb06-491d-9989-c856a401fcd0_en
+    version: C-2021-9332
+    normative_weight: METHODOLOGY_REFERENCE
+    scope: Life-cycle environmental performance measurement and communication
   - id: DE-DDG
     authority: Germany
     title: Digitale-Dienste-Gesetz, Section 5

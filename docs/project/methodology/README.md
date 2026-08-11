@@ -5,6 +5,13 @@ gepflegt wird, wie der Fortschritt getrackt wird, welche YAML-Konventionen gelte
 
 ## Dateien
 
+- [product-engineering-handbook.md](product-engineering-handbook.md) — praktisches
+  Gesamthandbuch: Disziplinen, Methoden, Branches, Lifecycle, Ist-Stand und
+  Reifepfad
+- [gap-analysis-process.md](gap-analysis-process.md) — wiederholbare
+  Lifecycle-Gap-Analyse mit zwölf Prüffeldern, Reifegrad und Closure-Regeln
+- [vorgehenssystem.md](vorgehenssystem.md) — Herkunft und Synthese des
+  repo-nativen Vorgehenssystems
 - [adr-process.md](adr-process.md) — Architecture Decision Records erstellen
 - [backlog-process.md](backlog-process.md) — Ideen und TODOs verwalten
 - [progress-tracking.md](progress-tracking.md) — Fortschritt tracken
@@ -31,3 +38,4 @@ funktioniert offline, gehört dir komplett.
 | „Wo stehen wir gerade?" | `progress.yaml` |
 | „Was ist die nächste Phase?" | `roadmap.yaml` |
 | „Was bedeutet eigentlich XYZ?" | `glossary.yaml` |
+| „Was haben wir noch nicht bedacht?" | `gap-analysis-process.md` + `gap-register.yaml` |

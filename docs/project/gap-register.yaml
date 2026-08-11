@@ -1,0 +1,440 @@
+schema_version: "1.0"
+last_assessed: 2026-08-10
+next_full_review_due: 2026-11-10
+owner: Mustafa Demir
+method: docs/project/methodology/gap-analysis-process.md
+assessment_report: docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+
+allowed_values:
+  domains:
+    - product
+    - ux_accessibility
+    - mobile
+    - methodology
+    - data_licensing
+    - legal_claims
+    - privacy
+    - security
+    - quality
+    - devops
+    - operations
+    - release_governance
+  gap_types:
+    - absent
+    - partial
+    - documented_not_operational
+    - stale
+    - trigger_based
+  statuses:
+    - open
+    - in_progress
+    - monitored
+    - closed
+    - accepted
+  priorities:
+    - P0
+    - P1
+    - P2
+    - P3
+  target_profiles:
+    - development
+    - release_candidate
+    - submission
+    - future
+
+gaps:
+  - id: GAP-001
+    domain: methodology
+    title: Wissenschaftliche Validierung und Kalibrierung des ESG-Scores
+    gap_type: partial
+    status: in_progress
+    priority: P0
+    target_profile: release_candidate
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor Aktivierung der Methodik 2.0 oder öffentlicher Bewerbung eines belastbaren Nachhaltigkeitsscores
+    concern: |
+      Parameterstruktur und Safety Controls existieren, aber Normalisierung,
+      Gewichte, Sensitivität, Referenzkorpus und unabhängiges Fachreview fehlen.
+    closure_criteria:
+      - Gold-, Grenz- und Missing-Data-Testkorpus ist versioniert
+      - Normalisierung, Gewichte und Unsicherheitsbehandlung sind begründet und reproduzierbar
+      - Sensitivitäts-, Stabilitäts- und Ranking-Regressionstests bestehen
+      - ESG-, LCA- und Social-/Human-Rights-Fachreview ist dokumentiert
+      - Aktivierungsentscheidung erzeugt eine neue Methodikversion und ADR
+    mapped_improvements:
+      - IMP-DEV-001
+      - IMP-DEV-003
+    mapped_risks:
+      - RISK-003
+      - RISK-012
+    source_refs:
+      - EU-PEF
+
+  - id: GAP-002
+    domain: legal_claims
+    title: Verbraucherrechtliche Kontrolle von Umwelt-, Nachhaltigkeits- und Health-Claims
+    gap_type: partial
+    status: open
+    priority: P0
+    target_profile: release_candidate
+    maturity_current: 1
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor öffentlicher Beta, Marketing oder App-Store-Submission
+    concern: |
+      Technische Claim-Safety existiert, aber es fehlt ein rechtlich und
+      fachlich freigegebenes Claim-Inventar für Score, Ampelfarben,
+      Umweltbehauptungen und den separaten Health-Hinweis.
+    closure_criteria:
+      - Alle In-App- und Marketing-Claims sind inventarisiert und klassifiziert
+      - Jede Umwelt- oder Nachhaltigkeitsaussage besitzt spezifische, aktuelle Evidenz
+      - Health- und Nutrition-Aussagen sind gegen EU-Recht und EU-Register geprüft
+      - Verbotene, generische oder zu starke Aussagen werden automatisiert oder im Review blockiert
+      - Qualifiziertes Rechts- und Fachreview ist dokumentiert
+    mapped_improvements:
+      - IMP-COMP-003
+      - IMP-COMP-004
+    mapped_risks:
+      - RISK-007
+    source_refs:
+      - APPLE-ARG
+      - EU-ECGT-2024-825
+      - EU-NHCR-1924-2006
+      - EU-HEALTH-CLAIMS-REGISTER
+
+  - id: GAP-003
+    domain: data_licensing
+    title: Lizenzarchitektur für die Kombination von OFF und weiteren Datenquellen
+    gap_type: partial
+    status: open
+    priority: P0
+    target_profile: development
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor Aufbau eines kombinierten Remote-Produkt- und Evidenzcaches
+    concern: |
+      Quellen und Lizenzen werden einzeln geführt. Die ODbL-Auswirkung auf
+      eine kombinierte Datenbank mit proprietären oder anders lizenzierten
+      Quellen ist noch nicht verbindlich bewertet und technisch getrennt.
+    closure_criteria:
+      - Database-, Content- und Bildlizenzen sind getrennt klassifiziert
+      - Produced-Work-, Derivative-Database- und Collective-Database-Szenario ist geprüft
+      - Physische oder logische Trennung inkompatibler Datensätze ist entschieden
+      - Attribution, Share-Alike, Export und Löschung sind technisch testbar
+      - Rechtsreview und ADR zur Produktionsarchitektur liegen vor
+    mapped_improvements:
+      - IMP-COMP-005
+      - IMP-DEV-002
+    mapped_risks:
+      - RISK-006
+    source_refs:
+      - OFF-LICENSE
+
+  - id: GAP-004
+    domain: privacy
+    title: Datenschutz-Betriebsmodell für Remote-Backend und externe Beta
+    gap_type: documented_not_operational
+    status: open
+    priority: P0
+    target_profile: release_candidate
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor Remote-Speicherung, Accounts, TestFlight oder Analytics
+    concern: |
+      Datenschutzanforderungen und RLS sind teilweise modelliert. Datenfluss,
+      Rechtsgrundlagen, Aufbewahrung, Betroffenenrechte, AVV, Löschung,
+      Incident und DPIA-Entscheidung sind noch nicht als Betriebsprozess belegt.
+    closure_criteria:
+      - Dateninventar und End-to-End-Datenfluss sind versioniert
+      - Rechtsgrundlage, Zweck, Empfänger, Region und Aufbewahrung sind je Datentyp festgelegt
+      - AVV, Löschung, Auskunft, Export und Incident-Prozess sind getestet
+      - DPIA-Erforderlichkeitsentscheidung ist dokumentiert
+      - Privacy Policy, App Privacy Details und Manifest stimmen mit realem Verhalten überein
+    mapped_improvements:
+      - IMP-COMP-003
+      - IMP-COMP-006
+      - IMP-DEV-002
+    mapped_risks:
+      - RISK-005
+    source_refs:
+      - EU-GDPR
+      - APPLE-APP-PRIVACY
+      - APPLE-APP-PRIVACY-DETAILS
+
+  - id: GAP-005
+    domain: security
+    title: End-to-End-Threat-Model und Missbrauchsschutz für den Serverpfad
+    gap_type: partial
+    status: open
+    priority: P1
+    target_profile: development
+    maturity_current: 2
+    maturity_target: 4
+    owner: Engineering
+    trigger: Vor Implementierung eines öffentlich erreichbaren Server-Writers
+    concern: |
+      Mobile MASVS und RLS sind vorhanden. Es fehlt ein systemweites Threat
+      Model für API, Writer, Adminzugang, Quellmanipulation, Replay, Rate
+      Limits, Kostenmissbrauch und Score-Snapshot-Integrität.
+    closure_criteria:
+      - Datenfluss- und Trust-Boundary-Diagramm ist erstellt
+      - Assets, Akteure, Bedrohungen und Abuse Cases sind priorisiert
+      - AuthN/AuthZ, Input Validation, Rate Limits, Idempotenz und Audit Trail sind getestet
+      - Secret Rotation und Break-glass-Zugriff sind dokumentiert
+      - unabhängiger Security-Review oder risikobasierter Penetrationstest ist entschieden
+    mapped_improvements:
+      - IMP-COMP-007
+      - IMP-DEV-002
+    mapped_risks:
+      - RISK-008
+    source_refs:
+      - OWASP-MASVS
+
+  - id: GAP-006
+    domain: quality
+    title: Messbare Performance-, Reliability- und Provider-Resilience-Budgets
+    gap_type: absent
+    status: open
+    priority: P1
+    target_profile: release_candidate
+    maturity_current: 1
+    maturity_target: 4
+    owner: Engineering
+    trigger: Vor externer Beta
+    concern: |
+      Funktionale Fehlerfälle sind getestet, aber Startzeit, Scan-to-Result,
+      API-Latenz, Speicher, Energie, Schema-Drift, Quoten und längere
+      Provider-Ausfälle besitzen keine messbaren Budgets oder Lastprofile.
+    closure_criteria:
+      - SLOs und Budgets für Start, Scan-to-Result, API und Datenfrische sind definiert
+      - Slow-network-, Offline-, Timeout-, Rate-Limit- und Schema-Drift-Tests bestehen
+      - Cache-, Stale-Data- und Provider-Ausfallverhalten ist sichtbar und getestet
+      - reale Geräte- und Netzwerktestmatrix ist dokumentiert
+    mapped_improvements:
+      - IMP-DEV-004
+      - IMP-OPS-001
+    mapped_risks:
+      - RISK-009
+    source_refs: []
+
+  - id: GAP-007
+    domain: product
+    title: Repräsentativer Feldtest für Produktabdeckung, Verständnis und Kaufentscheidung
+    gap_type: partial
+    status: open
+    priority: P1
+    target_profile: release_candidate
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor externer Beta und Score-Kalibrierung
+    concern: |
+      Der technische Kernflow ist auf dem iPhone validiert. Es fehlt ein
+      vorab definiertes, nicht über OFF-Search ausgewähltes Barcode-Korpus und
+      ein Nutzertest für Verständnis, Vertrauen, Fehlinterpretation und
+      tatsächliche Entscheidungshilfe.
+    closure_criteria:
+      - repräsentatives Barcode- und Edge-Case-Korpus ist vorab festgelegt
+      - Find-, Daten- und Score-Coverage werden ohne Selection Bias gemessen
+      - Nutzer verstehen Score, Unsicherheit, Quellen und Health-Trennung
+      - Fehlinterpretationen und Abbruchgründe werden erfasst und priorisiert
+      - Ergebnisse fließen in Methodik, UX und Roadmap ein
+    mapped_improvements:
+      - IMP-DEV-003
+      - IMP-DEV-004
+    mapped_risks:
+      - RISK-001
+      - RISK-012
+    source_refs: []
+
+  - id: GAP-008
+    domain: ux_accessibility
+    title: Vollständige Accessibility-Release-Aussage und App-Store-Metadaten
+    gap_type: partial
+    status: open
+    priority: P1
+    target_profile: release_candidate
+    maturity_current: 3
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor App-Store-Submission und bei neuen gemeinsamen Aufgaben
+    concern: |
+      VoiceOver, Larger Text, Kontrast und Reduced Motion sind stark geprüft.
+      Apples vollständige Kriterien je gemeinsamem Task sowie Voice Control,
+      Differentiation ohne Farbe, Dark Interface und Accessibility Nutrition
+      Labels sind noch nicht als Release-Evidenz bewertet.
+    closure_criteria:
+      - alle gemeinsamen iPhone-Aufgaben gegen Apples Kriterien auditiert
+      - VoiceOver, Voice Control, Larger Text, Kontrast, Farbe und Reduced Motion bewertet
+      - Dark-Interface-Unterstützung ist umgesetzt oder ehrlich als nicht unterstützt erklärt
+      - App Store Accessibility Nutrition Labels entsprechen der Evidenz
+      - Audit wird für jeden Release Candidate wiederholt
+    mapped_improvements:
+      - IMP-COMP-003
+    mapped_risks: []
+    source_refs:
+      - APPLE-ACCESSIBILITY-LABELS
+      - APPLE-HIG
+
+  - id: GAP-009
+    domain: operations
+    title: Observability, Incident, Restore und Datenkorrektur operationalisieren
+    gap_type: documented_not_operational
+    status: open
+    priority: P1
+    target_profile: submission
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor TestFlight mit externen Testern
+    concern: |
+      Ziele sind dokumentiert, aber Monitoring, Alerting, Backup/Restore,
+      Incident, Support, Score-Rücknahme und Korrektur eines falschen
+      Produktdatensatzes wurden noch nicht real geprobt.
+    closure_criteria:
+      - datenschutzfreundliche Telemetrie und Alerts sind definiert und getestet
+      - Backup, Restore, Migration und Rollback-Drill bestehen
+      - Incident-, Support- und Datenkorrekturprozess besitzen Owner und Reaktionszeit
+      - fehlerhafte Quelle oder Score-Version kann gesperrt und nachvollziehbar ersetzt werden
+    mapped_improvements:
+      - IMP-OPS-001
+    mapped_risks:
+      - RISK-009
+    source_refs:
+      - EU-GDPR
+
+  - id: GAP-010
+    domain: release_governance
+    title: Business Continuity für Accounts, Zertifikate, Domains und Secrets
+    gap_type: partial
+    status: open
+    priority: P1
+    target_profile: submission
+    maturity_current: 1
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor öffentlicher Beta
+    concern: |
+      Einzelne Backup-Hinweise existieren, aber Apple-/GitHub-/Domain-/Backend-
+      Zugriff, 2FA-Recovery, Zertifikate, Schlüsselrotation und Owner-Ausfall
+      sind nicht als getestetes Kontinuitätsverfahren dokumentiert.
+    closure_criteria:
+      - kritische Accounts, Rollen, Recovery-Wege und Ablaufdaten sind inventarisiert
+      - 2FA-, Zertifikats-, Domain- und Secret-Recovery ist sicher dokumentiert
+      - mindestens ein Recovery-/Rotation-Drill ist protokolliert
+      - Zugriff folgt Least Privilege und besitzt einen Break-glass-Prozess
+    mapped_improvements:
+      - IMP-OPS-002
+    mapped_risks:
+      - RISK-011
+    source_refs: []
+
+  - id: GAP-011
+    domain: devops
+    title: Regelmäßiger Compliance- und Quellen-Freshness-Review
+    gap_type: partial
+    status: in_progress
+    priority: P1
+    target_profile: development
+    maturity_current: 2
+    maturity_target: 4
+    owner: Release owner
+    trigger: Monatlich bis Release sowie bei Apple-, EU-, OWASP- oder Provider-Änderungen
+    concern: |
+      Das Quellenregister besitzt Review-Daten, aber Änderungserkennung,
+      Diff-Bewertung, Requirement-Impact und Eskalation überfälliger Reviews
+      sind noch nicht vollständig als wiederholbarer Prozess und Gate belegt.
+    closure_criteria:
+      - jede Primärquelle besitzt Version, Owner, letzten und nächsten Review
+      - überfällige Reviews blockieren Release Candidate
+      - relevante Änderungen erzeugen Gap, Requirement, ADR oder begründetes No-Impact
+      - quartalsweiser vollständiger Lifecycle-Gap-Audit ist terminiert
+    mapped_improvements:
+      - IMP-PROC-003
+    mapped_risks:
+      - RISK-010
+    source_refs:
+      - APPLE-ARG
+      - OWASP-MASVS
+
+  - id: GAP-012
+    domain: ux_accessibility
+    title: Dynamische externe Daten lokalisieren und Datenfrische verständlich anzeigen
+    gap_type: partial
+    status: open
+    priority: P2
+    target_profile: release_candidate
+    maturity_current: 2
+    maturity_target: 4
+    owner: Engineering
+    trigger: Vor breiter Produktabdeckung oder Offline-Cache
+    concern: |
+      Statische Terminologie ist sprachsicher. Externe Produktnamen, Tags,
+      Quellenwerte, Datenalter und Cache-Status brauchen weiterhin robuste
+      Lokalisierungs- und VoiceOver-Metadaten.
+    closure_criteria:
+      - externe Werte werden als Name, Code oder kontrollierter Begriff klassifiziert
+      - Sprache und Aussprache sind pro kontrolliertem Begriff definiert
+      - Datenstand, Cache- und Offline-Zustand sind verständlich sichtbar
+      - Tests decken lange, unbekannte und mehrsprachige externe Werte ab
+    mapped_improvements:
+      - IMP-DEV-004
+    mapped_risks: []
+    source_refs: []
+
+  - id: GAP-013
+    domain: data_licensing
+    title: Einspruchs-, Korrektur- und Rücknahmeprozess für Produktdaten und Scores
+    gap_type: documented_not_operational
+    status: open
+    priority: P1
+    target_profile: release_candidate
+    maturity_current: 1
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor Veröffentlichung realer Produktbewertungen
+    concern: |
+      Nutzer oder Hersteller können aktuell keinen fehlerhaften Datensatz oder
+      Score strukturiert melden. Korrektur, Re-Scoring, Rücknahme, Audit Trail
+      und Nutzerkommunikation sind noch nicht operationalisiert.
+    closure_criteria:
+      - nachvollziehbarer Melde- und Triageweg ist veröffentlicht
+      - Evidenzänderung erzeugt versionierten Re-Score statt stiller Überschreibung
+      - falsche oder riskante Scores können gesperrt oder zurückgezogen werden
+      - Entscheidung, Reaktionszeit und Kommunikation sind protokolliert
+    mapped_improvements:
+      - IMP-OPS-001
+    mapped_risks:
+      - RISK-007
+      - RISK-009
+    source_refs: []
+
+  - id: GAP-014
+    domain: release_governance
+    title: Trigger-Kontrollen für Accounts, Payment, UGC, Analytics, Standort und AI
+    gap_type: trigger_based
+    status: monitored
+    priority: P2
+    target_profile: future
+    maturity_current: 2
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Sobald eine der genannten Capabilities in Scope oder Abhängigkeiten erscheint
+    concern: |
+      Diese Fähigkeiten sind aktuell nicht aktiv. Ohne verpflichtenden
+      Capability-Trigger könnten Account-Löschung, Sign in with Apple, IAP,
+      UGC-Moderation, ATT/Consent, Location Privacy oder AI-Governance später
+      zu spät berücksichtigt werden.
+    closure_criteria:
+      - Pre-Coding-Check klassifiziert neue Capabilities
+      - anwendbare Requirements und Gates werden vor Implementierung aktiviert
+      - Privacy-, Security-, Legal- und Operations-Folgen sind in DoR und DoD enthalten
+    mapped_improvements:
+      - IMP-PROC-003
+    mapped_risks: []
+    source_refs:
+      - APPLE-ARG

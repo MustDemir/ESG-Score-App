@@ -5,6 +5,10 @@ require "yaml"
 
 repo_root = File.expand_path("../..", __dir__)
 register_path = File.join(repo_root, "docs/project/improvement-register.yaml")
+gap_register_path = File.join(repo_root, "docs/project/gap-register.yaml")
+risk_register_path = File.join(repo_root, "docs/project/risks.yaml")
+compliance_source_path =
+  File.join(repo_root, "docs/project/compliance/source-register.yaml")
 features_dir = File.join(repo_root, "docs/project/features")
 feature_readme_path = File.join(features_dir, "README.md")
 violations = []
@@ -183,6 +187,194 @@ visit = lambda do |id, path|
 end
 ids.each { |id| visit.call(id, []) }
 
+gap_count = 0
+unless File.file?(gap_register_path)
+  violations << "docs/project/gap-register.yaml: file is missing"
+else
+  gap_register = load_yaml(gap_register_path)
+  gap_count = Array(gap_register["gaps"]).length
+
+  %w[
+    schema_version
+    last_assessed
+    next_full_review_due
+    owner
+    method
+    assessment_report
+    allowed_values
+    gaps
+  ].each do |field|
+    unless gap_register.key?(field)
+      violations << "gap-register.yaml: missing root field #{field}"
+    end
+  end
+
+  %w[method assessment_report].each do |field|
+    reference = gap_register[field]
+    next if reference.to_s.strip.empty?
+
+    reference_path = File.join(repo_root, reference.to_s)
+    unless File.file?(reference_path)
+      violations << "gap-register.yaml: #{field} path does not exist: #{reference}"
+    end
+  end
+
+  begin
+    last_assessed = Date.parse(gap_register.fetch("last_assessed").to_s)
+    if last_assessed > Date.today
+      violations << "gap-register.yaml: last_assessed cannot be in the future"
+    end
+  rescue KeyError, Date::Error
+    violations << "gap-register.yaml: last_assessed must be an ISO date"
+  end
+
+  begin
+    next_review = Date.parse(gap_register.fetch("next_full_review_due").to_s)
+    if next_review < Date.today
+      violations <<
+        "gap-register.yaml: full lifecycle review overdue since #{next_review}"
+    end
+  rescue KeyError, Date::Error
+    violations << "gap-register.yaml: next_full_review_due must be an ISO date"
+  end
+
+  gap_allowed = gap_register.fetch("allowed_values", {})
+  gap_domains = Array(gap_allowed["domains"])
+  gap_types = Array(gap_allowed["gap_types"])
+  gap_statuses = Array(gap_allowed["statuses"])
+  gap_priorities = Array(gap_allowed["priorities"])
+  gap_profiles = Array(gap_allowed["target_profiles"])
+
+  {
+    "domains" => gap_domains,
+    "gap_types" => gap_types,
+    "statuses" => gap_statuses,
+    "priorities" => gap_priorities,
+    "target_profiles" => gap_profiles,
+  }.each do |field, values|
+    if values.empty?
+      violations << "gap-register.yaml: allowed_values.#{field} must not be empty"
+    end
+  end
+
+  risks =
+    if File.file?(risk_register_path)
+      Array(load_yaml(risk_register_path)["risks"])
+    else
+      violations << "docs/project/risks.yaml: file is missing"
+      []
+    end
+  risk_ids = risks.map { |risk| risk["id"] }.compact
+
+  sources =
+    if File.file?(compliance_source_path)
+      Array(load_yaml(compliance_source_path)["sources"])
+    else
+      violations << "docs/project/compliance/source-register.yaml: file is missing"
+      []
+    end
+  source_ids = sources.map { |source| source["id"] }.compact
+
+  gaps = Array(gap_register["gaps"])
+  violations << "gap-register.yaml: gaps must not be empty" if gaps.empty?
+  gap_ids = gaps.map { |gap| gap["id"] }.compact
+  gap_ids.each_with_object(Hash.new(0)) do |id, counts|
+    counts[id] += 1
+  end.each do |id, count|
+    violations << "gap-register.yaml: duplicate gap id #{id}" if count > 1
+  end
+
+  gaps.each_with_index do |gap, index|
+    location = "gap-register.yaml: gaps[#{index}]"
+    id = gap["id"]
+    unless id.to_s.match?(/\AGAP-\d{3}\z/)
+      violations << "#{location}: invalid id #{id.inspect}"
+    end
+
+    %w[title owner trigger concern].each do |field|
+      if gap[field].to_s.strip.empty?
+        violations << "#{id || location}: #{field} must not be empty"
+      end
+    end
+
+    {
+      "domain" => gap_domains,
+      "gap_type" => gap_types,
+      "status" => gap_statuses,
+      "priority" => gap_priorities,
+      "target_profile" => gap_profiles,
+    }.each do |field, values|
+      unless values.include?(gap[field])
+        violations << "#{id || location}: invalid #{field} #{gap[field].inspect}"
+      end
+    end
+
+    current_maturity = gap["maturity_current"]
+    target_maturity = gap["maturity_target"]
+    unless current_maturity.is_a?(Integer) && current_maturity.between?(0, 5)
+      violations << "#{id || location}: maturity_current must be an integer from 0 to 5"
+    end
+    unless target_maturity.is_a?(Integer) && target_maturity.between?(0, 5)
+      violations << "#{id || location}: maturity_target must be an integer from 0 to 5"
+    end
+    if current_maturity.is_a?(Integer) && target_maturity.is_a?(Integer) &&
+       target_maturity < current_maturity
+      violations << "#{id || location}: maturity_target cannot be below current maturity"
+    end
+
+    closure_criteria = Array(gap["closure_criteria"])
+    if closure_criteria.length < 3
+      violations << "#{id || location}: at least three closure criteria are required"
+    end
+
+    mapped_improvements = Array(gap["mapped_improvements"])
+    mapped_risks = Array(gap["mapped_risks"])
+    source_refs = Array(gap["source_refs"])
+
+    if %w[P0 P1].include?(gap["priority"]) && mapped_improvements.empty?
+      violations << "#{id || location}: P0/P1 gaps require an improvement mapping"
+    end
+
+    mapped_improvements.each do |improvement_id|
+      unless ids.include?(improvement_id)
+        violations << "#{id || location}: unknown improvement #{improvement_id}"
+      end
+    end
+    mapped_risks.each do |risk_id|
+      unless risk_ids.include?(risk_id)
+        violations << "#{id || location}: unknown risk #{risk_id}"
+      end
+    end
+    source_refs.each do |source_id|
+      unless source_ids.include?(source_id)
+        violations << "#{id || location}: unknown compliance source #{source_id}"
+      end
+    end
+
+    if gap["status"] == "monitored" && gap["gap_type"] != "trigger_based"
+      violations << "#{id || location}: monitored status requires trigger_based type"
+    end
+
+    if gap["status"] == "closed"
+      if !current_maturity.is_a?(Integer) || current_maturity < 4
+        violations << "#{id || location}: closed gaps require maturity_current >= 4"
+      end
+      evidence = Array(gap["closure_evidence"])
+      if evidence.empty?
+        violations << "#{id || location}: closed gaps require closure_evidence"
+      end
+      evidence.each do |reference|
+        next if reference.to_s.match?(%r{\Ahttps://})
+
+        evidence_path = File.join(repo_root, reference.to_s)
+        unless File.exist?(evidence_path)
+          violations << "#{id || location}: closure evidence path does not exist: #{reference}"
+        end
+      end
+    end
+  end
+end
+
 unless File.file?(feature_readme_path)
   violations << "docs/project/features/README.md: file is missing"
 else
@@ -257,6 +449,7 @@ if violations.empty?
     "Project control traceability OK: " \
     "#{improvements.length} improvements, " \
     "#{execution_order.length} active sequence items, " \
+    "#{gap_count} lifecycle gaps, " \
     "#{Dir.glob(File.join(features_dir, '*', 'state.yaml')).length} feature states",
   )
   exit 0

@@ -1,5 +1,5 @@
-version: "1.0"
-last_updated: "2026-07-27"
+version: "1.1"
+last_updated: "2026-08-10"
 owner: "ScanFair"
 
 integration_rules:
@@ -74,6 +74,34 @@ sources:
         - source_updates_every_18_to_24_months
     reviewed_on: "2026-07-27"
     review_due: "2026-10-27"
+
+  - id: gepa-product-declarations
+    name: GEPA Produktangaben
+    status: active
+    role: responsible_operator_product_and_origin_declaration
+    scope_restriction: coffee_reference_case_only
+    delivery:
+      canonical: official_product_publication
+      current_record: https://wug.gepa-shop.de/media/wysiwyg/pdf/Preisliste_04_2025_web.pdf
+      current_record_sha256: 74cc6607847090f5fb923f89b5a07e5542ec81a334ac9eef73876a4b28e6b150
+      automated_api: false
+    license:
+      database: Proprietary-publication
+      attribution: GEPA - The Fair Trade Company
+      redistribution_allowed: false
+      stored_content: extracted_factual_assertions_and_provenance_only
+      terms: https://www.gepa-shop.de/agb
+    quality:
+      class: official_responsible_operator_declaration
+      default_assertion_class: declared
+      default_confidence: medium
+      limitations:
+        - not_independently_audited_by_scanfair
+        - publication_may_change
+        - origin_may_be_product_or_batch_dependent
+        - no_environmental_performance_measurement
+    reviewed_on: "2026-08-10"
+    review_due: "2026-11-10"
 
 planned_sources:
   - id: gs1-traceability-standards

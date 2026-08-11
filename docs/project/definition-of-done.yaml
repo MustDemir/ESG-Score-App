@@ -1,4 +1,4 @@
-last_updated: 2026-05-19
+last_updated: 2026-08-10
 
 # =============================================================================
 # Definition of Done
@@ -27,6 +27,12 @@ universal_checks:
     check: Commit-Message folgt Konvention (siehe methodology/conventions.md)
   - id: U-5
     check: Out-of-Scope der aktuellen Phase nicht verletzt
+  - id: U-6
+    check: Auswirkungen auf Claims, Datenlizenz, Privacy, Security, Accessibility und Betrieb wurden klassifiziert
+  - id: U-7
+    check: Neue oder verschärfte Lücke wurde in gap-register.yaml und improvement-register.yaml verankert
+  - id: U-8
+    check: Account, Payment, UGC, Analytics, Standort und AI/ML wurden als Capability-Trigger geprüft
 
 # =============================================================================
 # TASK-TYPEN
@@ -88,6 +94,36 @@ task_types:
       - failure-modes.yaml [FM-02, FM-11]
 
   # ---------------------------------------------------------------------------
+  - id: data_source_integration
+    title: Neue ESG-, Produkt-, Risiko- oder Unternehmensdatenquelle
+    description: Quelle, Mapping oder neue Datenbeziehung vor Score-Aktivierung
+    lade_manifest:
+      pflicht:
+        - data/source-register.yaml
+        - data/data-architecture.md
+        - methodology-catalog/scoring-controls.yaml
+        - decisions/0022-evidence-first-data-integration.yaml
+        - decisions/0025-evidence-backed-traceability-links.yaml
+        - gap-register.yaml
+      kontext:
+        - compliance/source-register.yaml
+        - risks.yaml
+    checks:
+      - Autorität, Originalquelle, Version, Aktualität und Granularität sind dokumentiert
+      - Database-, Content- und Bildlizenz sowie Attribution sind getrennt geprüft
+      - ODbL- oder andere Kompositionswirkung auf den Zieldatenspeicher ist bewertet
+      - Produkt-, Rohstoff-, Herkunfts- oder Rechtsträgerbeziehung besitzt geeignete Evidenz und Confidence
+      - Rohfeld, Normalisierung und Retrieval-Channel bleiben nachvollziehbar
+      - Unsichere Community-, Hersteller- oder Kategorieangaben sind standardmäßig nicht score-aktiv
+      - Missing-Data-, Red-Flag-, Reproducibility- und Claim-Safety-Regeln sind erfüllt
+      - Mapper-, Contract-, negative und Schema-Drift-Tests bestehen
+      - Datenkorrektur, Rücknahme, Frische und Provider-Ausfall sind beschrieben
+      - G-DATA-ARCH, G-METHOD-CATALOG und betroffene Scoring-Safety-Gates bestehen
+    references:
+      - methodology/gap-analysis-process.md
+      - data/data-architecture.md
+
+  # ---------------------------------------------------------------------------
   - id: supabase_change
     title: Supabase-Schema- oder Policy-Änderung
     description: Migration, neue Tabelle, neue RLS-Policy
@@ -135,6 +171,9 @@ task_types:
       - Datenkonfidenz bleibt außerhalb der E-/S-/G-Gewichtung
       - Neue Gewichte benötigen Kalibrierung, Review und neue Methodikversion
       - Quelle, Lizenz, Scope, Aktualität und Mapping sind dokumentiert
+      - Umwelt-, Nachhaltigkeits-, Nutrition- und Health-Claims sind klassifiziert
+      - Referenzkorpus, Sensitivität und Ranking-Regression sind bei Aktivierung geprüft
+      - Qualifiziertes Fachreview liegt vor oder Änderung bleibt draft und nicht score-aktiv
       - G-METHOD-CATALOG erfolgreich
       - G-LINK-INTEGRITY erfolgreich
       - G-MISSING-DATA erfolgreich
@@ -186,16 +225,22 @@ task_types:
     checks:
       - Vollständige Release-Gate-Checklist (quality-strategy.md §5)
       - Coverage >= aktuelles Sprint-Ziel
-      - /security-review Slash-Command durchgelaufen
-      - compliance-auditor Skill durchgelaufen
+      - COMPLIANCE_PROFILE=release_candidate ohne offene anwendbare MUST-Findings
+      - G-MASVS und risikobasierter Security-Review abgeschlossen
       - Privacy Policy aktuell und versioniert
       - Apple Privacy Manifest gepflegt
+      - App Store Privacy Details stimmen mit App, SDKs und Backend überein
+      - Accessibility Nutrition Labels durch Common-Task-Evidenz gedeckt
+      - Umwelt-, Nachhaltigkeits- und Health-Claim-Review abgeschlossen
+      - Datenlizenz-, Attribution- und Supportnachweise geschlossen
       - Changelog geschrieben
       - Version-Bump in pubspec.yaml (SemVer)
       - Git-Tag gesetzt
       - Smoke-Test auf physischem iPhone
-      - Fastlane-Build erfolgreich
-      - Rollback-Plan im Kopf (welche Version war's vorher?)
+      - Signiertes Release-Archive reproduzierbar geprüft
+      - Backend-, Provider- und Reviewzugang funktionieren in der Zielumgebung
+      - Backup-, Restore-, Incident-, Support- und Datenkorrektur-Drill bestanden
+      - Rollback- und Score-Rücknahmeplan versioniert und reviewt
     references:
       - quality-strategy.md
       - failure-modes.yaml [FM-06, FM-07, FM-08, FM-15]
@@ -229,6 +274,55 @@ task_types:
       - Cross-Links funktionieren (relativ-Pfade korrekt)
       - last_updated-Feld aktualisiert
       - Falls Inhalt Entscheidung impliziert: ist auch ADR nötig?
+
+  # ---------------------------------------------------------------------------
+  - id: gap_assessment
+    title: Lifecycle-Gap- oder Phasenreife-Review
+    description: Vollständige oder capability-spezifische Lückenanalyse
+    lade_manifest:
+      pflicht:
+        - methodology/product-engineering-handbook.md
+        - methodology/gap-analysis-process.md
+        - gap-register.yaml
+        - improvement-register.yaml
+        - risks.yaml
+        - compliance/source-register.yaml
+      kontext:
+        - progress.yaml
+        - roadmap.yaml
+        - definition-of-done.yaml
+    checks:
+      - Zwölf Prüffelder gegen alle betroffenen Lifecycle-Phasen bewertet
+      - Negative-Space-, Premortem-, Threat-, Privacy- und NFR-Review durchgeführt
+      - Aktuelle Primärquellen mit Version und Prüftag verwendet
+      - Jeder P0-/P1-Gap besitzt Owner, Zielprofil, Trigger und Closure-Kriterien
+      - Jeder P0-/P1-Gap ist mit Improvement und Risiko verknüpft
+      - Auditbericht ist datiert und verändert frühere Befunde nicht still
+      - G-PROJECT-CONTROL und Dokumentations-Gates bestehen
+    references:
+      - methodology/gap-analysis-process.md
+
+  # ---------------------------------------------------------------------------
+  - id: operations_readiness
+    title: Betriebs-, Support- oder Resilience-Änderung
+    description: Monitoring, Alert, Incident, Backup, Restore, Korrektur oder Kontinuität
+    lade_manifest:
+      pflicht:
+        - delivery-operating-model.md
+        - improvement-register.yaml
+        - gap-register.yaml
+        - risks.yaml
+      kontext:
+        - failure-modes.yaml
+        - compliance/dsgvo-relevance.md
+    checks:
+      - SLO, Messpunkt, Alertschwelle, Owner und Reaktionszeit sind definiert
+      - Telemetrie ist datensparsam und mit Privacy-Angaben konsistent
+      - Runbook und Eskalationsweg sind versioniert
+      - Restore, Rollback oder Recovery wurde real geprobt
+      - Fehlerhafte Evidenz oder Score-Version kann gesperrt und korrigiert werden
+      - Nutzer-/Herstellermeldung und Audit Trail sind berücksichtigt
+      - Post-Drill-Findings sind in Gap-, Risiko- oder Verbesserungsregister erfasst
 
   # ---------------------------------------------------------------------------
   - id: dependency_update
@@ -282,8 +376,9 @@ escalation:
 # Wartung
 # =============================================================================
 maintenance:
-  cadence: 1× pro Phasenwechsel
+  cadence: Bei jedem Phasenwechsel und vollständiger Review mindestens quartalsweise
   questions:
     - Sind alle Task-Typen abgedeckt die in der neuen Phase auftauchen?
     - Welche Checks haben sich als zu lasch / zu streng erwiesen?
     - Gibt es neue Skills / Tools die wir hier einbinden sollten?
+    - Sind Primärquellen, Capability-Trigger und Gap-Zielprofile noch aktuell?

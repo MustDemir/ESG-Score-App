@@ -34,6 +34,7 @@ Each `ESGRelationship` records:
 - source record and supporting evidence IDs
 - confidence, retrieval time and optional validity period
 - whether the relationship is approved as a score input
+- optional product context for product-specific commodity-origin assertions
 
 ## Current integration
 
@@ -55,6 +56,13 @@ signals into explicit relationships. OFF community data is retained as
 ingredient. Therefore current OFF relationships cannot yet trigger
 commodity-country risk or legal-entity governance factors.
 
+The local coffee reference set adds three GEPA GTINs. Open Food Facts remains
+the product retrieval channel, while the official GEPA price list is retained
+as a separate responsible-operator declaration for coffee commodity and
+origin. Only extracted factual assertions, the source URL and its SHA-256 are
+stored; the publication itself is not redistributed. These declared links use
+medium confidence and do not activate a contextual risk score.
+
 ## Identity and relationship boundary
 
 The join path is explicit:
@@ -62,7 +70,7 @@ The join path is explicit:
 ```text
 GTIN product
   -> contains_commodity
-  -> commodity_has_origin
+  -> commodity_has_origin (context_entity_id = scanned GTIN)
   -> contextual environmental/social risk
 
 GTIN product
@@ -74,6 +82,9 @@ GTIN product
 Commodity-country risk requires both score-eligible links. Governance requires
 a score-eligible legal-entity resolution. Missing links block the affected
 factor and reduce confidence; they never create a neutral or positive value.
+The commodity-origin edge must carry the scanned product as context. This
+prevents an origin declared for one coffee from completing the relationship
+chain of another coffee product.
 
 The app currently calls Open Food Facts directly. Supabase is prepared as an
 optional cache and evidence store, but no remote project or Flutter SDK is
@@ -136,11 +147,15 @@ Open Food Facts database data is ODbL-licensed and requires attribution and
 share-alike handling. AGRIBALYSE 3.2 uses Etalab Open Licence 2.0 and requires
 ADEME attribution. Sources remain logically separated and the retrieval
 channel is explicit, avoiding a combined anonymous dataset.
+GEPA product publications are treated as proprietary source publications.
+ScanFair stores only extracted factual declarations and provenance for the
+local pilot, does not redistribute the document and labels the statements as
+manufacturer declarations rather than independent audit evidence.
 
 ## Next increments
 
-1. Build verified commodity-origin bindings for pilot products.
-2. Validate WRI Aqueduct only after the origin join passes link integrity.
+1. Validate WRI Aqueduct only after the coffee origin join passes field review.
+2. Add ILAB commodity-country risk as contextual, non-accusatory evidence.
 3. Resolve brand to legal entity through GLEIF/BRIS-compatible identifiers.
 4. Calibrate GHG normalization and missing-data behavior with test products.
 5. Create a dedicated EU development project and retain DPA/region evidence.

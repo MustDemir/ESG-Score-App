@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W33
-last_updated: 2026-08-10
+last_updated: 2026-08-11
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -16,8 +16,8 @@ roadmap_progress:
       progress_percent: 40
       next: connect_eu_supabase_server_writer_and_flutter_read_cache
     - id: M3-coffee-reference-case
-      progress_percent: 20
-      next: verify_pilot_products_commodity_origin_and_explanation
+      progress_percent: 45
+      next: integrate_contextual_environmental_social_and_governance_factors
     - id: M4-esg-source-expansion
       progress_percent: 15
       next: integrate_and_review_environmental_social_governance_sources
@@ -37,9 +37,9 @@ roadmap_progress:
     - id: N0-compliance-security-baseline
       progress_percent: 70
     - id: N1-coffee-pilot-products
-      progress_percent: 0
+      progress_percent: 100
     - id: N2-product-commodity-origin-links
-      progress_percent: 0
+      progress_percent: 100
     - id: N3-eu-supabase-project
       progress_percent: 0
     - id: N4-server-writer-flutter-cache
@@ -60,26 +60,145 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-10
-  branch: quality/ios-device-evidence
-  status: pull_request_open
-  pull_request: 17
+  prepared_at: 2026-08-11
+  session_closed_at: null
+  branch: feature/coffee-reference-case
+  status: integration_validated_remote_green
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/18
+  git_state:
+    committed: true
+    pushed: true
+    commits:
+      - f826acd feat: add evidence-first coffee reference case
+      - 2d2d6d0 docs: establish lifecycle gap control
+      - 62d9f63 fix: harden coffee fallback and context isolation
+    reason: Vier PR-Review-Findings sind behoben; lokale Gates und alle fuenf GitHub Required Checks sind gruen
+  latest_validation:
+    executed_at: "2026-08-11T07:35:06Z"
+    development_quality_gates: 21/21 PASS
+    flutter_tests: 89/89 PASS
+    flutter_line_coverage: 82.57 percent
+    database_migration_replay: PASS
+    database_pgtap: 55/55 PASS
+    database_lint: PASS
   completed:
-    - Pull Request 16 mit Scoring-, Accessibility- und MASVS-Baseline in main gemergt
-    - Reale Kamera, Permission-Entzug, manueller Fallback und erneuter Scan auf physischem iPhone validiert
-    - Dynamic Type mit groesster Accessibility-Schriftgroesse ohne gemeldeten Layoutfehler geprueft
-    - Deutscher VoiceOver-App-Kontext und vollstaendiger Low-Data-Hinweis validiert
-    - Environmental, Social und Governance mit englischer Aussprache und deutschen Werten validiert
-    - Zentralen Semantik-Terminologiekatalog mit wiederverwendbaren Widgets implementiert
-    - Technische OFF-Feldnamen in Score-Details durch deutsche Quellenbeschreibungen ersetzt
-    - Flutter Analyze ohne Befund und Flutter-Test-Suite 74 von 74 PASS
-    - Development Quality Pipeline mit 21 von 21 Gates und 81.76 Prozent Line-Coverage PASS
-    - Direkter Xcode-Release-Build streng signaturgeprueft, installiert und gestartet
-    - Katalogbasierte Aussprache fuer ScanFair, ESG, Open Food Facts und E/S/G auf physischem iPhone bestaetigt
-    - Scanner-Fokusreihenfolge und Reduce Motion auf physischem iPhone PASS; TODO-027 geschlossen
+    - Pull Request 17 mit VoiceOver-Lokalisierung und iPhone-Evidenz in main gemergt
+    - Drei Kaffee-Pilot-GTINs live ueber Open Food Facts bestaetigt
+    - Offizielle GEPA-Deklaration mit URL und SHA-256 als getrennte Evidenzquelle registriert
+    - Produktgebundene Kaffee-Herkunftsbeziehungen fuer Kolumbien, Uganda, Guatemala und Nicaragua implementiert
+    - ADR 0028 verhindert produktuebergreifende Rohstoff-Herkunftsjoins
+    - Flutter-Pilotfallback und erklaerende Traceability-Anzeige implementiert
+    - Fehlende Environmental-Evidenz blockiert weiterhin jeden Gesamt-ESG-Score
+    - Flutter Analyze PASS, Flutter-Test-Suite 85 von 85 PASS und 82.43 Prozent Line-Coverage
+    - Development Quality Pipeline mit 21 von 21 Gates PASS
+    - Supabase-Migration-Replay, 55 von 55 pgTAP-Tests und DB-Lint PASS
+    - Product Engineering Handbook mit zehn Disziplinen und vollständigem Lifecycle erstellt
+    - Lifecycle-Gap-Analyse mit zwölf Prüffeldern, acht Phasen und Reifegrad 0 bis 5 operationalisiert
+    - Vier P0-, acht P1- und zwei P2-/Trigger-Gaps mit Owner, Zielprofil und Closure-Vertrag erfasst
+    - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
+    - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Branch quality/ios-device-evidence committen, pushen und per Pull Request integrieren
-    - Danach Kaffee-Referenzfall und evidenzbasierte Datenquellen fortsetzen
+    - Kaffee- und Governance-Inkremente logisch getrennt committen, pushen und per Pull Request integrieren
+    - Danach Claim-, Lizenz- und Privacy-P0-Grenzen vor weiteren Remote-Datenintegrationen schließen
+  next_session_plan:
+    planning_basis: |
+      Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
+      Rechts- und Fachreviews koennen zusätzliche Wartezeit erzeugen.
+    sessions:
+      - sequence: 1
+        id: NEXT-01-integrate-current-baseline
+        focus: Aktuellen Kaffee- und Gap-Control-Stand integrieren
+        branch: feature/coffee-reference-case
+        exit_criteria:
+          - Änderungen logisch getrennt committed und gepusht
+          - Pull Request mit grünen Required Checks reviewt und gemergt
+          - Post-Merge-main ist grün
+      - sequence: 2
+        id: NEXT-02-data-license-composition
+        focus: OFF-ODbL und Lizenzkomposition entscheiden
+        suggested_branch: compliance/data-license-composition
+        exit_criteria:
+          - Produced Work, Derivative Database und Collective Database bewertet
+          - Trennungs- und Attributionsarchitektur als ADR festgelegt
+          - GAP-003 und IMP-COMP-005 besitzen prüfbare Evidenz
+      - sequence: 3
+        id: NEXT-03-claims-and-privacy-boundaries
+        focus: Umwelt-/Health-Claims und Privacy-Datenfluss ausarbeiten
+        suggested_branch: compliance/claims-privacy-boundaries
+        exit_criteria:
+          - Claim-Inventar und Health-Grenze versioniert
+          - Datentyp-, Zweck-, Empfänger- und Retention-Matrix erstellt
+          - Rechts-/Fachreview-Bedarf und DPIA-Entscheidungsweg dokumentiert
+      - sequence: 4
+        id: NEXT-04-backend-threat-model
+        focus: Backend-Threat-Model und EU-Supabase-Umgebungsvertrag
+        suggested_branch: compliance/backend-threat-model
+        exit_criteria:
+          - Trust Boundaries und Abuse Cases priorisiert
+          - Server-Writer-, Secret-, Rate-Limit- und Audit-Vertrag festgelegt
+          - Remote-Implementierung ist definition-of-ready
+      - sequence: 5
+        id: NEXT-05-eu-supabase-server-writer
+        focus: EU-Supabase, vertrauenswürdigen Server-Writer und read-only Flutter-Cache implementieren
+        suggested_branch: feature/eu-supabase-data-path
+        exit_criteria:
+          - Remote-nahe Migration-, RLS- und Integrationstests bestehen
+          - Service-Role bleibt außerhalb der App
+          - Cache-, Offline-, Stale-Data- und Fehlerverhalten sind getestet
+      - sequence: 6
+        id: NEXT-06-wri-aqueduct
+        focus: WRI-Aqueduct-Wasserrisiko für Kaffee integrieren
+        suggested_branch: feature/wri-aqueduct-integration
+        exit_criteria:
+          - Herkunftsgebundenes Mapping, Lizenz, Confidence und Claim-Grenze geprüft
+          - Parameter bleibt bis Kalibrierung kontrolliert aktiviert oder ausgesetzt
+      - sequence: 7
+        id: NEXT-07-social-risk
+        focus: ILAB-/ILO-nahe Kinderarbeits-, Zwangsarbeits- und Länderrisiken integrieren
+        suggested_branch: feature/social-risk-integration
+        exit_criteria:
+          - Länder-/Rohstoffrisiko wird nicht als Produktverstoß dargestellt
+          - Quellen-, Zeit-, Produktbezug- und Confidence-Evidenz bestehen
+      - sequence: 8
+        id: NEXT-08-governance-entity
+        focus: GLEIF-/BRIS-Rechtsträger- und Governance-Beziehungen integrieren
+        suggested_branch: feature/governance-entity-integration
+        exit_criteria:
+          - Marke, Produkt und Rechtsträger sind evidenzbasiert getrennt
+          - Unternehmens- und Governance-Daten besitzen geeignete Granularität
+      - sequence: 9
+        id: NEXT-09-coffee-score-calibration
+        focus: Versionierten Kaffee-Score-Snapshot und Methodikkalibrierung erstellen
+        suggested_branch: feature/coffee-score-calibration
+        exit_criteria:
+          - Gold-, Grenz-, Missing-Data- und Red-Flag-Korpus besteht
+          - Sensitivitäts- und Ranking-Regressionstests sind grün
+          - ESG-/LCA-/Social-Fachreview ist vorbereitet oder abgeschlossen
+      - sequence: 10
+        id: NEXT-10-beta-readiness
+        focus: Repräsentativen Feldtest, Performance und Beta-Readiness validieren
+        suggested_branch: quality/food-beta-readiness
+        exit_criteria:
+          - vorab festgelegtes Barcode-Korpus ohne OFF-Search-Selection-Bias geprüft
+          - Aufgabenabschluss, Verständnis und Fehlinterpretation getestet
+          - Performance-, Provider-Ausfall- und reale Gerätematrix bestanden
+    readiness_horizons:
+      further_sources_technically_ready:
+        after_sequence: 4
+        meaning: Lizenz-, Claim-, Privacy- und Security-Grenzen erlauben kontrollierte technische Quellenintegration
+      coffee_reference_case_complete:
+        after_sequence: 10
+        condition: Zusätzlich qualifiziertes Fach- und Rechtsreview für aktivierte Methodik und Claims
+      food_data_platform_v1:
+        estimated_after_focused_sessions: 10-14
+        condition: Kaffeeansatz auf mindestens Banane und Kakao/Schokolade übertragen und repräsentativ gemessen
+    food_v1_definition:
+      - sichere Produktidentifikation und produktgebundene Beziehungen
+      - belastbare Environmental-, Social- und Governance-Quellen
+      - Lizenz-, Provenienz-, Confidence- und Datenfrischenachweis
+      - versionierter und reproduzierbarer Score mit Missing-Data-Safety
+      - Datenkorrektur, Rücknahme, Monitoring und Provider-Fallback
+      - repräsentative Coverage-, Fach-, Rechts- und Nutzervalidierung
   known_open_points:
     - Node-20-Deprecation fuer actions/upload-artifact ist als TODO-032 offen
     - Release-Candidate-Accessibility wird trotz geschlossenem Development-TODO erneut auditiert
@@ -88,6 +207,8 @@ session_handoff:
     - MASVS meldet sechs offene oder partielle anwendbare MUST-Kontrollen vor Release Candidate
     - Das Release-Candidate-Profil hat weiterhin offene manuelle Apple-MUST-Evidenz
     - Verfuegbare Dependency-Updates werden ueber einzelne reviewte PRs eingespielt
+    - Kaffee-Pilotbeziehungen aktivieren noch keine Umwelt-, Social- oder Governance-Risikofaktoren
+    - Gap-Audit identifiziert vier P0-Grenzen vor Release Candidate oder Remote-Kombinationsdatenbank
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -293,6 +414,31 @@ milestones:
       MUST-Nachweise im Release-Candidate-Profil. Die lokale Gesamtpipeline
       besteht 21/21 Gates bei 69 Flutter-Tests und 81.11 Prozent Coverage.
 
+  - id: M22
+    title: Kaffee-Pilotprodukte und produktgebundene Herkunftskette
+    date: 2026-08-10
+    phase: phase-1-mvp
+    notes: |
+      Drei GEPA-Kaffee-GTINs sind als reproduzierbarer Pilot festgelegt und
+      live ueber OFF bestaetigt. Eine offizielle GEPA-Produktpublikation wird
+      mit URL, SHA-256, Deklarationsklasse und mittlerer Confidence getrennt
+      gefuehrt. ADR 0028, Dart-Modell und PostgreSQL erzwingen fuer
+      score-faehige Rohstoffherkunft den Kontext der gescannten GTIN. Die
+      Herkunftskette ist sichtbar, aktiviert aber noch keinen Risikofaktor
+      und kann ohne Environmental-Evidenz keinen Gesamtscore erzeugen.
+
+  - id: M23
+    title: Product-Engineering-Handbuch und Lifecycle-Gap-Control operationalisiert
+    date: 2026-08-10
+    phase: phase-1-mvp
+    notes: |
+      Zehn Entwicklungsdisziplinen sind in einem repo-nativen Handbuch
+      zusammengeführt. ADR 0029 definiert eine wiederholbare Gap-Analyse über
+      zwölf Prüffelder, acht Lifecycle-Phasen und Reifegrad 0 bis 5. Der erste
+      Audit erfasst vier P0-, acht P1- und zwei P2-/Trigger-Gaps. Das
+      Projekt-Control-Gate validiert Gap-IDs, Reifegrad, Zielprofil,
+      Improvement-/Risiko-/Quellenlinks, Review-Fälligkeit und Closure-Evidenz.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -412,6 +558,12 @@ decisions_made:
   - adr: 0027
     title: Environmental-Evidenz als Voraussetzung fuer den Gesamt-ESG-Score
     date: 2026-08-10
+  - adr: 0028
+    title: Produktgebundene Rohstoff-Herkunftsbeziehungen
+    date: 2026-08-10
+  - adr: 0029
+    title: Repo-native Lifecycle-Gap-Kontrolle mit Reifegrad und Evidence Closure
+    date: 2026-08-10
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -423,7 +575,9 @@ weekly_log:
       automatisierte Ergebnis-Accessibility und eine risikobasierte
       OWASP-MASVS-2.1-Baseline fuer den iOS-MVP umgesetzt. Den realen
       iPhone-Flow einschliesslich Berechtigungs-Fallback, Dynamic Type und
-      gemischter VoiceOver-Aussprache validiert.
+      gemischter VoiceOver-Aussprache validiert. Drei Kaffee-Pilotprodukte,
+      produktgebundene Herkunft und ein repo-natives Product-Engineering-
+      sowie Lifecycle-Gap-Control-System ergänzt.
     done:
       - ADR 0027 als append-only Precedence-Entscheidung angelegt
       - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
@@ -436,22 +590,28 @@ weekly_log:
       - Technische OFF-Feldnamen in der Datenansicht durch deutsche Quellenbeschreibungen ersetzt
       - Signierten Xcode-Release-Build auf physischem iPhone installiert und die katalogbasierte Aussprache gegengeprueft
       - Scanner-Fokusreihenfolge und Reduce Motion physisch validiert; TODO-027 geschlossen
+      - Product Engineering Handbook und wiederholbare Lifecycle-Gap-Analyse erstellt
+      - 14 Gaps in Claim-Recht, Lizenzkomposition, Privacy, Methodik, Security, Beta und Betrieb priorisiert
+      - Risiken, Definition of Done, Improvements und Primärquellen aktualisiert
+      - G-PROJECT-CONTROL um Gap-Reifegrad, Cross-Links und Review-Fälligkeit erweitert
     checks:
       - Scoring-Testmatrix 39/39 PASS
       - Accessibility- und Terminologietests 10/10 PASS
       - MASVS-Validator-Selbsttests 5/5 PASS
       - G-LOCAL-MASVS Development-Profil PASS mit sieben sichtbaren Release-Warnungen
       - Flutter Analyze PASS ohne Befunde
-      - Flutter-Test-Suite 74/74 PASS, Line-Coverage 81.76 Prozent
+      - Flutter-Test-Suite 85/85 PASS, Line-Coverage 82.43 Prozent
       - Development Quality Pipeline 21/21 PASS
+      - Supabase-Migration-Replay, pgTAP 55/55 und DB-Lint PASS
       - Xcode-Release-Build, strikte Codesign-Pruefung, Installation und Start PASS
+      - G-PROJECT-CONTROL mit 16 Improvements und 14 Lifecycle-Gaps PASS
     blockers:
       - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
       - Apple- und Claim-Release-Evidenz bleibt getrennt offen
     next_week:
-      - Accessibility-Branch committen, pushen und per Pull Request integrieren
-      - Kaffee-Referenzfall mit verifizierten Produkt-Rohstoff-Herkunftslinks fortsetzen
+      - Kaffee- und Gap-Control-Baseline logisch getrennt committen, pushen, reviewen und mergen
+      - Danach ODbL-Lizenzkomposition sowie Claim- und Privacy-Grenzen schließen
 
   - week: 2026-W31
     summary: |

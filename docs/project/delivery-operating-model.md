@@ -46,6 +46,7 @@ geprueft und integriert werden.
 Artefakte und Kontrollen:
 
 - Roadmap, Backlog, ADRs und Akzeptanzkriterien
+- Lifecycle-Gap-Analyse mit Reifegrad, Owner, Zielprofil und Closure-Evidenz
 - Feature- oder Prozessbranch statt direkter Arbeit auf `main`
 - Pull Request mit Risiko-, Evidenz- und Rollbackangaben
 - verpflichtende Statuschecks vor dem Merge
@@ -111,14 +112,15 @@ fachlich und operativ freigegeben; Betrieb und Rueckfallweg sind nachgewiesen.
 
 1. Ziel, betroffene Ebene und Risiko festlegen.
 2. Requirement, Issue oder ADR referenzieren oder erstellen.
-3. Akzeptanzkriterien und erforderliche Evidenz definieren.
-4. Fokussierten Branch von aktuellem `main` erstellen.
-5. Kleinsten vertikalen oder prozessualen Schnitt implementieren.
-6. Relevante lokale Tests und Gates ausfuehren.
-7. Pull Request mit Risiko, Evidenz, offenen Punkten und Rollback erstellen.
-8. Verpflichtende GitHub-Checks abwarten.
-9. Nur bei gruener Entscheidung nach `main` mergen.
-10. Post-Merge-CI pruefen und Fortschritt sowie Dokumentation aktualisieren.
+3. Betroffene Gap-Domaenen und Capability-Trigger klassifizieren.
+4. Akzeptanzkriterien und erforderliche Evidenz definieren.
+5. Fokussierten Branch von aktuellem `main` erstellen.
+6. Kleinsten vertikalen oder prozessualen Schnitt implementieren.
+7. Relevante lokale Tests und Gates ausfuehren.
+8. Pull Request mit Risiko, Evidenz, offenen Punkten und Rollback erstellen.
+9. Verpflichtende GitHub-Checks abwarten.
+10. Nur bei gruener Entscheidung nach `main` mergen.
+11. Post-Merge-CI pruefen und Fortschritt sowie Dokumentation aktualisieren.
 
 Direkte Pushes auf `main`, unversionierte Produktionsaenderungen und
 undokumentierte Gate-Ausnahmen sind nicht Teil des Standardprozesses.
@@ -133,6 +135,7 @@ Eine Aenderung ist bereit fuer die Umsetzung, wenn:
 - Datenquellen, Claims, Datenschutz und Lizenzen bewertet wurden, sofern
   betroffen.
 - erwartete Tests und Gates feststehen.
+- P0-/P1-Luecken, Claim-, Lizenz-, Privacy- und Capability-Trigger bewertet sind.
 - Owner fuer fachliche Entscheidung und technische Umsetzung bekannt sind.
 
 ## 6. Definition of Done

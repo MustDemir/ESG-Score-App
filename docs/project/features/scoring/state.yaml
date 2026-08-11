@@ -2,7 +2,7 @@ feature: scoring
 title: "ESG-Score-Calculator + OFF-Integration"
 status: review
 progress: 95
-current_focus: "Methodikkatalog v2 und quellenbezogene Parametermappings"
+current_focus: "Kaffee-Referenzfall und kontextuelle Quellenmappings"
 last_sync: "2026-08-10"
 
 lade_manifest:
@@ -92,6 +92,12 @@ done:
     benoetigt Environmental-Evidenz, waehrend S/G separat sichtbar bleiben.
     Eine 39-Faelle-Testmatrix deckt Saeulenkombinationen, Zweige, Clamping,
     nicht-endliche Eingaben und Ampelgrenzen ab.
+  - |
+    2026-08-10 — Drei Kaffee-Pilot-GTINs, offizielle Herstellerdeklarationen
+    und produktgebundene Rohstoff-Herkunftslinks implementiert. ADR 0028
+    verhindert, dass die Herkunft eines Kaffeeprodukts fuer ein anderes
+    Produkt verwendet wird. Die Links bleiben ohne freigegebenes
+    Quellenmapping und Environmental-Evidenz ohne Gesamtscore-Wirkung.
 
 decisions:
   - id: FD-SCO-01
@@ -138,8 +144,8 @@ open_items:
 
 next_steps:
   - Kandidatenquellen je Parameter fachlich und lizenzrechtlich bewerten
-  - Verifizierte Rohstoff-Herkunftsbindungen fuer Pilotprodukte aufbauen
-  - WRI Aqueduct nach erfolgreichem Origin-Link-Gate pruefen
+  - WRI Aqueduct gegen die produktgebundenen Herkunftslinks pruefen
+  - ILAB-Risikomapping als kontextuelles, nicht produktbeschuldigendes Signal pruefen
   - Methodik-Seite fuer Formel v1.0 und Katalog v2 schreiben
 
 cross_feature_dependencies:

@@ -2,8 +2,10 @@
 
 > Synthese der Entwicklungs-Methodik. Vier Quellen werden zu einem
 > integrierten, repo-nativen Vorgehenssystem verschmolzen.
-> Dient als Basis für die README-Integration.
-> Letztes Update: 2026-05-19
+> Dieses Dokument erklärt die Herkunft des Systems. Das aktuelle praktische
+> Arbeitsmodell, die Branch-Taxonomie und der belegte Umsetzungsstand stehen im
+> [ScanFair Product Engineering Handbook](product-engineering-handbook.md).
+> Letzte Einordnung: 2026-08-10
 
 ---
 

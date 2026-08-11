@@ -45,6 +45,16 @@ class ESGDataSource {
     apiVersion: '3.2',
   );
 
+  static const gepaProductDeclarations = ESGDataSource(
+    id: 'gepa-product-declarations',
+    name: 'GEPA Produktangaben',
+    datasetLicense: 'Proprietary-publication',
+    attribution: 'GEPA - The Fair Trade Company',
+    sourceUrl: 'https://www.gepa-shop.de',
+    termsUrl: 'https://www.gepa-shop.de/agb',
+    apiVersion: 'price-list-2025-04',
+  );
+
   static const localDemo = ESGDataSource(
     id: 'local-demo',
     name: 'Lokale Demo-Daten',

@@ -10,14 +10,17 @@
 
 Bei JEDER neuen Session in diesem Repo, BEVOR du auf User-Input reagierst:
 
-1. Lies `docs/project/progress.yaml` → ermittle `current_phase`, letzten
-   `weekly_log`-Eintrag, `next_week`-Items
-2. Lies `docs/project/roadmap.yaml` → check `out_of_scope` der aktuellen Phase
-3. Lies `docs/project/backlog.yaml` → priorisierte offene TODOs
-4. Identifiziere Blocker (Items mit `status: in_progress` oder `priority: P0`)
-5. **Bevor du Code-Vorschläge machst:** lies `docs/project/quality-strategy.md`
+1. Lies `docs/project/progress.yaml` → ermittle `current_phase`,
+   `session_handoff.next_session_plan`, letzten `weekly_log` und `next_week`
+2. Lies `docs/project/gap-register.yaml` und
+   `docs/project/improvement-register.yaml` → ermittle P0-/P1-Gaps,
+   Aktivierungstrigger und Abhängigkeiten
+3. Lies `docs/project/roadmap.yaml` → check `out_of_scope` der aktuellen Phase
+4. Lies `docs/project/backlog.yaml` → priorisierte offene TODOs
+5. Identifiziere Blocker (Items mit `status: in_progress` oder `priority: P0`)
+6. **Bevor du Code-Vorschläge machst:** lies `docs/project/quality-strategy.md`
    und `docs/project/definition-of-done.yaml`
-6. Begrüße den User mit einem 3-Zeilen-Status-Update:
+7. Begrüße den User mit einem 3-Zeilen-Status-Update:
    > „Wir sind in Phase X (Sprint Y). Zuletzt erledigt: A. Offen / P0: B, C.
    > Soll ich mit B weitermachen oder hast du was anderes im Kopf?"
 
@@ -84,6 +87,7 @@ fängt die nächste:
 | 5 | GitHub Actions CI/CD | Keine Merges ohne grüne Pipeline |
 | 6 | ADR-Append-Only-Regel | Entscheidungen können nicht heimlich „verloren" gehen |
 | 7 | `failure-modes.yaml` | Bekannte Fehler-Muster mit Defense |
+| 8 | `gap-register.yaml` + `G-PROJECT-CONTROL` | Blinde Flecken, Trigger und überfällige Reifeprüfungen |
 
 ---
 

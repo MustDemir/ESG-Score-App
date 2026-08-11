@@ -59,6 +59,20 @@ score_widgets_path = File.join(
   "score_widgets.dart"
 )
 readme_path = File.join(repo_root, "README.md")
+coffee_pilot_path = File.join(
+  repo_root,
+  "docs",
+  "project",
+  "data",
+  "coffee-pilot-products.yaml"
+)
+coffee_catalog_path = File.join(
+  repo_root,
+  "esg_app",
+  "lib",
+  "data_sources",
+  "coffee_pilot_catalog.dart"
+)
 
 def load_yaml(path)
   YAML.safe_load(
@@ -92,6 +106,8 @@ required_files = [
   score_model_path,
   score_widgets_path,
   readme_path,
+  coffee_pilot_path,
+  coffee_catalog_path,
 ]
 missing_files = required_files.reject { |path| File.exist?(path) }
 unless missing_files.empty?
@@ -105,6 +121,8 @@ relationship_model = File.read(relationship_model_path)
 product_model = File.read(product_model_path)
 score_model = File.read(score_model_path)
 score_widgets = File.read(score_widgets_path)
+coffee_pilot = load_yaml(coffee_pilot_path)
+coffee_catalog = File.read(coffee_catalog_path)
 customer_facing_content = [
   score_model,
   score_widgets,
@@ -162,6 +180,33 @@ when "link-integrity"
   ) == true
     violations << "Unbound product origins must not become commodity origins"
   end
+  unless controls.dig(
+    "link_integrity",
+    "contextual_origin_requires_context_entity"
+  ) == true
+    violations << "Commodity origin must require a context entity"
+  end
+  unless controls.dig(
+    "link_integrity",
+    "contextual_origin_context_type"
+  ) == "product"
+    violations << "Commodity origin context must be a product"
+  end
+  unless controls.dig(
+    "link_integrity",
+    "contextual_origin_must_match_scanned_gtin"
+  ) == true
+    violations << "Commodity origin context must match the scanned GTIN"
+  end
+  %w[
+    context_entity_id
+    traceability_relationships_context_check
+    enforce_traceability_context_type
+  ].each do |marker|
+    violations << "Database relationship context missing #{marker}" unless (
+      migration_sql.include?(marker)
+    )
+  end
 
   %w[
     ESGRelationship
@@ -170,6 +215,8 @@ when "link-integrity"
     evidenceIds
     scoreEligible
     supportsContextualRisk
+    contextEntity
+    supportsContextualRiskFor
   ].each do |marker|
     violations << "Dart relationship model missing #{marker}" unless (
       relationship_model.include?(marker)
@@ -180,6 +227,60 @@ when "link-integrity"
   end
   unless product_model.include?("hasScoreEligibleLegalEntity")
     violations << "Product model lacks legal-entity eligibility check"
+  end
+
+  unless coffee_pilot["status"] == "validated_fixture" &&
+         coffee_pilot["active_in_formula"] == false &&
+         coffee_pilot["methodology_version"] == "2.0-draft"
+    violations << "Coffee pilot must be validated, draft and formula-inactive"
+  end
+  pilot_products = coffee_pilot.fetch("products", [])
+  violations << "Coffee pilot needs at least three products" if (
+    pilot_products.length < 3
+  )
+  pilot_gtins = pilot_products.map { |product| product["gtin"].to_s }
+  if pilot_gtins.length != pilot_gtins.uniq.length
+    violations << "Coffee pilot contains duplicate GTINs"
+  end
+  pilot_products.each do |product|
+    gtin = product["gtin"].to_s
+    unless gtin.match?(/\A\d{8,14}\z/)
+      violations << "Coffee pilot has invalid GTIN #{gtin}"
+    end
+    unless product["commodity"] == "coffee"
+      violations << "#{gtin}: pilot commodity must be coffee"
+    end
+    origins = product["origin_countries"] || []
+    unless origins.any? && origins.all? { |code| code.to_s.match?(/\A[A-Z]{2}\z/) }
+      violations << "#{gtin}: pilot needs ISO alpha-2 commodity origins"
+    end
+    declaration = product.fetch("declaration", {})
+    unless declaration["assertion_class"] == "declared" &&
+           declaration["confidence"] == "medium" &&
+           declaration["score_eligible_relationships"] == true
+      violations << "#{gtin}: invalid declared relationship contract"
+    end
+    unless product.dig("open_food_facts_snapshot", "result") == "product_found"
+      violations << "#{gtin}: OFF pilot lookup is not reproducible"
+    end
+    unless product.dig("score_expectation", "overall_state") ==
+           "data_incomplete" &&
+           product.dig("score_expectation", "overall_score").nil? &&
+           product.dig("score_expectation", "contextual_risk_active") == false
+      violations << "#{gtin}: pilot score safety expectation is invalid"
+    end
+    unless coffee_catalog.include?(gtin)
+      violations << "#{gtin}: missing from Flutter coffee catalog"
+    end
+  end
+  pilot_hash = coffee_pilot.dig(
+    "sources",
+    "gepa_product_declarations",
+    "record_sha256"
+  ).to_s
+  unless pilot_hash.match?(/\A[a-f0-9]{64}\z/) &&
+         coffee_catalog.include?(pilot_hash)
+    violations << "Coffee pilot source hash is missing or out of sync"
   end
 when "missing-data"
   missing_controls = controls.fetch("missing_data", {})

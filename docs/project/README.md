@@ -11,6 +11,9 @@ docs/project/
 ├── README.md              # diese Datei — Übersicht
 ├── methodology/           # WIE wir dokumentieren (Prozess-Dokus)
 │   ├── README.md
+│   ├── product-engineering-handbook.md
+│   ├── gap-analysis-process.md
+│   ├── vorgehenssystem.md
 │   ├── adr-process.md
 │   ├── backlog-process.md
 │   ├── progress-tracking.md
@@ -19,6 +22,7 @@ docs/project/
 │   └── NNNN-titel.yaml
 ├── roadmap.yaml           # Phasen-Plan, Meilensteine
 ├── improvement-register.yaml # Bewertete Verbesserungen, Reihenfolge und Evidenz
+├── gap-register.yaml       # Reifegrad-Lücken, Trigger und Closure-Verträge
 ├── backlog.yaml           # Ideen, TODOs, geparkte Features
 ├── risks.yaml             # Risiko-Register
 ├── progress.yaml          # Fortschrittstracker
@@ -32,6 +36,7 @@ docs/project/
 ├── session-start-protocol.md # Wiedereinstieg in neue Claude-Sessions
 ├── audits/                # Dated audit reports with scope and evidence
 ├── accessibility/         # VoiceOver language and terminology policy
+├── data/                  # Quellenregister, Datenarchitektur und Pilot-Fixtures
 ├── implementation-plan.yaml # 22-Schritte-Plan in 5 Blöcken (Sprint 0 → Phase 2)
 ├── workflows/             # Strukturierte Arbeits-Rituale (Trigger-Phrasen-basiert)
 │   ├── README.md
@@ -66,6 +71,21 @@ docs/project/
 7. **Verbesserungen bleiben traceable.** Gesamtbewertungen werden im
    `improvement-register.yaml` mit Owner, Status, Akzeptanzkriterien, Evidenz
    und naechster Aktion gefuehrt.
+
+## Vorgehensmodell
+
+Das [ScanFair Product Engineering Handbook](methodology/product-engineering-handbook.md)
+ordnet Product Ownership, UX/Accessibility, Mobile Engineering, ESG-Methodik,
+Data Governance, Testing, Compliance, DevSecOps und Release Governance in einen
+gemeinsamen Lifecycle ein. Das
+[Delivery Operating Model](delivery-operating-model.md) enthält die
+verbindlichen Regeln; das Handbuch erklärt ihre praktische Anwendung und den
+belegten Projektstand.
+
+Die [ScanFair Lifecycle Gap Analysis](methodology/gap-analysis-process.md)
+prüft dieses Modell wiederholt auf blinde Flecken. Der aktuelle Befund liegt im
+[Gap-Register](gap-register.yaml) und im datierten
+[Product Engineering Gap Audit](audits/2026-08-10-product-engineering-gap-analysis.md).
 
 ## Schnellzugriff für Claude Code
 

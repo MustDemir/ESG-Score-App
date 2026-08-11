@@ -79,6 +79,7 @@ class ScanFairProduct {
   }
 
   bool get hasScoreEligibleCommodityOrigin {
+    final productEntityId = 'gtin:$barcode';
     final eligibleCommodityIds = relationships
         .where(
           (entry) =>
@@ -89,7 +90,7 @@ class ScanFairProduct {
         .toSet();
     return relationships.any(
       (entry) =>
-          entry.supportsContextualRisk &&
+          entry.supportsContextualRiskFor(productEntityId) &&
           eligibleCommodityIds.contains(entry.from.id),
     );
   }
