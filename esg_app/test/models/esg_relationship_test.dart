@@ -148,7 +148,44 @@ void main() {
         scoreEligible: true,
         retrievedAt: retrievedAt,
       ),
-      throwsAssertionError,
+      throwsArgumentError,
+    );
+  });
+
+  test('relationship context follows the database endpoint contract', () {
+    expect(
+      () => ESGRelationship(
+        id: 'relationship:self-context',
+        from: product,
+        to: commodity,
+        type: ESGRelationshipType.containsCommodity,
+        assertionClass: ESGAssertionClass.verified,
+        confidence: ESGConfidence.high,
+        source: ESGDataSource.localDemo,
+        sourceRecordId: 'verified-product-record',
+        evidenceIds: const ['verified:commodity'],
+        scoreEligible: true,
+        contextEntity: product,
+        retrievedAt: retrievedAt,
+      ),
+      throwsArgumentError,
+    );
+    expect(
+      () => ESGRelationship(
+        id: 'relationship:non-product-context',
+        from: commodity,
+        to: country,
+        type: ESGRelationshipType.commodityHasOrigin,
+        assertionClass: ESGAssertionClass.verified,
+        confidence: ESGConfidence.high,
+        source: ESGDataSource.localDemo,
+        sourceRecordId: 'verified-origin-record',
+        evidenceIds: const ['verified:origin'],
+        scoreEligible: true,
+        contextEntity: country,
+        retrievedAt: retrievedAt,
+      ),
+      throwsArgumentError,
     );
   });
 

@@ -330,8 +330,14 @@ class TraceabilityCard extends StatelessWidget {
     final commodities = product
         .relationshipsOfType(ESGRelationshipType.containsCommodity)
         .toList(growable: false);
+    final productEntityId = 'gtin:${product.barcode}';
     final commodityOrigins = product
         .relationshipsOfType(ESGRelationshipType.commodityHasOrigin)
+        .where(
+          (relationship) =>
+              relationship.contextEntity == null ||
+              relationship.contextEntity!.id == productEntityId,
+        )
         .toList(growable: false);
     final productOrigins = product
         .relationshipsOfType(ESGRelationshipType.hasProductOrigin)

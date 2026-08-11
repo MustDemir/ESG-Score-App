@@ -1,3 +1,5 @@
+import 'package:esg_app/models/product.dart';
+import 'package:esg_app/services/product_lookup_failure.dart';
 import 'package:esg_app/services/product_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -51,4 +53,45 @@ void main() {
       expect(product, isNull);
     },
   );
+
+  test('coffee pilot repository falls back when OFF lookup fails', () async {
+    final pilotRepository = CoffeePilotProductRepository(
+      source: const _FailingProductRepository(),
+    );
+
+    final product = await pilotRepository.findByBarcode('4013320225196');
+
+    expect(product, isNotNull);
+    expect(product!.name, contains('Kolumbien'));
+    expect(product.dataQualityWarnings, contains('pilot-source-fallback'));
+  });
+
+  test('coffee pilot repository rethrows failures for unknown GTINs', () {
+    final pilotRepository = CoffeePilotProductRepository(
+      source: const _FailingProductRepository(),
+    );
+
+    expect(
+      () => pilotRepository.findByBarcode('0000000000000'),
+      throwsA(isA<ProductLookupFailure>()),
+    );
+  });
+}
+
+class _FailingProductRepository implements ProductRepository {
+  const _FailingProductRepository();
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    throw const ProductLookupFailure(
+      type: ProductLookupFailureType.server,
+      message: 'Open Food Facts ist voruebergehend nicht verfuegbar.',
+    );
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
 }

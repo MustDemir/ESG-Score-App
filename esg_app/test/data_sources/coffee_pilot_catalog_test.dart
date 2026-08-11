@@ -32,6 +32,7 @@ void main() {
 
       expect(commodityLinks, hasLength(1));
       expect(commodityLinks.single.to.id, 'commodity:coffee');
+      expect(commodityLinks.single.contextEntity, isNull);
       expect(originLinks, hasLength(definition.origins.length));
       expect(
         originLinks.map((relationship) => relationship.contextEntity?.id),

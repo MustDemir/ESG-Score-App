@@ -2,6 +2,7 @@ import '../data/demo_products.dart';
 import '../data_sources/coffee_pilot_catalog.dart';
 import '../models/product.dart';
 import 'open_food_facts_service.dart';
+import 'product_lookup_failure.dart';
 
 abstract class ProductRepository {
   Future<ScanFairProduct?> findByBarcode(String barcode);
@@ -90,7 +91,12 @@ class CoffeePilotProductRepository implements ProductRepository {
   @override
   Future<ScanFairProduct?> findByBarcode(String barcode) async {
     final normalized = barcode.trim();
-    final sourceProduct = await source.findByBarcode(normalized);
+    ScanFairProduct? sourceProduct;
+    try {
+      sourceProduct = await source.findByBarcode(normalized);
+    } on ProductLookupFailure {
+      if (catalog.definitionFor(normalized) == null) rethrow;
+    }
     final product = catalog.enrichOrCreate(
       barcode: normalized,
       sourceProduct: sourceProduct,

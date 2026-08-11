@@ -86,7 +86,7 @@ class ESGEntity {
 }
 
 class ESGRelationship {
-  const ESGRelationship({
+  ESGRelationship({
     required this.id,
     required this.from,
     required this.to,
@@ -105,7 +105,7 @@ class ESGRelationship {
   }) : _scoreEligibleRequested = scoreEligible,
        assert(
          !scoreEligible ||
-             (evidenceIds.length > 0 &&
+             (evidenceIds.isNotEmpty &&
                  (confidence == ESGConfidence.high ||
                      confidence == ESGConfidence.medium) &&
                  (assertionClass == ESGAssertionClass.measured ||
@@ -113,13 +113,24 @@ class ESGRelationship {
                      assertionClass == ESGAssertionClass.declared)),
          'Score-eligible relationships need evidence, sufficient confidence, '
          'and a measured, verified, or declared assertion.',
-       ),
-       assert(
-         !scoreEligible ||
-             type != ESGRelationshipType.commodityHasOrigin ||
-             contextEntity != null,
-         'Score-eligible commodity origins need a product context.',
-       );
+       ) {
+    final context = contextEntity;
+    if (scoreEligible &&
+        type == ESGRelationshipType.commodityHasOrigin &&
+        context == null) {
+      throw ArgumentError(
+        'Score-eligible commodity origins need a product context.',
+      );
+    }
+    if (context != null && context.type != ESGEntityType.product) {
+      throw ArgumentError('Relationship context must be a product entity.');
+    }
+    if (context != null && (context.id == from.id || context.id == to.id)) {
+      throw ArgumentError(
+        'Relationship context must differ from both endpoints.',
+      );
+    }
+  }
 
   final String id;
   final ESGEntity from;

@@ -220,7 +220,6 @@ class CoffeePilotCatalog {
         sourceRecordId: sourceRecordId,
         evidenceIds: [_commodityEvidenceId(definition)],
         scoreEligible: true,
-        contextEntity: product,
         retrievedAt: _retrievedAt,
         observedAt: _observedAt,
       ),
