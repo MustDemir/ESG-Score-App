@@ -63,15 +63,15 @@ session_handoff:
   prepared_at: 2026-08-11
   session_closed_at: null
   branch: feature/coffee-reference-case
-  status: integration_committed_locally_validated_pending_push
-  pull_request: null
+  status: pull_request_open_remote_checks_pending
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/18
   git_state:
     committed: true
-    pushed: false
+    pushed: true
     commits:
       - f826acd feat: add evidence-first coffee reference case
       - 2d2d6d0 docs: establish lifecycle gap control
-    reason: Lokale Integration ist committed; Push, Pull Request und Remote-CI folgen in NEXT-01
+    reason: Branch und Pull Request sind remote; GitHub Required Checks und Merge folgen in NEXT-01
   latest_validation:
     executed_at: "2026-08-11T07:22:47Z"
     development_quality_gates: 21/21 PASS
