@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W33
-last_updated: 2026-08-10
+last_updated: 2026-08-11
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -60,15 +60,26 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-10
-  session_closed_at: 2026-08-10
+  prepared_at: 2026-08-11
+  session_closed_at: null
   branch: feature/coffee-reference-case
-  status: session_closed_locally_validated_uncommitted
+  status: integration_committed_locally_validated_pending_push
   pull_request: null
   git_state:
-    committed: false
+    committed: true
     pushed: false
-    reason: Commit, Push und Pull Request bleiben bis zur expliziten Freigabe offen
+    commits:
+      - f826acd feat: add evidence-first coffee reference case
+      - 2d2d6d0 docs: establish lifecycle gap control
+    reason: Lokale Integration ist committed; Push, Pull Request und Remote-CI folgen in NEXT-01
+  latest_validation:
+    executed_at: "2026-08-11T07:22:47Z"
+    development_quality_gates: 21/21 PASS
+    flutter_tests: 85/85 PASS
+    flutter_line_coverage: 82.43 percent
+    database_migration_replay: PASS
+    database_pgtap: 55/55 PASS
+    database_lint: PASS
   completed:
     - Pull Request 17 mit VoiceOver-Lokalisierung und iPhone-Evidenz in main gemergt
     - Drei Kaffee-Pilot-GTINs live ueber Open Food Facts bestaetigt
