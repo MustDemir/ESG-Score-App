@@ -9,7 +9,8 @@ reviewed. Future evidence must:
 - bind the environment contract, threat model and artifact with lowercase
   SHA-256 digests
 - contain no credentials, authorization headers or raw personal payloads
-- be generated from actual environment, writer-security or operational tests
+- be generated from actual environment, writer-security, operational or
+  release-candidate security tests
 
 Placeholder approvals are invalid. `G-BACKEND-BOUNDARY` verifies every record
 before the `remote_backend` profile can pass.

@@ -441,6 +441,7 @@ ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --prof
 # Backend-Grenze: Definition-of-ready gruen, Remote bis zur Implementierung rot
 ruby scripts/quality/validate_backend_boundary.rb --profile development
 ruby scripts/quality/validate_backend_boundary.rb --profile remote_backend
+ruby scripts/quality/validate_backend_boundary.rb --profile release_candidate
 
 # Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
 COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
@@ -482,6 +483,11 @@ Die fuenf Scoring-Safety-Gates sichern die Aktivierungsregeln fuer
 Methodik `2.0-draft`. Sie erklaeren Formel v1.0 nicht nachtraeglich fuer
 wissenschaftlich kalibriert oder rechtlich ESG-konform; deren S-/G-Anteile
 bleiben als heuristischer MVP-Stand gekennzeichnet.
+
+Das Backend-Development-Profil beweist nur die Definition-of-Ready bei
+deaktiviertem Remote-Pfad. `remote_backend` verlangt drei Implementierungs- und
+Betriebsreviews; `release_candidate` verlangt zusaetzlich und unabhaengig vom
+Aktivierungsstatus einen an den geprueften Commit gebundenen Security-Review.
 
 **GitHub Actions**
 

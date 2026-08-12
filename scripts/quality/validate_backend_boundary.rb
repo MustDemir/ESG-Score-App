@@ -26,6 +26,7 @@ class BackendBoundaryValidator
     writer_security
     operational_readiness
   ].freeze
+  RELEASE_REVIEW_CONTRACT = "release_security"
 
   attr_reader :violations
 
@@ -432,7 +433,10 @@ class BackendBoundaryValidator
       return
     end
 
-    return if @profile == "release_candidate" && !enabled
+    if @profile == "release_candidate"
+      validate_review(RELEASE_REVIEW_CONTRACT)
+      return unless enabled
+    end
 
     unless enabled && @environment["implementation_state"] == "deployed_to_eu_development"
       violations << "#{@profile}: remote backend must be enabled and deployed to EU development"
@@ -446,17 +450,19 @@ class BackendBoundaryValidator
       violations << "#{@profile}: active eu-central-1 development environment with approved DPA is required"
     end
 
-    REVIEW_CONTRACTS.each do |name|
-      review = @environment.dig("reviews", name) || {}
-      unless review["status"] == "approved"
-        violations << "#{@profile}: #{name} review must be approved"
-      end
-      validate_evidence(
-        review["evidence"],
-        @environment.dig("evidence_contracts", name) || {},
-        "#{@profile}: #{name}",
-      )
+    REVIEW_CONTRACTS.each { |name| validate_review(name) }
+  end
+
+  def validate_review(name)
+    review = @environment.dig("reviews", name) || {}
+    unless review["status"] == "approved"
+      violations << "#{@profile}: #{name} review must be approved"
     end
+    validate_evidence(
+      review["evidence"],
+      @environment.dig("evidence_contracts", name) || {},
+      "#{@profile}: #{name}",
+    )
   end
 
   def validate_evidence(relative_path, contract, label)
@@ -477,6 +483,11 @@ class BackendBoundaryValidator
     end
     contract.fetch("required_values", {}).each do |field, expected|
       violations << "#{label}: #{field} must be #{expected.inspect}" unless evidence[field] == expected
+    end
+    contract.fetch("field_patterns", {}).each do |field, pattern|
+      unless evidence[field].to_s.match?(Regexp.new(pattern))
+        violations << "#{label}: #{field} does not match #{pattern.inspect}"
+      end
     end
     require_fields(evidence, Array(contract["required_fields"]), label)
     Array(contract["digest_fields"]).each do |field|

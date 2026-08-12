@@ -11,6 +11,7 @@ policy_checks:
   - Writes are validated, idempotent, transactional and append-only audited
   - Environments, credentials and data are isolated by project and stage
   - Remote activation requires typed SHA-256-bound environment, writer and operations evidence
+  - Release candidate always requires separate typed security-review evidence bound to the reviewed commit
 evidence_required:
   - docs/project/security/backend-threat-model.yaml
   - docs/project/security/eu-supabase-environment-contract.yaml
@@ -46,4 +47,6 @@ sources:
 notes: |
   Development PASS means the remote implementation is definition-of-ready and
   still disabled. The remote_backend profile cannot pass until a real EU
-  development environment and all typed implementation evidence exist.
+  development environment and all typed implementation evidence exist. The
+  release_candidate profile additionally requires a release-specific security
+  review even when the remote backend remains disabled.

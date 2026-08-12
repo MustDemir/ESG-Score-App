@@ -87,18 +87,19 @@ session_handoff:
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
-    backend_boundary_gate_self_tests: 11/11 PASS
+    backend_boundary_gate_self_tests: 14/14 PASS
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
+    backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
-    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE and G-PRIVACY-BOUNDARY
+    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
     - Pull Request 20 mit Claim- und Privacy-Grenzen in main gemergt; GitHub-Run 31491650586 mit allen fuenf Jobs gruen
     - ADR 0032 trennt read-only Flutter und nicht mobilen vertrauenswuerdigen Server-Writer
     - STRIDE-/OWASP-API-Threat-Model mit sechs Trust Boundaries, zwoelf Bedrohungen und acht Abuse Cases versioniert
     - EU-Supabase-Umgebungsvertrag fuer Frankfurt, Identity, Secrets, SSRF, Ressourcen, Idempotenz, Audit und Incident Response festgelegt
     - G-BACKEND-BOUNDARY mit Development-, Remote- und Release-Candidate-Profil sowie typisierter SHA-256-Aktivierungsevidenz integriert
-    - Backend-Gate-Selbsttests 11/11; Remote-Profil blockiert erwartungsgemaess an acht fehlenden Aktivierungsevidenzen
+    - Backend-Gate-Selbsttests 14/14; Remote-Profil blockiert an acht Aktivierungsevidenzen und Release Candidate an separatem Security-Review
     - Development Quality Pipeline 25/25, Flutter 93/93 und 85.16 Prozent Coverage bestanden
     - Pull Request 19 mit Datenlizenz-Komposition in main gemergt; Post-Merge-CI 31483893887 mit allen fuenf Jobs gruen
     - Claim-Inventar fuer App, App Store und Webseite mit Umwelt-, Social-, Governance-, Nutrition-, Health- und Limitation-Klassen versioniert
@@ -722,8 +723,9 @@ weekly_log:
       - Flutter-Test-Suite 93/93 PASS, Line-Coverage 84.89 Prozent
       - Development Quality Pipeline 24/24 PASS
       - G-IOS-COMPILE und gebuendelter Privacy-Manifest-Audit PASS mit null Verstoessen
-      - Backend-Gate-Selbsttests 11/11 PASS
+      - Backend-Gate-Selbsttests 14/14 PASS
       - Backend-Remote-Profil erwartungsgemaess FAIL mit acht Aktivierungsblockern
+      - Backend-Release-Candidate-Profil erwartungsgemaess FAIL ohne separaten aktuellen Security-Review
       - Development Quality Pipeline 25/25 PASS
       - Flutter-Test-Suite 93/93 PASS, Line-Coverage 85.16 Prozent
     blockers:

@@ -67,6 +67,24 @@ class BackendBoundaryGateSelfTest
     end
 
     with_fixture do |root|
+      blocked = validator(root, "release_candidate")
+      assert(!blocked.run, "release candidate must require its security review")
+      assert(
+        blocked.violations.any? { |entry| entry.include?("release_security review must be approved") },
+        "release candidate failure should identify its missing security review",
+      )
+    end
+
+    with_fixture do |root|
+      prepare_release_review(root)
+      approved = validator(root, "release_candidate")
+      assert(
+        approved.run,
+        "disabled remote path should pass only with release review: #{approved.violations.join('; ')}",
+      )
+    end
+
+    with_fixture do |root|
       prepare_remote_activation(root)
       approved = validator(root, "remote_backend")
       assert(
@@ -230,6 +248,36 @@ class BackendBoundaryGateSelfTest
         ),
       )
     end
+  end
+
+  def prepare_release_review(root)
+    contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
+    model_path = "docs/project/security/backend-threat-model.yaml"
+    evidence_path = "docs/project/security/evidence/release-security-evidence.yaml"
+    artifact_path = "docs/project/security/evidence/release-security-review.md"
+    contract = load_yaml(root, contract_path)
+    contract["reviews"]["release_security"]["status"] = "approved"
+    contract["reviews"]["release_security"]["evidence"] = evidence_path
+    write_yaml(root, contract_path, contract)
+    write(root, artifact_path, "Approved release security review evidence\n")
+    write_yaml(
+      root,
+      evidence_path,
+      {
+        "schema_version" => "1.0",
+        "evidence_type" => "backend_release_security_review",
+        "reviewed_at" => "2026-08-12T11:00:00Z",
+        "reviewer_role" => "independent_security_reviewer",
+        "reviewed_commit_sha" => "a" * 40,
+        "tested_controls" => %w[authentication authorization secrets ssrf rate_limits idempotency audit incident_response],
+        "decision" => "approved",
+        "profile" => "release_candidate",
+        "environment_contract_sha256" => digest(root, contract_path),
+        "threat_model_sha256" => digest(root, model_path),
+        "artifact_path" => artifact_path,
+        "artifact_sha256" => digest(root, artifact_path),
+      },
+    )
   end
 end
 

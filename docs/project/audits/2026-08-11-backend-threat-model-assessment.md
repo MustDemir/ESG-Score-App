@@ -45,6 +45,11 @@ development behavior and negative remote, missing-control, key-leak and
 tampered-evidence paths. The full local quality pipeline supplies the final
 integration result for this branch.
 
+The `release_candidate` profile cannot inherit the development result. It
+always requires a separate typed security review bound to the reviewed commit,
+threat model, environment contract and review artifact. Remote activation adds
+the three environment, writer-security and operational-readiness reviews.
+
 ## Residual Findings
 
 - `GAP-005` remains `in_progress`: actual AuthN/AuthZ, parser, SSRF, rate,
@@ -53,5 +58,7 @@ integration result for this branch.
   security review or risk-based penetration test.
 - Remote activation remains blocked by environment, DPA/region,
   writer-security and operational-readiness evidence.
+- Release-candidate approval remains blocked by a separate current-commit
+  security review even while the remote backend is disabled.
 - Data-license, privacy, claim and App Store release gates remain independent
   blockers and cannot be waived by this assessment.

@@ -139,6 +139,9 @@ und Regionnachweis sowie drei typisierte, repository-interne und per SHA-256
 gebundene Reviews fuer Umgebung, Writer-Sicherheit und Betriebsbereitschaft.
 Das Gate prueft ausserdem, dass kein privilegierter Supabase-Schluessel in
 Flutter zugelassen ist und RLS-/Grant-Schutz in den Migrationen bestehen bleibt.
+`release_candidate` verlangt unabhaengig vom Aktivierungsstatus einen vierten,
+release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
+Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.
 
 ### Branch-Protection auf `main` (GitHub Settings)
 

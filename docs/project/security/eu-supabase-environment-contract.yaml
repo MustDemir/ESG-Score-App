@@ -224,6 +224,9 @@ reviews:
   operational_readiness:
     status: pending_not_implemented
     evidence: null
+  release_security:
+    status: pending_release_candidate
+    evidence: null
 
 evidence_contracts:
   environment_activation:
@@ -270,6 +273,24 @@ evidence_contracts:
       - artifact_path
       - artifact_sha256
     digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
+  release_security:
+    evidence_type: backend_release_security_review
+    required_values:
+      decision: approved
+      profile: release_candidate
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewer_role
+      - reviewed_commit_sha
+      - tested_controls
+      - environment_contract_sha256
+      - threat_model_sha256
+      - artifact_path
+      - artifact_sha256
+    field_patterns:
+      reviewed_commit_sha: "^[0-9a-f]{40}$"
+    digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
 
 remote_activation_blocks:
   - development_project_not_provisioned_or_wrong_region
@@ -280,6 +301,11 @@ remote_activation_blocks:
   - RLS_migration_or_remote_near_tests_failing
   - secret_rotation_break_glass_or_incident_drill_missing
   - privacy_or_data_license_remote_profile_failing
+
+release_candidate_blocks:
+  - release_specific_security_review_missing_or_stale
+  - reviewed_commit_does_not_match_release_candidate
+  - any_remote_activation_block_when_remote_backend_is_enabled
 
 primary_sources:
   - OWASP-API-SECURITY-2023

@@ -97,6 +97,7 @@ checks = {
     "client_invocation_allowed: false",
     "maximum_response_bytes: 1048576",
     "environment_activation",
+    "release_security",
   ],
   "docs/project/security/backend-threat-model.md" => [
     "Trust Boundaries",

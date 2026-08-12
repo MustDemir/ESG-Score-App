@@ -22,4 +22,6 @@ ruby scripts/quality/validate_backend_boundary.rb --profile development
 
 The `remote_backend` profile is expected to fail until `NEXT-05` provisions
 the dedicated Frankfurt development environment, implements the writer and
-closes all three review contracts. No credentials belong in this directory.
+closes its three activation-review contracts. `release_candidate` always
+requires a fourth, release-specific security review bound to the reviewed
+commit. No credentials belong in this directory.
