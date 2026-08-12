@@ -1,6 +1,7 @@
 import 'package:esg_app/models/product.dart';
 import 'package:esg_app/services/product_lookup_failure.dart';
 import 'package:esg_app/services/product_repository.dart';
+import 'package:esg_app/services/supabase_product_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -76,6 +77,104 @@ void main() {
       throwsA(isA<ProductLookupFailure>()),
     );
   });
+
+  test(
+    'read-through repository uses a fresh cache hit without fallback',
+    () async {
+      final fallback = _TrackingProductRepository(repository);
+      final outcomes = <ProductCacheOutcome>[];
+      final readThrough = ReadThroughProductRepository(
+        cache: _FixedProductCache(
+          await repository.findByBarcode('4000417025005'),
+        ),
+        fallback: fallback,
+        onCacheOutcome: outcomes.add,
+      );
+
+      final product = await readThrough.findByBarcode('4000417025005');
+
+      expect(product, isNotNull);
+      expect(fallback.lookups, 0);
+      expect(outcomes, [ProductCacheOutcome.hit]);
+    },
+  );
+
+  test(
+    'read-through repository falls back on miss, stale and offline',
+    () async {
+      for (final scenario in [
+        (
+          cache: const _FixedProductCache(null),
+          outcome: ProductCacheOutcome.miss,
+        ),
+        (
+          cache: const _FailingProductCache(ProductCacheFailureType.stale),
+          outcome: ProductCacheOutcome.stale,
+        ),
+        (
+          cache: const _FailingProductCache(
+            ProductCacheFailureType.noConnection,
+          ),
+          outcome: ProductCacheOutcome.unavailable,
+        ),
+      ]) {
+        final fallback = _TrackingProductRepository(repository);
+        final outcomes = <ProductCacheOutcome>[];
+        final readThrough = ReadThroughProductRepository(
+          cache: scenario.cache,
+          fallback: fallback,
+          onCacheOutcome: outcomes.add,
+        );
+
+        final product = await readThrough.findByBarcode('4000417025005');
+
+        expect(product, isNotNull);
+        expect(fallback.lookups, 1);
+        expect(outcomes, [scenario.outcome]);
+      }
+    },
+  );
+}
+
+class _FixedProductCache implements ProductCache {
+  const _FixedProductCache(this.product);
+
+  final ScanFairProduct? product;
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) async => product;
+}
+
+class _FailingProductCache implements ProductCache {
+  const _FailingProductCache(this.type);
+
+  final ProductCacheFailureType type;
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    throw ProductCacheFailure(type: type, message: 'cache test failure');
+  }
+}
+
+class _TrackingProductRepository implements ProductRepository {
+  _TrackingProductRepository(this.delegate);
+
+  final ProductRepository delegate;
+  int lookups = 0;
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    lookups += 1;
+    return delegate.findByBarcode(barcode);
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => delegate.recentProducts();
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) {
+    return delegate.suggestAlternativeFor(product);
+  }
 }
 
 class _FailingProductRepository implements ProductRepository {

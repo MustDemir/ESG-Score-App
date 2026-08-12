@@ -1,6 +1,6 @@
 id: R-DSGVO-11
-title: Auftragsverarbeitungsvertrag (AVV) mit Supabase + ggf. weiteren Dienstleistern
-kontrollmechanismus: Manual (AVV-Unterzeichnung) + Conftest (Existenz-Check des AVV-PDFs im Evidence-Store)
+title: Auftragsverarbeitungsbedingungen und Unterauftragsverarbeiter kontrollieren
+kontrollmechanismus: Hybrid (CI prueft Version, Region, Scope und Evidenzstatus; ein Owner bewertet DPA und Unterauftragsverarbeiter)
 
 lifecycle_phase: pre-deployment
 governance_dimension: regulatorisch
@@ -20,7 +20,8 @@ description: |
   Agreement) nach Art. 28 DSGVO.
 
   Für ScanFair MVP:
-  - Supabase (Backend + Auth) → AVV PFLICHT (Supabase stellt Standard-AVV bereit)
+  - Supabase (Backend) → aktuelle Auftragsverarbeitungsbedingungen muessen
+    zum tatsaechlichen Scope passen und vor Remote-Aktivierung geprueft sein
   - Open Food Facts → KEINE AVV nötig (wir senden keine personenbezogenen
     Daten an OFF; OFF ist Produkt-Datenbank)
   - Apple TestFlight → kein separater AVV (Apple Developer License regelt das)
@@ -33,30 +34,34 @@ description: |
   - Domain-Provider → meist kein AVV (kein PII-Verarbeiter)
 
 evidence_expected:
-  - Unterzeichneter Supabase-AVV (PDF) im Evidence-Store
-  - TOM-Katalog als Anlage zum AVV
-  - Liste aktiver Auftragsverarbeiter mit AVV-Status
+  - Versionierter Provider-Governance-Record mit DPA-Version und Entscheidung
+  - Verifizierter Projektstandort eu-central-1 und Datenklassifikation
+  - Aktuelle Unterauftragsverarbeiterliste mit Aenderungsprozess
+  - TOM- und Umgebungsvertrag fuer den aktivierten Scope
 
 acceptance_criteria:
-  - Supabase-AVV vor erstem Production-Use unterzeichnet
-  - AVV erwähnt EU-Frankfurt-Region (Drittland-Klausel-frei)
-  - AVV-Liste aktuell + bei neuem Dienstleister Update
-  - Unteraufträge im AVV genehmigt (Supabase nutzt AWS — must be allowed)
+  - Aktuelle Supabase-DPA-Version ist vor Remote-Aktivierung dokumentiert und durch den Owner freigegeben
+  - Frankfurt ist als primaere Region verifiziert; internationale Transfers und SCCs werden dadurch nicht pauschal ausgeschlossen
+  - Unterauftragsverarbeiterliste, Aenderungsbenachrichtigung und Review-Fristen sind aktuell
+  - Neue Provider, SDKs, Datenarten, Regionen oder Verarbeitungsvorgaenge reaktivieren den Review
+  - Personenbezogene Daten bleiben bis zur qualifizierten Privacy-Freigabe verboten
 
 linked_gates:
-  - G-DSGVO-AVV   # primär manuell (Existenz-Check), aber YAML-File mit AVV-Liste prüfbar
+  - G-PROVIDER-DPA
+  - G-PROVIDER-SUBPROCESSORS
 
 deployer_implication: |
-  - Supabase-AVV via Dashboard signieren BEVOR Production-Daten fließen
-  - AVV-Liste pflegen: docs/project/compliance/avv-liste.yaml
+  - Provider-Governance-Register vor Remote-Aktivierung freigeben
+  - DPA- und Unterauftragsverarbeiter-Aenderungen abonnieren und bewerten
   - Bei jedem neuen SDK/Service: AVV-Pflicht prüfen
   - Bei AVV-Klausel-Konflikten: juristischer Review
 
-audit_trigger: "Vor erstem TestFlight-Production-Build + bei jedem neuen Auftragsverarbeiter"
+audit_trigger: "Vor Remote-Aktivierung und Release sowie bei DPA-, Unterauftragsverarbeiter-, Region-, Daten- oder Provider-Aenderungen"
 
 sources:
-  - DSGVO Art. 28
-  - Supabase DPA (https://supabase.com/legal/dpa)
+  - EU-GDPR
+  - SUPABASE-DPA
+  - SUPABASE-SUBPROCESSORS
 
 phase: phase-1-mvp
 
@@ -65,10 +70,10 @@ related_failure_modes: []
 related_decisions: [0002]
 
 notes: |
-  Supabase stellt Standard-Vertrag (SCC-konform) bereit — Solo-Founder muss
-  „nur" akzeptieren. Trotzdem inhaltlich prüfen ob er zu unserer Architektur
-  passt (EU-Region-Bindung kritisch).
+  Das aktuelle Supabase-DPA wird laut Anbieter in die Nutzungsbedingungen
+  einbezogen. Diese technische Dokumentation ersetzt keine Rechtsberatung und
+  keine inhaltliche Owner-Freigabe fuer den konkreten Verarbeitungsscope.
 
-  WARNUNG für Phase 2: jeder US-KI-Provider (Claude direkt, OpenAI) braucht
-  zusätzlich Standardvertragsklauseln (SCC) für Drittland-Transfer. Bei AWS
-  Bedrock EU-Region geht's einfacher. Aleph Alpha = DE → trivial.
+  WARNUNG fuer Phase 2: Jeder neue KI-, Analytics-, Crash- oder Payment-
+  Provider erfordert eine eigene Rollen-, Transfer-, DPA- und Subprocessor-
+  Bewertung. Ein EU-Standort allein macht diese Pruefung nicht entbehrlich.

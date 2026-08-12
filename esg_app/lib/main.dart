@@ -5,16 +5,41 @@ import 'screens/scanner_screen.dart';
 import 'services/esg_score_calculator.dart';
 import 'services/open_food_facts_service.dart';
 import 'services/product_repository.dart';
+import 'services/supabase_product_cache_service.dart';
 import 'theme/scanfair_theme.dart';
 
 void main() {
+  final directSource = OpenFoodFactsProductRepository(
+    service: OpenFoodFactsService(),
+  );
+  final cacheConfiguration = _cacheConfiguration();
+  final ProductRepository productSource = cacheConfiguration == null
+      ? directSource
+      : ReadThroughProductRepository(
+          cache: SupabaseProductCacheService(configuration: cacheConfiguration),
+          fallback: directSource,
+        );
   runApp(
     ScanFairApp(
-      repository: CoffeePilotProductRepository(
-        source: OpenFoodFactsProductRepository(service: OpenFoodFactsService()),
-      ),
+      repository: CoffeePilotProductRepository(source: productSource),
     ),
   );
+}
+
+SupabaseProductCacheConfiguration? _cacheConfiguration() {
+  const projectUrl = String.fromEnvironment('SCANFAIR_SUPABASE_URL');
+  const publishableKey = String.fromEnvironment(
+    'SCANFAIR_SUPABASE_PUBLISHABLE_KEY',
+  );
+  try {
+    return SupabaseProductCacheConfiguration.fromValues(
+      projectUrl: projectUrl,
+      publishableKey: publishableKey,
+    );
+  } on FormatException catch (error) {
+    debugPrint('Remote product cache disabled: ${error.message}');
+    return null;
+  }
 }
 
 class ScanFairApp extends StatelessWidget {

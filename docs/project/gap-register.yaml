@@ -168,8 +168,10 @@ gaps:
     concern: |
       Aktueller und geplanter Datenfluss, Datentypen, Zwecke, Empfänger,
       Regionen, Retention und DPIA-Entscheidungsweg sind versioniert und im
-      Development-Profil geprüft. Vor externer Beta oder Remote-Aktivierung
-      fehlen qualifizierte Rechts-/DPIA-Prüfung, Provider-Rollen, AVV,
+      Development-Profil geprüft. Das Frankfurter Development-Projekt sowie
+      DPA-, Subprocessor- und Kostenmetadaten sind fail-closed inventarisiert.
+      Vor externer Beta oder Remote-Aktivierung fehlen weiterhin qualifizierte
+      Rechts-/DPIA-Prüfung und Provider-Owner-Freigaben,
       App-Privacy-Freigabe sowie getestete Rechte-, Lösch- und Incident-Prozesse.
     closure_criteria:
       - Dateninventar und End-to-End-Datenfluss sind versioniert
@@ -196,6 +198,9 @@ gaps:
       - docs/privacy.md
       - docs/project/gate-definitions/local/G-PRIVACY-BOUNDARY.yaml
       - scripts/quality/validate_claims_privacy_boundaries.rb
+      - docs/project/compliance/provider-governance-register.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-DPA.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-SUBPROCESSORS.yaml
 
   - id: GAP-005
     domain: security
@@ -210,10 +215,11 @@ gaps:
     trigger: Vor Implementierung eines öffentlich erreichbaren Server-Writers
     concern: |
       Systemweites Threat Model, Trust Boundaries, Abuse Cases und ein
-      fail-closed Umgebungs-/Writervertrag sind versioniert und automatisiert
-      geprueft. Noch offen sind die reale Writer-Implementierung, ihre
-      AuthN/AuthZ-, Parser-, SSRF-, Rate-, Replay-, Audit- und Incident-Tests
-      sowie die Entscheidung und Evidenz zum unabhaengigen Security-Review.
+      fail-closed Umgebungs-/Writervertrag sowie die lokale Writer-, RPC- und
+      Flutter-Read-Implementierung sind versioniert und automatisiert geprueft.
+      AuthN/AuthZ, Parser, SSRF-Grenze, Rate, Tagesbudget, Circuit Breaker,
+      Replay, Out-of-order und Audit sind lokal getestet. Offen bleiben der
+      unabhaengige Security-Review, Remote-Integration, Rotation und Incident Drill.
     closure_criteria:
       - Datenfluss- und Trust-Boundary-Diagramm ist erstellt
       - Assets, Akteure, Bedrohungen und Abuse Cases sind priorisiert
@@ -239,6 +245,10 @@ gaps:
       - docs/project/gate-definitions/local/G-BACKEND-BOUNDARY.yaml
       - scripts/quality/validate_backend_boundary.rb
       - scripts/quality/test_backend_boundary_gate.rb
+      - supabase/functions/_shared/writer_contract.test.mjs
+      - supabase/migrations/20260812000100_trusted_writer_cache_path.sql
+      - supabase/tests/database/trusted_writer_cache_path.test.sql
+      - docs/project/audits/2026-08-12-eu-supabase-local-integration-assessment.md
 
   - id: GAP-006
     domain: quality
@@ -247,12 +257,13 @@ gaps:
     status: open
     priority: P1
     target_profile: release_candidate
-    maturity_current: 1
+    maturity_current: 3
     maturity_target: 4
     owner: Engineering
     trigger: Vor externer Beta
     concern: |
-      Funktionale Fehlerfälle sind getestet, aber Startzeit, Scan-to-Result,
+      Cache-Miss, Stale, Offline, Timeout, Serverfehler, Retry-Budget und
+      Circuit Breaker sind funktional getestet. Startzeit, Scan-to-Result,
       API-Latenz, Speicher, Energie, Schema-Drift, Quoten und längere
       Provider-Ausfälle besitzen keine messbaren Budgets oder Lastprofile.
     closure_criteria:
@@ -393,7 +404,9 @@ gaps:
     concern: |
       Das Quellenregister besitzt Review-Daten, aber Änderungserkennung,
       Diff-Bewertung, Requirement-Impact und Eskalation überfälliger Reviews
-      sind noch nicht vollständig als wiederholbarer Prozess und Gate belegt.
+      sind noch nicht fuer alle Quellen als wiederholbarer Prozess und Gate
+      belegt. Supabase-DPA, Subprocessor-Liste und Kostenkontrolle besitzen
+      jetzt eine woechentliche Online-Markerpruefung.
     closure_criteria:
       - jede Primärquelle besitzt Version, Owner, letzten und nächsten Review
       - überfällige Reviews blockieren Release Candidate
@@ -406,6 +419,16 @@ gaps:
     source_refs:
       - APPLE-ARG
       - OWASP-MASVS
+      - SUPABASE-DPA
+      - SUPABASE-SUBPROCESSORS
+      - SUPABASE-COST-CONTROL
+    implementation_evidence:
+      - docs/project/gate-definitions/gate-definition-schema.yaml
+      - docs/project/gate-definitions/local/G-GATE-DEFINITION-QUALITY.yaml
+      - docs/project/compliance/provider-governance-register.yaml
+      - docs/project/audits/2026-08-12-provider-governance-gates-assessment.md
+      - scripts/quality/validate_gate_definitions.rb
+      - scripts/quality/validate_provider_governance.rb
 
   - id: GAP-012
     domain: ux_accessibility

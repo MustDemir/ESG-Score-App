@@ -1,5 +1,5 @@
 schema_version: "1.1"
-last_verified: 2026-08-11
+last_verified: 2026-08-12
 next_review_due: 2026-09-09
 review_owner: Release owner
 
@@ -126,10 +126,24 @@ sources:
   - id: SUPABASE-DPA
     authority: Supabase
     title: Data Processing Addendum
-    url: https://supabase.com/downloads/docs/Supabase%2BDPA%2B260601.pdf
-    version: 2026-06-01
+    url: https://supabase.com/legal/customer-resources/data-processing-addendum
+    version: v1-2026-08-01
     normative_weight: CONDITIONAL_MUST
     scope: Processor terms, processing region, transfers and subprocessors before remote personal-data processing
+  - id: SUPABASE-SUBPROCESSORS
+    authority: Supabase
+    title: Subprocessor List
+    url: https://supabase.com/legal/customer-resources/subprocessor-list
+    version: 2026-06-01
+    normative_weight: CONDITIONAL_MUST
+    scope: Provider inventory, processing-chain review and change notifications
+  - id: SUPABASE-COST-CONTROL
+    authority: Supabase
+    title: Control your costs
+    url: https://supabase.com/docs/guides/platform/cost-control
+    version: current-web
+    normative_weight: PROVIDER_OPERATIONAL_REQUIREMENT
+    scope: Free Plan cost boundary, Pro Spend Cap, quotas and paid-change governance
   - id: SUPABASE-PRODUCTION-CHECKLIST
     authority: Supabase
     title: Production Checklist

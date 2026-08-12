@@ -130,12 +130,15 @@ improvements:
       - docs/project/methodology/gap-analysis-process.md
       - docs/project/gap-register.yaml
       - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/gate-definitions/gate-definition-schema.yaml
+      - docs/project/gate-definitions/local/G-GATE-DEFINITION-QUALITY.yaml
+      - scripts/quality/validate_gate_definitions.rb
     verification:
       - G-PROJECT-CONTROL validiert Gap-Struktur und Cross-Links
       - Vollständiger Audit wird bei Phasenwechsel und mindestens quartalsweise wiederholt
     dependencies:
       - IMP-PROC-002
-    next_action: IMP-COMP-004 beginnen und Full-/Source-Review-Faelligkeiten im laufenden Gate-Betrieb ueberwachen
+    next_action: Legacy-Gate-Metadaten schrittweise auf scanfair-gate-v1 migrieren und weitere externe Quellen in die Freshness-Ueberwachung aufnehmen
 
   - id: IMP-COMP-001
     layer: compliance
@@ -355,13 +358,18 @@ improvements:
       - docs/project/decisions/0031-claims-and-privacy-boundaries.yaml
       - docs/project/gate-definitions/local/G-PRIVACY-BOUNDARY.yaml
       - scripts/quality/test_claims_privacy_gate.rb
+      - docs/project/compliance/provider-governance-register.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-DPA.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-SUBPROCESSORS.yaml
+      - docs/project/audits/2026-08-12-provider-governance-gates-assessment.md
     verification:
       - G-PRIVACY-BOUNDARY Development-Profil und Gate-Selbsttests bestehen
+      - Provider-DPA- und Subprocessor-Development-Gates validieren Quellen, Fristen und fail-closed Status
       - External-Beta-, Remote- und Release-Profile blockieren offene Evidenz
       - Datenfluss und App Store Privacy Details stimmen vor Freigabe mit Build und Backend überein
     dependencies:
       - IMP-PROC-003
-    next_action: Provider-Rollen, Rechtsgrundlagen und DPIA qualifiziert prüfen; danach App Privacy, AVV, Rechte-, Lösch- und Incident-Prozesse operationalisieren
+    next_action: DPA-/Subprocessor-Owner-Entscheidung und Aenderungsabonnement belegen; danach Rechtsgrundlagen, DPIA, App Privacy, Rechte-, Loesch- und Incident-Prozesse operationalisieren
 
   - id: IMP-COMP-007
     layer: compliance
@@ -390,6 +398,10 @@ improvements:
       - docs/project/audits/2026-08-11-backend-threat-model-assessment.md
       - docs/project/gate-definitions/local/G-BACKEND-BOUNDARY.yaml
       - scripts/quality/test_backend_boundary_gate.rb
+      - supabase/functions/_shared/writer_contract.test.mjs
+      - supabase/migrations/20260812000100_trusted_writer_cache_path.sql
+      - supabase/tests/database/trusted_writer_cache_path.test.sql
+      - docs/project/audits/2026-08-12-eu-supabase-local-integration-assessment.md
     verification:
       - Threat-Model-Review vor Implementierung des Remote-Writers
       - Security-Tests und G-DATA-RLS bestehen gegen die Zielarchitektur
@@ -397,7 +409,7 @@ improvements:
       - IMP-PROC-003
       - IMP-COMP-001
       - IMP-COMP-002
-    next_action: Writer-Kontrollen in NEXT-05 implementieren und danach unabhaengigen Security-Review oder risikobasierten Penetrationstest entscheiden
+    next_action: Unabhaengigen Security-Review oder risikobasierten Penetrationstest entscheiden und danach Remote-Integration, Rotation und Incident Drill belegen
 
   - id: IMP-DEV-001
     layer: development
@@ -457,6 +469,17 @@ improvements:
       - docs/project/decisions/0032-backend-security-boundary.yaml
       - supabase/migrations/20260727000100_initial_data_architecture.sql
       - supabase/tests/database/data_architecture.test.sql
+      - supabase/functions/ingest-products/index.ts
+      - supabase/migrations/20260812000100_trusted_writer_cache_path.sql
+      - supabase/tests/database/trusted_writer_cache_path.test.sql
+      - esg_app/lib/services/supabase_product_cache_service.dart
+      - esg_app/test/services/supabase_product_cache_service_test.dart
+      - docs/project/audits/2026-08-12-eu-supabase-local-integration-assessment.md
+      - docs/project/audits/2026-08-12-provider-governance-gates-assessment.md
+      - docs/project/compliance/provider-governance-register.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-DPA.yaml
+      - docs/project/gate-definitions/local/G-PROVIDER-SUBPROCESSORS.yaml
+      - docs/project/gate-definitions/local/G-COST-CONTROL.yaml
     verification:
       - G-DATA-ARCH und G-DATA-RLS bestehen
       - Integrations- und Offline-/Fehlerfalltests bestehen
@@ -465,7 +488,7 @@ improvements:
       - IMP-COMP-005
       - IMP-COMP-006
       - IMP-COMP-007
-    next_action: Dediziertes EU-Development-Projekt anlegen, Aktivierungsevidenz erfassen und den vertraglich begrenzten Server-Writer implementieren
+    next_action: Provider-Governance-Stand per PR integrieren, Owner-Entscheidungen belegen und danach Remote-Deployment samt Integrationstests ausfuehren
 
   - id: IMP-DEV-003
     layer: development

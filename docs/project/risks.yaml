@@ -112,10 +112,13 @@ risks:
       Datenschutzverstößen und App-Store-Ablehnung führen.
     mitigation: |
       Aktueller lokaler MVP verwendet kein Konto, kein Analytics-SDK und kein
-      Remote-Supabase-Projekt. Dateninventar, aktueller/geplanter Datenfluss,
+      aktiviertes Remote-Backend. Das separate Frankfurter Development-Projekt
+      ist provisioniert, aber Schema, App-Zugriff und Personendaten sind
+      deaktiviert. Dateninventar, aktueller/geplanter Datenfluss,
       Privacy Manifest, SDK-Audit und G-PRIVACY-BOUNDARY bestehen im
       Development-Profil. Externe Beta und Remote-Backend bleiben bis
-      qualifiziertem Rechts-/DPIA-Review, App Privacy, AVV, Retention,
+      DPA-/Subprocessor-Owner-Freigabe, qualifiziertem Rechts-/DPIA-Review,
+      App Privacy, Retention,
       Betroffenenrechten, Löschung und Incident-Prozess blockiert.
     related_todos: [TODO-008]
     related_gaps: [GAP-004]
@@ -123,7 +126,7 @@ risks:
     status: open
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-08-11
+    updated: 2026-08-12
 
   - id: RISK-006
     title: ODbL-Kompositionspflichten kollidieren mit weiteren Datenquellen
@@ -184,14 +187,16 @@ risks:
     mitigation: |
       Versioniertes End-to-End-Threat-Model, serverseitige Vertrauensgrenzen,
       fail-closed EU-Supabase-Umgebungsvertrag und G-BACKEND-BOUNDARY sind
-      umgesetzt. Idempotenz, Input Validation, Audit Trail, Rate Limits,
-      Secret Rotation und risikobasierter Security-Test muessen in NEXT-05
-      gegen die reale Writer-Implementierung belegt werden.
+      umgesetzt. Der lokale Writer belegt getrennte Invoker-Secrets, Input-
+      und Upstream-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz,
+      Out-of-order-Schutz und Append-only Audit. Remote-Integration, Secret-
+      Rotation, Incident Drill und unabhaengiger Security-Test bleiben offen.
     related_gaps: [GAP-005]
     related_improvements: [IMP-COMP-007, IMP-DEV-002]
     status: open
     owner: Engineering
     created: 2026-08-10
+    updated: 2026-08-12
 
   - id: RISK-009
     title: Provider-Ausfall, Datenalter oder fehlender Betriebsprozess erzeugt falsche Nutzerinformation
@@ -204,7 +209,9 @@ risks:
       Stale-Data-Anzeige, Korrektur und Rollback bleibt ein falscher Score
       möglicherweise unentdeckt oder aktiv.
     mitigation: |
-      Reliability-Budgets, Provider-Failure-Tests, Datenfrischeanzeige,
+      Read-through-Fallback, Stale-Ablehnung, Provider-Failure-Tests und
+      Circuit Breaker sind lokal implementiert. G-COST-CONTROL begrenzt den
+      Free-Plan- und Add-on-Status sowie 70-Prozent-Warnschwellen. Offen bleiben messbare SLOs,
       Monitoring, Alerts, Score-Sperre, versionierte Korrektur sowie
       Backup-/Restore- und Incident-Drills.
     related_gaps: [GAP-006, GAP-009, GAP-013]
@@ -212,6 +219,7 @@ risks:
     status: open
     owner: Engineering
     created: 2026-08-10
+    updated: 2026-08-12
 
   - id: RISK-010
     title: Apple-, EU-, OWASP- oder Provider-Regeln ändern sich unbemerkt
@@ -222,14 +230,17 @@ risks:
       Lebende Plattformregeln und Datenproviderbedingungen können bestehende
       Requirements, Gates, Metadaten oder Lizenzentscheidungen überholen.
     mitigation: |
-      Versioniertes Quellenregister, 30-Tage-Review bis Release,
-      quartalsweiser Lifecycle-Gap-Audit und Release-Blockade bei überfälliger
-      anwendbarer Primärquelle.
+      Versioniertes Quellenregister, G-GATE-DEFINITION-QUALITY und getrennte
+      DPA-, Subprocessor- und Kosten-Gates. Der woechentliche GitHub-Lauf
+      prueft offizielle Supabase-Versionsmarker; Aenderungen erzeugen Review
+      statt automatischer Freigabe. Andere Quellen folgen dem 30-Tage-Review
+      und quartalsweisen Lifecycle-Gap-Audit.
     related_gaps: [GAP-011]
     related_improvements: [IMP-PROC-003]
     status: open
     owner: Release owner
     created: 2026-08-10
+    updated: 2026-08-12
 
   - id: RISK-011
     title: Verlust kritischer Accounts, Zertifikate, Domains oder Recovery-Codes

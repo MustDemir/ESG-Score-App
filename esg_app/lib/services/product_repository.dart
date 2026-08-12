@@ -3,6 +3,7 @@ import '../data_sources/coffee_pilot_catalog.dart';
 import '../models/product.dart';
 import 'open_food_facts_service.dart';
 import 'product_lookup_failure.dart';
+import 'supabase_product_cache_service.dart';
 
 abstract class ProductRepository {
   Future<ScanFairProduct?> findByBarcode(String barcode);
@@ -76,6 +77,69 @@ class OpenFoodFactsProductRepository implements ProductRepository {
   ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
 
   void close() => service.close();
+}
+
+enum ProductCacheOutcome { hit, miss, stale, unavailable, invalidResponse }
+
+typedef ProductCacheObserver = void Function(ProductCacheOutcome outcome);
+
+class ReadThroughProductRepository implements ProductRepository {
+  ReadThroughProductRepository({
+    required this.cache,
+    required this.fallback,
+    this.onCacheOutcome,
+  });
+
+  final ProductCache cache;
+  final ProductRepository fallback;
+  final ProductCacheObserver? onCacheOutcome;
+  final List<ScanFairProduct> _recentProducts = [];
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) async {
+    ScanFairProduct? product;
+    try {
+      product = await cache.findByBarcode(barcode);
+      onCacheOutcome?.call(
+        product == null ? ProductCacheOutcome.miss : ProductCacheOutcome.hit,
+      );
+    } on ProductCacheFailure catch (failure) {
+      onCacheOutcome?.call(_outcomeFor(failure.type));
+    }
+    product ??= await fallback.findByBarcode(barcode);
+    if (product == null) return null;
+
+    _recentProducts.removeWhere((entry) => entry.barcode == product!.barcode);
+    _recentProducts.insert(0, product);
+    if (_recentProducts.length > 10) _recentProducts.removeLast();
+    return product;
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() {
+    if (_recentProducts.isNotEmpty) {
+      return List.unmodifiable(_recentProducts.take(3));
+    }
+    return fallback.recentProducts();
+  }
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) {
+    return fallback.suggestAlternativeFor(product);
+  }
+
+  ProductCacheOutcome _outcomeFor(ProductCacheFailureType type) {
+    return switch (type) {
+      ProductCacheFailureType.stale => ProductCacheOutcome.stale,
+      ProductCacheFailureType.invalidBarcode ||
+      ProductCacheFailureType.invalidResponse =>
+        ProductCacheOutcome.invalidResponse,
+      ProductCacheFailureType.noConnection ||
+      ProductCacheFailureType.timeout ||
+      ProductCacheFailureType.rateLimited ||
+      ProductCacheFailureType.server => ProductCacheOutcome.unavailable,
+    };
+  }
 }
 
 class CoffeePilotProductRepository implements ProductRepository {

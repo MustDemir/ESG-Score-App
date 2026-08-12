@@ -1,13 +1,14 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-11
+last_reviewed: 2026-08-12
 owner: Engineering
 status: accepted_for_definition_of_ready
 
 scope: |
-  Threat model for the planned ScanFair EU Supabase development data path.
+  Threat model for the locally implemented ScanFair EU Supabase data path.
   It covers public read access, trusted ingestion, upstream retrieval,
-  privileged database writes, auditability and operator access. The remote
-  backend is not deployed or enabled by this decision.
+  privileged database writes, auditability and operator access. The writer,
+  database and read adapter are validated locally; the remote backend is not
+  provisioned, deployed or enabled by this decision.
 
 methodology:
   primary: STRIDE
@@ -355,11 +356,10 @@ residual_risks:
 
 activation_boundary:
   remote_backend_enabled: false
-  implementation_state: contract_only
+  implementation_state: local_implementation_validated
   blocked_until:
     - EU_development_project_and_DPA_evidence
-    - writer_authentication_and_SSRF_tests
-    - rate_limit_idempotency_and_audit_tests
+    - independent_writer_security_review
     - secret_rotation_and_break_glass_drill
     - remote_migration_and_RLS_validation
     - privacy_and_license_activation_evidence

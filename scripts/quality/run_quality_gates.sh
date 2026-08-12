@@ -167,7 +167,37 @@ gate_backend_boundary() {
   fi
   cd "$REPO_ROOT" &&
     ruby scripts/quality/test_backend_boundary_gate.rb &&
+    "${NODE_BINARY:-node}" --test \
+      supabase/functions/_shared/writer_contract.test.mjs &&
     ruby scripts/quality/validate_backend_boundary.rb --profile "$profile"
+}
+
+gate_definition_quality() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_gate_definition_gate.rb &&
+    ruby scripts/quality/validate_gate_definitions.rb
+}
+
+gate_provider_dpa() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_provider_governance_gate.rb &&
+    ruby scripts/quality/validate_provider_governance.rb \
+      --gate dpa \
+      --profile "${PROVIDER_GOVERNANCE_PROFILE:-development}"
+}
+
+gate_provider_subprocessors() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/validate_provider_governance.rb \
+      --gate subprocessors \
+      --profile "${PROVIDER_GOVERNANCE_PROFILE:-development}"
+}
+
+gate_cost_control() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/validate_provider_governance.rb \
+      --gate cost \
+      --profile "${PROVIDER_GOVERNANCE_PROFILE:-development}"
 }
 
 gate_project_control() {
@@ -237,6 +267,10 @@ run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
 run_gate "G-CLAIM-GOVERNANCE" "Versioned claims and nutrition boundary" gate_claim_governance
 run_gate "G-PRIVACY-BOUNDARY" "Actual data-flow and privacy activation boundary" gate_privacy_boundary
 run_gate "G-BACKEND-BOUNDARY" "Trusted writer and EU Supabase activation boundary" gate_backend_boundary
+run_gate "G-GATE-DEFINITION-QUALITY" "Gate schema, semantics and traceability" gate_definition_quality
+run_gate "G-PROVIDER-DPA" "Supabase DPA and Frankfurt processing boundary" gate_provider_dpa
+run_gate "G-PROVIDER-SUBPROCESSORS" "Supabase subprocessor inventory and change governance" gate_provider_subprocessors
+run_gate "G-COST-CONTROL" "Supabase plan, quota and paid-change protection" gate_cost_control
 run_gate "G-PROJECT-CONTROL" "Gap, improvement and feature-state traceability" gate_project_control
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax

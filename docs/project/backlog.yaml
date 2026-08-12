@@ -200,13 +200,28 @@ todos:
       - Lokalen Migration-Replay, 71 pgTAP-Tests und DB-Lint validiert
       - Backend-Threat-Model und EU-Supabase-Umgebungsvertrag festgelegt
       - G-BACKEND-BOUNDARY mit positivem und negativem Evidenz-Selbsttest integriert
+      - Trusted Edge Writer mit getrennten Invoker-Secrets, festen Upstream-
+        Grenzen, Payload-Validierung und bounded Retry implementiert
+      - Server-only RPCs fuer Rate-/Tagesbudget, Circuit Breaker, Idempotenz,
+        Out-of-order-Schutz, Publikation und Append-only Audit implementiert
+      - Direkten Cache-Tabellenzugriff entzogen und frische Einzel-Read-RPC erstellt
+      - Read-only Flutter-Cache mit Miss-, Stale-, Offline- und Provider-Fallback getestet
+      - Lokalen Edge-Wrapper mit 401, 400, Publication, Replay und Read-RPC validiert
+      - Dediziertes scanfair-dev Projekt in eu-central-1 provisioniert, verifiziert und lokal verknuepft
+      - Aktuelle DPA-, Subprocessor- und Kostenquellen versioniert geprueft
+      - G-GATE-DEFINITION-QUALITY, G-PROVIDER-DPA,
+        G-PROVIDER-SUBPROCESSORS und G-COST-CONTROL integriert
+      - 11 Gate-Schema- und 26 Provider-Governance-Selbsttestassertionen bestanden
     remaining:
-      - Dediziertes EU-Development-Projekt anlegen und AVV/Region belegen
-      - Begrenzten Server-Writer mit AuthN/AuthZ, Validation, Rate Limits,
-        Idempotenz, Audit und Security-Tests implementieren
-      - Flutter-Read-Cache erst nach Environment-, Security- und Privacy-Review anbinden
+      - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
+      - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
+      - Feature-Branch ueber PR und geschuetztes main integrieren
+      - Migrationen und Writer erst danach remote deployen
+      - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
+      - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
+        und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
-    updated: 2026-08-11
+    updated: 2026-08-12
     created: 2026-05-19
 
   - id: TODO-005

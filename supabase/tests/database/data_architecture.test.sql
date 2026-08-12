@@ -247,6 +247,7 @@ select lives_ok(
       barcode,
       payload,
       payload_sha256,
+      source_observed_at,
       fetched_at,
       expires_at
     ) values (
@@ -254,6 +255,7 @@ select lives_ok(
       '12345678',
       '{"product_name":"ODbL fixture"}'::jsonb,
       repeat('a', 64),
+      timezone('utc', now()),
       timezone('utc', now()),
       timezone('utc', now()) + interval '1 day'
     )
@@ -268,6 +270,7 @@ select throws_ok(
       barcode,
       payload,
       payload_sha256,
+      source_observed_at,
       fetched_at,
       expires_at
     ) values (
@@ -275,6 +278,7 @@ select throws_ok(
       '87654321',
       '{"name":"external fixture"}'::jsonb,
       repeat('b', 64),
+      timezone('utc', now()),
       timezone('utc', now()),
       timezone('utc', now()) + interval '1 day'
     )
