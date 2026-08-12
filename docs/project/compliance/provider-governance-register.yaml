@@ -1,0 +1,119 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-12
+owner: Mustafa Demir
+environment: development
+provider: Supabase
+project_name: scanfair-dev
+region: eu-central-1
+region_display_name: Central EU Frankfurt
+region_verification:
+  status: verified
+  verified_at: 2026-08-12
+  method: authenticated_supabase_cli_project_metadata
+data_classification: public_source_and_synthetic_test_data_only
+personal_data_allowed: false
+remote_schema_deployed: false
+remote_app_access_enabled: false
+
+reviews:
+  dpa:
+    source_id: SUPABASE-DPA
+    expected_version: v1-2026-08-01
+    effective_date: 2026-08-01
+    last_verified_at: 2026-08-12
+    next_periodic_review_at: 2027-08-01
+    change_check_interval_days: 7
+    contract_mechanism: incorporated_into_supabase_terms
+    processing_scope: non_personal_development_only
+    decision: pending_owner_approval
+    reviewer_role: privacy_and_platform_owner
+    decision_reason: Remote activation remains disabled until the environment review is approved.
+    online_markers:
+      - Version 1
+      - August 1, 2026
+
+  subprocessors:
+    source_id: SUPABASE-SUBPROCESSORS
+    expected_version: 2026-06-01
+    last_verified_at: 2026-08-12
+    next_periodic_review_at: 2026-11-12
+    change_check_interval_days: 7
+    change_notification_subscription: pending_owner_action
+    decision: pending_owner_approval
+    reviewer_role: privacy_and_vendor_owner
+    decision_reason: The current list is inventoried; notification subscription and scope review remain open.
+    online_markers:
+      - Updated June 1, 2026
+
+  cost_control:
+    source_id: SUPABASE-COST-CONTROL
+    expected_version: current-web
+    last_verified_at: 2026-08-12
+    next_periodic_review_at: 2026-11-12
+    change_check_interval_days: 7
+    plan: free
+    plan_verification: user_confirmed_at_project_creation_pending_dashboard_evidence
+    expected_fixed_monthly_cost_usd: 0
+    paid_add_ons_allowed: false
+    spend_cap: unavailable_on_free_plan
+    decision: approved_for_free_development_with_remote_activation_disabled
+    reviewer_role: product_and_platform_owner
+    decision_reason: Free development is cost-bounded by provider restrictions; paid changes require approval.
+    thresholds_percent:
+      database_size: 70
+      egress: 70
+      edge_function_invocations: 70
+    usage_review_interval_days: 7
+    online_markers:
+      - This feature is available only with the Pro Plan
+      - you will not be charged while using the Free Plan
+
+activation_policy:
+  development:
+    remote_backend_enabled: false
+    dpa_decisions_allowed: [pending_owner_approval, approved]
+    subprocessor_decisions_allowed: [pending_owner_approval, approved]
+    cost_decisions_allowed: [approved_for_free_development_with_remote_activation_disabled]
+  remote_backend:
+    remote_backend_enabled: true
+    required_dpa_decision: approved
+    required_subprocessor_decision: approved
+    required_change_notification_subscription: confirmed
+    required_plan_verification: dashboard_evidence_reviewed
+  release_candidate:
+    inherits: remote_backend
+    fresh_review_required: true
+    qualified_privacy_review_required: true
+    maximum_evidence_age_days: 30
+
+provider_approval_evidence:
+  path: docs/project/compliance/evidence/provider-governance-approval.yaml
+  evidence_type: provider_governance_approval
+  maximum_remote_age_days: 92
+  required_values:
+    schema_version: "1.0"
+    decision: approved
+    provider: Supabase
+    project_name: scanfair-dev
+    region: eu-central-1
+    qualified_review_confirmed: true
+  required_fields:
+    - reviewed_at
+    - reviewed_commit_sha
+    - reviewer_identity
+    - reviewer_roles
+    - reviewer_qualifications
+    - approved_profiles
+    - approved_gates
+    - source_versions
+    - provider_register_sha256
+    - artifact_path
+    - artifact_sha256
+  required_reviewer_roles:
+    - privacy_and_platform_owner
+    - privacy_and_vendor_owner
+    - product_and_platform_owner
+  required_source_ids:
+    - SUPABASE-DPA
+    - SUPABASE-SUBPROCESSORS
+    - SUPABASE-COST-CONTROL

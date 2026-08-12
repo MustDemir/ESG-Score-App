@@ -139,7 +139,7 @@ decisions:
 open_items:
   - Methodik-Seite (App + Web) muss vor Launch geschrieben sein
   - Bei Score-Berechnung: Caching-Strategie in Supabase (für Phase 2 KI-Erklärungen relevant)
-  - Remote-EU-Projekt, DPA-Nachweis und Flutter-Cache-Adapter sind noch offen.
+  - Das Frankfurt-Development-Projekt und der Flutter-Cache-Adapter sind vorhanden; DPA-/Unterauftragsverarbeiter-Freigabe und Remote-Aktivierung bleiben offen.
   - Weitere Quellen, Gewichte und Kalibrierung fuer 2.0-draft sind offen.
 
 next_steps:

@@ -9,8 +9,9 @@ threat_model_ref: docs/project/security/backend-threat-model.yaml
 purpose: |
   Fail-closed environment, identity, secret, writer, resource and operational
   contract for the EU Supabase data path. Its writer, database RPCs and
-  read-only Flutter adapter are validated locally. It does not provision,
-  link, deploy or activate any remote project.
+  read-only Flutter adapter are validated locally. The dedicated Frankfurt
+  development project is provisioned and linked for controlled inspection,
+  but no schema, writer, app access or personal data is remotely activated.
 
 environment_isolation:
   separate_project_per_environment: true
@@ -27,13 +28,18 @@ environments:
     data_classification: synthetic_and_public_source_fixtures_only
     secrets: local_untracked_environment_only
   - id: development
-    status: not_provisioned
+    status: provisioned_linked_not_activated
     project_class: dedicated_remote_development
+    project_name: scanfair-dev
     region: eu-central-1
     region_display_name: Central EU Frankfurt
+    region_verified_on: 2026-08-12
+    plan: free
+    remote_schema_deployed: false
+    remote_app_access_enabled: false
     data_classification: public_source_and_synthetic_test_data_only
     personal_data_allowed: false
-    dpa_status: pending_before_activation
+    dpa_status: reviewed_pending_owner_approval
   - id: staging
     status: prohibited_until_separate_decision
     project_class: dedicated_remote_staging
@@ -120,8 +126,13 @@ resource_protection:
     open_seconds: 900
   cost_controls:
     spend_cap_or_billing_alert_required: true
+    current_plan: free
+    spend_cap_status: unavailable_on_free_plan
+    paid_add_ons_allowed: false
+    usage_review_interval_days: 7
     function_invocation_alert_percent: 70
     database_size_alert_percent: 70
+    egress_alert_percent: 70
 
 read_contract:
   client_roles: [anon, authenticated]
@@ -208,6 +219,9 @@ implementation_evidence:
   writer_contract_tests: 11/11 PASS
   database_tests: 119/119 PASS
   flutter_cache_and_fallback_tests: 15/15 PASS
+  gate_definition_tests: 11/11 PASS
+  provider_governance_tests: 26 assertions PASS
+  provider_online_source_markers: 3/3 PASS
   artifacts:
     - supabase/functions/_shared/writer_contract.mjs
     - supabase/functions/_shared/writer_contract.test.mjs
@@ -216,11 +230,16 @@ implementation_evidence:
     - supabase/tests/database/trusted_writer_cache_path.test.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
+    - docs/project/gate-definitions/gate-definition-schema.yaml
+    - docs/project/compliance/provider-governance-register.yaml
   validation_commands:
     - node --test supabase/functions/_shared/writer_contract.test.mjs
     - bash scripts/quality/run_data_database_gate.sh
     - bash scripts/quality/run_edge_writer_integration_gate.sh
     - flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
+    - ruby scripts/quality/test_gate_definition_gate.rb
+    - ruby scripts/quality/test_provider_governance_gate.rb
+    - bash scripts/quality/run_provider_governance_gates.sh
 
 activation_profiles:
   development:
@@ -239,7 +258,7 @@ activation_profiles:
 
 reviews:
   environment_activation:
-    status: pending_not_provisioned
+    status: pending_provider_governance_owner_approval_and_remote_deployment
     evidence: null
   writer_security:
     status: pending_independent_review
@@ -316,8 +335,10 @@ evidence_contracts:
     digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
 
 remote_activation_blocks:
-  - development_project_not_provisioned_or_wrong_region
-  - DPA_region_and_subprocessor_review_missing
+  - development_project_not_deployed_or_region_evidence_stale
+  - DPA_or_subprocessor_owner_approval_missing
+  - subprocessor_change_notification_not_confirmed
+  - free_plan_dashboard_evidence_not_reviewed
   - independent_writer_security_review_missing
   - privileged_secret_present_in_client_repository_or_logs
   - remote_environment_writer_and_RLS_integration_tests_missing
@@ -336,5 +357,7 @@ primary_sources:
   - SUPABASE-EDGE-FUNCTIONS
   - SUPABASE-REGIONS
   - SUPABASE-DPA
+  - SUPABASE-SUBPROCESSORS
+  - SUPABASE-COST-CONTROL
   - SUPABASE-PRODUCTION-CHECKLIST
   - EU-GDPR

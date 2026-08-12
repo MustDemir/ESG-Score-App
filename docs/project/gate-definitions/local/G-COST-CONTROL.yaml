@@ -1,0 +1,86 @@
+schema_version: "1.0"
+schema_profile: scanfair-gate-v1
+id: G-COST-CONTROL
+title: Supabase plan, quota and paid-change protection
+status: active
+dimension: finops
+lifecycle_phase: deployment-and-operations
+automation: HYBRID
+owner: Product and platform owner
+profile_scope: [development, remote_backend, release_candidate]
+
+trigger:
+  - remote_project_creation
+  - infrastructure_change
+  - plan_or_add_on_change
+  - weekly_usage_review
+  - release_candidate
+
+criteria:
+  - id: COST-001
+    statement: Development uses the Free Plan, expects zero fixed provider cost and prohibits paid add-ons by default.
+    verification: AUTO
+    severity: BLOCK
+  - id: COST-002
+    statement: Database, egress and Edge Function warning thresholds do not exceed seventy percent.
+    verification: AUTO
+    severity: BLOCK
+  - id: COST-003
+    statement: Free Plan spend-cap unavailability is represented accurately and no paid plan or add-on is enabled without owner approval.
+    verification: HYBRID
+    severity: BLOCK
+
+artifacts:
+  - id: COST-A01
+    type: repository_input
+    path: docs/project/compliance/provider-governance-register.yaml
+    required_for: [development, remote_backend, release_candidate]
+  - id: COST-A02
+    type: repository_input
+    path: docs/project/security/eu-supabase-environment-contract.yaml
+    required_for: [development, remote_backend, release_candidate]
+  - id: COST-A03
+    type: generated_evidence
+    path: .quality/provider-governance/G-COST-CONTROL.json
+    required_for: [development, remote_backend, release_candidate]
+  - id: COST-A04
+    type: manual_evidence
+    path: docs/project/compliance/evidence/provider-governance-approval.yaml
+    required_for: [remote_backend, release_candidate]
+
+decision:
+  pass: Free development remains cost-bounded and thresholds are valid; paid changes require explicit owner evidence.
+  fail: Plan, add-on, expected cost, threshold, freshness or approval metadata is missing or contradictory.
+  manual_review: Any paid plan, add-on, spend-cap change or quota expansion requires owner approval.
+
+enforcement:
+  development: block
+  remote_backend: block
+  release_candidate: block
+
+audit:
+  validator: scripts/quality/validate_provider_governance.rb
+  tests: scripts/quality/test_provider_governance_gate.rb
+  local_runner: scripts/quality/run_provider_governance_gates.sh
+  ci_workflow: .github/workflows/quality-gates.yml
+  evidence_output: .quality/provider-governance/G-COST-CONTROL.json
+  maximum_periodic_review_days: 92
+
+waiver:
+  allowed: false
+  conditions: []
+  maximum_days: null
+
+links:
+  requirements: []
+  improvements: [IMP-DEV-002, IMP-OPS-001]
+  gaps: [GAP-006, GAP-009]
+  risks: [RISK-009]
+  related_adrs: [0002, 0008, 0032]
+
+sources: [SUPABASE-COST-CONTROL]
+
+notes: |
+  The gate does not claim that a Free project has a configurable Spend Cap.
+  It fails closed on paid changes and keeps provider restrictions distinct
+  from production-grade availability and backup requirements.

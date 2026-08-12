@@ -207,9 +207,16 @@ todos:
       - Direkten Cache-Tabellenzugriff entzogen und frische Einzel-Read-RPC erstellt
       - Read-only Flutter-Cache mit Miss-, Stale-, Offline- und Provider-Fallback getestet
       - Lokalen Edge-Wrapper mit 401, 400, Publication, Replay und Read-RPC validiert
+      - Dediziertes scanfair-dev Projekt in eu-central-1 provisioniert, verifiziert und lokal verknuepft
+      - Aktuelle DPA-, Subprocessor- und Kostenquellen versioniert geprueft
+      - G-GATE-DEFINITION-QUALITY, G-PROVIDER-DPA,
+        G-PROVIDER-SUBPROCESSORS und G-COST-CONTROL integriert
+      - 11 Gate-Schema- und 26 Provider-Governance-Selbsttestassertionen bestanden
     remaining:
-      - Dediziertes EU-Development-Projekt anlegen und AVV/Region belegen
-      - Migrationen und Writer nach unabhaengigem Security-Review remote deployen
+      - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
+      - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
+      - Feature-Branch ueber PR und geschuetztes main integrieren
+      - Migrationen und Writer erst danach remote deployen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren

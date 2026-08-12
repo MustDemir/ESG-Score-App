@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 65
-      next: provision_review_and_validate_eu_supabase_development
+      progress_percent: 70
+      next: approve_provider_governance_deploy_and_validate_remote_development
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -35,13 +35,13 @@ roadmap_progress:
       next: testflight_submission_and_release_decision
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 80
+      progress_percent: 85
     - id: N1-coffee-pilot-products
       progress_percent: 100
     - id: N2-product-commodity-origin-links
       progress_percent: 100
     - id: N3-eu-supabase-project
-      progress_percent: 0
+      progress_percent: 40
     - id: N4-server-writer-flutter-cache
       progress_percent: 80
     - id: N5-wri-aqueduct
@@ -63,17 +63,19 @@ session_handoff:
   prepared_at: 2026-08-12
   session_closed_at: null
   branch: feature/eu-supabase-data-path
-  status: next_05_local_implementation_validated
+  status: next_05_provider_governance_validated_remote_activation_blocked
   pull_request: not_created
   git_state:
-    committed: false
+    committed: true
     pushed: false
+    working_tree_clean: false
     commits:
+      - 4002933 feat: implement trusted Supabase data path
       - 1cbcbcb Merge pull request 21 from MustDemir/compliance/backend-threat-model
-    reason: NEXT-04 ist gemergt; NEXT-05 Writer-, Datenbank- und Flutter-Pfad sind lokal validiert, aber noch nicht committed oder remote aktiviert
+    reason: NEXT-05 Kernpfad ist committed; Provider-Governance-Gates und aktualisierte SSOT sind lokal validiert, aber noch nicht committed, gepusht oder remote aktiviert
   latest_validation:
-    executed_at: "2026-08-12T12:28:41Z"
-    development_quality_gates: 25/25 PASS
+    executed_at: "2026-08-12T14:25:22Z"
+    development_quality_gates: 29/29 PASS
     flutter_tests: 101/101 PASS
     flutter_line_coverage: 84.26 percent
     database_migration_replay: PASS
@@ -92,6 +94,12 @@ session_handoff:
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
     backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
+    gate_definition_validation: PASS for 28 definitions, 4 canonical and 24 compatible legacy
+    gate_definition_self_tests: 11 assertions PASS
+    provider_governance_self_tests: 26 assertions PASS
+    provider_development_profile: 3/3 PASS
+    provider_online_source_markers: 3/3 PASS
+    provider_remote_profile: EXPECTED FAIL 0/3 with 9 blocking findings
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
@@ -103,6 +111,11 @@ session_handoff:
     - Miss-, Stale-, Offline-, Server- und invalide Cache-Antworten getestet
     - Reale lokale Edge Runtime validiert: 401, 400, Publication, Duplicate und Read-RPC bestanden
     - Sieben Migrationen, 119 pgTAP-Tests, DB-Lint, 11 Writer-Tests und 101 Flutter-Tests bestanden
+    - Dediziertes Supabase-Projekt scanfair-dev in eu-central-1 provisioniert und lokal verknuepft; sieben Migrationen per Dry Run aufgeloest
+    - Kanonisches ScanFair-Gate-Schema mit sieben Kernattributen und Meta-Gate fuer 28 Definitionen integriert
+    - DPA-, Unterauftragsverarbeiter- und Kosten-Gates mit Development-, Remote- und Release-Candidate-Profil integriert
+    - Offizielle DPA-, Unterauftragsverarbeiter- und Kostenkontrollmarker 3/3 online bestaetigt
+    - Development Pipeline 29/29 PASS; Remote-Provider-Profil blockiert erwartungsgemaess an neun Befunden
     - Pull Request 20 mit Claim- und Privacy-Grenzen in main gemergt; GitHub-Run 31491650586 mit allen fuenf Jobs gruen
     - ADR 0032 trennt read-only Flutter und nicht mobilen vertrauenswuerdigen Server-Writer
     - STRIDE-/OWASP-API-Threat-Model mit sechs Trust Boundaries, zwoelf Bedrohungen und acht Abuse Cases versioniert
@@ -146,8 +159,9 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - NEXT-05 Aenderungen reviewen, committen, pushen und Pull Request mit Required Checks erstellen
-    - Danach EU-Development-Projekt, AVV/Region und unabhaengigen Writer-Security-Review vorbereiten
+    - Provider-Governance-Aenderungen reviewen und als getrennten Commit festhalten
+    - Branch pushen und Pull Request mit sechs sichtbaren GitHub-Jobs und Required Checks erstellen
+    - Danach Owner-Freigaben, Aenderungsbenachrichtigung, Plan-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -192,7 +206,7 @@ session_handoff:
           - Remote-Implementierung ist definition-of-ready
       - sequence: 5
         id: NEXT-05-eu-supabase-server-writer
-        status: in_progress_local_implementation_complete
+        status: in_progress_provider_governance_validated
         branch: feature/eu-supabase-data-path
         focus: EU-Supabase, vertrauenswürdigen Server-Writer und read-only Flutter-Cache implementieren
         suggested_branch: feature/eu-supabase-data-path
@@ -201,8 +215,14 @@ session_handoff:
           - Migration Replay, 119 pgTAP-Tests und DB-Lint bestanden
           - Flutter Cache-Hit, Miss, Stale, Offline und Fehler-Fallback getestet
           - Lokale Edge-Wrapper-Integration inklusive Replay und Public Read bestanden
+          - Dediziertes Development-Projekt scanfair-dev in Frankfurt provisioniert und lokal verknuepft
+          - Sieben lokale Migrationen per Remote-Dry-Run reproduzierbar aufgeloest
+          - Gate-Metadaten, DPA, Unterauftragsverarbeiter und Kostenkontrolle als vier Gates integriert
+          - Development 29/29 und Provider-Online-Marker 3/3 bestanden
         remaining:
-          - EU-Development-Projekt und AVV-/Regionsevidenz
+          - DPA- und Unterauftragsverarbeiter-Owner-Freigabe
+          - Aenderungsbenachrichtigung und Free-Plan-Dashboard-Evidenz bestaetigen
+          - Typisierte Provider-Freigabe mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
           - unabhaengiger Writer-Security- und Operational-Readiness-Review
           - Remote Deployment, RLS-/Writer-Integration, Rotation und Incident Drill
           - Aktivierung erst nach Privacy- und Datenlizenzfreigabe

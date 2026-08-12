@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-08-11
+Letztes Update: 2026-08-12
 
 ---
 
@@ -46,6 +46,8 @@ Letztes Update: 2026-08-11
 | Öffentliche Claims und Nährwertgrenze | Inventar-, Runtime-, Evidenz- und Aktivierungsprofile | `G-CLAIM-GOVERNANCE` |
 | Privacy-Datenfluss und Aktivierung | Datenmatrix-, Code-, DPIA- und Review-Evidenz | `G-PRIVACY-BOUNDARY` |
 | Backend- und Writer-Sicherheitsgrenze | STRIDE-/Abuse-Case-Modell, Umgebungsvertrag und Aktivierungsevidenz | `G-BACKEND-BOUNDARY` |
+| Gate-Definitionen | Sieben Kernattribute, erlaubte Werte, Referenzen und positive/negative Selbsttests | `G-GATE-DEFINITION-QUALITY` |
+| Provider Governance | DPA, Unterauftragsverarbeiter, Frankfurt-Region, Plan und Kostenfreigaben | `G-PROVIDER-DPA`, `G-PROVIDER-SUBPROCESSORS`, `G-COST-CONTROL` |
 | Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
 | Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
 | Mobile Security | MASVS-2.1-Matrix + Repositorychecks + Device-Checkliste | `G-MASVS` |
@@ -79,11 +81,12 @@ uebersprungen.
 | `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy- und Backend-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
-| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 55 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
+| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 119 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
+| `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` | Gate-Schema, DPA-/Unterauftragsverarbeiter-/Kostenregister; geplante und manuelle Laeufe pruefen zusaetzlich offizielle Versionsmarker | Provider-, Gate- und Online-Pruefevidenz |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt fuenfundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-
+Sie deckt neunundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -144,6 +147,27 @@ Flutter zugelassen ist und RLS-/Grant-Schutz in den Migrationen bestehen bleibt.
 release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
 Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.
 
+`G-GATE-DEFINITION-QUALITY` validiert fuer alle Gate-Dateien die normalisierten
+sieben Kernattribute `trigger`, `criteria`, `artifacts`, `decision`, `owner`,
+`audit` und `waiver`. Bestehende Definitionen bleiben nur ueber deklarierte
+Legacy-Aliase kompatibel; neue Definitionen muessen `scanfair-gate-v1`
+verwenden. Positive und negative Selbsttests verhindern, dass ein formal
+vorhandenes, aber semantisch unvollstaendiges Gate akzeptiert wird.
+
+Die Provider-Gates trennen drei Ebenen. Im Profil `development` darf ein Gate
+nur bestehen, wenn das Frankfurt-Projekt ohne Personendaten, Remote-Schema und
+App-Zugriff fail-closed bleibt. `remote_backend` verlangt DPA- und
+Unterauftragsverarbeiter-Freigabe, bestaetigte Aenderungsbenachrichtigung,
+gepruefte Plan-Evidenz und ein tatsaechlich aktiviertes EU-Development-Backend.
+`release_candidate` erbt diese Grenzen und verlangt aktuelle qualifizierte
+Reviews. Ein gemeinsames typisiertes Freigabeartefakt muss Reviewer-Identitaet
+und -Qualifikation, freigegebene Profile und Gates, den geprueften Commit sowie
+die aktuellen Quellversionen enthalten. SHA-256 bindet es an Provider-Register
+und Review-Artefakt; reine Statusaenderungen koennen das Gate nicht schliessen.
+Woechentliche Online-Pruefungen vergleichen nur offizielle
+Versionsmarker. Eine Quellenaenderung erzeugt `review_required`, niemals eine
+automatische Rechts- oder Kostenfreigabe.
+
 ### Branch-Protection auf `main` (GitHub Settings)
 
 - Require pull request before merging
@@ -157,6 +181,11 @@ Der neue eigenstaendige Check `G-SUPPLY-CHAIN dependency and Action security`
 bleibt zusaetzlich im bereits erforderlichen lokalen Gate-Job eingebettet.
 Nach seinem ersten gruenen PR- und Post-Merge-Lauf wird er als fuenfter
 expliziter Required Check in das Ruleset aufgenommen.
+
+Der neue Check `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` wird nach
+seinem ersten gruenen PR- und Post-Merge-Lauf als weiterer Required Check
+aufgenommen. Bis dahin bleibt er sowohl im lokalen Hauptjob als auch als
+separater sichtbarer GitHub-Job enthalten.
 
 Die produktive Quality-Gate-Action ergaenzt den Linux-Job um
 `G-IOS-COMPILE` auf einem macOS-Runner. Das Gate baut eine unsigned
@@ -196,6 +225,7 @@ In dieser Reihenfolge abarbeiten:
 [ ] /security-review Slash-Command durchgelaufen
 [ ] compliance-auditor Skill durchgelaufen
 [ ] Privacy Policy aktualisiert (falls Datenfluss-Änderung)
+[ ] DPA, Unterauftragsverarbeiter, Aenderungsbenachrichtigung und Provider-Plan freigegeben
 [ ] Changelog für diese Version geschrieben
 [ ] Version-Bump in pubspec.yaml (SemVer)
 [ ] Git-Tag gesetzt

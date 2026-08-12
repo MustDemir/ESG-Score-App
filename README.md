@@ -260,7 +260,7 @@ als technische Fertigstellung.
 
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
-M2  Backend- und Datenanbindung           [#############-------]  65%
+M2  Backend- und Datenanbindung           [##############------]  70%
 M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache und 119 pgTAP-Tests | EU-Entwicklungsprojekt, AVV/Region, Deployment, Remote-Integration und unabhängige Reviews |
+| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 119 pgTAP-Tests sowie provisioniertes und lokal verknuepftes Frankfurt-Development-Projekt | DPA-/Unterauftragsverarbeiter-Freigabe, Benachrichtigung, Plan-Evidenz, Deployment, Remote-Integration und unabhaengige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -285,10 +285,10 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 Die Pakete werden erst bei nachweisbarer Implementierung fortgeschrieben:
 
 ```text
-N0  Compliance-/Security-Baseline        [################----]  80%
+N0  Compliance-/Security-Baseline        [#################---]  85%
 N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
 N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
-N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
+N3  EU-Supabase-Projekt verbinden         [########------------]  40%
 N4  Server-Writer und Flutter-Cache       [################----]  80%
 N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
 N6  ILAB-Social-Risikomapping             [--------------------]   0%
@@ -304,9 +304,12 @@ Fachreview-Evidenzen. N1 und N2 des lokalen
 evidence-first Kaffee-Referenzfalls sind abgeschlossen. Die produktgebundenen
 Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Der
 Trusted Writer, die serverseitigen RPCs und der read-only Flutter-Cache sind
-lokal implementiert und getestet, aber nicht remote aktiviert. Als naechstes
-folgen das dedizierte EU-Supabase-Development-Projekt, AVV-/Regionsevidenz,
-unabhaengiger Security-Review und Remote-Integration. Erst danach werden WRI, ILAB und GLEIF/BRIS
+lokal implementiert und getestet, aber nicht remote aktiviert. Das dedizierte
+Supabase-Development-Projekt `scanfair-dev` ist in Frankfurt provisioniert und
+lokal verknuepft; ein Dry Run bestaetigt die sieben vorgesehenen Migrationen.
+Vor der Remote-Aktivierung folgen DPA- und Unterauftragsverarbeiter-Freigabe,
+Benachrichtigungs- und Plan-Evidenz, unabhaengige Reviews sowie das kontrollierte
+Deployment. Erst danach werden WRI, ILAB und GLEIF/BRIS
 kontrolliert angebunden; score-relevant werden sie erst nach Kalibrierung und
 Fachreview.
 
@@ -383,6 +386,7 @@ implementiert.
 | Datenbank | Sieben Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 119 pgTAP-Tests und DB-Lint bestanden |
 | Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote deaktiviert |
 | Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
+| Provider Governance | Frankfurt-Region verifiziert; DPA-, Unterauftragsverarbeiter- und Kosten-Gates bestehen fail-closed fuer die lokale Entwicklung; Owner-Freigaben und Remote-Aktivierung bleiben offen |
 | Tests | 101/101 Flutter-Tests bestanden; Line Coverage 84,26% |
 | Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
 | Supply Chain | 59 Dart-Pakete, 2 iOS-Plugins und 16 Action-Referenzen inventarisiert; OSV meldet 0 bekannte Schwachstellen |
@@ -435,6 +439,7 @@ bash scripts/quality/run_ios_build_gate.sh
 bash scripts/quality/run_data_database_gate.sh
 node --test supabase/functions/_shared/writer_contract.test.mjs
 bash scripts/quality/run_edge_writer_integration_gate.sh
+bash scripts/quality/run_provider_governance_gates.sh
 
 # Lizenzarchitektur: lokal gruen, Remote-Profil bleibt bis zur Freigabe rot
 DATA_LICENSE_PROFILE=development bash scripts/quality/run_quality_gates.sh
@@ -450,6 +455,10 @@ ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --prof
 ruby scripts/quality/validate_backend_boundary.rb --profile development
 ruby scripts/quality/validate_backend_boundary.rb --profile remote_backend
 ruby scripts/quality/validate_backend_boundary.rb --profile release_candidate
+
+# Provider Governance: lokal gruen, Remote bis zu Owner-Evidenz und Deployment rot
+PROVIDER_GOVERNANCE_PROFILE=development bash scripts/quality/run_provider_governance_gates.sh
+PROVIDER_GOVERNANCE_PROFILE=remote_backend bash scripts/quality/run_provider_governance_gates.sh
 
 # Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
 COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
@@ -481,6 +490,10 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-CLAIM-GOVERNANCE` | Claim-Inventar, neutrale Nährwertgrenze und gehashte Rechts-/Fachreview-Evidenz pruefen |
 | `G-PRIVACY-BOUNDARY` | Ist-Datenfluss, Retention, DPIA-Entscheidung und Beta-/Remote-Aktivierung pruefen |
 | `G-BACKEND-BOUNDARY` | Threat Model, Trusted-Writer-, Secret-, Rate-, Idempotenz-, Audit- und EU-Aktivierungsvertrag pruefen |
+| `G-GATE-DEFINITION-QUALITY` | Sieben Kernattribute, Semantik und Traceability aller Gate-Definitionen pruefen |
+| `G-PROVIDER-DPA` | Aktuelle Supabase-DPA-, Regions-, Verarbeitungs- und Freigabegrenze pruefen |
+| `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter, Aenderungserkennung und Owner-Freigabe pruefen |
+| `G-COST-CONTROL` | Free-Plan-, Add-on-, Quoten- und Kostenfreigabegrenzen pruefen |
 | `G-DATA-RLS` | Sieben Migrationen real abspielen, 119 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
@@ -508,14 +521,20 @@ Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
 geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
-fuenfundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
-Supply-Chain-/Dependency-Review-Job, ein eigener nativer
+neunundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
+Supply-Chain-/Dependency-Review-Job, ein eigener Provider-Governance-Job, ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest, ein lokaler
 Edge-Writer-Auth-/Schema-Smoke-Test sowie ein separater Gitleaks-Secret-Scan.
 Dependabot prueft `pub` und GitHub Actions
 woechentlich; ein geplanter Montagslauf prueft den bestehenden Lockfile-Stand
 erneut gegen neu veroeffentlichte Schwachstellen. Bei manuellen Laeufen kann zwischen
 `development`, `release_candidate` und `submission` gewaehlt werden.
+
+Die lokale Pipeline umfasst damit 29 Gate-Gruppen. Der Provider-Job prueft bei
+Pull Requests die versionierten Registerdaten und laeuft bei Zeitplan- oder
+manuellem Start zusaetzlich gegen erwartete Versionsmarker der offiziellen
+Supabase-Seiten. Eine erkannte Aenderung fordert Review an; sie erteilt niemals
+automatisch eine rechtliche oder finanzielle Freigabe.
 
 `G-CMP-APPLE` umfasst `G-AS-BUILD-INTEGRITY`, `G-AS-PRIVACY`, `G-AS-CAMERA`,
 `G-AS-METADATA`, `G-AS-REVIEW-READINESS`, `G-AS-CLAIMS-TRANSPARENCY`,

@@ -1,0 +1,84 @@
+schema_version: "1.0"
+schema_profile: scanfair-gate-v1
+id: G-GATE-DEFINITION-QUALITY
+title: Gate definition schema, semantics and traceability
+status: active
+dimension: quality-governance
+lifecycle_phase: definition-and-pull-request
+automation: AUTO
+owner: Engineering
+profile_scope: [development, remote_backend, release_candidate]
+
+trigger:
+  - pull_request
+  - gate_definition_change
+  - source_register_change
+  - local_quality_run
+
+criteria:
+  - id: GDQ-001
+    statement: Every gate resolves the seven core attributes through canonical fields or approved legacy aliases.
+    verification: AUTO
+    severity: BLOCK
+  - id: GDQ-002
+    statement: Canonical gate metadata uses allowed values and internally consistent automation, criteria and waiver rules.
+    verification: AUTO
+    severity: BLOCK
+  - id: GDQ-003
+    statement: Canonical sources, artifacts and SSOT links resolve without orphan references.
+    verification: AUTO
+    severity: BLOCK
+  - id: GDQ-004
+    statement: Gate mechanics include positive and negative self-tests and produce reviewable evidence.
+    verification: AUTO
+    severity: BLOCK
+
+artifacts:
+  - id: GDQ-A01
+    type: repository_input
+    path: docs/project/gate-definitions/gate-definition-schema.yaml
+    required_for: [development, remote_backend, release_candidate]
+  - id: GDQ-A02
+    type: repository_input
+    path: scripts/quality/test_gate_definition_gate.rb
+    required_for: [development, remote_backend, release_candidate]
+  - id: GDQ-A03
+    type: generated_evidence
+    path: .quality/gate-definitions/report.json
+    required_for: [development, remote_backend, release_candidate]
+
+decision:
+  pass: All gate definitions satisfy the normalized core contract and every canonical gate passes semantic and traceability validation.
+  fail: A required attribute, reference, semantic rule, self-test or evidence output is missing or contradictory.
+
+enforcement:
+  development: block
+  remote_backend: block
+  release_candidate: block
+
+audit:
+  validator: scripts/quality/validate_gate_definitions.rb
+  tests: scripts/quality/test_gate_definition_gate.rb
+  local_runner: scripts/quality/run_quality_gates.sh
+  ci_workflow: .github/workflows/quality-gates.yml
+  evidence_output: .quality/gate-definitions/report.json
+
+waiver:
+  allowed: false
+  conditions: []
+  maximum_days: null
+
+links:
+  requirements: []
+  improvements: [IMP-PROC-003]
+  gaps: [GAP-011]
+  risks: [RISK-010]
+  related_adrs: [0009, 0012, 0021]
+
+sources:
+  - docs/project/methodology/vorgehenssystem.md
+
+notes: |
+  Legacy definitions remain readable through explicit aliases, but every new
+  gate must use scanfair-gate-v1. Schema PASS validates definition quality; it
+  never substitutes a manual legal, security, scientific or release decision.

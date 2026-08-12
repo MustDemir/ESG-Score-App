@@ -1,4 +1,4 @@
-last_updated: 2026-08-10
+last_updated: 2026-08-12
 
 # =============================================================================
 # Definition of Done
@@ -89,9 +89,41 @@ task_types:
       - Error-States in UI definiert
       - Test mit mock-Response geschrieben
       - Bei Personendaten: DSGVO-Datenfluss dokumentiert
+      - Bei gehostetem Provider: provider_governance Task-Typ ebenfalls erfuellt
     references:
       - decisions/0008-security-baseline.yaml [SEC-1, SEC-4]
       - failure-modes.yaml [FM-02, FM-11]
+
+  # ---------------------------------------------------------------------------
+  - id: provider_governance
+    title: Gehosteten Provider anlegen, ändern oder remote aktivieren
+    description: Provider-, Region-, Vertrags-, Unterauftragsverarbeiter- oder Planänderung
+    lade_manifest:
+      pflicht:
+        - compliance/provider-governance-register.yaml
+        - compliance/source-register.yaml
+        - security/eu-supabase-environment-contract.yaml
+        - gate-definitions/gate-definition-schema.yaml
+      kontext:
+        - compliance/privacy-data-inventory.yaml
+        - costs.yaml
+        - risks.yaml
+    checks:
+      - Offizielle Providerquellen besitzen URL, Version, Prüfdatum und nächsten Reviewtermin
+      - DPA-Version, Geltungsmechanismus, Verarbeitungsscope und Owner-Entscheidung sind explizit
+      - Unterauftragsverarbeiterliste und Status der Änderungsbenachrichtigung sind dokumentiert
+      - Region und tatsächlicher Projektstatus sind mit reproduzierbarer Evidenz verifiziert
+      - Datentypen und Personendatenfreigabe stimmen mit Privacy-SSOT und Runtime überein
+      - Plan, Add-ons, erwartete Fixkosten, Quoten und Warnschwellen sind dokumentiert
+      - Pending-Entscheidungen bleiben pending und setzen Remote-Aktivierung fail-closed
+      - G-GATE-DEFINITION-QUALITY und alle betroffenen Provider-Gates bestehen
+      - Remote-Aktivierung erfolgt nur mit grünem remote_backend-Profil
+      - Keine Secrets oder vollständigen Kopien veränderlicher Rechtstexte werden als Evidenz committed
+    references:
+      - compliance/provider-governance-register.yaml
+      - quality-strategy.md
+      - decisions/0031-claims-and-privacy-boundaries.yaml
+      - decisions/0032-backend-security-boundary.yaml
 
   # ---------------------------------------------------------------------------
   - id: data_source_integration
