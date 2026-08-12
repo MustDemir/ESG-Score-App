@@ -110,7 +110,7 @@ fi
 {
   echo '# G-BACKEND-EDGE Result'
   echo
-  echo '- Writer contract tests: 11/11 PASS'
+  echo '- Writer contract tests: 12/12 PASS'
   echo "- Invalid secret: HTTP $unauthorized_status PASS"
   echo "- Cross-actor secret: HTTP $actor_scope_status PASS"
   echo "- Unknown URL field: HTTP $schema_status PASS"

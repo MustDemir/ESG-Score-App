@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   WriterContractError,
+  auditOutcomeForFailure,
   authenticateWriter,
   buildOpenFoodFactsUrl,
   canonicalJson,
@@ -242,4 +243,27 @@ test('contract errors retain stable machine-readable codes', () => {
   const error = new WriterContractError('test_code', 'Test message', 422);
   assert.equal(error.code, 'test_code');
   assert.equal(error.statusCode, 422);
+});
+
+test('classifies audit failures by dependency boundary', () => {
+  assert.equal(
+    auditOutcomeForFailure({ code: 'upstream_temporary_failure', statusCode: 503 }),
+    'upstream_unavailable',
+  );
+  assert.equal(
+    auditOutcomeForFailure({ code: 'upstream_invalid_schema', statusCode: 502 }),
+    'upstream_rejected',
+  );
+  assert.equal(
+    auditOutcomeForFailure({ code: 'database_rpc_failed', statusCode: 503 }),
+    'database_unavailable',
+  );
+  assert.equal(
+    auditOutcomeForFailure({ code: 'database_rpc_failed', statusCode: 404 }),
+    'database_rejected',
+  );
+  assert.equal(
+    auditOutcomeForFailure({ code: 'writer_internal_error', statusCode: 500 }),
+    'writer_internal_error',
+  );
 });

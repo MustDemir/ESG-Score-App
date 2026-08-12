@@ -63,8 +63,8 @@ session_handoff:
   prepared_at: 2026-08-12
   session_closed_at: null
   branch: feature/eu-supabase-data-path
-  status: next_05_branch_pushed_remote_activation_blocked
-  pull_request: not_created
+  status: next_05_pr_22_review_fixes_validated_ci_pending
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/22
   git_state:
     committed: true
     pushed: true
@@ -73,14 +73,14 @@ session_handoff:
       - 95369f3 feat: add provider governance quality gates
       - 4002933 feat: implement trusted Supabase data path
       - 1cbcbcb Merge pull request 21 from MustDemir/compliance/backend-threat-model
-    reason: NEXT-05 Kernpfad und Provider-Governance-Gates sind lokal validiert, committed und auf den Feature-Branch gepusht; Pull Request und Remote-Aktivierung bleiben offen
+    reason: PR 22 ist offen; zwei Review-Findings sind lokal behoben und validiert, der erneute GitHub-Lauf und die Remote-Aktivierung bleiben offen
   latest_validation:
-    executed_at: "2026-08-12T14:25:22Z"
+    executed_at: "2026-08-12T16:57:06Z"
     development_quality_gates: 29/29 PASS
     flutter_tests: 101/101 PASS
     flutter_line_coverage: 84.26 percent
     database_migration_replay: PASS
-    database_pgtap: 119/119 PASS
+    database_pgtap: 123/123 PASS
     database_lint: PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
@@ -90,7 +90,7 @@ session_handoff:
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
     backend_boundary_gate_self_tests: 16/16 PASS
-    writer_contract_tests: 11/11 PASS
+    writer_contract_tests: 12/12 PASS
     edge_wrapper_integration: PASS with automated invalid-secret and cross-actor 401, schema 400, plus controlled 201 publication, idempotent replay and bounded public read
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
@@ -111,12 +111,15 @@ session_handoff:
     - Read-only Flutter-Cache ohne neue native Abhaengigkeit mit Direct-OFF-Fallback implementiert
     - Miss-, Stale-, Offline-, Server- und invalide Cache-Antworten getestet
     - Reale lokale Edge Runtime validiert: 401, 400, Publication, Duplicate und Read-RPC bestanden
-    - Sieben Migrationen, 119 pgTAP-Tests, DB-Lint, 11 Writer-Tests und 101 Flutter-Tests bestanden
+    - Sieben Migrationen, 123 pgTAP-Tests, DB-Lint, 12 Writer-Tests und 101 Flutter-Tests bestanden
     - Dediziertes Supabase-Projekt scanfair-dev in eu-central-1 provisioniert und lokal verknuepft; sieben Migrationen per Dry Run aufgeloest
     - Kanonisches ScanFair-Gate-Schema mit sieben Kernattributen und Meta-Gate fuer 28 Definitionen integriert
     - DPA-, Unterauftragsverarbeiter- und Kosten-Gates mit Development-, Remote- und Release-Candidate-Profil integriert
     - Offizielle DPA-, Unterauftragsverarbeiter- und Kostenkontrollmarker 3/3 online bestaetigt
     - Development Pipeline 29/29 PASS; Remote-Provider-Profil blockiert erwartungsgemaess an neun Befunden
+    - Pull Request 22 erstellt; erster GitHub-Lauf 31619232317 mit allen sechs Jobs gruen
+    - Review-Findings zu idempotenter Cache-Erneuerung und Audit-Fehlerklassifikation behoben
+    - Review-Regression lokal mit 123/123 pgTAP-, 12/12 Writer-Tests, Edge-Integration und 29/29 Gates validiert
     - Pull Request 20 mit Claim- und Privacy-Grenzen in main gemergt; GitHub-Run 31491650586 mit allen fuenf Jobs gruen
     - ADR 0032 trennt read-only Flutter und nicht mobilen vertrauenswuerdigen Server-Writer
     - STRIDE-/OWASP-API-Threat-Model mit sechs Trust Boundaries, zwoelf Bedrohungen und acht Abuse Cases versioniert
@@ -160,8 +163,9 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Pull Request fuer feature/eu-supabase-data-path erstellen und sechs sichtbare GitHub-Jobs pruefen
-    - Review durchfuehren und erst nach gruenen Required Checks in main mergen
+    - Review-Fix-Commit pushen und erneuten GitHub-Lauf mit sechs Jobs pruefen
+    - Review-Konversationen nach belegter Behebung aufloesen und PR 22 mergen
+    - Post-Merge-main-Lauf pruefen und lokale main synchronisieren
     - Danach Owner-Freigaben, Aenderungsbenachrichtigung, Plan-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
     planning_basis: |
@@ -213,7 +217,7 @@ session_handoff:
         suggested_branch: feature/eu-supabase-data-path
         completed_parts:
           - Trusted Writer, server-only RPCs und Append-only Audit lokal implementiert
-          - Migration Replay, 119 pgTAP-Tests und DB-Lint bestanden
+          - Migration Replay, 123 pgTAP-Tests und DB-Lint bestanden
           - Flutter Cache-Hit, Miss, Stale, Offline und Fehler-Fallback getestet
           - Lokale Edge-Wrapper-Integration inklusive Replay und Public Read bestanden
           - Dediziertes Development-Projekt scanfair-dev in Frankfurt provisioniert und lokal verknuepft

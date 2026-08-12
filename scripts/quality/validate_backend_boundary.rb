@@ -256,8 +256,8 @@ class BackendBoundaryValidator
     expected = {
       "state" => "local_implementation_validated",
       "remote_deployment_evidence" => "absent",
-      "writer_contract_tests" => "11/11 PASS",
-      "database_tests" => "119/119 PASS",
+      "writer_contract_tests" => "12/12 PASS",
+      "database_tests" => "123/123 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -507,7 +507,7 @@ class BackendBoundaryValidator
         offline
       ],
       "supabase/tests/database/trusted_writer_cache_path.test.sql" => %w[
-        plan(48)
+        plan(52)
         duplicate_existing
         rejected_older_observation
         writer\ circuit

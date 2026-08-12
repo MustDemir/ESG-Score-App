@@ -373,6 +373,26 @@ begin
     from private.writer_idempotency_keys as keys
     where keys.idempotency_key = v_idempotency_key
   ) then
+    update public.cached_products as cached
+    set
+      fetched_at = case
+        when p_fetched_at > cached.fetched_at then p_fetched_at
+        else cached.fetched_at
+      end,
+      expires_at = case
+        when p_expires_at > cached.expires_at then p_expires_at
+        else cached.expires_at
+      end,
+      updated_at = clock_timestamp()
+    where cached.source_id = v_source_id
+      and cached.barcode = p_barcode
+      and cached.source_observed_at = p_source_observed_at
+      and cached.payload_sha256 = v_payload_sha256
+      and (
+        cached.fetched_at < p_fetched_at
+        or cached.expires_at < p_expires_at
+      );
+
     v_audit_outcome := 'duplicate_existing';
     v_response_status := 200;
   else
@@ -488,7 +508,14 @@ begin
     or p_barcode !~ '^[0-9]{8,14}$'
     or p_input_sha256 !~ '^[a-f0-9]{64}$'
     or p_actor_type not in ('scheduled_ingestion_job', 'audited_operator_replay')
-    or p_outcome not in ('not_found', 'upstream_rejected', 'upstream_unavailable')
+    or p_outcome not in (
+      'not_found',
+      'upstream_rejected',
+      'upstream_unavailable',
+      'database_rejected',
+      'database_unavailable',
+      'writer_internal_error'
+    )
     or p_status_code not between 400 and 599
   then
     raise exception 'invalid writer outcome audit input' using errcode = '22023';
@@ -511,7 +538,11 @@ begin
     p_request_id,
     p_input_sha256,
     p_actor_type,
-    'fetch_product_cache',
+    case
+      when p_outcome in ('database_rejected', 'database_unavailable')
+        then 'publish_product_cache'
+      else 'fetch_product_cache'
+    end,
     'open-food-facts',
     p_barcode,
     p_input_sha256,

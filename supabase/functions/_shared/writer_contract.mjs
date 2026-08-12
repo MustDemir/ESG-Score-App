@@ -353,6 +353,16 @@ export async function sha256Hex(value) {
   return [...digest].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
+export function auditOutcomeForFailure({ code, statusCode }) {
+  if (code.startsWith('upstream_')) {
+    return statusCode === 503 ? 'upstream_unavailable' : 'upstream_rejected';
+  }
+  if (code.startsWith('database_')) {
+    return statusCode === 503 ? 'database_unavailable' : 'database_rejected';
+  }
+  return 'writer_internal_error';
+}
+
 export async function readBoundedBytes(stream, maximumBytes, errorFactory) {
   if (!stream) return new Uint8Array();
   const reader = stream.getReader();

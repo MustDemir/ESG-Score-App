@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(48);
+select plan(52);
 
 select has_schema('private', 'private writer schema exists');
 select has_table(
@@ -180,8 +180,8 @@ select lives_ok(
       '4000417025005',
       '{"code":"4000417025005","product_name":"Fresh product"}'::jsonb,
       (select observed_at from writer_test_clock),
-      (select fetched_at from writer_test_clock),
-      (select expires_at from writer_test_clock),
+      (select fetched_at + interval '2 hours' from writer_test_clock),
+      (select expires_at + interval '2 hours' from writer_test_clock),
       'v3'
     )
   $$,
@@ -204,6 +204,24 @@ select is(
   ),
   'duplicate_existing',
   'replayed payload does not create a new publication'
+);
+select is(
+  (
+    select fetched_at
+    from public.cached_products
+    where source_id = 'open-food-facts' and barcode = '4000417025005'
+  ),
+  (select fetched_at + interval '2 hours' from writer_test_clock),
+  'idempotent replay advances the successful fetch time'
+);
+select is(
+  (
+    select expires_at
+    from public.cached_products
+    where source_id = 'open-food-facts' and barcode = '4000417025005'
+  ),
+  (select expires_at + interval '2 hours' from writer_test_clock),
+  'idempotent replay renews cache freshness without a new key'
 );
 select is(
   (
@@ -413,6 +431,29 @@ select is(
   ),
   1,
   'non-publication outcome is present in the audit trail'
+);
+select lives_ok(
+  $$
+    select public.record_writer_outcome(
+      'request-outcome-0002',
+      'correlation-outcome-0002',
+      'scheduled_ingestion_job',
+      '12345678',
+      repeat('b', 64),
+      'database_rejected',
+      409
+    )
+  $$,
+  'database publication failure can be audited separately'
+);
+select is(
+  (
+    select action || ':' || outcome
+    from private.writer_audit_log
+    where request_id = 'request-outcome-0002'
+  ),
+  'publish_product_cache:database_rejected',
+  'database failure evidence identifies the publication boundary'
 );
 select hasnt_column(
   'private',

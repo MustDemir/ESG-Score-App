@@ -1,5 +1,6 @@
 import {
   WriterContractError,
+  auditOutcomeForFailure,
   authenticateWriter,
   canonicalJson,
   fetchOpenFoodFactsProduct,
@@ -116,10 +117,7 @@ Deno.serve(async (request: Request) => {
             p_barcode: barcode,
             p_correlation_id: input.correlationId,
             p_input_sha256: inputDigest,
-            p_outcome:
-              normalized.statusCode === 503
-                ? 'upstream_unavailable'
-                : 'upstream_rejected',
+            p_outcome: auditOutcomeForFailure(normalized),
             p_request_id: input.requestId,
             p_status_code: normalized.statusCode,
           });
