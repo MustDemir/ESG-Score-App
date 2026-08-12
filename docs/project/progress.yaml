@@ -63,16 +63,17 @@ session_handoff:
   prepared_at: 2026-08-12
   session_closed_at: null
   branch: feature/eu-supabase-data-path
-  status: next_05_provider_governance_validated_remote_activation_blocked
+  status: next_05_branch_pushed_remote_activation_blocked
   pull_request: not_created
   git_state:
     committed: true
-    pushed: false
-    working_tree_clean: false
+    pushed: true
+    working_tree_clean: true
     commits:
+      - 95369f3 feat: add provider governance quality gates
       - 4002933 feat: implement trusted Supabase data path
       - 1cbcbcb Merge pull request 21 from MustDemir/compliance/backend-threat-model
-    reason: NEXT-05 Kernpfad ist committed; Provider-Governance-Gates und aktualisierte SSOT sind lokal validiert, aber noch nicht committed, gepusht oder remote aktiviert
+    reason: NEXT-05 Kernpfad und Provider-Governance-Gates sind lokal validiert, committed und auf den Feature-Branch gepusht; Pull Request und Remote-Aktivierung bleiben offen
   latest_validation:
     executed_at: "2026-08-12T14:25:22Z"
     development_quality_gates: 29/29 PASS
@@ -159,8 +160,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Provider-Governance-Aenderungen reviewen und als getrennten Commit festhalten
-    - Branch pushen und Pull Request mit sechs sichtbaren GitHub-Jobs und Required Checks erstellen
+    - Pull Request fuer feature/eu-supabase-data-path erstellen und sechs sichtbare GitHub-Jobs pruefen
+    - Review durchfuehren und erst nach gruenen Required Checks in main mergen
     - Danach Owner-Freigaben, Aenderungsbenachrichtigung, Plan-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
     planning_basis: |
