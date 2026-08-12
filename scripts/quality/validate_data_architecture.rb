@@ -98,6 +98,16 @@ else
     "OFF image license" => "'cc-by-sa-3.0'",
     "OFF cache boundary trigger" =>
       "enforce_cached_product_license_boundary",
+    "trusted writer private schema" =>
+      "create schema if not exists private",
+    "bounded single-product read" => "get_fresh_cached_product",
+    "cache list access revoked" =>
+      "revoke select on table public.cached_products from anon, authenticated",
+    "writer capacity function" => "claim_writer_capacity",
+    "transactional writer function" => "publish_off_product",
+    "writer outcome audit function" => "record_writer_outcome",
+    "append-only writer audit" => "reject_writer_audit_mutation",
+    "writer idempotency store" => "writer_idempotency_keys",
   }
   required_markers.each do |name, marker|
     violations << "Missing #{name}" unless sql.include?(marker)
@@ -149,6 +159,40 @@ dart_files.each do |path|
   next unless File.read(path).match?(credential_pattern)
 
   violations << "Forbidden service-role reference in #{path.delete_prefix("#{repo_root}/")}"
+end
+
+flutter_cache_path = File.join(
+  repo_root,
+  "esg_app",
+  "lib",
+  "services",
+  "supabase_product_cache_service.dart"
+)
+if File.exist?(flutter_cache_path)
+  cache_code = File.read(flutter_cache_path)
+  %w[get_fresh_cached_product sb_publishable_ expiresAt].each do |marker|
+    violations << "Flutter cache adapter missing #{marker}" unless cache_code.include?(marker)
+  end
+else
+  violations << "Missing read-only Flutter cache adapter"
+end
+
+writer_markers = /ingest-products|x-scanfair-writer-secret|claim_writer_capacity|publish_off_product|record_writer_outcome/i
+dart_files.each do |path|
+  next unless File.read(path).match?(writer_markers)
+
+  violations << "Trusted writer invocation found in #{path.delete_prefix("#{repo_root}/")}"
+end
+
+writer_contract_path = File.join(
+  repo_root,
+  "supabase",
+  "functions",
+  "_shared",
+  "writer_contract.mjs"
+)
+unless File.exist?(writer_contract_path)
+  violations << "Missing trusted writer contract implementation"
 end
 
 if violations.empty?

@@ -129,20 +129,20 @@ Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidu
 | Produktdaten | Open Food Facts API v3 | Produktdaten plus feldgenaue Evidenz-Provenienz |
 | Umwelt-LCA | AGRIBALYSE 3.2 | offizieller Kategorieproxy mit DQR; aktuell via OFF transportiert |
 | Traceability | evidenzbasierte Entity-/Relationship-Schicht | GTIN, Rohstoff, Herkunft, Marke und spaeter Rechtstraeger getrennt aufloesen |
-| Backend / Cache | Supabase/PostgreSQL | lokales RLS-Schema vorbereitet, Remote noch nicht verbunden |
+| Backend / Cache | Supabase/PostgreSQL + Edge Function | lokal validierter Trusted Writer und read-only Cache; Remote deaktiviert |
 | Lokaler Cache | geplant | Offline-Grundmodus und letzte Scans |
 
 ```text
 iPhone Kamera
   -> Flutter App
   -> Barcode Scan
-  -> Open Food Facts API
+  -> optional: frischer Supabase-Einzeldatensatz
+  -> bei Miss/Stale/Offline: Open Food Facts API
   -> AGRIBALYSE-Kategorieevidenz mit Retrieval-Channel
   -> normalisierte ESGEvidence
   -> explizite Produkt-/Rohstoff-/Herkunfts-/Unternehmensbeziehungen
   -> regelbasierte ESG-Scoring Engine
   -> Score-Ergebnis + Details + Quellen
-  -> spaeter optionaler Supabase-Cache
 ```
 
 ---
@@ -260,7 +260,7 @@ als technische Fertigstellung.
 
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
-M2  Backend- und Datenanbindung           [#########-----------]  45%
+M2  Backend- und Datenanbindung           [#############-------]  65%
 M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, 71 pgTAP-Tests sowie Backend-Threat-Model und EU-Umgebungsvertrag | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
+| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache und 119 pgTAP-Tests | EU-Entwicklungsprojekt, AVV/Region, Deployment, Remote-Integration und unabhängige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -289,7 +289,7 @@ N0  Compliance-/Security-Baseline        [################----]  80%
 N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
 N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
-N4  Server-Writer und Flutter-Cache       [--------------------]   0%
+N4  Server-Writer und Flutter-Cache       [################----]  80%
 N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
 N6  ILAB-Social-Risikomapping             [--------------------]   0%
 N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
@@ -302,10 +302,11 @@ sowie ein STRIDE-/OWASP-API-Threat-Model mit EU-Supabase-Umgebungsvertrag;
 offen sind die priorisierten manuellen Apple-, MASVS-, Rechts- und
 Fachreview-Evidenzen. N1 und N2 des lokalen
 evidence-first Kaffee-Referenzfalls sind abgeschlossen. Die produktgebundenen
-Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Als
-naechstes beginnen die offenen M2-Arbeiten mit dediziertem EU-Supabase-
-Development-Projekt, vertrauenswuerdigem Server-Writer und read-only
-Flutter-Cache. Erst danach werden WRI, ILAB und GLEIF/BRIS
+Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Der
+Trusted Writer, die serverseitigen RPCs und der read-only Flutter-Cache sind
+lokal implementiert und getestet, aber nicht remote aktiviert. Als naechstes
+folgen das dedizierte EU-Supabase-Development-Projekt, AVV-/Regionsevidenz,
+unabhaengiger Security-Review und Remote-Integration. Erst danach werden WRI, ILAB und GLEIF/BRIS
 kontrolliert angebunden; score-relevant werden sie erst nach Kalibrierung und
 Fachreview.
 
@@ -358,13 +359,15 @@ Das Projekt verbindet Management- und Produktmethoden mit einem umsetzbaren App-
 
 Der aktuelle Entwicklungsstand bleibt lokal: kein TestFlight, kein App-Store,
 kein Hosting und kein Online-Release. Die App scannt EAN-/UPC-Barcodes mit der
-iPhone-Kamera und laedt Produktdaten ueber Open Food Facts API v3. Manuelle
+iPhone-Kamera. Ohne Remote-Konfiguration laedt sie Produktdaten weiterhin
+direkt ueber Open Food Facts API v3. Der neue read-only Cachepfad ist lokal
+getestet, aber bewusst deaktiviert. Manuelle
 Barcode-Eingabe und injizierbare Demo-Daten bleiben als Fallback und fuer
 deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
 Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
 implementiert.
 
-**Validierter MVP-Stand (11. August 2026)**
+**Validierter MVP-Stand (12. August 2026)**
 
 | Bereich | Ergebnis |
 | --- | --- |
@@ -377,7 +380,10 @@ implementiert.
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Nährwerte erscheinen neutral ohne Health-Score oder Fortschrittsbalken |
 | Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Dreizehn Supabase-Tabellen reproduzierbar; 55 pgTAP-Tests und DB-Lint bestanden, Remote noch nicht verbunden |
+| Datenbank | Sieben Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 119 pgTAP-Tests und DB-Lint bestanden |
+| Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote deaktiviert |
+| Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
+| Tests | 101/101 Flutter-Tests bestanden; Line Coverage 84,26% |
 | Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
 | Supply Chain | 59 Dart-Pakete, 2 iOS-Plugins und 16 Action-Referenzen inventarisiert; OSV meldet 0 bekannte Schwachstellen |
 | Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
@@ -427,6 +433,8 @@ bash scripts/quality/run_quality_gates.sh
 bash scripts/quality/run_supply_chain_gate.sh
 bash scripts/quality/run_ios_build_gate.sh
 bash scripts/quality/run_data_database_gate.sh
+node --test supabase/functions/_shared/writer_contract.test.mjs
+bash scripts/quality/run_edge_writer_integration_gate.sh
 
 # Lizenzarchitektur: lokal gruen, Remote-Profil bleibt bis zur Freigabe rot
 DATA_LICENSE_PROFILE=development bash scripts/quality/run_quality_gates.sh
@@ -438,7 +446,7 @@ ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --prof
 ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate claims --profile release_candidate
 ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --profile release_candidate
 
-# Backend-Grenze: Definition-of-ready gruen, Remote bis zur Implementierung rot
+# Backend-Grenze: lokale Implementierung gruen, Remote bis zur Freigabe rot
 ruby scripts/quality/validate_backend_boundary.rb --profile development
 ruby scripts/quality/validate_backend_boundary.rb --profile remote_backend
 ruby scripts/quality/validate_backend_boundary.rb --profile release_candidate
@@ -473,7 +481,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-CLAIM-GOVERNANCE` | Claim-Inventar, neutrale Nährwertgrenze und gehashte Rechts-/Fachreview-Evidenz pruefen |
 | `G-PRIVACY-BOUNDARY` | Ist-Datenfluss, Retention, DPIA-Entscheidung und Beta-/Remote-Aktivierung pruefen |
 | `G-BACKEND-BOUNDARY` | Threat Model, Trusted-Writer-, Secret-, Rate-, Idempotenz-, Audit- und EU-Aktivierungsvertrag pruefen |
-| `G-DATA-RLS` | Migration real abspielen, 55 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
+| `G-DATA-RLS` | Sieben Migrationen real abspielen, 119 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
@@ -484,8 +492,8 @@ Methodik `2.0-draft`. Sie erklaeren Formel v1.0 nicht nachtraeglich fuer
 wissenschaftlich kalibriert oder rechtlich ESG-konform; deren S-/G-Anteile
 bleiben als heuristischer MVP-Stand gekennzeichnet.
 
-Das Backend-Development-Profil beweist nur die Definition-of-Ready bei
-deaktiviertem Remote-Pfad. `remote_backend` verlangt drei Implementierungs- und
+Das Backend-Development-Profil beweist die lokal getestete Implementierung bei
+deaktiviertem Remote-Pfad. Es ist kein Deployment-Nachweis. `remote_backend` verlangt drei Implementierungs- und
 Betriebsreviews; `release_candidate` verlangt zusaetzlich und unabhaengig vom
 Aktivierungsstatus einen an den geprueften Commit gebundenen Security-Review.
 
@@ -502,8 +510,9 @@ iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
 geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
 fuenfundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
 Supply-Chain-/Dependency-Review-Job, ein eigener nativer
-iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
-separater Gitleaks-Secret-Scan. Dependabot prueft `pub` und GitHub Actions
+iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest, ein lokaler
+Edge-Writer-Auth-/Schema-Smoke-Test sowie ein separater Gitleaks-Secret-Scan.
+Dependabot prueft `pub` und GitHub Actions
 woechentlich; ein geplanter Montagslauf prueft den bestehenden Lockfile-Stand
 erneut gegen neu veroeffentlichte Schwachstellen. Bei manuellen Laeufen kann zwischen
 `development`, `release_candidate` und `submission` gewaehlt werden.

@@ -86,11 +86,13 @@ The commodity-origin edge must carry the scanned product as context. This
 prevents an origin declared for one coffee from completing the relationship
 chain of another coffee product.
 
-The app currently calls Open Food Facts directly. Supabase is prepared as an
-optional cache and evidence store, but no remote project or Flutter SDK is
-connected yet.
+The app currently calls Open Food Facts directly because remote configuration
+is intentionally absent. A read-only Supabase REST adapter is implemented and
+uses the same OFF mapper after a fresh cache hit; cache miss, stale data,
+offline state or backend failure falls back to the direct provider. No
+Supabase Flutter SDK or additional native dependency is required.
 
-The planned remote path is governed by the accepted backend threat model and
+The locally implemented remote path is governed by the accepted backend threat model and
 EU Supabase environment contract. Flutter remains a read-only, untrusted
 client with a publishable key. Only a non-mobile trusted workload may invoke
 the bounded writer and use privileged database capability. Remote activation
@@ -104,7 +106,7 @@ The local migrations define:
 | Table | Purpose | Client access |
 |---|---|---|
 | `data_sources` | source, license and API metadata | read active rows |
-| `cached_products` | allowlisted source payload cache | read fresh rows |
+| `cached_products` | allowlisted source payload cache | no direct table access; fresh single-barcode RPC only |
 | `product_evidence` | normalized, published evidence | read published rows |
 | `score_snapshots` | reproducible formula output | read published rows |
 | `scans` | account-linked scan history | owner only |
@@ -117,9 +119,20 @@ The local migrations define:
 | `traceability_entity_identifiers` | GTIN, ISO country, LEI and mapping identifiers | read identifiers of published entities |
 | `traceability_relationships` | evidence-backed subject links and score eligibility | read published rows |
 
-All thirteen tables use RLS. Product data, evidence, relationships, scores and methodology can only
-be written by a trusted backend path. Draft methodology is invisible to
-clients. A Supabase service-role key must never be embedded in the Flutter app.
+All thirteen public tables use RLS. Five additional tables in the unexposed
+`private` schema retain writer idempotency, append-only audit, minute windows
+daily usage and circuit-breaker state. Product data, evidence, relationships, scores and methodology
+can only be written by a trusted backend path. Draft methodology is invisible
+to clients. A privileged backend key must never be embedded in the Flutter app.
+
+`public.get_fresh_cached_product` returns at most one fresh row with explicit
+columns. `anon` and `authenticated` cannot select `cached_products` directly.
+Only the server role may call `claim_writer_capacity`, `publish_off_product`,
+`record_writer_upstream_health` and `record_writer_outcome`. Publication rejects invalid inputs, duplicate or
+older observations as defined, updates the OFF-only cache transactionally and
+leaves a redacted append-only audit record. Five consecutive upstream failures
+open the persisted circuit for fifteen minutes; a successful health result
+resets it.
 
 `G-DATA-ARCH` validates migration structure, grants and licensing without
 Docker. `G-DATA-RLS` rebuilds PostgreSQL and runs pgTAP behavior tests locally
@@ -189,8 +202,8 @@ manufacturer declarations rather than independent audit evidence.
    correction/deletion before remote activation.
 6. Create a dedicated EU development project in `eu-central-1` and retain
    approved DPA/region evidence under the environment contract.
-7. Implement the bounded server-side cache writer, its security tests and a
-   read-only Flutter cache adapter.
+7. Deploy the locally validated writer and migrations only after independent
+   writer-security review, then run remote environment/RLS integration tests.
 
 ## Primary references
 

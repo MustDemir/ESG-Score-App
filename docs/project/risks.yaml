@@ -184,14 +184,16 @@ risks:
     mitigation: |
       Versioniertes End-to-End-Threat-Model, serverseitige Vertrauensgrenzen,
       fail-closed EU-Supabase-Umgebungsvertrag und G-BACKEND-BOUNDARY sind
-      umgesetzt. Idempotenz, Input Validation, Audit Trail, Rate Limits,
-      Secret Rotation und risikobasierter Security-Test muessen in NEXT-05
-      gegen die reale Writer-Implementierung belegt werden.
+      umgesetzt. Der lokale Writer belegt getrennte Invoker-Secrets, Input-
+      und Upstream-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz,
+      Out-of-order-Schutz und Append-only Audit. Remote-Integration, Secret-
+      Rotation, Incident Drill und unabhaengiger Security-Test bleiben offen.
     related_gaps: [GAP-005]
     related_improvements: [IMP-COMP-007, IMP-DEV-002]
     status: open
     owner: Engineering
     created: 2026-08-10
+    updated: 2026-08-12
 
   - id: RISK-009
     title: Provider-Ausfall, Datenalter oder fehlender Betriebsprozess erzeugt falsche Nutzerinformation
@@ -204,7 +206,8 @@ risks:
       Stale-Data-Anzeige, Korrektur und Rollback bleibt ein falscher Score
       möglicherweise unentdeckt oder aktiv.
     mitigation: |
-      Reliability-Budgets, Provider-Failure-Tests, Datenfrischeanzeige,
+      Read-through-Fallback, Stale-Ablehnung, Provider-Failure-Tests und
+      Circuit Breaker sind lokal implementiert. Offen bleiben messbare SLOs,
       Monitoring, Alerts, Score-Sperre, versionierte Korrektur sowie
       Backup-/Restore- und Incident-Drills.
     related_gaps: [GAP-006, GAP-009, GAP-013]

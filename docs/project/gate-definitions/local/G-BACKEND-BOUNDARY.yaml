@@ -18,7 +18,13 @@ evidence_required:
   - docs/project/security/backend-threat-model.md
   - docs/project/decisions/0032-backend-security-boundary.yaml
   - scripts/quality/test_backend_boundary_gate.rb
+  - scripts/quality/run_edge_writer_integration_gate.sh
+  - supabase/functions/_shared/writer_contract.test.mjs
+  - supabase/tests/database/trusted_writer_cache_path.test.sql
+  - esg_app/test/services/supabase_product_cache_service_test.dart
+  - docs/project/audits/2026-08-12-eu-supabase-local-integration-assessment.md
   - .quality/quality-gate-report.md
+  - .quality/edge-writer/report.md
 decision: block
 owner: Engineering
 audit_trail:

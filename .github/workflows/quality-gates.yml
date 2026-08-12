@@ -250,11 +250,24 @@ jobs:
         id: database-tests
         run: bash scripts/quality/run_data_database_gate.sh
 
+      - name: Run trusted writer Edge integration gate
+        id: edge-writer-tests
+        run: bash scripts/quality/run_edge_writer_integration_gate.sh
+
       - name: Publish database gate summary
         if: always()
         run: |
           echo "## G-DATA-RLS" >> "$GITHUB_STEP_SUMMARY"
           echo "Supabase migration replay, pgTAP RLS behavior tests and database lint: **${{ steps.database-tests.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
+          echo "Trusted writer contract and local Edge authentication/schema smoke: **${{ steps.edge-writer-tests.outcome }}**" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload backend data-path evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scanfair-backend-data-path-evidence
+          include-hidden-files: true
+          path: .quality/edge-writer/**
 
   secret-scan:
     name: Secret scan gate

@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W33
-last_updated: 2026-08-11
+last_updated: 2026-08-12
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 45
-      next: connect_eu_supabase_server_writer_and_flutter_read_cache
+      progress_percent: 65
+      next: provision_review_and_validate_eu_supabase_development
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -43,7 +43,7 @@ roadmap_progress:
     - id: N3-eu-supabase-project
       progress_percent: 0
     - id: N4-server-writer-flutter-cache
-      progress_percent: 0
+      progress_percent: 80
     - id: N5-wri-aqueduct
       progress_percent: 0
     - id: N6-ilab-social-risk
@@ -60,25 +60,24 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-11
+  prepared_at: 2026-08-12
   session_closed_at: null
-  branch: compliance/backend-threat-model
-  status: next_04_ready_for_review
-  pull_request: pending_creation
+  branch: feature/eu-supabase-data-path
+  status: next_05_local_implementation_validated
+  pull_request: not_created
   git_state:
-    committed: true
-    pushed: true
+    committed: false
+    pushed: false
     commits:
-      - 60baeda Merge pull request 20 from MustDemir/compliance/claims-privacy-boundaries
-      - c93cab0 fix: close claims privacy review gaps
-    reason: NEXT-03 ist ueber Pull Request 20 gemergt; NEXT-04 ist lokal vollstaendig validiert und wird ueber einen eigenen Pull Request reviewt
+      - 1cbcbcb Merge pull request 21 from MustDemir/compliance/backend-threat-model
+    reason: NEXT-04 ist gemergt; NEXT-05 Writer-, Datenbank- und Flutter-Pfad sind lokal validiert, aber noch nicht committed oder remote aktiviert
   latest_validation:
-    executed_at: "2026-08-11T13:03:37Z"
+    executed_at: "2026-08-12T12:28:41Z"
     development_quality_gates: 25/25 PASS
-    flutter_tests: 93/93 PASS
-    flutter_line_coverage: 85.16 percent
+    flutter_tests: 101/101 PASS
+    flutter_line_coverage: 84.26 percent
     database_migration_replay: PASS
-    database_pgtap: 71/71 PASS
+    database_pgtap: 119/119 PASS
     database_lint: PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
@@ -87,13 +86,23 @@ session_handoff:
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
-    backend_boundary_gate_self_tests: 14/14 PASS
+    backend_boundary_gate_self_tests: 16/16 PASS
+    writer_contract_tests: 11/11 PASS
+    edge_wrapper_integration: PASS with automated invalid-secret and cross-actor 401, schema 400, plus controlled 201 publication, idempotent replay and bounded public read
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
     backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - NEXT-04 ueber Pull Request 21 gemergt; Post-Merge GitHub-Run 31588234607 mit allen fuenf Jobs gruen
+    - NEXT-05 Trusted Edge Writer mit getrennten Scheduler-/Operator-Secrets und fester OFF-Upstream-Grenze implementiert
+    - Server-only RPCs fuer Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz, Publikation und Append-only Audit implementiert
+    - Direkten Client-SELECT auf cached_products entzogen und frische Einzel-Read-RPC freigegeben
+    - Read-only Flutter-Cache ohne neue native Abhaengigkeit mit Direct-OFF-Fallback implementiert
+    - Miss-, Stale-, Offline-, Server- und invalide Cache-Antworten getestet
+    - Reale lokale Edge Runtime validiert: 401, 400, Publication, Duplicate und Read-RPC bestanden
+    - Sieben Migrationen, 119 pgTAP-Tests, DB-Lint, 11 Writer-Tests und 101 Flutter-Tests bestanden
     - Pull Request 20 mit Claim- und Privacy-Grenzen in main gemergt; GitHub-Run 31491650586 mit allen fuenf Jobs gruen
     - ADR 0032 trennt read-only Flutter und nicht mobilen vertrauenswuerdigen Server-Writer
     - STRIDE-/OWASP-API-Threat-Model mit sechs Trust Boundaries, zwoelf Bedrohungen und acht Abuse Cases versioniert
@@ -137,8 +146,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - NEXT-04 Pull Request und alle Required Checks reviewen und mergen
-    - Nach gruenem Post-Merge-Lauf NEXT-05 EU-Supabase-Serverpfad implementieren
+    - NEXT-05 Aenderungen reviewen, committen, pushen und Pull Request mit Required Checks erstellen
+    - Danach EU-Development-Projekt, AVV/Region und unabhaengigen Writer-Security-Review vorbereiten
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -183,9 +192,20 @@ session_handoff:
           - Remote-Implementierung ist definition-of-ready
       - sequence: 5
         id: NEXT-05-eu-supabase-server-writer
-        status: planned
+        status: in_progress_local_implementation_complete
+        branch: feature/eu-supabase-data-path
         focus: EU-Supabase, vertrauenswürdigen Server-Writer und read-only Flutter-Cache implementieren
         suggested_branch: feature/eu-supabase-data-path
+        completed_parts:
+          - Trusted Writer, server-only RPCs und Append-only Audit lokal implementiert
+          - Migration Replay, 119 pgTAP-Tests und DB-Lint bestanden
+          - Flutter Cache-Hit, Miss, Stale, Offline und Fehler-Fallback getestet
+          - Lokale Edge-Wrapper-Integration inklusive Replay und Public Read bestanden
+        remaining:
+          - EU-Development-Projekt und AVV-/Regionsevidenz
+          - unabhaengiger Writer-Security- und Operational-Readiness-Review
+          - Remote Deployment, RLS-/Writer-Integration, Rotation und Incident Drill
+          - Aktivierung erst nach Privacy- und Datenlizenzfreigabe
         exit_criteria:
           - Remote-nahe Migration-, RLS- und Integrationstests bestehen
           - Service-Role bleibt außerhalb der App
@@ -256,7 +276,7 @@ session_handoff:
     - Kaffee-Pilotbeziehungen aktivieren noch keine Umwelt-, Social- oder Governance-Risikofaktoren
     - Gap-Audit identifiziert vier P0-Grenzen vor Release Candidate oder Remote-Kombinationsdatenbank
     - Claim- und Privacy-Development-Gates sind gruen, aber oeffentliche Aktivierung bleibt bis Kalibrierung und qualifiziertem Rechts-/Fach-/DPIA-Review rot
-    - Backend-Development-Gate ist gruen, aber Remote-Aktivierung bleibt bis EU-Projekt, Writer-Implementierung und drei gehashten Reviews rot
+    - Backend-Development-Gate prueft die lokale Implementierung; Remote-Aktivierung bleibt bis EU-Projekt, AVV/Region, Remote-Integration und drei gehashten Reviews rot
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine

@@ -167,6 +167,8 @@ gate_backend_boundary() {
   fi
   cd "$REPO_ROOT" &&
     ruby scripts/quality/test_backend_boundary_gate.rb &&
+    "${NODE_BINARY:-node}" --test \
+      supabase/functions/_shared/writer_contract.test.mjs &&
     ruby scripts/quality/validate_backend_boundary.rb --profile "$profile"
 }
 

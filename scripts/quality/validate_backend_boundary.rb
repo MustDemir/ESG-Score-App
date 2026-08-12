@@ -193,8 +193,8 @@ class BackendBoundaryValidator
 
     activation = @threat_model.fetch("activation_boundary", {})
     unless activation["remote_backend_enabled"] == false &&
-           activation["implementation_state"] == "contract_only"
-      violations << "#{label}: threat-model activation boundary must remain contract-only and disabled"
+           activation["implementation_state"] == "local_implementation_validated"
+      violations << "#{label}: threat-model activation boundary must remain locally validated and remotely disabled"
     end
   end
 
@@ -202,7 +202,7 @@ class BackendBoundaryValidator
     label = @environment_path
     require_fields(
       @environment,
-      %w[schema_version last_reviewed owner status implementation_state remote_backend_enabled threat_model_ref purpose environment_isolation environments key_and_identity_contract writer_contract resource_protection read_contract audit_contract secret_lifecycle incident_contract activation_profiles reviews evidence_contracts remote_activation_blocks primary_sources],
+      %w[schema_version last_reviewed owner status implementation_state remote_backend_enabled threat_model_ref purpose environment_isolation environments key_and_identity_contract writer_contract resource_protection read_contract audit_contract secret_lifecycle incident_contract implementation_evidence activation_profiles reviews evidence_contracts remote_activation_blocks primary_sources],
       label,
     )
     return if @environment.empty?
@@ -248,6 +248,28 @@ class BackendBoundaryValidator
     validate_writer_contract(label)
     validate_resource_contract(label)
     validate_read_audit_and_operations(label)
+    validate_local_implementation_evidence(label)
+  end
+
+  def validate_local_implementation_evidence(label)
+    evidence = @environment.fetch("implementation_evidence", {})
+    expected = {
+      "state" => "local_implementation_validated",
+      "remote_deployment_evidence" => "absent",
+      "writer_contract_tests" => "11/11 PASS",
+      "database_tests" => "119/119 PASS",
+      "flutter_cache_and_fallback_tests" => "15/15 PASS",
+    }
+    expected.each do |field, value|
+      unless evidence[field] == value
+        violations << "#{label}: implementation_evidence.#{field} must be #{value.inspect}"
+      end
+    end
+    %w[artifacts validation_commands].each do |field|
+      if Array(evidence[field]).empty?
+        violations << "#{label}: implementation_evidence.#{field} must not be empty"
+      end
+    end
   end
 
   def validate_records(records, prefix, fields, label, id_pattern: nil)
@@ -298,6 +320,10 @@ class BackendBoundaryValidator
     end
     unless Array(writer["allowed_invokers"]) == %w[scheduled_ingestion_job audited_operator_replay]
       violations << "#{label}: trusted writer invokers must remain narrowly allowlisted"
+    end
+    unless writer["authentication"] ==
+           "separate_server_side_secret_per_named_invoker"
+      violations << "#{label}: trusted writer must use a separate secret per named invoker"
     end
     input = writer.fetch("input_contract", {})
     unless input["barcode_pattern"] == "^[0-9]{8,14}$" &&
@@ -399,18 +425,21 @@ class BackendBoundaryValidator
       end
     end
     adr = read("docs/project/decisions/0032-backend-security-boundary.yaml")
-    unless adr.include?("G-BACKEND-BOUNDARY") && adr.include?("current_state: contract_only_remote_disabled")
+    unless adr.include?("G-BACKEND-BOUNDARY") && adr.include?("current_state: local_implementation_validated_remote_disabled")
       violations << "ADR 0032: backend gate or disabled current state is missing"
     end
 
     app_dir = path("esg_app/lib")
     forbidden = /service[_-]?role|supabase[_-]?secret|postgres[_-]?password|management[_-]?api[_-]?token/i
+    mobile_writer_markers = /ingest-products|x-scanfair-writer-secret|claim_writer_capacity|publish_off_product|record_writer_outcome/i
     if Dir.exist?(app_dir)
       Find.find(app_dir) do |file|
         next unless File.file?(file)
         next unless File.extname(file) == ".dart"
 
-        violations << "#{relative(file)}: privileged backend credential marker in Flutter code" if File.read(file).match?(forbidden)
+        content = File.read(file)
+        violations << "#{relative(file)}: privileged backend credential marker in Flutter code" if content.match?(forbidden)
+        violations << "#{relative(file)}: trusted writer invocation marker in Flutter code" if content.match?(mobile_writer_markers)
       end
     else
       violations << "esg_app/lib: directory is missing"
@@ -422,13 +451,97 @@ class BackendBoundaryValidator
            migration_text.include?("revoke all on table")
       violations << "Supabase migrations: forced RLS and explicit revocation markers are required"
     end
+
+    required_migration_markers = %w[
+      create\ schema\ if\ not\ exists\ private
+      get_fresh_cached_product
+      revoke\ select\ on\ table\ public.cached_products
+      claim_writer_capacity
+      publish_off_product
+      record_writer_outcome
+      writer_idempotency_keys
+      writer_audit_log
+      writer_circuit_state
+      reject_writer_audit_mutation
+      record_writer_upstream_health
+    ]
+    required_migration_markers.each do |marker|
+      readable = marker.tr("\\", "")
+      unless migration_text.include?(readable)
+        violations << "Supabase migrations: missing trusted-writer marker #{readable.inspect}"
+      end
+    end
+
+    implementation_files = {
+      "supabase/functions/_shared/writer_contract.mjs" => %w[
+        authenticateWriter
+        parseWriterRequest
+        validateUpstreamUrl
+        fetchOpenFoodFactsProduct
+        maximumResponseBytes
+      ],
+      "supabase/functions/_shared/writer_contract.test.mjs" => %w[
+        node:test
+        writer_unauthorized
+        upstream_not_allowed
+        upstream_response_too_large
+      ],
+      "supabase/functions/ingest-products/index.ts" => %w[
+        SCANFAIR_SCHEDULED_WRITER_SECRET
+        SCANFAIR_OPERATOR_REPLAY_SECRET
+        SCANFAIR_ENVIRONMENT
+        SUPABASE_SERVICE_ROLE_KEY
+        claim_writer_capacity
+        publish_off_product
+        record_writer_outcome
+      ],
+      "esg_app/lib/services/supabase_product_cache_service.dart" => %w[
+        get_fresh_cached_product
+        ProductCacheFailureType
+        sb_publishable_
+        expiresAt
+      ],
+      "esg_app/test/services/supabase_product_cache_service_test.dart" => %w[
+        cache\ miss
+        stale\ cache
+        offline
+      ],
+      "supabase/tests/database/trusted_writer_cache_path.test.sql" => %w[
+        plan(48)
+        duplicate_existing
+        rejected_older_observation
+        writer\ circuit
+        append-only
+      ],
+      "scripts/quality/run_edge_writer_integration_gate.sh" => %w[
+        writer_unauthorized
+        audited_operator_replay
+        unknown_or_missing_fields
+        G-BACKEND-EDGE
+      ],
+      ".github/workflows/quality-gates.yml" => %w[
+        edge-writer-tests
+        run_edge_writer_integration_gate.sh
+        scanfair-backend-data-path-evidence
+      ],
+    }
+    implementation_files.each do |file, markers|
+      content = read(file)
+      markers.each do |marker|
+        readable = marker.tr("\\", "")
+        unless content.include?(readable)
+          violations << "#{file}: missing implementation marker #{readable.inspect}"
+        end
+      end
+    end
   end
 
   def validate_profile
     enabled = @environment["remote_backend_enabled"] == true
     if @profile == "development"
-      unless !enabled && @environment["implementation_state"] == "contract_only"
-        violations << "development: remote backend must remain disabled and contract-only"
+      unless !enabled &&
+             @environment["implementation_state"] == "local_implementation_validated"
+        violations << "development: remote backend must remain disabled with a locally validated implementation"
       end
       return
     end

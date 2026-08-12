@@ -48,6 +48,20 @@ class BackendBoundaryGateSelfTest
     end
 
     with_fixture do |root|
+      FileUtils.rm(
+        File.join(root, "supabase/functions/_shared/writer_contract.mjs"),
+      )
+      check = validator(root, "development")
+      assert(!check.run, "gate must reject a missing writer contract implementation")
+      assert(
+        check.violations.any? do |entry|
+          entry.include?("writer_contract.mjs: file is missing")
+        end,
+        "implementation failure should identify the missing writer contract",
+      )
+    end
+
+    with_fixture do |root|
       contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
       contract = load_yaml(root, contract_path)
       contract["key_and_identity_contract"]["mobile_application"]["allowed_key_types"] =
@@ -131,7 +145,12 @@ class BackendBoundaryGateSelfTest
       copy(root, "docs/project/compliance/source-register.yaml")
       copy(root, "docs/project/decisions/0032-backend-security-boundary.yaml")
       copy(root, "esg_app/lib")
+      copy(root, "esg_app/test/services/supabase_product_cache_service_test.dart")
       copy(root, "supabase/migrations")
+      copy(root, "supabase/functions")
+      copy(root, "supabase/tests/database/trusted_writer_cache_path.test.sql")
+      copy(root, "scripts/quality/run_edge_writer_integration_gate.sh")
+      copy(root, ".github/workflows/quality-gates.yml")
       yield root
     end
   end

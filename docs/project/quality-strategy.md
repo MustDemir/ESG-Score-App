@@ -131,7 +131,8 @@ Remote- und Release-Profile verlangen zusaetzlich qualifizierte Reviews sowie
 typisierte, repository-interne und SHA-256-gebundene Evidenz. Beliebige
 Statusfelder oder Platzhalterdateien koennen diese Gates nicht auf gruen setzen.
 
-`G-BACKEND-BOUNDARY` laeuft lokal im Profil `development`: Der Remote-Pfad
+`G-BACKEND-BOUNDARY` laeuft lokal im Profil `development`: Writer-Vertrag,
+Datenbank-RPCs und read-only Flutter-Cache werden geprueft; der Remote-Pfad
 muss deaktiviert bleiben, waehrend Threat Model und Sicherheitsvertrag
 vollstaendig und widerspruchsfrei sein muessen. `remote_backend` verlangt ein
 aktives separates EU-Development-Projekt in `eu-central-1`, freigegebenen DPA-
