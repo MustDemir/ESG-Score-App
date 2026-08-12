@@ -88,6 +88,55 @@ sources:
     version: "2.1.0"
     normative_weight: RISK_BASED_SECURITY_BASELINE
     scope: iOS mobile application security and privacy verification
+  - id: OWASP-API-SECURITY-2023
+    authority: OWASP Foundation
+    title: OWASP API Security Top 10
+    url: https://owasp.org/API-Security/editions/2023/en/0x11-t10/
+    version: "2023"
+    normative_weight: RISK_BASED_SECURITY_BASELINE
+    scope: Authorization, resource consumption, business-flow, SSRF and API configuration risks
+  - id: SUPABASE-API-KEYS
+    authority: Supabase
+    title: Understanding API keys
+    url: https://supabase.com/docs/guides/getting-started/api-keys
+    version: current-web
+    normative_weight: PROVIDER_SECURITY_REQUIREMENT
+    scope: Publishable and secret key trust boundaries
+  - id: SUPABASE-RLS
+    authority: Supabase
+    title: Row Level Security
+    url: https://supabase.com/docs/guides/database/postgres/row-level-security
+    version: current-web
+    normative_weight: PROVIDER_SECURITY_REQUIREMENT
+    scope: Exposed-schema RLS, grants and privileged bypass behavior
+  - id: SUPABASE-EDGE-FUNCTIONS
+    authority: Supabase
+    title: Edge Functions
+    url: https://supabase.com/docs/guides/functions
+    version: current-web
+    normative_weight: PROVIDER_ARCHITECTURE_REFERENCE
+    scope: Server-side runtime, authentication, secrets, limits and short-lived workloads
+  - id: SUPABASE-REGIONS
+    authority: Supabase
+    title: Available regions
+    url: https://supabase.com/docs/guides/platform/regions
+    version: current-web
+    normative_weight: PROVIDER_CONFIGURATION_REQUIREMENT
+    scope: Dedicated project region and Central EU Frankfurt selection
+  - id: SUPABASE-DPA
+    authority: Supabase
+    title: Data Processing Addendum
+    url: https://supabase.com/downloads/docs/Supabase%2BDPA%2B260601.pdf
+    version: 2026-06-01
+    normative_weight: CONDITIONAL_MUST
+    scope: Processor terms, processing region, transfers and subprocessors before remote personal-data processing
+  - id: SUPABASE-PRODUCTION-CHECKLIST
+    authority: Supabase
+    title: Production Checklist
+    url: https://supabase.com/docs/guides/deployment/going-into-prod
+    version: current-web
+    normative_weight: PROVIDER_SECURITY_GUIDANCE
+    scope: RLS, performance, load testing, backups, availability and operational readiness
   - id: EU-GDPR
     authority: European Union
     title: General Data Protection Regulation

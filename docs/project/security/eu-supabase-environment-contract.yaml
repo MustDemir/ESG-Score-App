@@ -1,0 +1,292 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-11
+owner: Engineering
+status: accepted_for_definition_of_ready
+implementation_state: contract_only
+remote_backend_enabled: false
+threat_model_ref: docs/project/security/backend-threat-model.yaml
+
+purpose: |
+  Fail-closed environment, identity, secret, writer, resource and operational
+  contract for the planned EU Supabase data path. It defines readiness but
+  does not provision, link, deploy or activate any remote project.
+
+environment_isolation:
+  separate_project_per_environment: true
+  production_data_in_non_production: prohibited
+  cross_environment_keys: prohibited
+  linked_remote_reset: prohibited
+  schema_change_path: reviewed_migrations_from_protected_main
+
+environments:
+  - id: local
+    status: active
+    project_class: disposable_local_cli
+    region: developer_machine
+    data_classification: synthetic_and_public_source_fixtures_only
+    secrets: local_untracked_environment_only
+  - id: development
+    status: not_provisioned
+    project_class: dedicated_remote_development
+    region: eu-central-1
+    region_display_name: Central EU Frankfurt
+    data_classification: public_source_and_synthetic_test_data_only
+    personal_data_allowed: false
+    dpa_status: pending_before_activation
+  - id: staging
+    status: prohibited_until_separate_decision
+    project_class: dedicated_remote_staging
+    region: eu-central-1
+    data_classification: synthetic_or_anonymized_release_fixtures_only
+    personal_data_allowed: false
+    dpa_status: pending
+  - id: production
+    status: prohibited_until_release_decision
+    project_class: dedicated_remote_production
+    region: eu-central-1
+    data_classification: minimum_approved_runtime_data_only
+    personal_data_allowed: pending_privacy_activation
+    dpa_status: pending
+
+key_and_identity_contract:
+  mobile_application:
+    allowed_key_types: [publishable]
+    forbidden_key_types: [secret, service_role, postgres_password, management_api_token]
+    permissions: read_published_and_fresh_rows_through_RLS_only
+    direct_writer_invocation_allowed: false
+    key_storage: build_time_public_configuration_not_a_secret
+  trusted_writer:
+    runtime_identity: dedicated_server_workload
+    privileged_key_location: managed_supabase_project_secrets_only
+    repository_storage: prohibited
+    client_distribution: prohibited
+    privilege: minimum_required_server_write_path
+  operator:
+    identity: individual_MFA_protected_account
+    shared_dashboard_accounts: prohibited
+    routine_database_bypass: prohibited
+  ci:
+    identity: environment_scoped_short_lived_or_rotatable_credential
+    pull_request_secrets: prohibited_for_untrusted_contexts
+    production_access_from_feature_branch: prohibited
+
+writer_contract:
+  client_invocation_allowed: false
+  allowed_invokers: [scheduled_ingestion_job, audited_operator_replay]
+  authentication: dedicated_server_side_invocation_secret
+  authorization: deny_by_default_allow_named_job_scope
+  accepted_methods: [POST]
+  accepted_content_types: [application/json]
+  input_contract:
+    source_ids: allowlisted_only
+    barcode_pattern: "^[0-9]{8,14}$"
+    maximum_batch_size: 25
+    maximum_request_bytes: 65536
+    unknown_fields: reject
+  upstream_contract:
+    schemes: [https]
+    methods: [GET]
+    hosts:
+      - world.openfoodfacts.org
+    runtime_url_input: prohibited
+    redirects: revalidate_every_target
+    private_link_local_and_loopback_targets: prohibited
+    request_timeout_seconds: 8
+    maximum_attempts: 3
+    maximum_response_bytes: 1048576
+  idempotency_contract:
+    required: true
+    key_fields: [source_id, source_record_id, source_observed_at, payload_sha256]
+    duplicate_behavior: return_existing_result_without_new_publication
+    out_of_order_behavior: reject_older_observation
+    transaction_scope: payload_evidence_relationships_snapshot_and_audit
+  publication_contract:
+    validate_before_write: true
+    publish_after_complete_transaction: true
+    immutable_published_score_snapshots: true
+    source_and_license_fields_server_controlled: true
+
+resource_protection:
+  writer_requests_per_minute_per_invoker: 10
+  writer_requests_per_minute_global: 30
+  upstream_requests_per_second: 1
+  daily_upstream_request_budget: 500
+  maximum_batch_concurrency: 2
+  retry_backoff: exponential_with_jitter
+  circuit_breaker:
+    opens_after_consecutive_failures: 5
+    open_seconds: 900
+  cost_controls:
+    spend_cap_or_billing_alert_required: true
+    function_invocation_alert_percent: 70
+    database_size_alert_percent: 70
+
+read_contract:
+  client_roles: [anon, authenticated]
+  maximum_products_per_barcode_query: 1
+  explicit_columns_only: true
+  public_list_endpoint: prohibited
+  fresh_cache_only: true
+  published_evidence_and_scores_only: true
+  draft_methodology_visible: false
+  user_scan_access: owner_only_if_accounts_are_activated
+  fallback_order: [fresh_remote_cache, direct_Open_Food_Facts, transparent_no_data]
+  stale_data_must_be_explicit: true
+
+audit_contract:
+  append_only: true
+  privileged_client_mutation: prohibited
+  required_fields:
+    - request_id
+    - idempotency_key
+    - actor_type
+    - action
+    - source_id
+    - target_record
+    - input_sha256
+    - outcome
+    - status_code
+    - started_at
+    - completed_at
+    - correlation_id
+  prohibited_fields:
+    - authorization_header
+    - secret_or_service_key
+    - raw_personal_payload
+    - full_upstream_response
+  retention_status: pending_privacy_and_operations_review
+  clock: UTC
+
+secret_lifecycle:
+  maximum_rotation_days: 180
+  immediate_rotation_triggers:
+    - suspected_exposure
+    - operator_or_CI_compromise
+    - repository_or_log_detection
+    - staff_or_provider_access_change
+  rotation_requires:
+    - new_secret_created
+    - writer_redeployed_or_reconfigured
+    - old_secret_revoked
+    - negative_old_secret_test
+    - audit_evidence_recorded
+  break_glass:
+    allowed: true
+    maximum_minutes: 30
+    owner_approval: required
+    reason_and_scope: required
+    audit_record: required
+    post_event_rotation: required
+    app_bypass: prohibited
+
+incident_contract:
+  detection_channels:
+    - secret_scan
+    - authentication_failure_rate
+    - rate_limit_and_circuit_breaker_events
+    - writer_error_and_audit_gap
+    - billing_and_database_size_alert
+    - RLS_regression
+  immediate_actions:
+    - disable_writer_invocation
+    - rotate_suspected_credentials
+    - preserve_redacted_logs_and_audit_evidence
+    - assess_personal_data_and_notification_duties
+    - switch_app_to_direct_or_no_data_fallback
+  recovery_requires:
+    - root_cause_record
+    - migration_and_RLS_revalidation
+    - replay_from_allowlisted_source_if_needed
+    - post_incident_review
+
+activation_profiles:
+  development:
+    remote_backend_must_be_disabled: true
+    contract_and_threat_model_must_be_complete: true
+    unresolved_implementation_evidence_allowed: true
+  remote_backend:
+    remote_backend_must_be_enabled: true
+    development_environment_must_be_active: true
+    environment_review_must_be_approved: true
+    writer_security_review_must_be_approved: true
+    operational_readiness_must_be_approved: true
+  release_candidate:
+    remote_controls_apply_when_enabled: true
+    separate_release_security_review_required: true
+
+reviews:
+  environment_activation:
+    status: pending_not_provisioned
+    evidence: null
+  writer_security:
+    status: pending_not_implemented
+    evidence: null
+  operational_readiness:
+    status: pending_not_implemented
+    evidence: null
+
+evidence_contracts:
+  environment_activation:
+    evidence_type: backend_environment_activation
+    required_values:
+      decision: approved
+      environment: development
+      region: eu-central-1
+      dpa_status: approved
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewer_role
+      - environment_contract_sha256
+      - threat_model_sha256
+      - artifact_path
+      - artifact_sha256
+    digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
+  writer_security:
+    evidence_type: backend_writer_security_review
+    required_values:
+      decision: approved
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewer_role
+      - tested_controls
+      - environment_contract_sha256
+      - threat_model_sha256
+      - artifact_path
+      - artifact_sha256
+    digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
+  operational_readiness:
+    evidence_type: backend_operational_readiness
+    required_values:
+      decision: approved
+    required_fields:
+      - schema_version
+      - reviewed_at
+      - reviewer_role
+      - tested_controls
+      - environment_contract_sha256
+      - threat_model_sha256
+      - artifact_path
+      - artifact_sha256
+    digest_fields: [environment_contract_sha256, threat_model_sha256, artifact_sha256]
+
+remote_activation_blocks:
+  - development_project_not_provisioned_or_wrong_region
+  - DPA_region_and_subprocessor_review_missing
+  - writer_authentication_or_SSRF_tests_missing
+  - privileged_secret_present_in_client_repository_or_logs
+  - rate_limit_idempotency_or_audit_controls_missing
+  - RLS_migration_or_remote_near_tests_failing
+  - secret_rotation_break_glass_or_incident_drill_missing
+  - privacy_or_data_license_remote_profile_failing
+
+primary_sources:
+  - OWASP-API-SECURITY-2023
+  - SUPABASE-API-KEYS
+  - SUPABASE-RLS
+  - SUPABASE-EDGE-FUNCTIONS
+  - SUPABASE-REGIONS
+  - SUPABASE-DPA
+  - SUPABASE-PRODUCTION-CHECKLIST
+  - EU-GDPR

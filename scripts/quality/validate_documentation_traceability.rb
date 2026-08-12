@@ -18,6 +18,7 @@ checks = {
     "G-CLAIM-SAFETY",
     "G-CLAIM-GOVERNANCE",
     "G-PRIVACY-BOUNDARY",
+    "G-BACKEND-BOUNDARY",
     "G-PROJECT-CONTROL",
     "G-SUPPLY-CHAIN",
     "AGRIBALYSE 3.2",
@@ -66,6 +67,9 @@ checks = {
     "APPLE-ARG",
     "EDPB-DPIA-WP248",
     "DE-UWG-EMP-CO",
+    "OWASP-API-SECURITY-2023",
+    "SUPABASE-API-KEYS",
+    "SUPABASE-DPA",
   ],
   "docs/project/compliance/claim-inventory.yaml" => [
     "Nährwert-Hinweis",
@@ -81,6 +85,23 @@ checks = {
     "Current Data Flow",
     "DPIA Decision Path",
   ],
+  "docs/project/security/backend-threat-model.yaml" => [
+    "accepted_for_definition_of_ready",
+    "THR-012",
+    "ABUSE-008",
+    "remote_backend_enabled: false",
+  ],
+  "docs/project/security/eu-supabase-environment-contract.yaml" => [
+    "eu-central-1",
+    "allowed_key_types: [publishable]",
+    "client_invocation_allowed: false",
+    "maximum_response_bytes: 1048576",
+    "environment_activation",
+  ],
+  "docs/project/security/backend-threat-model.md" => [
+    "Trust Boundaries",
+    "G-BACKEND-BOUNDARY",
+  ],
   "esg_app/README.md" => [
     "flutter run",
     "Open Food Facts API v3",
@@ -92,6 +113,7 @@ checks = {
     "traceability_relationships",
     "license-composition-policy.yaml",
     "G-DATA-LICENSE",
+    "G-BACKEND-BOUNDARY",
   ],
   "docs/project/data/license-composition-policy.yaml" => [
     "produced_work",

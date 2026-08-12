@@ -1,0 +1,49 @@
+id: G-BACKEND-BOUNDARY
+name: Trusted writer and EU Supabase activation boundary
+dimension: security
+lifecycle_phase: architecture-and-deployment
+trigger: Pull request, remote project creation, writer change, new endpoint, new source or release
+policy_checks:
+  - Assets, actors, trust boundaries, threats and abuse cases are versioned
+  - Flutter is read-only and permits publishable keys only
+  - Server writer invocation is unavailable to the mobile client
+  - Upstream hosts, methods, payloads, timeouts, retries and budgets are bounded
+  - Writes are validated, idempotent, transactional and append-only audited
+  - Environments, credentials and data are isolated by project and stage
+  - Remote activation requires typed SHA-256-bound environment, writer and operations evidence
+evidence_required:
+  - docs/project/security/backend-threat-model.yaml
+  - docs/project/security/eu-supabase-environment-contract.yaml
+  - docs/project/security/backend-threat-model.md
+  - docs/project/decisions/0032-backend-security-boundary.yaml
+  - scripts/quality/test_backend_boundary_gate.rb
+  - .quality/quality-gate-report.md
+decision: block
+owner: Engineering
+audit_trail:
+  enabled: true
+  evidence_store_ref: artifact://scanfair-quality-gate-results
+waiver:
+  allowed: false
+  requires: null
+links:
+  requirements:
+    - GAP-005
+    - IMP-COMP-007
+    - IMP-DEV-002
+  related_adrs:
+    - 0002
+    - 0008
+    - 0022
+    - 0032
+sources:
+  - OWASP-API-SECURITY-2023
+  - SUPABASE-API-KEYS
+  - SUPABASE-RLS
+  - SUPABASE-EDGE-FUNCTIONS
+  - SUPABASE-REGIONS
+  - SUPABASE-DPA
+notes: |
+  Development PASS means the remote implementation is definition-of-ready and
+  still disabled. The remote_backend profile cannot pass until a real EU
+  development environment and all typed implementation evidence exist.

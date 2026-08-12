@@ -37,6 +37,14 @@ add the Flutter cache adapter after a dedicated EU Supabase development
 project, environment-specific publishable key handling, DPA evidence and the
 required Apple privacy review are available.
 
+The definition-of-ready for that increment is versioned in
+`docs/project/security/backend-threat-model.yaml` and
+`docs/project/security/eu-supabase-environment-contract.yaml`. Run
+`ruby scripts/quality/validate_backend_boundary.rb --profile development`
+before changing the remote data path. `G-BACKEND-BOUNDARY` deliberately fails
+remote activation without typed, SHA-256-bound environment, writer-security
+and operational-readiness evidence.
+
 ## Security model
 
 - All public tables have RLS enabled and forced.
@@ -48,6 +56,8 @@ required Apple privacy review are available.
 - Only published methodology is client-readable; catalog writes are server-only.
 - Authenticated users can only read, create and delete their own scan rows.
 - No service-role key is permitted in Flutter code.
+- A mobile client cannot invoke the trusted writer; only named server-side
+  jobs and audited operator replay may do so.
 - Open Food Facts data keeps source, attribution and ODbL metadata.
 - AGRIBALYSE data keeps version 3.2, Etalab-2.0 attribution and OFF as its
   current retrieval channel.

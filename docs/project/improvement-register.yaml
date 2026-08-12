@@ -366,7 +366,7 @@ improvements:
   - id: IMP-COMP-007
     layer: compliance
     title: End-to-End-Threat-Model und Backend-Abuse-Sicherheitsprüfung
-    status: planned
+    status: in_progress
     priority: P1
     risk: H
     owner: Engineering
@@ -384,6 +384,12 @@ improvements:
     evidence:
       - docs/project/compliance/owasp-masvs-ios-baseline.yaml
       - docs/project/audits/2026-08-10-product-engineering-gap-analysis.md
+      - docs/project/security/backend-threat-model.yaml
+      - docs/project/security/backend-threat-model.md
+      - docs/project/security/eu-supabase-environment-contract.yaml
+      - docs/project/audits/2026-08-11-backend-threat-model-assessment.md
+      - docs/project/gate-definitions/local/G-BACKEND-BOUNDARY.yaml
+      - scripts/quality/test_backend_boundary_gate.rb
     verification:
       - Threat-Model-Review vor Implementierung des Remote-Writers
       - Security-Tests und G-DATA-RLS bestehen gegen die Zielarchitektur
@@ -391,7 +397,7 @@ improvements:
       - IMP-PROC-003
       - IMP-COMP-001
       - IMP-COMP-002
-    next_action: Trust-Boundary-Diagramm und priorisierte Abuse-Case-Liste vor IMP-DEV-002 erstellen
+    next_action: Writer-Kontrollen in NEXT-05 implementieren und danach unabhaengigen Security-Review oder risikobasierten Penetrationstest entscheiden
 
   - id: IMP-DEV-001
     layer: development
@@ -429,7 +435,7 @@ improvements:
   - id: IMP-DEV-002
     layer: development
     title: EU-Supabase, Server-Writer und read-only Flutter-Cache
-    status: planned
+    status: in_progress
     priority: P1
     risk: H
     owner: Engineering
@@ -446,6 +452,9 @@ improvements:
       - Secrets und Service-Role-Schluessel gelangen nie in die App
     evidence:
       - docs/project/data/data-architecture.md
+      - docs/project/security/backend-threat-model.yaml
+      - docs/project/security/eu-supabase-environment-contract.yaml
+      - docs/project/decisions/0032-backend-security-boundary.yaml
       - supabase/migrations/20260727000100_initial_data_architecture.sql
       - supabase/tests/database/data_architecture.test.sql
     verification:
@@ -456,7 +465,7 @@ improvements:
       - IMP-COMP-005
       - IMP-COMP-006
       - IMP-COMP-007
-    next_action: Environment-, Secret- und Datenschutzvertrag fuer das EU-Development-Projekt definieren
+    next_action: Dediziertes EU-Development-Projekt anlegen, Aktivierungsevidenz erfassen und den vertraglich begrenzten Server-Writer implementieren
 
   - id: IMP-DEV-003
     layer: development

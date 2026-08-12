@@ -260,7 +260,7 @@ als technische Fertigstellung.
 
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
-M2  Backend- und Datenanbindung           [########------------]  40%
+M2  Backend- und Datenanbindung           [#########-----------]  45%
 M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, Migrationen und 55 pgTAP-Tests | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
+| M2 | lokales Supabase-Schema, 13 RLS-Tabellen, 71 pgTAP-Tests sowie Backend-Threat-Model und EU-Umgebungsvertrag | EU-Entwicklungsprojekt, Server-Writer, Cache und Flutter-Read-Adapter |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -285,7 +285,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 Die Pakete werden erst bei nachweisbarer Implementierung fortgeschrieben:
 
 ```text
-N0  Compliance-/Security-Baseline        [###############-----]  75%
+N0  Compliance-/Security-Baseline        [################----]  80%
 N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
 N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
 N3  EU-Supabase-Projekt verbinden         [--------------------]   0%
@@ -297,14 +297,15 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 ```
 
 **Umsetzungsreihenfolge:** N0 besitzt jetzt den Dependency-/Supply-Chain-Scan,
-die risikobasierte OWASP-MASVS-Baseline und fail-closed Claim-/Privacy-Grenzen;
+die risikobasierte OWASP-MASVS-Baseline, fail-closed Claim-/Privacy-Grenzen
+sowie ein STRIDE-/OWASP-API-Threat-Model mit EU-Supabase-Umgebungsvertrag;
 offen sind die priorisierten manuellen Apple-, MASVS-, Rechts- und
 Fachreview-Evidenzen. N1 und N2 des lokalen
 evidence-first Kaffee-Referenzfalls sind abgeschlossen. Die produktgebundenen
-Herkunfts- und Evidenzvertraege sind jetzt stabil. Bevor die offenen
-M2-Arbeiten mit EU-Supabase, vertrauenswuerdigem Server-Writer und read-only
-Flutter-Cache beginnen, ist als naechste Grenze das Backend-Threat-Model zu
-schliessen. Erst danach werden WRI, ILAB und GLEIF/BRIS
+Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Als
+naechstes beginnen die offenen M2-Arbeiten mit dediziertem EU-Supabase-
+Development-Projekt, vertrauenswuerdigem Server-Writer und read-only
+Flutter-Cache. Erst danach werden WRI, ILAB und GLEIF/BRIS
 kontrolliert angebunden; score-relevant werden sie erst nach Kalibrierung und
 Fachreview.
 
@@ -437,6 +438,10 @@ ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --prof
 ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate claims --profile release_candidate
 ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --profile release_candidate
 
+# Backend-Grenze: Definition-of-ready gruen, Remote bis zur Implementierung rot
+ruby scripts/quality/validate_backend_boundary.rb --profile development
+ruby scripts/quality/validate_backend_boundary.rb --profile remote_backend
+
 # Strenger App-Store-Release-Check (offene MUST-Evidenz blockiert)
 COMPLIANCE_PROFILE=release_candidate bash scripts/quality/run_quality_gates.sh
 ```
@@ -466,6 +471,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-CLAIM-SAFETY` | Risiko-, Proxy- und Kundenaussagen gegen unzulaessige Behauptungen pruefen |
 | `G-CLAIM-GOVERNANCE` | Claim-Inventar, neutrale Nährwertgrenze und gehashte Rechts-/Fachreview-Evidenz pruefen |
 | `G-PRIVACY-BOUNDARY` | Ist-Datenfluss, Retention, DPIA-Entscheidung und Beta-/Remote-Aktivierung pruefen |
+| `G-BACKEND-BOUNDARY` | Threat Model, Trusted-Writer-, Secret-, Rate-, Idempotenz-, Audit- und EU-Aktivierungsvertrag pruefen |
 | `G-DATA-RLS` | Migration real abspielen, 55 pgTAP-RLS-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
@@ -488,7 +494,7 @@ Sie veroeffentlicht Gate-Summaries und die Artefakte
 `scanfair-ios-simulator-app`. Das
 iOS-Artefakt enthaelt neben `Runner.app` auch `ios_privacy_audit.json` mit den
 geprueften App-, Flutter- und `mobile_scanner`-Privacy-Manifests. Neben den
-vierundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
+fuenfundzwanzig lokalen Gate-Gruppen laufen ein sichtbarer
 Supply-Chain-/Dependency-Review-Job, ein eigener nativer
 iOS-Compile-/Privacy-Job, der echte Supabase-/RLS-Datenbanktest und ein
 separater Gitleaks-Secret-Scan. Dependabot prueft `pub` und GitHub Actions

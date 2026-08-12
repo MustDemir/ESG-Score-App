@@ -90,6 +90,13 @@ The app currently calls Open Food Facts directly. Supabase is prepared as an
 optional cache and evidence store, but no remote project or Flutter SDK is
 connected yet.
 
+The planned remote path is governed by the accepted backend threat model and
+EU Supabase environment contract. Flutter remains a read-only, untrusted
+client with a publishable key. Only a non-mobile trusted workload may invoke
+the bounded writer and use privileged database capability. Remote activation
+stays disabled until environment, writer-security and operational-readiness
+evidence is approved and hash-bound to both contracts.
+
 ## Supabase boundary
 
 The local migrations define:
@@ -120,6 +127,9 @@ and in GitHub Actions. `G-METHOD-CATALOG` validates the YAML source of truth,
 profile inheritance, allowed claims and the separation of ESG from confidence.
 `G-LINK-INTEGRITY`, `G-MISSING-DATA`, `G-RED-FLAG`, `G-SCORE-REPRO` and
 `G-CLAIM-SAFETY` validate the draft scoring safety controls independently.
+`G-BACKEND-BOUNDARY` validates the trust boundaries, abuse cases, secret and
+identity separation, SSRF/resource limits, idempotency, audit contract and the
+fail-closed remote activation profile.
 
 ## Methodology boundary
 
@@ -177,8 +187,10 @@ manufacturer declarations rather than independent audit evidence.
 4. Calibrate GHG normalization and missing-data behavior with test products.
 5. Complete qualified data-license review and implement partition export and
    correction/deletion before remote activation.
-6. Create a dedicated EU development project and retain DPA/region evidence.
-7. Add a server-side cache writer and a read-only Flutter cache adapter.
+6. Create a dedicated EU development project in `eu-central-1` and retain
+   approved DPA/region evidence under the environment contract.
+7. Implement the bounded server-side cache writer, its security tests and a
+   read-only Flutter cache adapter.
 
 ## Primary references
 
@@ -196,6 +208,12 @@ manufacturer declarations rather than independent audit evidence.
   https://supabase.com/docs/guides/local-development/database-migrations
 - Supabase Row Level Security:
   https://supabase.com/docs/guides/database/postgres/row-level-security
+- Supabase API key security:
+  https://supabase.com/docs/guides/getting-started/api-keys
+- Supabase Edge Functions:
+  https://supabase.com/docs/guides/functions
+- OWASP API Security Top 10 2023:
+  https://owasp.org/API-Security/editions/2023/en/0x11-t10/
 - GS1 Global Traceability Standard and EPCIS:
   https://www.gs1.org/standards/traceability
 - GLEIF API for legal-entity and ownership data:

@@ -45,6 +45,7 @@ Letztes Update: 2026-08-11
 | Subject Links und Score-Sicherheit | Link-, Missing-Data-, Red-Flag-, Reproduzierbarkeits- und Claim-Regeln | `G-LINK-INTEGRITY` bis `G-CLAIM-SAFETY` |
 | Öffentliche Claims und Nährwertgrenze | Inventar-, Runtime-, Evidenz- und Aktivierungsprofile | `G-CLAIM-GOVERNANCE` |
 | Privacy-Datenfluss und Aktivierung | Datenmatrix-, Code-, DPIA- und Review-Evidenz | `G-PRIVACY-BOUNDARY` |
+| Backend- und Writer-Sicherheitsgrenze | STRIDE-/Abuse-Case-Modell, Umgebungsvertrag und Aktivierungsevidenz | `G-BACKEND-BOUNDARY` |
 | Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
 | Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
 | Mobile Security | MASVS-2.1-Matrix + Repositorychecks + Device-Checkliste | `G-MASVS` |
@@ -75,14 +76,14 @@ uebersprungen.
 
 | Job | Inhalt | Ergebnis |
 |---|---|---|
-| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
+| `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy- und Backend-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
 | `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 55 pgTAP-RLS-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt vierundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-
+Sie deckt fuenfundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -129,6 +130,15 @@ Runtime-Grenze und eine mit dem Code uebereinstimmende SSOT. External-Beta-,
 Remote- und Release-Profile verlangen zusaetzlich qualifizierte Reviews sowie
 typisierte, repository-interne und SHA-256-gebundene Evidenz. Beliebige
 Statusfelder oder Platzhalterdateien koennen diese Gates nicht auf gruen setzen.
+
+`G-BACKEND-BOUNDARY` laeuft lokal im Profil `development`: Der Remote-Pfad
+muss deaktiviert bleiben, waehrend Threat Model und Sicherheitsvertrag
+vollstaendig und widerspruchsfrei sein muessen. `remote_backend` verlangt ein
+aktives separates EU-Development-Projekt in `eu-central-1`, freigegebenen DPA-
+und Regionnachweis sowie drei typisierte, repository-interne und per SHA-256
+gebundene Reviews fuer Umgebung, Writer-Sicherheit und Betriebsbereitschaft.
+Das Gate prueft ausserdem, dass kein privilegierter Supabase-Schluessel in
+Flutter zugelassen ist und RLS-/Grant-Schutz in den Migrationen bestehen bleibt.
 
 ### Branch-Protection auf `main` (GitHub Settings)
 
