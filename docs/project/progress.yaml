@@ -13,7 +13,7 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 40
+      progress_percent: 45
       next: connect_eu_supabase_server_writer_and_flutter_read_cache
     - id: M3-coffee-reference-case
       progress_percent: 45
@@ -35,7 +35,7 @@ roadmap_progress:
       next: testflight_submission_and_release_decision
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 75
+      progress_percent: 80
     - id: N1-coffee-pilot-products
       progress_percent: 100
     - id: N2-product-commodity-origin-links
@@ -62,20 +62,21 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-11
   session_closed_at: null
-  branch: compliance/claims-privacy-boundaries
-  status: next_03_in_review
-  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/20
+  branch: compliance/backend-threat-model
+  status: next_04_ready_for_review
+  pull_request: pending_creation
   git_state:
     committed: true
     pushed: true
     commits:
-      - 497ab23 feat: enforce claim and privacy boundaries
-    reason: NEXT-03 ist lokal validiert, auf GitHub gepusht und als Draft Pull Request 20 gegen main eroeffnet
+      - 60baeda Merge pull request 20 from MustDemir/compliance/claims-privacy-boundaries
+      - c93cab0 fix: close claims privacy review gaps
+    reason: NEXT-03 ist ueber Pull Request 20 gemergt; NEXT-04 ist lokal vollstaendig validiert und wird ueber einen eigenen Pull Request reviewt
   latest_validation:
-    executed_at: "2026-08-11T12:04:51Z"
-    development_quality_gates: 24/24 PASS
+    executed_at: "2026-08-11T13:03:37Z"
+    development_quality_gates: 25/25 PASS
     flutter_tests: 93/93 PASS
-    flutter_line_coverage: 84.89 percent
+    flutter_line_coverage: 85.16 percent
     database_migration_replay: PASS
     database_pgtap: 71/71 PASS
     database_lint: PASS
@@ -86,9 +87,20 @@ session_handoff:
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
+    backend_boundary_gate_self_tests: 14/14 PASS
+    backend_development_profile: PASS
+    backend_remote_profile: EXPECTED FAIL with 8 activation blockers
+    backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
-    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE and G-PRIVACY-BOUNDARY
+    release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Pull Request 20 mit Claim- und Privacy-Grenzen in main gemergt; GitHub-Run 31491650586 mit allen fuenf Jobs gruen
+    - ADR 0032 trennt read-only Flutter und nicht mobilen vertrauenswuerdigen Server-Writer
+    - STRIDE-/OWASP-API-Threat-Model mit sechs Trust Boundaries, zwoelf Bedrohungen und acht Abuse Cases versioniert
+    - EU-Supabase-Umgebungsvertrag fuer Frankfurt, Identity, Secrets, SSRF, Ressourcen, Idempotenz, Audit und Incident Response festgelegt
+    - G-BACKEND-BOUNDARY mit Development-, Remote- und Release-Candidate-Profil sowie typisierter SHA-256-Aktivierungsevidenz integriert
+    - Backend-Gate-Selbsttests 14/14; Remote-Profil blockiert an acht Aktivierungsevidenzen und Release Candidate an separatem Security-Review
+    - Development Quality Pipeline 25/25, Flutter 93/93 und 85.16 Prozent Coverage bestanden
     - Pull Request 19 mit Datenlizenz-Komposition in main gemergt; Post-Merge-CI 31483893887 mit allen fuenf Jobs gruen
     - Claim-Inventar fuer App, App Store und Webseite mit Umwelt-, Social-, Governance-, Nutrition-, Health- und Limitation-Klassen versioniert
     - Nährwert-Hinweis auf neutrale Quellenfakten ohne Health-Score, Fortschrittsbalken oder Nutzenversprechen reduziert
@@ -125,8 +137,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - NEXT-03 logisch committen, pushen und als Pull Request gegen main reviewen
-    - Nach gruenem Post-Merge-Lauf NEXT-04 Backend-Threat-Model beginnen
+    - NEXT-04 Pull Request und alle Required Checks reviewen und mergen
+    - Nach gruenem Post-Merge-Lauf NEXT-05 EU-Supabase-Serverpfad implementieren
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -152,7 +164,7 @@ session_handoff:
           - GAP-003 und IMP-COMP-005 besitzen prüfbare Evidenz
       - sequence: 3
         id: NEXT-03-claims-and-privacy-boundaries
-        status: in_review
+        status: completed
         focus: Umwelt-/Health-Claims und Privacy-Datenfluss ausarbeiten
         branch: compliance/claims-privacy-boundaries
         exit_criteria:
@@ -161,6 +173,8 @@ session_handoff:
           - Rechts-/Fachreview-Bedarf und DPIA-Entscheidungsweg dokumentiert
       - sequence: 4
         id: NEXT-04-backend-threat-model
+        status: completed
+        branch: compliance/backend-threat-model
         focus: Backend-Threat-Model und EU-Supabase-Umgebungsvertrag
         suggested_branch: compliance/backend-threat-model
         exit_criteria:
@@ -169,6 +183,7 @@ session_handoff:
           - Remote-Implementierung ist definition-of-ready
       - sequence: 5
         id: NEXT-05-eu-supabase-server-writer
+        status: planned
         focus: EU-Supabase, vertrauenswürdigen Server-Writer und read-only Flutter-Cache implementieren
         suggested_branch: feature/eu-supabase-data-path
         exit_criteria:
@@ -241,6 +256,7 @@ session_handoff:
     - Kaffee-Pilotbeziehungen aktivieren noch keine Umwelt-, Social- oder Governance-Risikofaktoren
     - Gap-Audit identifiziert vier P0-Grenzen vor Release Candidate oder Remote-Kombinationsdatenbank
     - Claim- und Privacy-Development-Gates sind gruen, aber oeffentliche Aktivierung bleibt bis Kalibrierung und qualifiziertem Rechts-/Fach-/DPIA-Review rot
+    - Backend-Development-Gate ist gruen, aber Remote-Aktivierung bleibt bis EU-Projekt, Writer-Implementierung und drei gehashten Reviews rot
 
 # =============================================================================
 # MILESTONES — append-only, große Meilensteine
@@ -493,6 +509,17 @@ milestones:
       SHA-256-Bindung verhindern Scheinfreigaben; Release Candidate bleibt bis
       Kalibrierung, Rechts-, Fach-, App-Privacy- und DPIA-Review blockiert.
 
+  - id: M26
+    title: Backend-Sicherheitsgrenze definition-of-ready
+    date: 2026-08-11
+    phase: phase-1-mvp
+    notes: |
+      ADR 0032, ein STRIDE-/OWASP-API-Threat-Model und der EU-Supabase-
+      Umgebungsvertrag trennen read-only Flutter vom vertrauenswuerdigen
+      Server-Writer. G-BACKEND-BOUNDARY validiert 25 lokale Gate-Gruppen und
+      blockiert Remote-Aktivierung bis zu typisierter, SHA-256-gebundener
+      Umgebungs-, Security- und Betriebsevidenz.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -624,6 +651,9 @@ decisions_made:
   - adr: 0031
     title: Fail-closed Claim- und Privacy-Grenzen vor externer Aktivierung
     date: 2026-08-11
+  - adr: 0032
+    title: Read-only Mobile-Client und vertrauenswuerdiger Server-Writer
+    date: 2026-08-11
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
@@ -642,6 +672,8 @@ weekly_log:
       quellengetrennt und durch ein profilbasiertes Gate abgesichert.
       Claim- und Privacy-Inventare, neutrale Nährwertgrenze und zwei
       profilbasierte Aktivierungsgates sind lokal validiert.
+      Das Backend-Threat-Model, der EU-Supabase-Umgebungsvertrag und ein
+      fail-closed Backend-Aktivierungsgate sind definition-of-ready.
     done:
       - ADR 0027 als append-only Precedence-Entscheidung angelegt
       - 39 Calculator-/Mapper-Faelle fuer Saeulen, Zweige, Grenzwerte und ungueltige Zahlen umgesetzt
@@ -667,6 +699,10 @@ weekly_log:
       - Health-Balken durch neutralen Nährwert-Hinweis ohne Score ersetzt
       - Privacy-Datenmatrix, aktueller/geplanter Datenfluss und DPIA-Pfad erstellt
       - G-CLAIM-GOVERNANCE und G-PRIVACY-BOUNDARY mit Hash-Evidenz integriert
+      - ADR 0032 mit read-only Flutter und nicht mobilem Trusted Writer akzeptiert
+      - Zwoelf STRIDE-/OWASP-API-Bedrohungen und acht Abuse Cases priorisiert
+      - EU-Supabase-Umgebungs-, Secret-, Writer-, Ressourcen-, Audit- und Incident-Vertrag versioniert
+      - G-BACKEND-BOUNDARY mit drei Aktivierungsprofilen und Hash-Evidenz integriert
     checks:
       - Scoring-Testmatrix 39/39 PASS
       - Accessibility- und Terminologietests 10/10 PASS
@@ -687,15 +723,21 @@ weekly_log:
       - Flutter-Test-Suite 93/93 PASS, Line-Coverage 84.89 Prozent
       - Development Quality Pipeline 24/24 PASS
       - G-IOS-COMPILE und gebuendelter Privacy-Manifest-Audit PASS mit null Verstoessen
+      - Backend-Gate-Selbsttests 14/14 PASS
+      - Backend-Remote-Profil erwartungsgemaess FAIL mit acht Aktivierungsblockern
+      - Backend-Release-Candidate-Profil erwartungsgemaess FAIL ohne separaten aktuellen Security-Review
+      - Development Quality Pipeline 25/25 PASS
+      - Flutter-Test-Suite 93/93 PASS, Line-Coverage 85.16 Prozent
     blockers:
       - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
       - Apple- und Claim-Release-Evidenz bleibt getrennt offen
       - Remote-Backend bleibt bis Rechtsreview, Share-Alike-Export und Korrektur/Loeschung blockiert
       - External Beta und Release bleiben bis Claim-Kalibrierung, Rechts-/Fachreview, App Privacy und DPIA-Evidenz blockiert
+      - Remote-Backend bleibt ausserdem bis EU-Projekt, Writer-Implementierung und drei Backend-Reviews blockiert
     next_week:
-      - Claim-/Privacy-Stand committen, pushen, reviewen und mergen
-      - Danach NEXT-04 Backend-Threat-Model und EU-Supabase-Umgebungsvertrag beginnen
+      - NEXT-04 committen, pushen, reviewen und mergen
+      - Danach NEXT-05 mit dediziertem EU-Development-Projekt und begrenztem Server-Writer beginnen
 
   - week: 2026-W31
     summary: |

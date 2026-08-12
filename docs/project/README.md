@@ -37,6 +37,7 @@ docs/project/
 ├── audits/                # Dated audit reports with scope and evidence
 ├── accessibility/         # VoiceOver language and terminology policy
 ├── data/                  # Quellenregister, Datenarchitektur, Lizenzvertrag und Pilot-Fixtures
+├── security/              # Backend-Threat-Model, Umgebungsvertrag und Aktivierungsevidenz
 ├── implementation-plan.yaml # 22-Schritte-Plan in 5 Blöcken (Sprint 0 → Phase 2)
 ├── workflows/             # Strukturierte Arbeits-Rituale (Trigger-Phrasen-basiert)
 │   ├── README.md
@@ -95,6 +96,9 @@ festgehalten.
 Claim-, Nährwert- und Privacy-Aktivierungsgrenzen mit verbleibender Rechts-,
 Fach- und DPIA-Evidenz stehen im
 [Claims and Privacy Boundary Assessment](audits/2026-08-11-claims-privacy-boundaries-assessment.md).
+Das [Backend Threat Model Assessment](audits/2026-08-11-backend-threat-model-assessment.md)
+dokumentiert die Trust Boundaries, priorisierten Missbrauchsfaelle und die
+fail-closed Freigabegrenze fuer den geplanten EU-Supabase-Serverpfad.
 
 ## Schnellzugriff für Claude Code
 

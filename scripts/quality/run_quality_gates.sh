@@ -157,6 +157,19 @@ gate_privacy_boundary() {
       --gate privacy --profile "$profile"
 }
 
+gate_backend_boundary() {
+  local profile="${BACKEND_BOUNDARY_PROFILE:-}"
+  if [ -z "$profile" ]; then
+    case "${COMPLIANCE_PROFILE:-development}" in
+      release_candidate|submission) profile="release_candidate" ;;
+      *) profile="development" ;;
+    esac
+  fi
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_backend_boundary_gate.rb &&
+    ruby scripts/quality/validate_backend_boundary.rb --profile "$profile"
+}
+
 gate_project_control() {
   cd "$REPO_ROOT" && ruby scripts/quality/validate_project_control.rb
 }
@@ -223,6 +236,7 @@ run_gate "G-SCORE-REPRO" "Versioned score-input reproducibility" gate_score_repr
 run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
 run_gate "G-CLAIM-GOVERNANCE" "Versioned claims and nutrition boundary" gate_claim_governance
 run_gate "G-PRIVACY-BOUNDARY" "Actual data-flow and privacy activation boundary" gate_privacy_boundary
+run_gate "G-BACKEND-BOUNDARY" "Trusted writer and EU Supabase activation boundary" gate_backend_boundary
 run_gate "G-PROJECT-CONTROL" "Gap, improvement and feature-state traceability" gate_project_control
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax

@@ -182,9 +182,11 @@ risks:
       Autorisierung, Replay, manipulierte Quellantworten, fehlende Rate Limits
       oder kompromittierte Secrets falsche Evidenz und Scores publizieren.
     mitigation: |
-      End-to-End-Threat-Model vor Implementierung, serverseitige
-      Vertrauensgrenzen, Idempotenz, Input Validation, Audit Trail, Rate Limits,
-      Secret Rotation und risikobasierter Security-Test.
+      Versioniertes End-to-End-Threat-Model, serverseitige Vertrauensgrenzen,
+      fail-closed EU-Supabase-Umgebungsvertrag und G-BACKEND-BOUNDARY sind
+      umgesetzt. Idempotenz, Input Validation, Audit Trail, Rate Limits,
+      Secret Rotation und risikobasierter Security-Test muessen in NEXT-05
+      gegen die reale Writer-Implementierung belegt werden.
     related_gaps: [GAP-005]
     related_improvements: [IMP-COMP-007, IMP-DEV-002]
     status: open

@@ -201,17 +201,19 @@ gaps:
     domain: security
     title: End-to-End-Threat-Model und Missbrauchsschutz für den Serverpfad
     gap_type: partial
-    status: open
+    status: in_progress
     priority: P1
     target_profile: development
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Engineering
     trigger: Vor Implementierung eines öffentlich erreichbaren Server-Writers
     concern: |
-      Mobile MASVS und RLS sind vorhanden. Es fehlt ein systemweites Threat
-      Model für API, Writer, Adminzugang, Quellmanipulation, Replay, Rate
-      Limits, Kostenmissbrauch und Score-Snapshot-Integrität.
+      Systemweites Threat Model, Trust Boundaries, Abuse Cases und ein
+      fail-closed Umgebungs-/Writervertrag sind versioniert und automatisiert
+      geprueft. Noch offen sind die reale Writer-Implementierung, ihre
+      AuthN/AuthZ-, Parser-, SSRF-, Rate-, Replay-, Audit- und Incident-Tests
+      sowie die Entscheidung und Evidenz zum unabhaengigen Security-Review.
     closure_criteria:
       - Datenfluss- und Trust-Boundary-Diagramm ist erstellt
       - Assets, Akteure, Bedrohungen und Abuse Cases sind priorisiert
@@ -225,6 +227,18 @@ gaps:
       - RISK-008
     source_refs:
       - OWASP-MASVS
+      - OWASP-API-SECURITY-2023
+      - SUPABASE-API-KEYS
+      - SUPABASE-RLS
+      - SUPABASE-EDGE-FUNCTIONS
+    implementation_evidence:
+      - docs/project/security/backend-threat-model.yaml
+      - docs/project/security/backend-threat-model.md
+      - docs/project/security/eu-supabase-environment-contract.yaml
+      - docs/project/decisions/0032-backend-security-boundary.yaml
+      - docs/project/gate-definitions/local/G-BACKEND-BOUNDARY.yaml
+      - scripts/quality/validate_backend_boundary.rb
+      - scripts/quality/test_backend_boundary_gate.rb
 
   - id: GAP-006
     domain: quality

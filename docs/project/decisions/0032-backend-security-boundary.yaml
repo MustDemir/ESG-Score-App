@@ -1,0 +1,65 @@
+id: 0032
+title: Fail-closed trusted writer and EU Supabase environment boundary
+date: 2026-08-11
+status: accepted
+deciders: [Mustafa]
+tags: [security, backend, supabase, threat-model, secrets, quality-gates]
+
+context: |
+  ScanFair has forced RLS and migration tests, but the planned remote path also
+  introduces a public API, privileged writer, upstream data consumption,
+  managed secrets, resource costs, audit requirements and operator access.
+  RLS alone cannot prevent forged writer calls, SSRF, replay, cache poisoning,
+  cost exhaustion or control-plane compromise. The environment and runtime
+  boundary must be definition-of-ready before NEXT-05 implements it.
+
+options_considered:
+  - name: Let Flutter write cache and evidence through RLS
+    pros: [small implementation surface]
+    cons:
+      - public clients can be modified and cannot hold privileged secrets
+      - product facts, provenance and score snapshots become client-controlled
+      - rate-limit, source validation and audit guarantees are weak
+  - name: Expose an app-triggered privileged writer endpoint
+    pros: [cache can fill immediately after a scan]
+    cons:
+      - creates a public write and cost-abuse surface
+      - needs stronger bot, replay, SSRF and authorization controls
+  - name: Use read-only Flutter access and a non-mobile trusted writer
+    pros:
+      - privileged credentials remain server-side
+      - ingestion is bounded, idempotent and auditable
+      - public reads stay protected by RLS and publication state
+      - direct Open Food Facts remains a safe cache-miss fallback
+    cons:
+      - newly scanned products may not be present in the remote cache immediately
+      - scheduled ingestion and operations evidence add implementation work
+
+decision: Use read-only Flutter access and a non-mobile trusted writer
+rationale: |
+  ScanFair's score and provenance are integrity-sensitive public claims. They
+  must not be writable by a reverse-engineerable mobile client. The selected
+  boundary permits a publishable key in Flutter only for bounded reads. A
+  separately authenticated writer performs allowlisted source retrieval and
+  transactional publication with server-managed secrets. Remote activation is
+  fail-closed on typed environment, writer-security and operations evidence.
+
+implementation:
+  threat_model: docs/project/security/backend-threat-model.yaml
+  environment_contract: docs/project/security/eu-supabase-environment-contract.yaml
+  diagram: docs/project/security/backend-threat-model.md
+  gate: G-BACKEND-BOUNDARY
+  profiles: [development, remote_backend, release_candidate]
+  current_state: contract_only_remote_disabled
+
+consequences:
+  - The iOS app cannot invoke the trusted writer or contain privileged keys.
+  - Public API queries are single-product, explicit-column and read-only.
+  - The writer must implement host allowlisting, SSRF defense, schema and size validation, idempotency, budgets and append-only audit.
+  - Development, staging and production require separate projects and credentials.
+  - NEXT-05 may implement only the contracts defined here and must produce typed hash-bound evidence before remote activation.
+  - A development gate PASS proves design completeness, not deployment or security approval.
+
+supersedes: null
+superseded_by: null
+related: [0002, 0008, 0020, 0022, 0026, 0029, 0030, 0031]

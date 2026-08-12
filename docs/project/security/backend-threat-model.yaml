@@ -1,0 +1,381 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-11
+owner: Engineering
+status: accepted_for_definition_of_ready
+
+scope: |
+  Threat model for the planned ScanFair EU Supabase development data path.
+  It covers public read access, trusted ingestion, upstream retrieval,
+  privileged database writes, auditability and operator access. The remote
+  backend is not deployed or enabled by this decision.
+
+methodology:
+  primary: STRIDE
+  overlays:
+    - OWASP_API_Security_Top_10_2023
+    - OWASP_MASVS_2_1
+    - GDPR_Article_32_risk_based_controls
+  review_trigger:
+    - new_remote_endpoint
+    - new_data_source
+    - authentication_or_account_activation
+    - new_personal_data_or_retention
+    - privileged_role_or_secret_change
+    - material_writer_or_database_change
+
+assumptions:
+  - Flutter performs public read-only queries and never receives a secret or service-role key.
+  - The trusted writer is not invokable by the mobile application.
+  - Upstream hosts, methods, payload size and request budgets are allowlisted.
+  - All exposed tables keep forced RLS and explicit least-privilege grants.
+  - Development, staging and production use separate Supabase projects.
+  - Current direct Open Food Facts lookup remains available until the remote path is activated.
+
+assets:
+  - id: AST-001
+    name: Published product cache
+    security_properties: [integrity, availability, license_partitioning]
+  - id: AST-002
+    name: Normalized ESG evidence and traceability relationships
+    security_properties: [integrity, provenance, reproducibility]
+  - id: AST-003
+    name: Published score snapshots
+    security_properties: [integrity, reproducibility, claim_safety]
+  - id: AST-004
+    name: Private scans and future account data
+    security_properties: [confidentiality, integrity, deletion]
+  - id: AST-005
+    name: Server writer secret and privileged database capability
+    security_properties: [confidentiality, least_privilege, rotation]
+  - id: AST-006
+    name: Writer audit and incident evidence
+    security_properties: [integrity, completeness, non_repudiation]
+  - id: AST-007
+    name: Source and license boundaries
+    security_properties: [integrity, attribution, segregation]
+
+actors:
+  - id: ACT-001
+    name: iOS application user
+    trust: untrusted_client
+  - id: ACT-002
+    name: Automated or modified malicious client
+    trust: hostile
+  - id: ACT-003
+    name: Trusted server writer
+    trust: privileged_workload
+  - id: ACT-004
+    name: Upstream data provider
+    trust: external_untrusted_input
+  - id: ACT-005
+    name: Release and operations owner
+    trust: privileged_human
+  - id: ACT-006
+    name: Supabase platform
+    trust: contracted_processor_pending_activation_review
+
+trust_boundaries:
+  - id: TB-01
+    name: iOS application to public Supabase API
+    authentication: publishable_key_and_optional_user_jwt
+    authorization: forced_rls_and_explicit_select_grants
+  - id: TB-02
+    name: Scheduler or operator to trusted writer
+    authentication: dedicated_server_side_invocation_secret
+    authorization: deny_mobile_and_public_invocation
+  - id: TB-03
+    name: Trusted writer to upstream provider
+    authentication: source_specific_server_credentials_when_required
+    authorization: host_method_and_path_allowlist
+  - id: TB-04
+    name: Trusted writer to privileged database path
+    authentication: server_secret_from_managed_runtime_secrets
+    authorization: writer_only_least_privilege_contract
+  - id: TB-05
+    name: Public database roles to exposed schemas
+    authentication: anon_or_authenticated_role
+    authorization: forced_rls_default_deny
+  - id: TB-06
+    name: Operator and CI to Supabase control plane
+    authentication: individual_mfa_protected_identity_or_short_lived_ci_credential
+    authorization: environment_scoped_least_privilege
+
+data_flows:
+  - id: FLOW-01
+    from: ACT-001
+    to: TB-01
+    data: barcode_and_published_product_response
+    state: planned
+  - id: FLOW-02
+    from: ACT-005
+    to: TB-02
+    data: bounded_ingestion_job_request
+    state: planned
+  - id: FLOW-03
+    from: ACT-003
+    to: TB-03
+    data: allowlisted_source_request_and_untrusted_response
+    state: planned
+  - id: FLOW-04
+    from: ACT-003
+    to: TB-04
+    data: validated_payload_evidence_relationships_and_score_snapshot
+    state: planned
+  - id: FLOW-05
+    from: ACT-003
+    to: AST-006
+    data: request_id_actor_action_hash_outcome_and_timing
+    state: planned
+
+threats:
+  - id: THR-001
+    category: spoofing
+    title: Forged writer invocation
+    severity: critical
+    boundary: TB-02
+    assets: [AST-001, AST-002, AST-003]
+    attack: A public or modified client impersonates the ingestion scheduler.
+    controls:
+      - mobile_invocation_is_forbidden
+      - dedicated_server_side_invocation_secret
+      - constant_time_credential_validation
+      - invocation_attempt_audit
+    verification:
+      - unauthenticated_and_publishable_key_requests_return_401_or_403
+      - writer_authentication_integration_test
+    implementation_status: contract_defined
+  - id: THR-002
+    category: tampering
+    title: Direct client writes or mass assignment
+    severity: critical
+    boundary: TB-05
+    assets: [AST-001, AST-002, AST-003, AST-007]
+    attack: A client writes unpublished fields, score inputs or license metadata.
+    controls:
+      - forced_rls_on_every_exposed_table
+      - no_client_insert_update_or_delete_grants_for_server_data
+      - writer_side_field_allowlist
+    verification:
+      - pgTAP_anon_and_authenticated_write_denial
+      - property_allowlist_tests
+    implementation_status: partially_implemented
+  - id: THR-003
+    category: information_disclosure
+    title: Privileged secret reaches app, logs or repository
+    severity: critical
+    boundary: TB-04
+    assets: [AST-005]
+    attack: A server secret or service-role capability is extracted from a build or log.
+    controls:
+      - Flutter_allows_publishable_key_only
+      - managed_runtime_secrets
+      - log_redaction
+      - immediate_rotation_on_suspected_exposure
+      - repository_secret_scanning
+    verification:
+      - app_bundle_and_repository_secret_scan
+      - rotation_drill_evidence
+    implementation_status: partially_implemented
+  - id: THR-004
+    category: tampering
+    title: Malformed or manipulated upstream payload poisons evidence
+    severity: high
+    boundary: TB-03
+    assets: [AST-001, AST-002, AST-003]
+    attack: An upstream response exploits parser assumptions or injects unsupported fields.
+    controls:
+      - strict_schema_and_size_validation
+      - source_field_allowlist
+      - provenance_and_payload_sha256
+      - publish_only_after_validation
+      - no_positive_missing_data_imputation
+    verification:
+      - malformed_oversized_and_schema_drift_tests
+      - score_reproducibility_gate
+    implementation_status: contract_defined
+  - id: THR-005
+    category: elevation_of_privilege
+    title: Server-side request forgery through source configuration
+    severity: critical
+    boundary: TB-03
+    assets: [AST-005, AST-006]
+    attack: Attacker-controlled URL input makes the writer access internal or arbitrary hosts.
+    controls:
+      - no_runtime_arbitrary_url_input
+      - exact_https_host_and_path_prefix_allowlist
+      - GET_only_upstream_requests
+      - redirect_revalidation
+      - private_and_link_local_address_denial
+    verification:
+      - ssrf_host_redirect_scheme_and_ip_test_matrix
+    implementation_status: contract_defined
+  - id: THR-006
+    category: repudiation
+    title: Writer action cannot be reconstructed
+    severity: high
+    boundary: TB-04
+    assets: [AST-006]
+    attack: A privileged mutation occurs without attributable request and outcome evidence.
+    controls:
+      - append_only_writer_audit
+      - request_and_idempotency_identifiers
+      - payload_and_result_hashes_without_raw_secrets
+      - clock_and_retention_contract
+    verification:
+      - audit_completeness_and_mutation_denial_tests
+    implementation_status: contract_defined
+  - id: THR-007
+    category: denial_of_service
+    title: Request amplification or cost exhaustion
+    severity: high
+    boundary: TB-02
+    assets: [AST-001, AST-006]
+    attack: Repeated jobs, fan-out or expensive upstream calls exhaust quotas and budget.
+    controls:
+      - per_invoker_and_global_rate_limits
+      - bounded_batch_concurrency_timeout_and_retries
+      - daily_upstream_budget
+      - circuit_breaker_and_billing_alert
+    verification:
+      - burst_budget_retry_and_circuit_breaker_tests
+    implementation_status: contract_defined
+  - id: THR-008
+    category: tampering
+    title: Replay or out-of-order update overwrites newer evidence
+    severity: high
+    boundary: TB-04
+    assets: [AST-001, AST-002, AST-003]
+    attack: A previously valid request is replayed or races with a newer source observation.
+    controls:
+      - deterministic_idempotency_key
+      - observed_at_precedence
+      - transactional_upsert
+      - immutable_published_score_snapshot
+    verification:
+      - duplicate_replay_and_out_of_order_integration_tests
+    implementation_status: contract_defined
+  - id: THR-009
+    category: information_disclosure
+    title: Overbroad read exposes draft or personal records
+    severity: critical
+    boundary: TB-05
+    assets: [AST-002, AST-003, AST-004]
+    attack: Public queries enumerate unpublished methodology, evidence or another user's scan.
+    controls:
+      - explicit_column_selection_and_single_barcode_query
+      - published_and_fresh_row_policies
+      - owner_only_private_scan_policy
+      - no_public_list_or_export_endpoint
+    verification:
+      - pgTAP_publication_freshness_and_owner_isolation_tests
+    implementation_status: partially_implemented
+  - id: THR-010
+    category: tampering
+    title: Cross-source cache or license contamination
+    severity: high
+    boundary: TB-04
+    assets: [AST-001, AST-007]
+    attack: Non-ODbL data enters the Open Food Facts cache partition.
+    controls:
+      - source_partition_trigger
+      - dedicated_store_required_for_external_raw_data
+      - source_and_license_fields_are_writer_controlled
+    verification:
+      - data_license_gate_and_database_trigger_tests
+    implementation_status: partially_implemented
+  - id: THR-011
+    category: denial_of_service
+    title: Upstream outage or stale cache causes unsafe fallback
+    severity: high
+    boundary: TB-03
+    assets: [AST-001, AST-003]
+    attack: Provider failure returns stale, partial or misleading results as current.
+    controls:
+      - explicit_freshness_and_stale_state
+      - bounded_retry_with_jitter
+      - direct_OFF_or_no_data_fallback
+      - no_score_when_required_evidence_is_missing
+    verification:
+      - timeout_rate_limit_stale_cache_and_offline_tests
+    implementation_status: partially_implemented
+  - id: THR-012
+    category: elevation_of_privilege
+    title: Operator or CI control-plane compromise
+    severity: critical
+    boundary: TB-06
+    assets: [AST-005, AST-006]
+    attack: A compromised owner session or CI token changes schema, functions or secrets.
+    controls:
+      - MFA_and_individual_operator_identity
+      - protected_main_and_reviewed_migrations
+      - environment_scoped_short_lived_CI_access
+      - no_owner_bypass_for_application_changes
+      - break_glass_audit_and_rotation
+    verification:
+      - branch_protection_and_access_review_evidence
+      - break_glass_tabletop_test
+    implementation_status: contract_defined
+
+abuse_cases:
+  - id: ABUSE-001
+    scenario: Mobile client attempts privileged writes with its publishable key.
+    expected_result: denied_and_audited_without_data_change
+  - id: ABUSE-002
+    scenario: Bot enumerates barcodes or requests an unbounded result set.
+    expected_result: bounded_single_product_read_or_rate_limited
+  - id: ABUSE-003
+    scenario: Writer receives an arbitrary URL, localhost, private IP or redirect.
+    expected_result: rejected_before_network_access
+  - id: ABUSE-004
+    scenario: Same ingestion request is replayed many times.
+    expected_result: idempotent_no_duplicate_snapshot_or_evidence
+  - id: ABUSE-005
+    scenario: Upstream returns an oversized or malformed payload.
+    expected_result: rejected_without_cache_or_score_publication
+  - id: ABUSE-006
+    scenario: A secret appears in an exception or audit field.
+    expected_result: redacted_and_security_incident_opened
+  - id: ABUSE-007
+    scenario: A stale cache record is returned during provider outage.
+    expected_result: stale_state_visible_and_no_unsupported_score
+  - id: ABUSE-008
+    scenario: Operator requests emergency privileged access.
+    expected_result: time_bounded_owner_approved_and_audited_break_glass
+
+residual_risks:
+  - id: RES-001
+    risk: Supabase and upstream provider availability remain external dependencies.
+    treatment: accept_for_development_with_fallback_and_monitoring
+  - id: RES-002
+    risk: A single-owner project cannot provide organizational separation of duties.
+    treatment: require immutable_evidence_external_review_and_time_bounded_break_glass
+  - id: RES-003
+    risk: Platform edge execution may occur outside the database project region.
+    treatment: qualify_actual_processing_regions_in_DPA_and_privacy_review_before_activation
+
+activation_boundary:
+  remote_backend_enabled: false
+  implementation_state: contract_only
+  blocked_until:
+    - EU_development_project_and_DPA_evidence
+    - writer_authentication_and_SSRF_tests
+    - rate_limit_idempotency_and_audit_tests
+    - secret_rotation_and_break_glass_drill
+    - remote_migration_and_RLS_validation
+    - privacy_and_license_activation_evidence
+
+related:
+  gaps: [GAP-005, GAP-006]
+  risks: [RISK-008, RISK-009]
+  improvements: [IMP-COMP-007, IMP-DEV-002, IMP-OPS-001]
+  decisions: [0002, 0008, 0022, 0026, 0029, 0030, 0031, 0032]
+
+primary_sources:
+  - OWASP-API-SECURITY-2023
+  - OWASP-MASVS
+  - SUPABASE-API-KEYS
+  - SUPABASE-RLS
+  - SUPABASE-EDGE-FUNCTIONS
+  - SUPABASE-REGIONS
+  - SUPABASE-DPA
+  - EU-GDPR
