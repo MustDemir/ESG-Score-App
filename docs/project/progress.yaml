@@ -799,6 +799,11 @@ weekly_log:
     next_week:
       - NEXT-04 committen, pushen, reviewen und mergen
       - Danach NEXT-05 mit dediziertem EU-Development-Projekt und begrenztem Server-Writer beginnen
+      - "Audit-Folgearbeiten (Branch feature/audit-2026-08-13-hardening reviewen/mergen), danach offen:"
+      - Fonts als Assets buendeln (F-20, TODO-038) — Inter/Instrument Serif OFL-Download braucht Freigabe durch Mustafa
+      - Lokaler On-Device-Produktcache (F-04, TODO-038) — eigene Session, neue Dependency plus Persistenzschicht; Stale-Serving (ADR 0033) deckt einen Teil ab
+      - Retention-/Archivierungs-ADR fuer writer_audit_log und Sweeps (TODO-037-Rest)
+      - Response-code gegen angefragten Barcode verifizieren und Settings-Deeplink fuer Kamera-Berechtigung (TODO-038-Rest)
 
   - week: 2026-W31
     summary: |
@@ -1072,14 +1077,14 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 26
-  todos_open: 5
-  todos_in_progress: 5
-  todos_done: 20
+  decisions_total: 34
+  todos_open: 6
+  todos_in_progress: 6
+  todos_done: 24
   todos_parked: 1
   todos_review: 1
   milestones_reached: 25
-  risks_open: 3
-  risks_mitigated: 2
-  risks_accepted: 1
+  risks_open: 11
+  risks_mitigated: 3
+  risks_accepted: 0
   ideas_parked: 9

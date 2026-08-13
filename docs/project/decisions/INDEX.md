@@ -54,7 +54,7 @@ Letztes Update: 2026-08-13
 
 | Status | Anzahl |
 |---|---|
-| accepted | 27 |
+| accepted | 29 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 2 |
