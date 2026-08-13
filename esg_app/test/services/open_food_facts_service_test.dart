@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:esg_app/data_sources/open_food_facts_product_mapper.dart';
+import 'package:esg_app/models/product.dart';
 import 'package:esg_app/services/open_food_facts_service.dart';
 import 'package:esg_app/services/product_lookup_failure.dart';
 import 'package:esg_app/models/esg_relationship.dart';
@@ -241,6 +243,91 @@ void main() {
     expect(requests, 0);
   });
 
+  test('honors the Retry-After header on 429 responses', () async {
+    var attempts = 0;
+    final delays = <Duration>[];
+    final service = OpenFoodFactsService(
+      client: MockClient((_) async {
+        attempts++;
+        if (attempts == 1) {
+          return http.Response('', 429, headers: {'retry-after': '3'});
+        }
+        return http.Response(
+          jsonEncode({
+            'status': 'success',
+            'product': {'product_name': 'Recovered Product', 'brands': 'X'},
+          }),
+          200,
+        );
+      }),
+      overallDeadline: const Duration(seconds: 30),
+      delay: (duration) async => delays.add(duration),
+    );
+
+    final product = await service.findByBarcode('4000417025005');
+
+    expect(product!.name, 'Recovered Product');
+    expect(delays, [const Duration(seconds: 3)]);
+  });
+
+  test('stops retrying when the overall deadline would be exceeded', () async {
+    var attempts = 0;
+    final service = OpenFoodFactsService(
+      client: MockClient((_) async {
+        attempts++;
+        return http.Response('', 503);
+      }),
+      requestTimeout: const Duration(milliseconds: 10),
+      retryBaseDelay: const Duration(milliseconds: 50),
+      overallDeadline: const Duration(milliseconds: 20),
+      delay: (_) async {},
+    );
+
+    await expectLater(
+      service.findByBarcode('4000417025005'),
+      throwsA(
+        isA<ProductLookupFailure>().having(
+          (failure) => failure.type,
+          'type',
+          ProductLookupFailureType.server,
+        ),
+      ),
+    );
+    expect(attempts, 1);
+  });
+
+  test('maps mapper exceptions to a non-retryable invalidResponse', () async {
+    var attempts = 0;
+    final service = OpenFoodFactsService(
+      client: MockClient((_) async {
+        attempts++;
+        return http.Response(
+          jsonEncode({
+            'product': {'product_name': 'Kaputtes Produkt'},
+          }),
+          200,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        );
+      }),
+      mapper: const _ThrowingMapper(),
+      delay: (_) async {},
+    );
+
+    await expectLater(
+      service.findByBarcode('4000417025005'),
+      throwsA(
+        isA<ProductLookupFailure>()
+            .having(
+              (failure) => failure.type,
+              'type',
+              ProductLookupFailureType.invalidResponse,
+            )
+            .having((failure) => failure.cause, 'cause', isA<StateError>()),
+      ),
+    );
+    expect(attempts, 1);
+  });
+
   test('does not retry malformed JSON', () async {
     var attempts = 0;
     final service = OpenFoodFactsService(
@@ -263,4 +350,17 @@ void main() {
     );
     expect(attempts, 1);
   });
+}
+
+class _ThrowingMapper extends OpenFoodFactsProductMapper {
+  const _ThrowingMapper();
+
+  @override
+  ScanFairProduct map(
+    Map<String, Object?> json, {
+    required String barcode,
+    required DateTime retrievedAt,
+  }) {
+    throw StateError('mapper bug');
+  }
 }

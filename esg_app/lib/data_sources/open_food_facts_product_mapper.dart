@@ -18,29 +18,37 @@ class OpenFoodFactsProductMapper {
       product['last_updated_t'] ?? product['last_modified_t'],
     );
     final schemaVersion = _nullableString(product['schema_version']);
+    // Der Feldname in der Evidenz muss dem Feld folgen, das den WERT
+    // geliefert hat — nicht der blossen Schluessel-Praesenz. Sonst behauptet
+    // die Provenienz bei v2/v3-Mischpayloads das falsche Feld (F-14).
+    final environmentalGrade =
+        _nullableString(product['environmental_score_grade']) ??
+        _nullableString(product['ecoscore_grade']);
     final environmentalGradeField =
-        product.containsKey('environmental_score_grade')
+        _nullableString(product['environmental_score_grade']) != null
         ? 'environmental_score_grade'
         : 'ecoscore_grade';
+    final environmentalScore =
+        _double(product['environmental_score_score']) ??
+        _double(product['ecoscore_score']);
     final environmentalScoreField =
-        product.containsKey('environmental_score_score')
+        _double(product['environmental_score_score']) != null
         ? 'environmental_score_score'
         : 'ecoscore_score';
+    final agribalyseData =
+        _mapFromPaths(product, const [
+          ['environmental_score_data', 'agribalyse'],
+        ]) ??
+        _mapFromPaths(product, const [
+          ['ecoscore_data', 'agribalyse'],
+        ]);
     final environmentalDataField =
-        product.containsKey('environmental_score_data')
+        _mapFromPaths(product, const [
+              ['environmental_score_data', 'agribalyse'],
+            ]) !=
+            null
         ? 'environmental_score_data.agribalyse.co2_total'
         : 'ecoscore_data.agribalyse.co2_total';
-
-    final environmentalGrade = _nullableString(
-      product['environmental_score_grade'] ?? product['ecoscore_grade'],
-    );
-    final environmentalScore = _double(
-      product['environmental_score_score'] ?? product['ecoscore_score'],
-    );
-    final agribalyseData = _mapFromPaths(product, const [
-      ['environmental_score_data', 'agribalyse'],
-      ['ecoscore_data', 'agribalyse'],
-    ]);
     final co2Total = _double(agribalyseData?['co2_total']);
     final agribalyseCode = _nullableString(
       agribalyseData?['code'] ?? agribalyseData?['agribalyse_proxy_food_code'],
@@ -258,7 +266,7 @@ class OpenFoodFactsProductMapper {
       id: 'gtin:$barcode',
       type: ESGEntityType.product,
       displayName: _string(
-        product['product_name'],
+        _nullableString(product['product_name_de']) ?? product['product_name'],
         fallback: 'Unbenanntes Produkt',
       ),
       identifiers: [
@@ -357,7 +365,12 @@ class OpenFoodFactsProductMapper {
 
     return ScanFairProduct(
       barcode: barcode,
-      name: _string(product['product_name'], fallback: 'Unbenanntes Produkt'),
+      // Deutscher Produktname hat Vorrang vor dem Hauptsprachen-Namen
+      // (ADR 0034 / TODO-033).
+      name: _string(
+        _nullableString(product['product_name_de']) ?? product['product_name'],
+        fallback: 'Unbenanntes Produkt',
+      ),
       brand: brand,
       category: _firstTag(product['categories_tags']) ?? 'Lebensmittel',
       imageEmoji: '□',

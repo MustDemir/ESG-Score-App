@@ -1,12 +1,35 @@
 import '../models/esg_score.dart';
 import '../models/product.dart';
 
+/// ESG-Formel v1.1 (ADR 0034): Säulen entstehen nur aus echter Evidenz —
+/// keine Neutral-Baselines, exaktes Tag-Matching statt Substring, und ein
+/// Gesamtwert ohne alle drei Säulen ist ein sichtbarer Teilscore.
 class ESGScoreCalculator {
   const ESGScoreCalculator();
 
+  // Konstanten der Formel v1.1 — Änderungen erfordern einen Versions-Bump
+  // von ESGScore.formulaVersion (ADR 0034).
   static const _environmentWeight = 0.50;
   static const _socialWeight = 0.30;
   static const _governanceWeight = 0.20;
+
+  static const _fairTradeLabels = {'fair-trade', 'fairtrade'};
+  static const _organicLabels = {'organic', 'bio', 'eu-organic', 'demeter'};
+  static const _veganLabels = {'vegan', 'vegetarian'};
+  static const _cultivationStandardLabels = {'rainforest-alliance', 'utz'};
+  static const _rspoLabels = {'rspo', 'rspo-certified'};
+  static const _regionalOrigins = {
+    'germany',
+    'deutschland',
+    'austria',
+    'switzerland',
+    'european-union',
+  };
+  static const _completeQualityTags = {'complete', 'ecoscore-complete'};
+
+  // Trifft "palm", "palmöl", "palm oil", "palmfett", "palmkernöl" — aber
+  // nicht "palmitate"/"palmitic"/"palmito" (Audit-Finding F-13).
+  static final _palmPattern = RegExp(r'\bpalm(?!it)');
 
   ESGScore calculate(ScanFairProduct product) {
     final environmental = _calculateEnvironmental(product);
@@ -30,9 +53,21 @@ class ESGScoreCalculator {
       social: social,
       governance: governance,
     );
+    if (total == null) {
+      return ESGScore(
+        state: ScoreState.dataIncomplete,
+        dataCompleteness: completeness,
+        environmental: environmental,
+        social: social,
+        governance: governance,
+        sources: _scoreSources(product),
+      );
+    }
 
     return ESGScore(
-      state: total == null ? ScoreState.dataIncomplete : ScoreState.fullScore,
+      state: pillars.length == 3
+          ? ScoreState.fullScore
+          : ScoreState.partialScore,
       environmental: environmental,
       social: social,
       governance: governance,
@@ -86,15 +121,15 @@ class ESGScoreCalculator {
   }
 
   PillarScore? _calculateSocial(ScanFairProduct product) {
-    if (!product.hasSocialSignal) return null;
-
-    var score = 50.0;
-    final tags = _normalizedTags(product);
+    final labels = _normalizedTags(product.labelsTags);
+    final origins = _normalizedTags(product.originTags);
     final ingredients = product.ingredientsText?.toLowerCase() ?? '';
+
+    var delta = 0.0;
     final factors = <ScoreFactor>[];
 
-    if (_containsAny(tags, ['fair-trade', 'fairtrade', 'gepa'])) {
-      score += 25;
+    if (_matchesAny(labels, _fairTradeLabels)) {
+      delta += 25;
       factors.add(
         ScoreFactor(
           label: 'Fair-Trade-Signal',
@@ -106,8 +141,8 @@ class ESGScoreCalculator {
       );
     }
 
-    if (_containsAny(tags, ['organic', 'bio', 'eu-organic', 'demeter'])) {
-      score += 20;
+    if (_matchesAny(labels, _organicLabels)) {
+      delta += 20;
       factors.add(
         ScoreFactor(
           label: 'Bio-Siegel',
@@ -119,8 +154,8 @@ class ESGScoreCalculator {
       );
     }
 
-    if (_containsAny(tags, ['vegan', 'vegetarian'])) {
-      score += 10;
+    if (_matchesAny(labels, _veganLabels)) {
+      delta += 10;
       factors.add(
         ScoreFactor(
           label: 'Vegan/Vegetarisch',
@@ -132,14 +167,8 @@ class ESGScoreCalculator {
       );
     }
 
-    if (_containsAny(tags, [
-      'germany',
-      'deutschland',
-      'austria',
-      'switzerland',
-      'european-union',
-    ])) {
-      score += 15;
+    if (_matchesAny(origins, _regionalOrigins)) {
+      delta += 15;
       factors.add(
         ScoreFactor(
           label: 'Regionale/EU-Herkunft',
@@ -151,8 +180,8 @@ class ESGScoreCalculator {
       );
     }
 
-    if (_containsAny(tags, ['rainforest-alliance', 'utz'])) {
-      score += 20;
+    if (_matchesAny(labels, _cultivationStandardLabels)) {
+      delta += 20;
       factors.add(
         ScoreFactor(
           label: 'Sozial-/Anbaustandard',
@@ -164,9 +193,22 @@ class ESGScoreCalculator {
       );
     }
 
-    if (ingredients.contains('palm') &&
-        !_containsAny(tags, ['rspo-certified', 'rspo'])) {
-      score -= 15;
+    final hasRspoSignal = _matchesAny(labels, _rspoLabels);
+    if (hasRspoSignal) {
+      delta += 10;
+      factors.add(
+        ScoreFactor(
+          label: 'Zertifiziertes Palmöl (RSPO)',
+          value: '+10',
+          source: 'Open Food Facts · Kennzeichnungen',
+          available: true,
+          evidenceIds: _evidenceIds(product, 'labels'),
+        ),
+      );
+    }
+
+    if (_palmPattern.hasMatch(ingredients) && !hasRspoSignal) {
+      delta -= 15;
       factors.add(
         ScoreFactor(
           label: 'Palmöl ohne RSPO-Signal',
@@ -178,36 +220,26 @@ class ESGScoreCalculator {
       );
     }
 
-    if (factors.isEmpty) {
-      factors.add(
-        const ScoreFactor(
-          label: 'Soziale Signale',
-          value: 'Neutraler Startwert',
-          source: 'ScanFair Methodik v1.0',
-          available: true,
-        ),
-      );
-    }
+    // Ohne echte Signale gibt es keine Social-Säule — kein Neutralwert
+    // (ADR 0034).
+    if (factors.isEmpty) return null;
 
     return PillarScore(
       pillar: ScorePillar.social,
-      value: _clamp(score),
+      value: _clamp(50 + delta),
       label: 'Social',
       factors: factors,
     );
   }
 
   PillarScore? _calculateGovernance(ScanFairProduct product) {
-    if (!product.hasGovernanceSignal) return null;
+    final qualityTags = _normalizedTags(product.dataQualityTags);
 
-    var score = 50.0;
+    var delta = 0.0;
     final factors = <ScoreFactor>[];
 
-    if (_containsAny(product.dataQualityTags, [
-      'complete',
-      'ecoscore-complete',
-    ])) {
-      score += 20;
+    if (_matchesAny(qualityTags, _completeQualityTags)) {
+      delta += 20;
       factors.add(
         ScoreFactor(
           label: 'Datenqualität',
@@ -219,35 +251,8 @@ class ESGScoreCalculator {
       );
     }
 
-    if (product.hasKnownBrand && !product.brand.contains(',')) {
-      score += 10;
-      factors.add(
-        ScoreFactor(
-          label: 'Marke eindeutig',
-          value: '+10',
-          source: 'Open Food Facts · Marke',
-          available: true,
-          evidenceIds: _evidenceIds(product, 'brand'),
-        ),
-      );
-    }
-
-    if (product.ingredientsText != null &&
-        product.ingredientsText!.trim().isNotEmpty) {
-      score += 10;
-      factors.add(
-        ScoreFactor(
-          label: 'Zutatenliste vorhanden',
-          value: '+10',
-          source: 'Open Food Facts · Zutaten',
-          available: true,
-          evidenceIds: _evidenceIds(product, 'ingredients'),
-        ),
-      );
-    }
-
-    if (_containsAny(product.dataQualityWarnings, ['missing'])) {
-      score -= 10;
+    if (_hasSegment(product.dataQualityWarnings, 'missing')) {
+      delta -= 10;
       factors.add(
         ScoreFactor(
           label: 'Datenwarnung',
@@ -259,20 +264,13 @@ class ESGScoreCalculator {
       );
     }
 
-    if (factors.isEmpty) {
-      factors.add(
-        const ScoreFactor(
-          label: 'Governance-Signal',
-          value: 'Neutraler Startwert',
-          source: 'ScanFair Methodik v1.0',
-          available: true,
-        ),
-      );
-    }
+    // Marke oder Zutatenliste allein sind keine Governance-Evidenz mehr —
+    // kein Neutralwert (ADR 0034).
+    if (factors.isEmpty) return null;
 
     return PillarScore(
       pillar: ScorePillar.governance,
-      value: _clamp(score),
+      value: _clamp(50 + delta),
       label: 'Governance',
       factors: factors,
     );
@@ -327,15 +325,28 @@ class ESGScoreCalculator {
 
   double _clamp(double value) => value.clamp(0, 100).toDouble();
 
-  List<String> _normalizedTags(ScanFairProduct product) {
-    return [
-      ...product.labelsTags,
-      ...product.originTags,
-    ].map((tag) => tag.toLowerCase().replaceAll('en:', '')).toList();
+  /// Normalisiert OFF-Tags auf Kleinschreibung ohne Sprachpräfix ("en:",
+  /// "de:", …). Verglichen wird immer der ganze Tag — nie ein Substring.
+  Set<String> _normalizedTags(List<String> tags) {
+    return tags
+        .map(
+          (tag) => tag.trim().toLowerCase().replaceFirst(
+            RegExp(r'^[a-z]{2,3}:'),
+            '',
+          ),
+        )
+        .where((tag) => tag.isNotEmpty)
+        .toSet();
   }
 
-  bool _containsAny(List<String> tags, List<String> needles) {
-    return tags.any((tag) => needles.any(tag.contains));
+  bool _matchesAny(Set<String> tags, Set<String> needles) {
+    return tags.any(needles.contains);
+  }
+
+  /// Prüft, ob ein Tag das Segment (durch "-" getrennt) exakt enthält —
+  /// "origins-missing" enthält "missing", "antibiotics" enthält kein "bio".
+  bool _hasSegment(List<String> tags, String segment) {
+    return _normalizedTags(tags).any((tag) => tag.split('-').contains(segment));
   }
 
   List<String> _evidenceIds(ScanFairProduct product, String metric) {

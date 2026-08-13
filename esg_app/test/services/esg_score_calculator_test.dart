@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const calculator = ESGScoreCalculator();
 
-  group('aggregate score precedence', () {
+  group('aggregate score precedence (Formel v1.1, ADR 0034)', () {
     test('calculates a full green score for GEPA chocolate', () {
       final product = demoProducts.firstWhere(
         (entry) => entry.barcode == '4000417025005',
@@ -20,14 +20,18 @@ void main() {
       expect(score.trafficLight, TrafficLight.green);
       expect(score.environmental?.value, 55);
       expect(score.social?.value, 95);
-      expect(score.governance?.value, 90);
-      expect(score.total, closeTo(74, 0.01));
+      expect(score.governance?.value, 70);
+      expect(score.total, closeTo(70, 0.01));
+      expect(score.isPartial, isFalse);
+      expect(score.partialNote, isNull);
     });
 
-    test('allows an Environmental-only score with visible completeness', () {
+    test('marks an Environmental-only score as visible partial score', () {
       final score = calculator.calculate(_product(ecoscoreScore: 80));
 
-      expect(score.state, ScoreState.fullScore);
+      expect(score.state, ScoreState.partialScore);
+      expect(score.isPartial, isTrue);
+      expect(score.partialNote, isNotNull);
       expect(score.environmental?.value, 80);
       expect(score.social, isNull);
       expect(score.governance, isNull);
@@ -35,11 +39,12 @@ void main() {
       expect(score.dataCompleteness, closeTo(1 / 3, 0.0001));
     });
 
-    test('normalizes weights across Environmental and Social', () {
+    test('normalizes weights across Environmental and Social as partial', () {
       final score = calculator.calculate(
         _product(ecoscoreScore: 80, labelsTags: const ['en:vegan']),
       );
 
+      expect(score.state, ScoreState.partialScore);
       expect(score.environmental?.value, 80);
       expect(score.social?.value, 60);
       expect(score.governance, isNull);
@@ -47,7 +52,21 @@ void main() {
       expect(score.dataCompleteness, closeTo(2 / 3, 0.0001));
     });
 
-    test('withholds total when Environmental is missing but S and G exist', () {
+    test('requires all three pillars for a full score', () {
+      final score = calculator.calculate(
+        _product(
+          ecoscoreScore: 80,
+          labelsTags: const ['en:fairtrade'],
+          dataQualityTags: const ['en:complete'],
+        ),
+      );
+
+      expect(score.state, ScoreState.fullScore);
+      expect(score.isPartial, isFalse);
+      expect(score.dataCompleteness, 1);
+    });
+
+    test('withholds total when Environmental is missing', () {
       final score = calculator.calculate(
         _product(brand: 'Testmarke', labelsTags: const ['en:fairtrade']),
       );
@@ -55,10 +74,11 @@ void main() {
       expect(score.state, ScoreState.dataIncomplete);
       expect(score.environmental, isNull);
       expect(score.social?.value, 75);
-      expect(score.governance?.value, 60);
+      // Eine Marke allein ist keine Governance-Evidenz mehr (ADR 0034).
+      expect(score.governance, isNull);
       expect(score.total, isNull);
       expect(score.trafficLight, TrafficLight.grey);
-      expect(score.dataCompleteness, closeTo(2 / 3, 0.0001));
+      expect(score.dataCompleteness, closeTo(1 / 3, 0.0001));
     });
 
     test('keeps missing Eco-Score as dataIncomplete instead of guessing', () {
@@ -103,6 +123,7 @@ void main() {
 
         expect(score.environmental?.value, entry.value);
         expect(score.total, entry.value);
+        expect(score.state, ScoreState.partialScore);
       });
     }
 
@@ -196,7 +217,7 @@ void main() {
       expect(score.social?.value, 55);
     });
 
-    test('does not apply palm oil penalty with RSPO signal', () {
+    test('treats an RSPO label as its own certified factor', () {
       final score = calculator.calculate(
         _product(
           ecoscoreScore: 70,
@@ -205,7 +226,59 @@ void main() {
         ),
       );
 
-      expect(score.social?.value, 50);
+      // +10 RSPO-Faktor, keine Palmoel-Strafe.
+      expect(score.social?.value, 60);
+    });
+
+    test('withholds the Social pillar without any real signal', () {
+      final score = calculator.calculate(
+        _product(ecoscoreScore: 70, ingredientsText: 'water, oats'),
+      );
+
+      // Eine blosse Zutatenliste erzeugt keine Social-Saeule (ADR 0034).
+      expect(score.social, isNull);
+      expect(score.state, ScoreState.partialScore);
+    });
+
+    test('does not read "bio" inside "antibiotics" (exact tag match)', () {
+      final score = calculator.calculate(
+        _product(ecoscoreScore: 70, labelsTags: const ['en:no-antibiotics']),
+      );
+
+      expect(score.social, isNull);
+    });
+
+    test('does not read "palm" inside "palmitate"', () {
+      final score = calculator.calculate(
+        _product(
+          ecoscoreScore: 70,
+          labelsTags: const ['en:vegan'],
+          ingredientsText: 'sodium palmitate, palmitic acid',
+        ),
+      );
+
+      // Nur der Vegan-Faktor, keine Palmoel-Strafe.
+      expect(score.social?.value, 60);
+    });
+
+    test('still detects German palm-oil ingredients', () {
+      final score = calculator.calculate(
+        _product(
+          ecoscoreScore: 70,
+          labelsTags: const ['en:vegan'],
+          ingredientsText: 'Zucker, Palmöl, Kakao',
+        ),
+      );
+
+      expect(score.social?.value, 45);
+    });
+
+    test('strips non-English tag prefixes before matching', () {
+      final score = calculator.calculate(
+        _product(ecoscoreScore: 70, labelsTags: const ['de:bio']),
+      );
+
+      expect(score.social?.value, 70);
     });
 
     test('clamps combined Social bonuses at 100', () {
@@ -235,20 +308,31 @@ void main() {
       expect(score.governance?.value, 70);
     });
 
-    test('applies known single-brand bonus in isolation', () {
+    test('does not read "complete" inside "incomplete"', () {
+      final score = calculator.calculate(
+        _product(
+          ecoscoreScore: 70,
+          dataQualityTags: const ['en:nutrition-facts-incomplete'],
+        ),
+      );
+
+      expect(score.governance, isNull);
+    });
+
+    test('a brand alone yields no Governance pillar', () {
       final score = calculator.calculate(
         _product(ecoscoreScore: 70, brand: 'Testmarke'),
       );
 
-      expect(score.governance?.value, 60);
+      expect(score.governance, isNull);
     });
 
-    test('applies ingredients transparency bonus in isolation', () {
+    test('an ingredients list alone yields no Governance pillar', () {
       final score = calculator.calculate(
         _product(ecoscoreScore: 70, ingredientsText: 'water'),
       );
 
-      expect(score.governance?.value, 60);
+      expect(score.governance, isNull);
     });
 
     test('applies missing-data warning penalty in isolation', () {
@@ -262,13 +346,14 @@ void main() {
       expect(score.governance?.value, 40);
     });
 
-    test('uses neutral Governance baseline for an unmatched quality tag', () {
+    test('an unmatched quality tag yields no Governance pillar', () {
       final score = calculator.calculate(
         _product(ecoscoreScore: 70, dataQualityTags: const ['en:checked']),
       );
 
-      expect(score.governance?.value, 50);
-      expect(score.governance?.factors.single.value, 'Neutraler Startwert');
+      // Kein Neutralwert mehr — ohne wertbare Evidenz keine Saeule
+      // (ADR 0034).
+      expect(score.governance, isNull);
     });
   });
 
@@ -313,6 +398,33 @@ void main() {
     expect(product.ecoscoreGrade, 'b');
     expect(product.originTags, contains('en:germany'));
     expect(product.evidenceFor('environmental_score'), hasLength(1));
+  });
+
+  test('prefers the German product name when present', () {
+    final product = const OpenFoodFactsProductMapper().map(
+      {'product_name': 'Oat drink', 'product_name_de': 'Haferdrink'},
+      barcode: '123',
+      retrievedAt: DateTime.utc(2026, 8, 13),
+    );
+
+    expect(product.name, 'Haferdrink');
+  });
+
+  test('evidence sourceField follows the field that supplied the value', () {
+    // v3-Feld vorhanden aber null, Legacy-Feld liefert den Wert (F-14).
+    final product = const OpenFoodFactsProductMapper().map(
+      {
+        'product_name': 'Mischpayload',
+        'environmental_score_grade': null,
+        'ecoscore_grade': 'b',
+      },
+      barcode: '123',
+      retrievedAt: DateTime.utc(2026, 8, 13),
+    );
+
+    final evidence = product.evidenceFor('environmental_score').single;
+    expect(evidence.value, 'b');
+    expect(evidence.sourceField, 'ecoscore_grade');
   });
 }
 
