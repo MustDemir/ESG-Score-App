@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/home_screen.dart';
@@ -18,6 +20,7 @@ void main() {
       : ReadThroughProductRepository(
           cache: SupabaseProductCacheService(configuration: cacheConfiguration),
           fallback: directSource,
+          onCacheOutcome: _logCacheOutcome,
         );
   runApp(
     ScanFairApp(
@@ -37,9 +40,23 @@ SupabaseProductCacheConfiguration? _cacheConfiguration() {
       publishableKey: publishableKey,
     );
   } on FormatException catch (error) {
-    debugPrint('Remote product cache disabled: ${error.message}');
+    // developer.log bleibt im Gegensatz zu debugPrint auch in Release-Builds
+    // ueber das VM-Service/os_log sichtbar (Cache-Ausfall darf nicht stumm
+    // bleiben, Audit-Finding F-06).
+    developer.log(
+      'Remote product cache disabled: ${error.message}',
+      name: 'scanfair.cache',
+      level: 1000,
+    );
     return null;
   }
+}
+
+void _logCacheOutcome(ProductCacheOutcome outcome) {
+  developer.log(
+    'product cache outcome: ${outcome.name}',
+    name: 'scanfair.cache',
+  );
 }
 
 class ScanFairApp extends StatelessWidget {

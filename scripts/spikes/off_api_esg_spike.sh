@@ -14,7 +14,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 OUT="${REPO_ROOT}/docs/project/spikes/off-api-$(date +%Y-%m-%d).md"
-UA="${OPENFOODFACTS_USER_AGENT:-ScanFair-Spike/0.1 (business.demir@gmail.com)}"
+UA="${OPENFOODFACTS_USER_AGENT:-ScanFair-Spike/0.1 (https://github.com/MustDemir/ESG-Score-App)}"
 API="https://world.openfoodfacts.org/api/v2/product"
 
 # Wir holen alle ESG-relevanten Felder
