@@ -79,7 +79,16 @@ class OpenFoodFactsProductRepository implements ProductRepository {
   void close() => service.close();
 }
 
-enum ProductCacheOutcome { hit, miss, stale, unavailable, invalidResponse }
+enum ProductCacheOutcome {
+  hit,
+  miss,
+  stale,
+  staleServed,
+  unavailable,
+  invalidResponse,
+  error,
+  skipped,
+}
 
 typedef ProductCacheObserver = void Function(ProductCacheOutcome outcome);
 
@@ -88,25 +97,71 @@ class ReadThroughProductRepository implements ProductRepository {
     required this.cache,
     required this.fallback,
     this.onCacheOutcome,
-  });
+    this.failureThreshold = 3,
+    this.failureCooldown = const Duration(minutes: 2),
+    DateTime Function()? clock,
+  }) : assert(failureThreshold > 0),
+       _clock = clock ?? DateTime.now;
 
   final ProductCache cache;
   final ProductRepository fallback;
   final ProductCacheObserver? onCacheOutcome;
+
+  /// Circuit Breaker (Audit-Finding F-15): nach so vielen Cache-Fehlern in
+  /// Folge wird der Cache fuer [failureCooldown] uebersprungen, statt jeden
+  /// Scan mit dem Cache-Timeout zu belasten.
+  final int failureThreshold;
+  final Duration failureCooldown;
+  final DateTime Function() _clock;
+
   final List<ScanFairProduct> _recentProducts = [];
+  var _consecutiveCacheFailures = 0;
+  DateTime? _skipCacheUntil;
 
   @override
   Future<ScanFairProduct?> findByBarcode(String barcode) async {
+    ProductCacheLookup? cached;
     ScanFairProduct? product;
-    try {
-      product = await cache.findByBarcode(barcode);
-      onCacheOutcome?.call(
-        product == null ? ProductCacheOutcome.miss : ProductCacheOutcome.hit,
-      );
-    } on ProductCacheFailure catch (failure) {
-      onCacheOutcome?.call(_outcomeFor(failure.type));
+    final skipUntil = _skipCacheUntil;
+    if (skipUntil != null && _clock().isBefore(skipUntil)) {
+      onCacheOutcome?.call(ProductCacheOutcome.skipped);
+    } else {
+      try {
+        cached = await cache.findByBarcode(barcode);
+        _consecutiveCacheFailures = 0;
+        _skipCacheUntil = null;
+        if (cached == null) {
+          onCacheOutcome?.call(ProductCacheOutcome.miss);
+        } else if (cached.isStale) {
+          onCacheOutcome?.call(ProductCacheOutcome.stale);
+        } else {
+          onCacheOutcome?.call(ProductCacheOutcome.hit);
+          product = cached.product;
+        }
+      } on ProductCacheFailure catch (failure) {
+        _registerCacheFailure();
+        onCacheOutcome?.call(_outcomeFor(failure.type));
+      } on Object {
+        // Der optionale Cache darf die Pflichtquelle nie mitreissen (FM-17):
+        // auch unerwartete Fehler muessen im OFF-Fallback landen.
+        _registerCacheFailure();
+        onCacheOutcome?.call(ProductCacheOutcome.error);
+      }
     }
-    product ??= await fallback.findByBarcode(barcode);
+
+    if (product == null) {
+      try {
+        product = await fallback.findByBarcode(barcode);
+      } on ProductLookupFailure {
+        // Ein veralteter Cache-Eintrag ist besser als gar keine Antwort:
+        // gekennzeichnet servieren statt Fehler zeigen (ADR 0033).
+        if (cached == null) rethrow;
+        onCacheOutcome?.call(ProductCacheOutcome.staleServed);
+        product = cached.product.withDataQualityWarning(
+          ScanFairProduct.staleCacheWarning,
+        );
+      }
+    }
     if (product == null) return null;
 
     _recentProducts.removeWhere((entry) => entry.barcode == product!.barcode);
@@ -126,6 +181,13 @@ class ReadThroughProductRepository implements ProductRepository {
   @override
   ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) {
     return fallback.suggestAlternativeFor(product);
+  }
+
+  void _registerCacheFailure() {
+    _consecutiveCacheFailures += 1;
+    if (_consecutiveCacheFailures >= failureThreshold) {
+      _skipCacheUntil = _clock().add(failureCooldown);
+    }
   }
 
   ProductCacheOutcome _outcomeFor(ProductCacheFailureType type) {

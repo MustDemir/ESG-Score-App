@@ -7,8 +7,22 @@ import 'package:http/http.dart' as http;
 import '../data_sources/open_food_facts_product_mapper.dart';
 import '../models/product.dart';
 
+/// Ergebnis eines Cache-Treffers: das Produkt plus Frische-Metadaten, damit
+/// veraltete Daten gekennzeichnet statt verworfen werden (ADR 0033).
+class ProductCacheLookup {
+  const ProductCacheLookup({
+    required this.product,
+    required this.isStale,
+    this.fetchedAt,
+  });
+
+  final ScanFairProduct product;
+  final bool isStale;
+  final DateTime? fetchedAt;
+}
+
 abstract class ProductCache {
-  Future<ScanFairProduct?> findByBarcode(String barcode);
+  Future<ProductCacheLookup?> findByBarcode(String barcode);
 }
 
 enum ProductCacheFailureType {
@@ -125,7 +139,7 @@ class SupabaseProductCacheService implements ProductCache {
   final DateTime Function() _clock;
 
   @override
-  Future<ScanFairProduct?> findByBarcode(String barcode) async {
+  Future<ProductCacheLookup?> findByBarcode(String barcode) async {
     final normalized = barcode.trim();
     if (!RegExp(r'^\d{8,14}$').hasMatch(normalized)) {
       throw const ProductCacheFailure(
@@ -204,6 +218,7 @@ class SupabaseProductCacheService implements ProductCache {
     final row = Map<String, Object?>.from(rows.single as Map);
     final payload = row['payload'];
     final fetchedAt = DateTime.tryParse(row['fetched_at']?.toString() ?? '');
+    final staleAfter = DateTime.tryParse(row['stale_after']?.toString() ?? '');
     final expiresAt = DateTime.tryParse(row['expires_at']?.toString() ?? '');
     if (payload is! Map || fetchedAt == null || expiresAt == null) {
       throw const ProductCacheFailure(
@@ -212,12 +227,9 @@ class SupabaseProductCacheService implements ProductCache {
       );
     }
     final now = _clock().toUtc();
-    if (!expiresAt.toUtc().isAfter(now)) {
-      throw const ProductCacheFailure(
-        type: ProductCacheFailureType.stale,
-        message: 'Der gespeicherte Produktdatensatz ist abgelaufen.',
-      );
-    }
+    // Der Server liefert keine Zeilen nach expires_at; wenn doch eine
+    // ankommt, ist das ein Uhren-/Serverproblem und zaehlt als Miss.
+    if (!expiresAt.toUtc().isAfter(now)) return null;
     if (fetchedAt.toUtc().isAfter(now.add(const Duration(minutes: 5)))) {
       throw const ProductCacheFailure(
         type: ProductCacheFailureType.invalidResponse,
@@ -226,11 +238,21 @@ class SupabaseProductCacheService implements ProductCache {
     }
 
     try {
-      return mapper.map(
+      final product = mapper.map(
         Map<String, Object?>.from(payload),
         barcode: normalized,
         retrievedAt: fetchedAt.toUtc(),
       );
+      // Veraltete Daten werden gekennzeichnet serviert statt verworfen
+      // (ADR 0033).
+      final isStale = staleAfter != null && !now.isBefore(staleAfter.toUtc());
+      return ProductCacheLookup(
+        product: product,
+        isStale: isStale,
+        fetchedAt: fetchedAt.toUtc(),
+      );
+    } on ProductCacheFailure {
+      rethrow;
     } on Object catch (error) {
       throw ProductCacheFailure(
         type: ProductCacheFailureType.invalidResponse,

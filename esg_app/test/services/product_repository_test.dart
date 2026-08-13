@@ -100,15 +100,35 @@ void main() {
   );
 
   test(
+    'read-through repository survives unexpected cache exceptions',
+    () async {
+      final fallback = _TrackingProductRepository(repository);
+      final outcomes = <ProductCacheOutcome>[];
+      final readThrough = ReadThroughProductRepository(
+        cache: const _ThrowingProductCache(),
+        fallback: fallback,
+        onCacheOutcome: outcomes.add,
+      );
+
+      final product = await readThrough.findByBarcode('4000417025005');
+
+      expect(product, isNotNull);
+      expect(fallback.lookups, 1);
+      expect(outcomes, [ProductCacheOutcome.error]);
+    },
+  );
+
+  test(
     'read-through repository falls back on miss, stale and offline',
     () async {
+      final staleProduct = await repository.findByBarcode('4000417025005');
       for (final scenario in [
         (
           cache: const _FixedProductCache(null),
           outcome: ProductCacheOutcome.miss,
         ),
         (
-          cache: const _FailingProductCache(ProductCacheFailureType.stale),
+          cache: _FixedProductCache(staleProduct, isStale: true),
           outcome: ProductCacheOutcome.stale,
         ),
         (
@@ -130,19 +150,97 @@ void main() {
 
         expect(product, isNotNull);
         expect(fallback.lookups, 1);
-        expect(outcomes, [scenario.outcome]);
+        expect(outcomes.first, scenario.outcome);
       }
     },
   );
+
+  test('read-through repository serves a labeled stale row when the '
+      'fallback fails (ADR 0033)', () async {
+    final staleProduct = await repository.findByBarcode('4000417025005');
+    final outcomes = <ProductCacheOutcome>[];
+    final readThrough = ReadThroughProductRepository(
+      cache: _FixedProductCache(staleProduct, isStale: true),
+      fallback: const _FailingProductRepository(),
+      onCacheOutcome: outcomes.add,
+    );
+
+    final product = await readThrough.findByBarcode('4000417025005');
+
+    expect(product, isNotNull);
+    expect(product!.servedFromStaleCache, isTrue);
+    expect(outcomes, [
+      ProductCacheOutcome.stale,
+      ProductCacheOutcome.staleServed,
+    ]);
+  });
+
+  test(
+    'read-through repository skips the cache after repeated failures',
+    () async {
+      var nowMillis = 0;
+      final outcomes = <ProductCacheOutcome>[];
+      final readThrough = ReadThroughProductRepository(
+        cache: const _FailingProductCache(ProductCacheFailureType.timeout),
+        fallback: repository,
+        onCacheOutcome: outcomes.add,
+        failureThreshold: 2,
+        failureCooldown: const Duration(minutes: 2),
+        clock: () => DateTime.fromMillisecondsSinceEpoch(nowMillis),
+      );
+
+      // Zwei Fehlversuche oeffnen den Breaker …
+      await readThrough.findByBarcode('4000417025005');
+      await readThrough.findByBarcode('4000417025005');
+      // … der dritte Lookup ueberspringt den Cache …
+      await readThrough.findByBarcode('4000417025005');
+      // … und nach Ablauf des Cooldowns wird er wieder versucht.
+      nowMillis = const Duration(minutes: 3).inMilliseconds;
+      await readThrough.findByBarcode('4000417025005');
+
+      expect(outcomes, [
+        ProductCacheOutcome.unavailable,
+        ProductCacheOutcome.unavailable,
+        ProductCacheOutcome.skipped,
+        ProductCacheOutcome.unavailable,
+      ]);
+    },
+  );
+
+  test('read-through repository rethrows the fallback failure without any '
+      'cached row', () async {
+    final readThrough = ReadThroughProductRepository(
+      cache: const _FixedProductCache(null),
+      fallback: const _FailingProductRepository(),
+    );
+
+    expect(
+      () => readThrough.findByBarcode('4000417025005'),
+      throwsA(isA<ProductLookupFailure>()),
+    );
+  });
 }
 
 class _FixedProductCache implements ProductCache {
-  const _FixedProductCache(this.product);
+  const _FixedProductCache(this.product, {this.isStale = false});
 
   final ScanFairProduct? product;
+  final bool isStale;
 
   @override
-  Future<ScanFairProduct?> findByBarcode(String barcode) async => product;
+  Future<ProductCacheLookup?> findByBarcode(String barcode) async {
+    if (product == null) return null;
+    return ProductCacheLookup(product: product!, isStale: isStale);
+  }
+}
+
+class _ThrowingProductCache implements ProductCache {
+  const _ThrowingProductCache();
+
+  @override
+  Future<ProductCacheLookup?> findByBarcode(String barcode) {
+    throw StateError('unexpected cache bug');
+  }
 }
 
 class _FailingProductCache implements ProductCache {
@@ -151,7 +249,7 @@ class _FailingProductCache implements ProductCache {
   final ProductCacheFailureType type;
 
   @override
-  Future<ScanFairProduct?> findByBarcode(String barcode) {
+  Future<ProductCacheLookup?> findByBarcode(String barcode) {
     throw ProductCacheFailure(type: type, message: 'cache test failure');
   }
 }

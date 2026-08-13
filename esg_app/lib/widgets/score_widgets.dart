@@ -85,11 +85,13 @@ class ScoreHero extends StatelessWidget {
     final semanticsLabel = displayScore == null
         ? 'Kein ESG-Gesamtscore verfügbar'
         : 'ESG-Gesamtscore $displayScore von 10';
+    final partialNote = score.partialNote;
 
     return Semantics(
       container: true,
       attributedLabel: ScanFairSemanticTerminology.annotate(
         '$semanticsLabel. ${score.verdictLabel}. '
+        '${partialNote == null ? '' : '$partialNote '}'
         'Datenvollständigkeit ${(score.dataCompleteness * 100).round()} Prozent. '
         '${score.tagline}',
       ),
@@ -142,6 +144,8 @@ class ScoreHero extends StatelessWidget {
                 runSpacing: ScanFairTokens.space2,
                 children: [
                   _Pill(label: score.verdictLabel, color: color),
+                  if (score.isPartial)
+                    const _Pill(label: 'Teilscore', color: ScanFairTokens.ink3),
                   _Pill(
                     label: 'Daten ${(score.dataCompleteness * 100).round()}%',
                     color: ScanFairTokens.ink3,
@@ -149,6 +153,10 @@ class ScoreHero extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: ScanFairTokens.space3),
+              if (score.partialNote != null) ...[
+                Text(score.partialNote!, style: textTheme.bodyMedium),
+                const SizedBox(height: ScanFairTokens.space1),
+              ],
               Text(score.tagline, style: textTheme.bodyMedium),
             ],
           ),
@@ -229,6 +237,57 @@ class SecondaryInfoCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Kennzeichnet Ergebnisse, die nicht aus einer erreichbaren Live-Quelle
+/// stammen: veralteter Cache-Eintrag (ADR 0033) oder lokaler
+/// Pilot-Fallback (Audit-Finding F-17). Rendert nichts, wenn die Daten
+/// aktuell sind.
+class DataFreshnessNotice extends StatelessWidget {
+  const DataFreshnessNotice({required this.product, super.key});
+
+  final ScanFairProduct product;
+
+  @override
+  Widget build(BuildContext context) {
+    final String message;
+    if (product.servedFromStaleCache) {
+      message =
+          'Live-Daten waren nicht erreichbar. Angezeigt wird der zuletzt '
+          'gespeicherte Datenstand.';
+    } else if (product.dataQualityWarnings.contains('pilot-source-fallback')) {
+      message =
+          'Die Produktdatenquelle war nicht erreichbar. Angezeigt werden '
+          'lokal hinterlegte Basisdaten.';
+    } else {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: ScanFairTokens.space4),
+      padding: const EdgeInsets.all(ScanFairTokens.space3),
+      decoration: BoxDecoration(
+        color: ScanFairTokens.warningBg,
+        borderRadius: BorderRadius.circular(ScanFairTokens.radiusLg),
+        border: Border.all(
+          color: ScanFairTokens.warningFg.withValues(alpha: 0.25),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.history_toggle_off, color: ScanFairTokens.warningFg),
+          const SizedBox(width: ScanFairTokens.space3),
+          Expanded(
+            child: TerminologyText(
+              message,
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+        ],
       ),
     );
   }

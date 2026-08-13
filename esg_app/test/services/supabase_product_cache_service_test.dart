@@ -64,7 +64,8 @@ void main() {
                 'environmental_score_score': 73,
               },
               'fetched_at': '2026-08-12T11:00:00Z',
-              'expires_at': '2026-08-13T11:00:00Z',
+              'stale_after': '2026-08-13T11:00:00Z',
+              'expires_at': '2026-08-19T11:00:00Z',
               'source_schema_version': 'v3',
             },
           ]),
@@ -73,10 +74,12 @@ void main() {
       }),
     );
 
-    final product = await service.findByBarcode('4000417025005');
+    final lookup = await service.findByBarcode('4000417025005');
 
-    expect(product!.name, 'Cached product');
-    expect(product.ecoscoreScore, 73);
+    expect(lookup!.product.name, 'Cached product');
+    expect(lookup.product.ecoscoreScore, 73);
+    expect(lookup.isStale, isFalse);
+    expect(lookup.fetchedAt, DateTime.utc(2026, 8, 12, 11));
     expect(captured.method, 'POST');
     expect(captured.url.path, '/rest/v1/rpc/get_fresh_cached_product');
     expect(captured.headers['apikey'], publishableKey);
@@ -97,7 +100,7 @@ void main() {
     expect(await service.findByBarcode('4000417025005'), isNull);
   });
 
-  test('rejects stale cache rows even if the backend returns one', () async {
+  test('labels stale cache rows inside the hard expiry window', () async {
     final service = SupabaseProductCacheService(
       configuration: configuration,
       clock: () => now,
@@ -107,7 +110,8 @@ void main() {
             {
               'payload': {'product_name': 'Stale product'},
               'fetched_at': '2026-08-10T11:00:00Z',
-              'expires_at': '2026-08-11T11:00:00Z',
+              'stale_after': '2026-08-11T11:00:00Z',
+              'expires_at': '2026-08-17T11:00:00Z',
             },
           ]),
           200,
@@ -115,16 +119,32 @@ void main() {
       ),
     );
 
-    await expectLater(
-      service.findByBarcode('4000417025005'),
-      throwsA(
-        isA<ProductCacheFailure>().having(
-          (failure) => failure.type,
-          'type',
-          ProductCacheFailureType.stale,
+    final lookup = await service.findByBarcode('4000417025005');
+
+    expect(lookup!.isStale, isTrue);
+    expect(lookup.product.name, 'Stale product');
+  });
+
+  test('treats rows past the hard expiry as a miss', () async {
+    final service = SupabaseProductCacheService(
+      configuration: configuration,
+      clock: () => now,
+      client: MockClient(
+        (_) async => http.Response(
+          jsonEncode([
+            {
+              'payload': {'product_name': 'Expired product'},
+              'fetched_at': '2026-08-01T11:00:00Z',
+              'stale_after': '2026-08-02T11:00:00Z',
+              'expires_at': '2026-08-08T11:00:00Z',
+            },
+          ]),
+          200,
         ),
       ),
     );
+
+    expect(await service.findByBarcode('4000417025005'), isNull);
   });
 
   test(
