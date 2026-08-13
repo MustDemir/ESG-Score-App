@@ -20,7 +20,7 @@ bash scripts/quality/run_edge_writer_integration_gate.sh
 
 `db reset --local` recreates the local database and applies every migration.
 Do not run `db reset --linked` against a non-disposable remote project.
-The 119-test pgTAP suite verifies table structure, RLS activation, fact,
+The 151-test pgTAP suite verifies table structure, RLS activation, fact,
 methodology and traceability write denial, relationship eligibility
 constraints, draft-method visibility, owner-only scan behavior and the OFF
 license-partition boundary. It also verifies writer authorization, bounded

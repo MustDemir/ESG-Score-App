@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W33
-last_updated: 2026-08-12
+last_updated: 2026-08-13
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -748,6 +748,17 @@ weekly_log:
       - Zwoelf STRIDE-/OWASP-API-Bedrohungen und acht Abuse Cases priorisiert
       - EU-Supabase-Umgebungs-, Secret-, Writer-, Ressourcen-, Audit- und Incident-Vertrag versioniert
       - G-BACKEND-BOUNDARY mit drei Aktivierungsprofilen und Hash-Evidenz integriert
+      - Ganzheitliches technisches Risiko-Audit des gesamten Repos mit Claude Code durchgefuehrt (2026-08-13)
+      - Vier P0-, zehn P1- und zehn P2-Findings mit file-line-Belegen dokumentiert (Auditbericht docs/project/audits/2026-08-13-technical-risk-audit.md)
+      - RISK-013 bis RISK-015, FM-17 und TODO-034 bis TODO-038 aus den Audit-Findings angelegt
+      - TODO-034 umgesetzt — Stuck-Spinner-Klasse behoben (finally, Catch-All, robuster Cache-Fallback, Mapper-Guard, Retry-Schleife)
+      - Doppel-Tap-Guards, Kamera-Lifecycle-pause, Permission-resumed-Fix, Pop-Guard und Cache-Outcome-Logging umgesetzt (TODO-038 teilweise)
+      - Lints unawaited_futures und discarded_futures aktiviert; fuenf neue Regressionstests fuer die Audit-Bugklassen
+      - Backend-Haertungsmigration umgesetzt (FK-Indizes, Policy-/Grant-Haertung, TTL-Cap, updated_at-Trigger, DEFINER-Trigger, private RLS, Snapshot-Unique) mit 23 neuen pgTAP-Assertions (TODO-037 teilweise)
+      - ADR 0033 akzeptiert und umgesetzt: stale_after/expires_at entkoppelt, Stale-Serving mit Client-Kennzeichnung (TODO-035)
+      - ADR 0034 akzeptiert und umgesetzt: Formel v1.1 ohne Neutral-Baselines, partialScore-State, exaktes Tag-Matching, lc=de (TODO-036)
+      - Evidence-sourceField wertgetrieben statt containsKey (F-14-Fix)
+      - Gesamtdeadline, Retry-After-Handling und Cache-Circuit-Breaker im Daten-Layer ergaenzt
     checks:
       - Scoring-Testmatrix 39/39 PASS
       - Accessibility- und Terminologietests 10/10 PASS
@@ -773,6 +784,11 @@ weekly_log:
       - Backend-Release-Candidate-Profil erwartungsgemaess FAIL ohne separaten aktuellen Security-Review
       - Development Quality Pipeline 25/25 PASS
       - Flutter-Test-Suite 93/93 PASS, Line-Coverage 85.16 Prozent
+      - Nach Audit-Fixes: Flutter Analyze PASS (inkl. neuer Future-Lints), Flutter-Test-Suite 106/106 PASS, Line-Coverage 84.28 Prozent (Gate 60)
+      - Nach Audit-Fixes: Development Quality Pipeline Decision PASS
+      - Backend-Haertung: Migration-Replay mit acht Migrationen, pgTAP 146/146 und DB-Lint PASS
+      - Backend-Haertung: Edge-Writer-Integrationsgate PASS nach service_role-Revoke
+      - Nach ADR-0033/0034-Umsetzung: Flutter 121/121 PASS, pgTAP 151/151 mit neun Migrationen PASS, Edge-Gate PASS, Pipeline Decision PASS
     blockers:
       - Dynamische externe Produktwerte und rohe Tags brauchen sprachsichere Anzeige-Metadaten
       - MASVS Release Candidate blockiert bis Storage-/Logging-, TLS-, Mindest-iOS-, Kamera- und Privacy-Evidenz vorliegt
