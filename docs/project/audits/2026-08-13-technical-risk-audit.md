@@ -49,7 +49,7 @@ und die bestätigten Bugs sind deckungsgleich.
 - **Betroffene Stellen:** `esg_app/lib/screens/home_screen.dart:49-58` (nur
   `on ProductLookupFailure`, kein `finally`, kein Catch-All);
   `esg_app/lib/services/open_food_facts_service.dart:81-98` (fängt nur
-  `ProductLookupFailure`, `TimeoutException`, `http.ClientException` — 
+  `ProductLookupFailure`, `TimeoutException`, `http.ClientException` —
   `HandshakeException`/`CertificateException` sind keins davon);
   `esg_app/lib/services/product_repository.dart:106` (fängt nur `ProductCacheFailure`).
   Zusätzlich ungeschützt: der OFF-Pfad ruft den 604-Zeilen-Mapper ohne Guard auf
