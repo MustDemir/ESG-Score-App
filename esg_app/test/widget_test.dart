@@ -71,7 +71,7 @@ void main() {
 
     expect(find.text('Ergebnis'), findsOneWidget);
     expect(find.text('Positive Signale'), findsOneWidget);
-    expect(find.text('7.4'), findsOneWidget);
+    expect(find.text('7.0'), findsOneWidget);
   });
 
   testWidgets('Manual barcode can open low-data state', (tester) async {
@@ -125,6 +125,70 @@ void main() {
     expect(scheme.surface, const Color(0xFFFBFAF6));
   });
 
+  testWidgets('Unexpected repository exception recovers the scan flow', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ScanFairApp(repository: _CrashingProductRepository()),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '4000417025005');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pumpAndSettle();
+
+    // Der unerwartete Fehler landet im Fehler-Screen statt die App zu sperren.
+    expect(find.text('Produktdaten nicht lesbar'), findsOneWidget);
+    expect(find.text('Erneut versuchen'), findsNothing);
+
+    await tester.tap(find.text('Zurueck'));
+    await tester.pumpAndSettle();
+
+    // _isLoading hat sich erholt: Scan-Button und manuelle Eingabe sind aktiv.
+    expect(
+      find.widgetWithText(ElevatedButton, 'Barcode scannen'),
+      findsOneWidget,
+    );
+    expect(find.text('Scan wird geprüft'), findsNothing);
+    expect(tester.widget<TextField>(find.byType(TextField)).enabled, isTrue);
+  });
+
+  testWidgets('Retry from the error screen repeats the lookup', (tester) async {
+    final repository = _FlakyProductRepository(failuresBeforeSuccess: 1);
+    await tester.pumpWidget(ScanFairApp(repository: repository));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), '4000417025005');
+    await tester.tap(find.byTooltip('Barcode prüfen'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Keine Verbindung'), findsOneWidget);
+
+    await tester.tap(find.text('Erneut versuchen'));
+    await tester.pumpAndSettle();
+
+    expect(repository.lookups, 2);
+    expect(find.text('Ergebnis'), findsOneWidget);
+  });
+
+  testWidgets('Double tap opens only one scanner screen', (tester) async {
+    await tester.pumpWidget(
+      buildDemoApp(
+        scannerViewportBuilder: (context, onBarcodeDetected) =>
+            const ColoredBox(color: Colors.black),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final scanButton = find.widgetWithText(ElevatedButton, 'Barcode scannen');
+    await tester.tap(scanButton);
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(scanButton, warnIfMissed: false);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ScannerScreen), findsOneWidget);
+  });
+
   testWidgets('Network failure opens a retryable error state', (tester) async {
     await tester.pumpWidget(
       ScanFairApp(
@@ -158,6 +222,45 @@ class _FailingProductRepository implements ProductRepository {
       type: ProductLookupFailureType.noConnection,
       message: 'Open Food Facts ist momentan nicht erreichbar.',
     );
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
+}
+
+class _CrashingProductRepository implements ProductRepository {
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    throw StateError('unexpected repository bug');
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
+}
+
+class _FlakyProductRepository implements ProductRepository {
+  _FlakyProductRepository({required this.failuresBeforeSuccess});
+
+  final int failuresBeforeSuccess;
+  final _delegate = DemoProductRepository();
+  int lookups = 0;
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    lookups += 1;
+    if (lookups <= failuresBeforeSuccess) {
+      throw const ProductLookupFailure(
+        type: ProductLookupFailureType.noConnection,
+        message: 'Open Food Facts ist momentan nicht erreichbar.',
+      );
+    }
+    return _delegate.findByBarcode(barcode);
   }
 
   @override

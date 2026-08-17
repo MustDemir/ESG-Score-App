@@ -24,6 +24,7 @@ class LowDataScreen extends StatelessWidget {
         children: [
           ProductSummaryCard(product: product),
           const SizedBox(height: ScanFairTokens.space4),
+          DataFreshnessNotice(product: product),
           Semantics(
             container: true,
             attributedLabel: ScanFairSemanticTerminology.annotate(

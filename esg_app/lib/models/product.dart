@@ -46,20 +46,49 @@ class ScanFairProduct {
   final List<ESGEvidence> evidence;
   final List<ESGRelationship> relationships;
 
+  /// Kennzeichnung fuer Daten, die aus einem veralteten Cache-Eintrag
+  /// stammen, weil die Live-Quelle nicht erreichbar war (ADR 0033).
+  static const staleCacheWarning = 'stale-cache';
+
+  bool get servedFromStaleCache =>
+      dataQualityWarnings.contains(staleCacheWarning);
+
+  /// Liefert eine Kopie mit einer zusaetzlichen Datenqualitaets-Warnung.
+  ScanFairProduct withDataQualityWarning(String warning) {
+    if (dataQualityWarnings.contains(warning)) return this;
+    return ScanFairProduct(
+      barcode: barcode,
+      name: name,
+      brand: brand,
+      category: category,
+      imageEmoji: imageEmoji,
+      productType: productType,
+      ecoscoreGrade: ecoscoreGrade,
+      ecoscoreScore: ecoscoreScore,
+      co2Total: co2Total,
+      ingredientsText: ingredientsText,
+      nutritionSourceLabel: nutritionSourceLabel,
+      nutritionFacts: nutritionFacts,
+      packagingTags: packagingTags,
+      originTags: originTags,
+      labelsTags: labelsTags,
+      dataQualityTags: dataQualityTags,
+      dataQualityWarnings: [...dataQualityWarnings, warning],
+      evidence: evidence,
+      relationships: relationships,
+    );
+  }
+
   bool get hasEnvironmentalSignal =>
       ecoscoreScore != null ||
       (ecoscoreGrade != null && ecoscoreGrade!.trim().isNotEmpty);
 
-  bool get hasSocialSignal =>
-      labelsTags.isNotEmpty ||
-      originTags.isNotEmpty ||
-      (ingredientsText != null && ingredientsText!.trim().isNotEmpty);
+  // Eine blosse Zutatenliste oder ein Markenname sind keine wertbare
+  // Social-/Governance-Evidenz (ADR 0034).
+  bool get hasSocialSignal => labelsTags.isNotEmpty || originTags.isNotEmpty;
 
   bool get hasGovernanceSignal =>
-      hasKnownBrand ||
-      dataQualityTags.isNotEmpty ||
-      dataQualityWarnings.isNotEmpty ||
-      (ingredientsText != null && ingredientsText!.trim().isNotEmpty);
+      dataQualityTags.isNotEmpty || dataQualityWarnings.isNotEmpty;
 
   bool get hasKnownBrand {
     final normalized = brand.trim().toLowerCase();

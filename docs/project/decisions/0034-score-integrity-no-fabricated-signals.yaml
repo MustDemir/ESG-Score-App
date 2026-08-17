@@ -1,0 +1,87 @@
+id: 0034
+title: No fabricated pillar values and no full-score claim from partial evidence
+date: 2026-08-13
+status: accepted
+deciders: [Mustafa]
+tags: [scoring, esg, methodology, transparency, data-quality]
+
+context: |
+  The app promises "Wir zeigen nur belegte Signale und verzichten auf
+  Schätzung" (esg_score.dart). Three implemented behaviors contradict that
+  promise (RISK-014, audit findings F-03 and F-13):
+
+  1. Neutral baselines fabricate pillar values. A product whose only social
+     signal is the existence of an ingredients list receives Social = 50
+     ("Neutraler Startwert"); a known brand alone yields Governance = 50.
+     These fabricated 50s enter the total with 30% and 20% weight.
+  2. Weight renormalization turns one pillar into a full score. A product
+     with only an eco-score of 80 yields total = 80, state = fullScore and a
+     green traffic light at 1/3 data completeness.
+  3. Unanchored substring matching misfires: "bio" matches inside
+     "antibiotics" (+20 organic bonus), "palm" inside "palmitate" (-15
+     penalty); labels and origins share one bag; no lc/cc parameter is sent,
+     so keyword heuristics run against unpredictable languages.
+
+options_considered:
+  - name: Keep the current heuristics, adjust copy
+    pros:
+      - no code change
+    cons:
+      - the copy would have to stop claiming evidence-only scoring
+      - greenwashing and EU 2024/825 exposure remain (RISK-007)
+
+  - name: Evidence-only pillars, explicit partial state, exact tag matching
+    pros:
+      - aligns the formula with the app's central claim
+      - honest UI state instead of a manufactured green light
+      - removes a whole class of false positives deterministically
+    cons:
+      - fewer products get an aggregate score
+      - visible behavior change; tests and copy must move together
+
+decision: |
+  Option 2:
+  1. Remove the neutral baselines. A pillar without positive or negative
+     evidence is "nicht bewertet" (null), never 50. hasSocialSignal /
+     hasGovernanceSignal stop counting a bare ingredients list or brand name
+     as scoreable evidence.
+  2. Introduce ScoreState.partialScore. An aggregate is only state fullScore
+     when all three pillars carry real evidence. With Environmental evidence
+     plus at most one further pillar the state is partialScore: the total and
+     traffic light render with an explicit partial marker ("nur Umwelt
+     belegt"), never as an unqualified green. ADR 0027 stays authoritative:
+     no Environmental evidence means no aggregate at all.
+  3. Replace substring matching with exact matching on prefix-normalized OFF
+     tags (strip only a leading language prefix, compare whole tags); match
+     labels and origins separately; request lc=de and product_name_de.
+  4. Bind the scoring constants (weights, grade map, deltas, traffic-light
+     cut-offs) to formulaVersion and bump it to 1.1; score results must be
+     reproducible from a versioned artifact.
+
+rationale: |
+  A score built from fabricated neutrals is estimation, which the product
+  explicitly disclaims. The change trades coverage for defensibility, which
+  is the project's stated priority (claim inventory, G-CLAIM-SAFETY) and a
+  legal necessity under Directive (EU) 2024/825 from September 2026. Doing
+  this before M5 calibration prevents calibrating weights against fabricated
+  inputs.
+
+consequences:
+  - esg_score_calculator.dart drops both baselines; tests that lock in the
+    fabricated behavior are rewritten to lock in the evidence-only behavior.
+  - ESGScore gains partialScore; ScoreHero and result/low-data routing
+    distinguish full, partial and incomplete explicitly.
+  - Tag matching becomes exact; regression tests cover the
+    bio-in-antibiotics and palm-in-palmitate classes.
+  - OFF requests send lc=de; German display names are preferred when
+    present (relates to TODO-033).
+  - formulaVersion 1.1 with a documented constant table; claim inventory and
+    method footnote copy are updated in the same change.
+
+
+supersedes: null
+superseded_by: null
+related:
+  - 0010
+  - 0011
+  - 0027

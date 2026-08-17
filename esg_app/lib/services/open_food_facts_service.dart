@@ -15,13 +15,16 @@ class OpenFoodFactsService {
     this.requestTimeout = const Duration(seconds: 8),
     this.maxAttempts = 3,
     this.retryBaseDelay = const Duration(milliseconds: 250),
+    this.overallDeadline = const Duration(seconds: 12),
     this.userAgent = defaultUserAgent,
     this.mapper = const OpenFoodFactsProductMapper(),
     RetryDelay? delay,
+    Stopwatch Function()? stopwatchFactory,
   }) : assert(maxAttempts > 0),
        _client = client ?? http.Client(),
        _ownsClient = client == null,
-       _delay = delay ?? _defaultDelay;
+       _delay = delay ?? _defaultDelay,
+       _stopwatchFactory = stopwatchFactory ?? Stopwatch.new;
 
   static const defaultUserAgent =
       'ScanFair/0.1 (https://github.com/MustDemir/ESG-Score-App)';
@@ -30,6 +33,7 @@ class OpenFoodFactsService {
   static const _fields = <String>[
     'code',
     'product_name',
+    'product_name_de',
     'brands',
     'categories_tags',
     'image_front_small_url',
@@ -62,8 +66,14 @@ class OpenFoodFactsService {
   final Duration requestTimeout;
   final int maxAttempts;
   final Duration retryBaseDelay;
+
+  /// Obergrenze fuer den gesamten Lookup inklusive aller Retries — der
+  /// Nutzer wartet nie laenger als diese Deadline (Audit-Finding F-15).
+  final Duration overallDeadline;
+
   final String userAgent;
   final OpenFoodFactsProductMapper mapper;
+  final Stopwatch Function() _stopwatchFactory;
 
   Future<ScanFairProduct?> findByBarcode(String barcode) async {
     final normalized = barcode.trim();
@@ -74,6 +84,7 @@ class OpenFoodFactsService {
       );
     }
 
+    final elapsed = _stopwatchFactory()..start();
     ProductLookupFailure? lastFailure;
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
@@ -97,15 +108,28 @@ class OpenFoodFactsService {
         if (attempt == maxAttempts) throw lastFailure;
       }
 
-      await _delay(_backoffFor(attempt));
+      // Bei 429 hat das vom Server angeforderte Warteintervall Vorrang vor
+      // dem eigenen Backoff — alles andere verstaerkt das Rate-Limit (F-15).
+      var delay = _backoffFor(attempt);
+      final retryAfter = lastFailure.retryAfter;
+      if (retryAfter != null && retryAfter > delay) delay = retryAfter;
+
+      // Kein weiterer Versuch, wenn die Gesamtdeadline ueberschritten wuerde.
+      if (elapsed.elapsed + delay + requestTimeout > overallDeadline) {
+        throw lastFailure;
+      }
+      await _delay(delay);
     }
 
     throw lastFailure!;
   }
 
   Future<ScanFairProduct?> _requestProduct(String barcode) async {
+    // lc=de bevorzugt deutsche Feldwerte; ohne den Parameter kommen
+    // Produktnamen in der Hauptsprache des Produkts (ADR 0034).
     final uri = Uri.https(_host, '/api/v3/product/$barcode.json', {
       'fields': _fields.join(','),
+      'lc': 'de',
     });
     final response = await _client
         .get(
@@ -120,6 +144,7 @@ class OpenFoodFactsService {
         type: ProductLookupFailureType.rateLimited,
         message: 'Zu viele Produktabfragen. Bitte kurz warten.',
         statusCode: response.statusCode,
+        retryAfter: _retryAfter(response.headers['retry-after']),
       );
     }
     if (_isTemporaryServerError(response.statusCode)) {
@@ -152,11 +177,21 @@ class OpenFoodFactsService {
 
     final product = payload['product'];
     if (product is Map) {
-      return mapper.map(
-        Map<String, Object?>.from(product),
-        barcode: barcode,
-        retrievedAt: DateTime.now().toUtc(),
-      );
+      // Mapper-Fehler werden wie im Supabase-Pfad als invalidResponse
+      // klassifiziert, statt als rohe Exception die UI zu erreichen (FM-17).
+      try {
+        return mapper.map(
+          Map<String, Object?>.from(product),
+          barcode: barcode,
+          retrievedAt: DateTime.now().toUtc(),
+        );
+      } on Object catch (error) {
+        throw ProductLookupFailure(
+          type: ProductLookupFailureType.invalidResponse,
+          message: 'Die Produktdaten konnten nicht verarbeitet werden.',
+          cause: error,
+        );
+      }
     }
 
     final result = payload['result'];
@@ -171,6 +206,12 @@ class OpenFoodFactsService {
 
   Duration _backoffFor(int completedAttempt) {
     return retryBaseDelay * (1 << (completedAttempt - 1));
+  }
+
+  Duration? _retryAfter(String? headerValue) {
+    final seconds = int.tryParse(headerValue?.trim() ?? '');
+    if (seconds == null || seconds <= 0) return null;
+    return Duration(seconds: seconds);
   }
 
   bool _isTemporaryServerError(int statusCode) {

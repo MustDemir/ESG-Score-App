@@ -86,7 +86,11 @@ Deno.serve(async (request: Request) => {
           p_actor_type: actor,
           p_barcode: barcode,
           p_correlation_id: input.correlationId,
-          p_expires_at: new Date(fetchedAt.getTime() + 86_400_000).toISOString(),
+          // Hard serving bound (7 days, ADR 0033); the 24h freshness marker
+          // (stale_after) is derived server-side by the cache trigger.
+          p_expires_at: new Date(
+            fetchedAt.getTime() + 7 * 86_400_000,
+          ).toISOString(),
           p_fetched_at: fetchedAt.toISOString(),
           p_payload: JSON.parse(canonicalJson(product)),
           p_request_id: input.requestId,

@@ -1,4 +1,4 @@
-last_updated: 2026-05-19
+last_updated: 2026-08-13
 
 # =============================================================================
 # Failure-Modes-Register
@@ -242,6 +242,26 @@ failure_modes:
       - Klare Kommunikation bei Tier-Changes
       - Bestehende User behalten alte Bedingungen ("Grandfathering")
     related: [ADR-0006]
+
+  - id: FM-17
+    category: error_handling
+    title: "Zu enge Exception-Filter — unerwartete Fehlerklasse friert UI-State ein"
+    frequency: high
+    severity: critical
+    symptoms:
+      - try/catch fängt nur die eigene Failure-Klasse, kein finally, kein Catch-All
+      - Loading-Flag bleibt nach TLS-/Parse-/Typfehler dauerhaft true
+      - Fire-and-forget-Futures ohne Error-Handler (unawaited_futures-Lint aus)
+      - App wirkt "tot" ohne Fehlermeldung, erst Neustart hilft
+    our_defense:
+      - Loading-Flags IMMER in finally zurücksetzen
+      - Letzte Verteidigungslinie: Catch-All auf UI-Ebene routet in Fehler-Screen
+      - Mapper-/Parser-Aufrufe an jeder Quelle wrappen (Paritätsregel zwischen Pfaden)
+      - Lints unawaited_futures + discarded_futures in analysis_options.yaml aktivieren
+      - Test mit Repository das eine plain Exception wirft (Erholung des UI-States beweisen)
+    related: [RISK-009, TODO-034]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md (F-01, F-07, F-09)
+    created: 2026-08-13
 
 # =============================================================================
 # REVIEW-RHYTHMUS

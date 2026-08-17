@@ -1,0 +1,87 @@
+id: 0033
+title: Cache freshness must be decoupled from the upstream refresh budget
+date: 2026-08-13
+status: accepted
+deciders: [Mustafa]
+tags: [backend, cache, supabase, scaling, open-food-facts]
+
+context: |
+  The trusted writer path limits upstream Open Food Facts fetches to 500 per
+  UTC day (claim_writer_capacity) as a deliberate cost and abuse control
+  (THR-007). Independently, the Edge writer publishes every cache row with a
+  24-hour expires_at, and get_fresh_cached_product serves nothing past that
+  timestamp.
+
+  The product of the two values was never computed: with a 24-hour TTL and
+  500 refreshes per day, the steady-state maximum of simultaneously fresh
+  products is 500. At the roadmap target of 10k-100k products the cache hit
+  rate approaches zero and Open Food Facts absorbs the full scan volume —
+  exactly the rate-limit exposure ADR 0022 cites as the motivation for the
+  cache. The 146-test suite cannot surface this because tests publish a
+  single product. Recorded as RISK-013 and audit finding F-02
+  (docs/project/audits/2026-08-13-technical-risk-audit.md).
+
+options_considered:
+  - name: Raise the daily budget by two orders of magnitude
+    pros:
+      - smallest code change, cache semantics stay simple
+    cons:
+      - abandons the cost control the budget exists for
+      - still couples freshness linearly to spend forever
+      - blanket refresh wastes budget on products nobody scans
+
+  - name: Serve stale-but-labeled rows (decouple freshness from deletion)
+    pros:
+      - a cached product stays useful after its freshness window instead of
+        vanishing; hit rate no longer capped by budget times TTL
+      - the client already models this outcome (ProductCacheOutcome.stale)
+        and re-validates freshness client-side
+      - keeps the 500/day cost control unchanged
+      - honest UX ("Stand: vor 3 Tagen") fits the transparency-first claims
+    cons:
+      - needs a schema change (separate stale_after marker), an Edge writer
+        change and a client label
+      - stale data shown to users must be visibly dated
+
+  - name: Demand-driven refresh from scan telemetry
+    pros:
+      - budget flows to products users actually scan
+    cons:
+      - requires scan telemetry that does not exist yet (privacy review
+        needed before any collection)
+      - does not help the long tail on its own
+
+decision: |
+  Adopt option 2 now, option 3 later. Cache rows carry two timestamps:
+  stale_after (24 hours, freshness quality signal) and expires_at (hard
+  serving bound, at most 7 days per cached_products_ttl_bound_check from
+  migration 20260813000100). get_fresh_cached_product keeps serving rows
+  until expires_at but reports staleness; the Flutter client labels stale
+  data with its age instead of discarding it. The 500/day budget stays.
+  Demand-driven refresh is revisited once scan telemetry has passed the
+  privacy boundary (G-PRIVACY-BOUNDARY).
+
+rationale: |
+  Freshness and cost are different concerns and need different knobs. The
+  budget protects cost and the upstream provider; the freshness window
+  protects data quality claims. Coupling them through row deletion made the
+  cache arithmetically useless at target scale while every individual test
+  passed. Serving dated-but-labeled data matches the app's evidence-first
+  positioning better than silently falling through to a rate-limited
+  upstream on every scan.
+
+consequences:
+  - Migration adds stale_after to cached_products; the Edge writer sets
+    stale_after = fetched_at + 24h and expires_at = fetched_at + 7d.
+  - get_fresh_cached_product returns an is_stale flag; the client maps it to
+    the existing stale outcome and shows the data age.
+  - The client-side freshness re-validation in SupabaseProductCacheService
+    switches from rejecting stale rows to labeling them.
+  - pgTAP coverage for the stale-serving window.
+
+
+supersedes: null
+superseded_by: null
+related:
+  - 0022
+  - 0032

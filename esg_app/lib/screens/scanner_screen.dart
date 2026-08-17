@@ -57,16 +57,26 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!_usesPhysicalCamera || !_controller.value.hasCameraPermission) return;
+    if (!_usesPhysicalCamera) return;
 
     switch (state) {
       case AppLifecycleState.resumed:
+        // Auch nach verweigerter Berechtigung erneut versuchen: Wer den
+        // Zugriff in den Einstellungen erlaubt hat, soll beim Zurueckkehren
+        // sofort wieder scannen koennen.
         if (!_hasCompleted) unawaited(_startScanner());
       case AppLifecycleState.inactive:
+        // Kurze Unterbrechungen (Notification, Control Center, Anruf) nur
+        // pausieren — stop() wuerde die Kamera-Session komplett abbauen.
+        if (_controller.value.hasCameraPermission) {
+          unawaited(_pauseScanner());
+        }
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
-        unawaited(_stopScanner());
+        if (_controller.value.hasCameraPermission) {
+          unawaited(_stopScanner());
+        }
     }
   }
 
@@ -79,6 +89,10 @@ class _ScannerScreenState extends State<ScannerScreen>
     _hasCompleted = true;
     if (_usesPhysicalCamera) await _stopScanner();
     if (!mounted) return;
+    // Waehrend _stopScanner kann der Close-Button den Screen bereits gepoppt
+    // haben; ein zweiter pop wuerde sonst den HomeScreen entfernen.
+    final route = ModalRoute.of(context);
+    if (route != null && !route.isCurrent) return;
     Navigator.of(context).pop(barcode);
   }
 
@@ -101,9 +115,17 @@ class _ScannerScreenState extends State<ScannerScreen>
     };
   }
 
+  var _isRestarting = false;
+
   Future<void> _restartScanner() async {
-    await _stopScanner();
-    await _startScanner();
+    if (_isRestarting) return;
+    _isRestarting = true;
+    try {
+      await _stopScanner();
+      await _startScanner();
+    } finally {
+      _isRestarting = false;
+    }
   }
 
   Future<void> _startScanner() async {
@@ -111,6 +133,14 @@ class _ScannerScreenState extends State<ScannerScreen>
       await _controller.start();
     } on MobileScannerException {
       // The controller publishes the native error for ScannerErrorView.
+    }
+  }
+
+  Future<void> _pauseScanner() async {
+    try {
+      await _controller.pause();
+    } on MobileScannerException {
+      // Pausing an unavailable camera must not block the lifecycle.
     }
   }
 
@@ -184,7 +214,13 @@ class _ScannerScreenState extends State<ScannerScreen>
                             _ScannerControlButton(
                               icon: Icons.close,
                               tooltip: 'Scanner schließen',
-                              onPressed: () => Navigator.of(context).maybePop(),
+                              onPressed: () {
+                                // Verhindert, dass eine parallel laufende
+                                // Barcode-Erkennung nach dem Schliessen noch
+                                // ein Ergebnis poppt.
+                                _hasCompleted = true;
+                                unawaited(Navigator.of(context).maybePop());
+                              },
                             ),
                             if (_usesPhysicalCamera)
                               _ScannerControlButton(
@@ -240,7 +276,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 ScannerErrorView(
                   failure: failure,
                   onRetry: _restartScanner,
-                  onBack: () => Navigator.of(context).maybePop(),
+                  onBack: () => unawaited(Navigator.of(context).maybePop()),
                 ),
             ],
           ),

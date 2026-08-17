@@ -7,7 +7,7 @@
 
 set -euo pipefail
 
-UA="${OPENFOODFACTS_USER_AGENT:-ScanFair-Smoketest/0.1 (business.demir@gmail.com)}"
+UA="${OPENFOODFACTS_USER_AGENT:-ScanFair-Smoketest/0.1 (https://github.com/MustDemir/ESG-Score-App)}"
 API="https://world.openfoodfacts.org/api/v2/product"
 FIELDS="product_name,brands,nutriments,ecoscore_grade,nutriscore_grade,categories_tags,ingredients_text_de,countries_tags"
 

@@ -1,4 +1,4 @@
-enum ScoreState { fullScore, dataIncomplete, notFound }
+enum ScoreState { fullScore, partialScore, dataIncomplete, notFound }
 
 enum TrafficLight { green, yellow, red, grey }
 
@@ -12,7 +12,7 @@ class ESGScore {
     this.social,
     this.governance,
     this.total,
-    this.sources = const ['Open Food Facts', 'ScanFair Methodik v1.0'],
+    this.sources = const ['Open Food Facts', 'ScanFair Methodik v1.1'],
   });
 
   final ScoreState state;
@@ -23,13 +23,25 @@ class ESGScore {
   final double dataCompleteness;
   final List<String> sources;
 
-  static const formulaVersion = '1.0';
+  static const formulaVersion = '1.1';
 
   bool get hasFullScore => state == ScoreState.fullScore && total != null;
 
+  /// Voll- oder Teilscore mit vorhandenem Gesamtwert (ADR 0034).
+  bool get hasAggregateScore =>
+      total != null &&
+      (state == ScoreState.fullScore || state == ScoreState.partialScore);
+
+  bool get isPartial => state == ScoreState.partialScore;
+
+  /// Sichtbarer Hinweis, dass der Gesamtwert nicht auf allen drei Säulen
+  /// beruht — ein Teilscore darf nie als unqualifiziertes Grün erscheinen.
+  String? get partialNote =>
+      isPartial ? 'Teilscore: nicht alle Säulen sind belegt.' : null;
+
   TrafficLight get trafficLight {
     final value = total;
-    if (state != ScoreState.fullScore || value == null) {
+    if (!hasAggregateScore || value == null) {
       return TrafficLight.grey;
     }
     if (value >= 70) return TrafficLight.green;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../accessibility/semantic_terminology.dart';
@@ -35,6 +37,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _barcodeController = TextEditingController();
   var _isLoading = false;
+  var _scannerOpen = false;
+  var _detailsOpen = false;
 
   @override
   void dispose() {
@@ -46,81 +50,115 @@ class _HomeScreenState extends State<HomeScreen> {
     final normalizedBarcode = barcode.trim();
     if (normalizedBarcode.isEmpty || _isLoading) return;
 
-    setState(() => _isLoading = true);
-    ScanFairProduct? product;
-    ProductLookupFailure? failure;
-    try {
-      product = await widget.repository.findByBarcode(normalizedBarcode);
-    } on ProductLookupFailure catch (error) {
-      failure = error;
-    }
-    if (!mounted) return;
-    setState(() => _isLoading = false);
+    // Schleife statt Callback-Rekursion: "Erneut versuchen" auf dem
+    // Fehler-Screen liefert true zurueck und startet den Lookup neu.
+    while (true) {
+      final result = await _lookup(normalizedBarcode);
+      if (!mounted) return;
 
-    if (failure != null) {
+      final failure = result.failure;
+      if (failure != null) {
+        final retry = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(
+            builder: (_) => LookupErrorScreen(failure: failure),
+          ),
+        );
+        if (retry == true && mounted) continue;
+        return;
+      }
+
+      final product = result.product;
+      if (product == null) {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => NotFoundScreen(barcode: normalizedBarcode),
+          ),
+        );
+        return;
+      }
+
+      final score = widget.calculator.calculate(product);
+      if (score.state == ScoreState.dataIncomplete) {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute(
+            builder: (_) => LowDataScreen(product: product, score: score),
+          ),
+        );
+        return;
+      }
+
       await Navigator.of(context).push<void>(
         MaterialPageRoute(
-          builder: (_) => LookupErrorScreen(
-            failure: failure!,
-            onRetry: () {
-              Navigator.of(context).pop();
-              _openBarcode(normalizedBarcode);
-            },
+          builder: (_) => ResultScreen(
+            product: product,
+            score: score,
+            alternative: widget.repository.suggestAlternativeFor(product),
+            onOpenDetails: () => unawaited(_openDetails(product, score)),
           ),
         ),
       );
       return;
     }
-
-    if (product == null) {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute(
-          builder: (_) => NotFoundScreen(barcode: normalizedBarcode),
-        ),
-      );
-      return;
-    }
-
-    final foundProduct = product;
-    final score = widget.calculator.calculate(foundProduct);
-    if (score.state == ScoreState.dataIncomplete) {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute(
-          builder: (_) => LowDataScreen(product: foundProduct, score: score),
-        ),
-      );
-      return;
-    }
-
-    await Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => ResultScreen(
-          product: foundProduct,
-          score: score,
-          alternative: widget.repository.suggestAlternativeFor(foundProduct),
-          onOpenDetails: () => _openDetails(foundProduct, score),
-        ),
-      ),
-    );
   }
 
-  void _openDetails(ScanFairProduct product, ESGScore score) {
-    Navigator.of(context).push<void>(
-      MaterialPageRoute(
-        builder: (_) => DetailScreen(product: product, score: score),
-      ),
-    );
+  Future<({ScanFairProduct? product, ProductLookupFailure? failure})> _lookup(
+    String barcode,
+  ) async {
+    setState(() => _isLoading = true);
+    try {
+      final product = await widget.repository.findByBarcode(barcode);
+      return (product: product, failure: null);
+    } on ProductLookupFailure catch (error) {
+      return (product: null, failure: error);
+    } on Object catch (error) {
+      // Letzte Verteidigungslinie (FM-17): unerwartete Fehler wie TLS- oder
+      // Mapping-Ausnahmen duerfen die App nicht dauerhaft sperren.
+      return (
+        product: null,
+        failure: ProductLookupFailure(
+          type: ProductLookupFailureType.invalidResponse,
+          message:
+              'Bei der Produktabfrage ist ein unerwarteter Fehler '
+              'aufgetreten. Bitte versuche es erneut.',
+          cause: error,
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _openDetails(ScanFairProduct product, ESGScore score) async {
+    if (_detailsOpen || !mounted) return;
+    _detailsOpen = true;
+    try {
+      await Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => DetailScreen(product: product, score: score),
+        ),
+      );
+    } finally {
+      _detailsOpen = false;
+    }
   }
 
   Future<void> _openScanner() async {
-    if (_isLoading) return;
+    if (_isLoading || _scannerOpen) return;
 
-    final barcode = await Navigator.of(context).push<String>(
-      MaterialPageRoute(
-        builder: (_) =>
-            ScannerScreen(viewportBuilder: widget.scannerViewportBuilder),
-      ),
-    );
+    // Guard gegen Doppel-Tap: zwei ScannerScreens wuerden um die einzige
+    // Kamera-Session konkurrieren und eine tote Preview hinterlassen.
+    _scannerOpen = true;
+    final String? barcode;
+    try {
+      barcode = await Navigator.of(context).push<String>(
+        MaterialPageRoute(
+          builder: (_) =>
+              ScannerScreen(viewportBuilder: widget.scannerViewportBuilder),
+        ),
+      );
+    } finally {
+      _scannerOpen = false;
+    }
     if (!mounted || barcode == null) return;
     await _openBarcode(barcode);
   }
@@ -153,11 +191,15 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: ScanFairTokens.space2),
             Text("Was gibt's heute im Wagen?", style: textTheme.displayMedium),
             const SizedBox(height: ScanFairTokens.space5),
-            _PrimaryScanButton(isLoading: _isLoading, onPressed: _openScanner),
+            _PrimaryScanButton(
+              isLoading: _isLoading,
+              onPressed: () => unawaited(_openScanner()),
+            ),
             const SizedBox(height: ScanFairTokens.space4),
             _ManualBarcodeCard(
               controller: _barcodeController,
-              onSubmit: () => _openBarcode(_barcodeController.text),
+              isLoading: _isLoading,
+              onSubmit: () => unawaited(_openBarcode(_barcodeController.text)),
             ),
             const SizedBox(height: ScanFairTokens.space5),
             Text('Was du scannen kannst', style: textTheme.titleMedium),
@@ -188,7 +230,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(
                       ScanFairTokens.radiusLg,
                     ),
-                    onTap: () => _openBarcode(product.barcode),
+                    onTap: _isLoading
+                        ? null
+                        : () => unawaited(_openBarcode(product.barcode)),
                     child: ProductSummaryCard(product: product, compact: true),
                   ),
                 ),
@@ -221,7 +265,13 @@ class _PrimaryScanButton extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.qr_code_scanner_outlined),
+            if (isLoading)
+              const SizedBox.square(
+                dimension: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              )
+            else
+              const Icon(Icons.qr_code_scanner_outlined),
             const SizedBox(width: ScanFairTokens.space3),
             Expanded(
               child: Text(isLoading ? 'Scan wird geprüft' : 'Barcode scannen'),
@@ -235,9 +285,14 @@ class _PrimaryScanButton extends StatelessWidget {
 }
 
 class _ManualBarcodeCard extends StatelessWidget {
-  const _ManualBarcodeCard({required this.controller, required this.onSubmit});
+  const _ManualBarcodeCard({
+    required this.controller,
+    required this.isLoading,
+    required this.onSubmit,
+  });
 
   final TextEditingController controller;
+  final bool isLoading;
   final VoidCallback onSubmit;
 
   @override
@@ -250,6 +305,7 @@ class _ManualBarcodeCard extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: controller,
+                enabled: !isLoading,
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.search,
                 decoration: const InputDecoration(
@@ -261,7 +317,7 @@ class _ManualBarcodeCard extends StatelessWidget {
             ),
             const SizedBox(width: ScanFairTokens.space3),
             IconButton.filled(
-              onPressed: onSubmit,
+              onPressed: isLoading ? null : onSubmit,
               icon: const Icon(Icons.search),
               tooltip: 'Barcode prüfen',
             ),

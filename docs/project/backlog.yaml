@@ -1,4 +1,4 @@
-last_updated: 2026-08-11
+last_updated: 2026-08-13
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -825,3 +825,187 @@ todos:
     evidence:
       - docs/project/accessibility/voiceover-language-policy.md
     created: 2026-08-10
+
+  # =========================================================================
+  # AUDIT-FINDINGS 2026-08-13 (durchgefuehrt mit Claude Code)
+  # Vollstaendiger Auditbericht:
+  # docs/project/audits/2026-08-13-technical-risk-audit.md
+  # =========================================================================
+  - id: TODO-034
+    title: Stuck-Spinner-Klasse beheben — Catch-All, finally und Fallback-Robustheit
+    description: |
+      F-01 + F-07 + F-09 des Audits: _openBarcode faengt nur
+      ProductLookupFailure ohne finally; TLS-/Mapper-Fehler frieren die App
+      dauerhaft ein. Der Read-Through faengt nur ProductCacheFailure, sodass
+      ein Cache-Fehler den OFF-Fallback killt. Die onRetry-Closure nutzt
+      unguarded context mit verworfener Future. Fix: _isLoading in finally,
+      Catch-All auf LookupErrorScreen, on Object im Read-Through mit
+      garantiertem Fallback, Mapper-Guard-Paritaet im OFF-Service, Retry als
+      Rueckgabewert statt Callback-Rekursion, Lints unawaited_futures und
+      discarded_futures aktivieren, Throwing-Repository- und Retry-Flow-Tests.
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: done
+    owner: Engineering
+    related_risks: [RISK-009]
+    related: [FM-17]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md
+    result: |
+      _openBarcode nutzt finally + Catch-All und routet unerwartete Fehler in
+      den LookupErrorScreen; der Fehler-Screen poppt sich selbst mit
+      bool-Ergebnis und der Retry laeuft als Schleife statt Rekursion.
+      ReadThroughProductRepository faengt on Object (neues Outcome error) —
+      ein Cache-Fehler erreicht den OFF-Fallback immer. Der OFF-Service
+      wrappt den Mapper wie der Supabase-Pfad (invalidResponse).
+      unawaited_futures und discarded_futures sind aktiv, alle Call-Sites
+      bereinigt. Neue Tests: Crashing-Repository-Erholung, Retry-Flow,
+      ThrowingMapper, ThrowingCache. flutter analyze 0 Findings,
+      106/106 Tests, Coverage 84.28 Prozent (Gate 60), Pipeline PASS.
+    evidence:
+      - esg_app/lib/screens/home_screen.dart
+      - esg_app/lib/screens/lookup_error_screen.dart
+      - esg_app/lib/services/product_repository.dart
+      - esg_app/lib/services/open_food_facts_service.dart
+      - esg_app/test/widget_test.dart
+    created: 2026-08-13
+    completed: 2026-08-13
+
+  - id: TODO-035
+    title: Cache-Budget und TTL gemeinsam dimensionieren (ADR)
+    description: |
+      F-02: 500 Upstream-Fetches/Tag mal 24h-TTL ergibt maximal ~500
+      gleichzeitig frische Produkte — Cache bei Zielskala wirkungslos.
+      Optionen als ADR entscheiden: Budget anheben, TTL von Refresh-Rate
+      entkoppeln (expires_at lang + stale_after mit Stale-Kennzeichnung),
+      oder demand-driven Ingestion aus Scan-Telemetrie.
+      ADR 0033 (accepted) entkoppelt stale_after (24h Frische-Marker)
+      von expires_at (harte 7-Tage-Grenze).
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: done
+    completed: 2026-08-13
+    result: |
+      ADR 0033 akzeptiert und umgesetzt: Migration 20260813000200 ergaenzt
+      stale_after (Trigger-derived, 24h) plus Constraint; die Read-RPC
+      serviert bis expires_at und exponiert die Frische; der Edge-Writer
+      setzt expires_at auf 7 Tage; der Flutter-Client kennzeichnet stale
+      Daten (DataFreshnessNotice) und serviert sie als Fallback, wenn OFF
+      nicht erreichbar ist. 5 neue pgTAP-Assertions, Client-Tests angepasst.
+    owner: Engineering
+    related_risks: [RISK-013]
+    related: [TODO-004, 0022]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md
+    created: 2026-08-13
+
+  - id: TODO-036
+    title: Scoring-Integritaet — Baselines, partialScore und exaktes Tag-Matching (ADR)
+    description: |
+      F-03 + F-13: Neutral-50-Baselines aus Zutatenliste/Marke entfernen oder
+      als "nicht bewertet" ausweisen; Ein-Saeulen-Ergebnis nicht als
+      fullScore mit gruener Ampel zeigen; Substring-Matching (bio in
+      antibiotics, palm in palmitate) durch exaktes praefix-normalisiertes
+      Tag-Matching ersetzen; Labels und Origins getrennt matchen; lc=de und
+      product_name_de anfragen; Magic Numbers an formulaVersion binden.
+      VOR der M5-Kalibrierung entscheiden, sonst wird auf falscher
+      Grundlage kalibriert.
+      ADR 0034 (accepted) legt evidence-only Saeulen, partialScore-State,
+      exaktes Tag-Matching und formulaVersion 1.1 fest.
+    phase: phase-1-mvp
+    priority: P0
+    effort: M
+    status: done
+    completed: 2026-08-13
+    result: |
+      Formel v1.1 umgesetzt: Neutral-Baselines entfernt (Saeule ohne echte
+      Evidenz = null), ScoreState.partialScore mit sichtbarem Teilscore-
+      Marker in ScoreHero und Semantik, exaktes praefix-normalisiertes
+      Tag-Matching (bio!=antibiotics, palm!=palmitate per Regex), Labels und
+      Origins getrennt, RSPO als eigener Faktor, lc=de plus product_name_de
+      im OFF-Request, F-14-Fix (sourceField wertgetrieben). Testmatrix auf
+      v1.1 umgeschrieben inkl. False-Positive-Regressionstests.
+    owner: Mustafa
+    related_risks: [RISK-014, RISK-003]
+    related: [0011, 0027, TODO-033]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md
+    created: 2026-08-13
+
+  - id: TODO-037
+    title: Backend-Haertung vor Remote-Deploy — Retention, Indizes, service_role-Revoke
+    description: |
+      F-10 bis F-12, F-18, F-19: writer_audit_log zeit-partitionieren und
+      indizieren, pg_cron-Sweeps fuer writer_rate_windows und abgelaufene
+      cached_products, sechs FK-Indizes ergaenzen, revoke
+      insert/update/delete on cached_products from service_role, verwaiste
+      Policy "Fresh product cache is readable" droppen, TTL-Obergrenze in
+      publish_off_product, create-policy-Statements idempotent machen,
+      Invoker-Trigger auf SECURITY DEFINER umstellen, updated_at-Trigger
+      ergaenzen. In die offenen TODO-004-Restpunkte einplanen.
+    phase: phase-1-mvp
+    priority: P1
+    effort: M
+    status: in_progress
+    owner: Engineering
+    related_risks: [RISK-015, RISK-008]
+    related: [TODO-004, 0032]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md
+    completed_parts:
+      - Migration 20260813000100_backend_hardening mit 23 neuen pgTAP-Assertions
+      - Sechs FK-Covering-Indizes ergaenzt, zwei redundante Indizes entfernt
+      - Partial-Indizes fuer publizierte Snapshots und Evidenz
+      - Forensik-Indizes auf writer_audit_log (request, correlation, created_at)
+      - Verwaiste Policy "Fresh product cache is readable" gedroppt
+      - revoke insert/update/delete on cached_products from service_role
+      - TTL-Obergrenze 7 Tage als Tabellen-Constraint
+      - set_updated_at-Trigger auf allen zehn public-Tabellen mit updated_at
+      - Beide Validierungs-Trigger auf SECURITY DEFINER (RLS-entkoppelt)
+      - RLS auf allen fuenf private-Tabellen aktiviert (nicht forced) plus default-privileges-Revoke
+      - Unique-Index auf score_snapshots (barcode, formula_version, input_fingerprint)
+      - PII-Default-User-Agent aus beiden Spike-Skripten entfernt; README-Testzahlen korrigiert
+    remaining_parts:
+      - Retention/Archivierung fuer writer_audit_log (Zeit-Partitionierung) und Sweeps fuer writer_rate_windows/abgelaufene cached_products — braucht Retention-ADR
+      - Bounded-RPCs statt direkter anon-Listen-Endpoints fuer Evidenz-/Snapshot-Tabellen
+      - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
+      - create-policy-Statements der Migrationen 1/2/4 idempotent machen (vor Remote-Deploy)
+    updated: 2026-08-13
+    created: 2026-08-13
+
+  - id: TODO-038
+    title: UX-/Client-Fixes aus Audit — Doppel-Tap, Permission-Recovery, Offline-Cache
+    description: |
+      F-04, F-05, F-06, F-08, F-15 bis F-17, F-20 bis F-22: Navigations-
+      Guards gegen Doppel-Push; Kamera-Permission-Recovery (resumed-Guard,
+      app_settings-Deeplink); Cache-Outcome-Logging produktiv verdrahten;
+      kleiner lokaler LRU-Produkt-Cache mit Stale-Kennzeichnung;
+      Gesamtdeadline pro Lookup + Retry-After respektieren; pause() statt
+      stop() bei inactive; Pilot-Fallback als Netzwerk-Degradation
+      kennzeichnen; Fonts als Assets buendeln; Loading-Feedback fuer
+      manuelle Eingabe; LookupErrorScreen scrollbar; Response-code gegen
+      Barcode verifizieren. Reihenfolge und Details im Auditbericht.
+    phase: phase-1-mvp
+    priority: P1
+    effort: L
+    status: in_progress
+    owner: Engineering
+    related_risks: [RISK-001, RISK-005, RISK-009]
+    source: docs/project/audits/2026-08-13-technical-risk-audit.md
+    completed_parts:
+      - Doppel-Tap-Guards fuer Scanner- und Detail-Navigation mit Widget-Test
+      - Kamera-Lifecycle nutzt pause() bei inactive statt vollem stop()
+      - resumed startet den Scanner auch nach zuvor verweigerter Berechtigung
+      - Close-Button setzt _hasCompleted; Pop-Guard verhindert Doppel-Pop nach async gap
+      - In-Flight-Guard fuer "Erneut pruefen" im Scanner-Fehlerzustand
+      - Cache-Outcome- und Config-Fehler-Logging in main.dart verdrahtet (dart:developer)
+      - Manuelle Eingabe und Recent-Taps waehrend Lookup deaktiviert; Spinner im Scan-Button
+      - LookupErrorScreen scrollbar (200-Prozent-Textskalierung ohne Overflow)
+      - Gesamtdeadline pro Lookup (12s) und Retry-After-Header im OFF-Service
+      - Cache-Circuit-Breaker im Read-Through (3 Fehler, 2 Minuten Cooldown)
+      - Pilot-Fallback und Stale-Cache als DataFreshnessNotice gekennzeichnet
+    remaining_parts:
+      - Lokaler On-Device-Produktcache mit Stale-Kennzeichnung
+      - Fonts als Assets buendeln statt Google-Fonts-Laufzeit-Fetch
+      - Response-code gegen angefragten Barcode verifizieren
+      - Einstellungen-Deeplink fuer Kamera-Berechtigung (app_settings/permission_handler)
+    updated: 2026-08-13
+    created: 2026-08-13

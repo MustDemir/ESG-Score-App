@@ -28,6 +28,7 @@ class ResultScreen extends StatelessWidget {
         children: [
           ProductSummaryCard(product: product),
           const SizedBox(height: ScanFairTokens.space4),
+          DataFreshnessNotice(product: product),
           ScoreHero(score: score),
           const SizedBox(height: ScanFairTokens.space4),
           PillarBars(score: score),

@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 123 pgTAP-Tests sowie provisioniertes und lokal verknuepftes Frankfurt-Development-Projekt | DPA-/Unterauftragsverarbeiter-Freigabe, Benachrichtigung, Plan-Evidenz, Deployment, Remote-Integration und unabhaengige Reviews |
+| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 151 pgTAP-Tests sowie provisioniertes und lokal verknuepftes Frankfurt-Development-Projekt | DPA-/Unterauftragsverarbeiter-Freigabe, Benachrichtigung, Plan-Evidenz, Deployment, Remote-Integration und unabhaengige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -383,7 +383,7 @@ implementiert.
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Nährwerte erscheinen neutral ohne Health-Score oder Fortschrittsbalken |
 | Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Sieben Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 123 pgTAP-Tests und DB-Lint bestanden |
+| Datenbank | Neun Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 151 pgTAP-Tests und DB-Lint bestanden |
 | Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote deaktiviert |
 | Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
 | Provider Governance | Frankfurt-Region verifiziert; DPA-, Unterauftragsverarbeiter- und Kosten-Gates bestehen fail-closed fuer die lokale Entwicklung; Owner-Freigaben und Remote-Aktivierung bleiben offen |
@@ -494,7 +494,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-PROVIDER-DPA` | Aktuelle Supabase-DPA-, Regions-, Verarbeitungs- und Freigabegrenze pruefen |
 | `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter, Aenderungserkennung und Owner-Freigabe pruefen |
 | `G-COST-CONTROL` | Free-Plan-, Add-on-, Quoten- und Kostenfreigabegrenzen pruefen |
-| `G-DATA-RLS` | Sieben Migrationen real abspielen, 123 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
+| `G-DATA-RLS` | Neun Migrationen real abspielen, 151 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
