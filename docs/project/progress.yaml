@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W33
-last_updated: 2026-08-13
+current_week: 2026-W34
+last_updated: 2026-08-18
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 70
-      next: approve_provider_governance_deploy_and_validate_remote_development
+      progress_percent: 75
+      next: review_apply_forward_only_hardening_then_validate_disabled_remote_schema
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -41,9 +41,9 @@ roadmap_progress:
     - id: N2-product-commodity-origin-links
       progress_percent: 100
     - id: N3-eu-supabase-project
-      progress_percent: 40
+      progress_percent: 60
     - id: N4-server-writer-flutter-cache
-      progress_percent: 80
+      progress_percent: 85
     - id: N5-wri-aqueduct
       progress_percent: 0
     - id: N6-ilab-social-risk
@@ -60,31 +60,32 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-12
+  prepared_at: 2026-08-18
   session_closed_at: null
-  branch: feature/eu-supabase-data-path
-  status: next_05_pr_22_review_fixes_validated_ci_pending
-  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/22
+  branch: feature/backend-remote-readiness
+  status: todo_037_forward_only_hardening_pushed_pr_24_open
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/24
   git_state:
     committed: true
     pushed: true
-    working_tree_clean: true
+    working_tree_clean: false
     commits:
-      - 95369f3 feat: add provider governance quality gates
-      - 4002933 feat: implement trusted Supabase data path
-      - 1cbcbcb Merge pull request 21 from MustDemir/compliance/backend-threat-model
-    reason: PR 22 ist offen; zwei Review-Findings sind lokal behoben und validiert, der erneute GitHub-Lauf und die Remote-Aktivierung bleiben offen
+      - 5711779 feat: harden remote schema read boundaries
+      - 6e9202f Merge pull request 23 from MustDemir/feature/audit-2026-08-13-hardening
+      - 9c7e398 docs: clean audit report formatting
+      - fc34a7d chore(project): close audit session with recorded follow-ups
+    reason: Forward-only-Haertung ist lokal vollstaendig validiert, committed und in Draft-PR 24 gepusht. GitHub-CI, Review, Merge und Remote-Anwendung stehen noch aus. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
   latest_validation:
-    executed_at: "2026-08-12T16:57:06Z"
+    executed_at: "2026-08-17T16:27:38Z"
     development_quality_gates: 29/29 PASS
-    flutter_tests: 101/101 PASS
-    flutter_line_coverage: 84.26 percent
+    flutter_tests: 121/121 PASS
+    flutter_line_coverage: 84.15 percent
     database_migration_replay: PASS
-    database_pgtap: 123/123 PASS
+    database_pgtap: 172/172 PASS
     database_lint: PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
-    claims_privacy_gate_self_tests: 15/15 PASS
+    claims_privacy_gate_self_tests: 18/18 PASS
     claims_development_profile: PASS
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
@@ -104,6 +105,15 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Pull Request 23 mit Audit-Haertung gemergt; Post-Merge GitHub-Run 32044569504 mit allen sechs Jobs gruen
+    - Remote-Iststand des Frankfurt-Projekts abgeglichen; neun Migrationen registriert, kein Linked-Schema-Diff und kein DB-Lint-Befund
+    - Remote-Laufzeittabellen leer bestaetigt; nur drei Quellen- und zwei Methodik-Metadatensaetze vorhanden
+    - ADR 0035 fuer unveraenderliche angewandte Migrationen und Forward-only-Korrekturen akzeptiert
+    - Zehnte Migration mit partial_score-Paritaet, direktem Evidence-/Snapshot-SELECT-Revoke und zwei begrenzten Barcode-RPCs erstellt
+    - 21 neue pgTAP-Assertions fuer Grants, Policies, Barcode-Isolation, Publikationsstatus und Formelversion bestanden
+    - Gesamter lokaler DB-Replay mit zehn Migrationen, 172/172 pgTAP und DB-Lint bestanden
+    - Provider-Gate korrigiert: Schema-Bereitstellung ist von Runtime-/App-Aktivierung getrennt; Remote-Profile bleiben fail-closed
+    - Development Quality Pipeline 29/29, Flutter 121/121 und 84.15 Prozent Coverage bestanden
     - NEXT-04 ueber Pull Request 21 gemergt; Post-Merge GitHub-Run 31588234607 mit allen fuenf Jobs gruen
     - NEXT-05 Trusted Edge Writer mit getrennten Scheduler-/Operator-Secrets und fester OFF-Upstream-Grenze implementiert
     - Server-only RPCs fuer Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz, Publikation und Append-only Audit implementiert
@@ -163,10 +173,11 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Review-Fix-Commit pushen und erneuten GitHub-Lauf mit sechs Jobs pruefen
-    - Review-Konversationen nach belegter Behebung aufloesen und PR 22 mergen
-    - Post-Merge-main-Lauf pruefen und lokale main synchronisieren
-    - Danach Owner-Freigaben, Aenderungsbenachrichtigung, Plan-Evidenz und unabhaengige Backend-Reviews vorbereiten
+    - Draft-PR 24 und alle GitHub-Quality-Jobs pruefen
+    - PR erst nach gruenen Checks reviewen, freigeben und mergen
+    - Migration 20260817000100 erst nach Merge kontrolliert remote anwenden
+    - Remote Schema-Diff, Lint sowie RPC-/Grant-Negativtests bei weiterhin deaktivierter Runtime belegen
+    - Danach Retention-/Cleanup-ADR und Read-Rate-Limit als getrennte TODO-037-Restpunkte bearbeiten
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
@@ -704,6 +715,32 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W34
+    summary: |
+      Audit-Haertung ueber PR 23 integriert und den tatsaechlichen Zustand des
+      Frankfurter Supabase-Development-Schemas reconciled. Eine neue
+      Forward-only-Migration schliesst direkte Evidence-/Snapshot-Listenreads,
+      fuehrt barcode-begrenzte RPCs ein und synchronisiert partial_score mit
+      Formel v1.1, ohne die aktivierungsbezogenen Freigaben vorwegzunehmen.
+    done:
+      - PR 23 gemergt und sechs Post-Merge-GitHub-Jobs gruen bestaetigt
+      - Neun remote angewandte Migrationen ohne Linked-Diff oder Lint-Befund belegt
+      - Runtime-, Writer-, App- und Personendaten-Aktivierung weiterhin deaktiviert
+      - ADR 0035, Remote-Schema-Assessment und Migration 20260817000100 erstellt
+      - Zwei explizite Barcode-RPCs statt direkter Evidence-/Snapshot-SELECTs umgesetzt
+      - DB-score_state um partial_score erweitert
+      - Zehn Migrationen, 172/172 pgTAP und DB-Lint lokal bestanden
+      - Development Quality Pipeline 29/29 und Flutter 121/121 bestanden
+    blockers:
+      - Neue Migration ist noch nicht per PR integriert oder remote angewandt
+      - Retention-/Cleanup-Regeln brauchen Privacy-/Operations-Review und eigenen ADR
+      - Read-Rate-Limit braucht Abuse-Modell, technische Umsetzung und Negativtests
+      - DPA-, Subprocessor-, Datenlizenz-, Security- und Operations-Freigaben fehlen weiterhin
+    next_week:
+      - Draft-PR 24 pruefen und erst nach gruenen GitHub-Checks mergen
+      - Neue Migration nach dem Merge kontrolliert anwenden und Remote-Negativtests dokumentieren
+      - Retention-/Cleanup-ADR beginnen, ohne willkuerliche Frist festzulegen
+
   - week: 2026-W33
     summary: |
       Scoring-Precedence, entscheidungsbasierte Calculator-Tests,
@@ -1077,7 +1114,7 @@ weekly_log:
 # STATS — automatisch aktualisierbar
 # =============================================================================
 stats:
-  decisions_total: 34
+  decisions_total: 35
   todos_open: 6
   todos_in_progress: 6
   todos_done: 24
