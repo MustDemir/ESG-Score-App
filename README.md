@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | zehn lokal reproduzierbare Migrationen, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 172 pgTAP-Tests sowie neun reconciled Migrationen im Frankfurt-Development-Schema | Forward-only-Migration per PR und kontrolliert remote anwenden; danach DPA-/Unterauftragsverarbeiter-Freigabe, Runtime-Integration und unabhaengige Reviews |
+| M2 | elf lokal reproduzierbare Migrationen, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache und 180 pgTAP-Tests; Migration 10 im Frankfurt-Development-Schema transaktional verifiziert | service_role-Least-Privilege-Migration per PR und kontrolliert remote anwenden; danach DPA-/Unterauftragsverarbeiter-Freigabe, Runtime-Integration und unabhaengige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -372,7 +372,7 @@ deterministische Tests erhalten. ESG-Score-Logik, Result-/Detail-Screens,
 Low-Data-, Not-Found-, Permission- und technische Fehlerzustaende sind
 implementiert.
 
-**Validierter MVP-Stand (12. August 2026)**
+**Validierter MVP-Stand (18. August 2026)**
 
 | Bereich | Ergebnis |
 | --- | --- |
@@ -385,7 +385,7 @@ implementiert.
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Nährwerte erscheinen neutral ohne Health-Score oder Fortschrittsbalken |
 | Methodik | Formel v1.1 evidence-only mit partialScore aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Zehn lokale Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 172 pgTAP-Tests und DB-Lint bestanden |
+| Datenbank | Elf lokale Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 180 pgTAP-Tests und DB-Lint bestanden; Migration 10 remote verifiziert, Migration 11 noch im Review-Pfad |
 | Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote-Schema deployed, Runtime deaktiviert |
 | Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
 | Provider Governance | Frankfurt-Region verifiziert; DPA-, Unterauftragsverarbeiter- und Kosten-Gates bestehen fail-closed fuer die lokale Entwicklung; Owner-Freigaben und Remote-Aktivierung bleiben offen |
@@ -458,6 +458,10 @@ ruby scripts/quality/validate_backend_boundary.rb --profile development
 ruby scripts/quality/validate_backend_boundary.rb --profile remote_backend
 ruby scripts/quality/validate_backend_boundary.rb --profile release_candidate
 
+# Nur nach expliziter Remote-Freigabe gegen das verknuepfte Development-Projekt:
+# transaktionale Testdaten werden am Ende vollstaendig zurueckgerollt
+supabase db query --linked --file scripts/quality/verify_remote_backend_readiness.sql
+
 # Provider Governance: lokal gruen, Remote bis zu Owner-Evidenz und Deployment rot
 PROVIDER_GOVERNANCE_PROFILE=development bash scripts/quality/run_provider_governance_gates.sh
 PROVIDER_GOVERNANCE_PROFILE=remote_backend bash scripts/quality/run_provider_governance_gates.sh
@@ -496,7 +500,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-PROVIDER-DPA` | Aktuelle Supabase-DPA-, Regions-, Verarbeitungs- und Freigabegrenze pruefen |
 | `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter, Aenderungserkennung und Owner-Freigabe pruefen |
 | `G-COST-CONTROL` | Free-Plan-, Add-on-, Quoten- und Kostenfreigabegrenzen pruefen |
-| `G-DATA-RLS` | Zehn Migrationen real abspielen, 172 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
+| `G-DATA-RLS` | Elf Migrationen real abspielen, 180 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |

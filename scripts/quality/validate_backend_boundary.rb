@@ -255,9 +255,9 @@ class BackendBoundaryValidator
     evidence = @environment.fetch("implementation_evidence", {})
     expected = {
       "state" => "remote_schema_deployed_runtime_disabled",
-      "remote_deployment_evidence" => "docs/project/audits/2026-08-17-remote-schema-state-assessment.md",
+      "remote_deployment_evidence" => "docs/project/audits/2026-08-18-remote-deployment-verification.md",
       "writer_contract_tests" => "12/12 PASS",
-      "database_tests" => "172/172 PASS",
+      "database_tests" => "180/180 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -524,6 +524,23 @@ class BackendBoundaryValidator
         cannot\ enumerate\ product\ evidence
         latest\ published\ snapshot
         unpublished\ formula\ versions\ stay\ hidden
+      ],
+      "supabase/migrations/20260818000100_service_role_least_privilege.sql" => %w[
+        revoke\ all\ privileges\ on\ table\ public.product_evidence
+        revoke\ all\ privileges\ on\ all\ tables\ in\ schema\ private
+        alter\ default\ privileges\ for\ role\ postgres
+        grant\ execute\ on\ function\ public.publish_off_product
+      ],
+      "supabase/tests/database/service_role_least_privilege.test.sql" => %w[
+        plan(8)
+        no\ direct\ privileges\ on\ public\ application\ tables
+        no\ direct\ privileges\ on\ private\ writer\ tables
+        can\ execute\ product\ publication\ RPC
+      ],
+      "scripts/quality/verify_remote_backend_readiness.sql" => %w[
+        service_role\ still\ has\ a\ direct\ application-table\ privilege
+        bounded\ evidence\ RPC\ leaked\ or\ omitted\ rows
+        SCANFAIR_VERIFICATION_ROLLBACK
       ],
       "scripts/quality/run_edge_writer_integration_gate.sh" => %w[
         writer_unauthorized

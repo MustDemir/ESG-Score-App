@@ -406,9 +406,15 @@ improvements:
       - supabase/migrations/20260812000100_trusted_writer_cache_path.sql
       - supabase/tests/database/trusted_writer_cache_path.test.sql
       - docs/project/audits/2026-08-12-eu-supabase-local-integration-assessment.md
+      - docs/project/decisions/0036-service-role-rpc-only.yaml
+      - supabase/migrations/20260818000100_service_role_least_privilege.sql
+      - supabase/tests/database/service_role_least_privilege.test.sql
+      - scripts/quality/verify_remote_backend_readiness.sql
+      - docs/project/audits/2026-08-18-remote-deployment-verification.md
     verification:
       - Threat-Model-Review vor Implementierung des Remote-Writers
       - Security-Tests und G-DATA-RLS bestehen gegen die Zielarchitektur
+      - service_role besitzt keine direkten App-Datenrechte und nur explizite Writer-RPC-Ausfuehrungsrechte
     dependencies:
       - IMP-PROC-003
       - IMP-COMP-001

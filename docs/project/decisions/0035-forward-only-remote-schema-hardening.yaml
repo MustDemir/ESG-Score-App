@@ -52,8 +52,9 @@ implementation:
   migration: supabase/migrations/20260817000100_backend_remote_readiness.sql
   tests: supabase/tests/database/backend_remote_readiness.test.sql
   assessment: docs/project/audits/2026-08-17-remote-schema-state-assessment.md
-  deployment_state: local_validated_not_yet_applied_remotely
+  deployment_state: applied_and_verified_remotely_2026-08-18
   runtime_state: disabled
+  deployment_assessment: docs/project/audits/2026-08-18-remote-deployment-verification.md
 
 consequences:
   - Historical migrations must not be rewritten after remote application.
