@@ -359,6 +359,10 @@ improvements:
       - docs/project/gate-definitions/local/G-PRIVACY-BOUNDARY.yaml
       - scripts/quality/test_claims_privacy_gate.rb
       - docs/project/compliance/provider-governance-register.yaml
+      - docs/project/decisions/0035-forward-only-remote-schema-hardening.yaml
+      - docs/project/audits/2026-08-17-remote-schema-state-assessment.md
+      - supabase/migrations/20260817000100_backend_remote_readiness.sql
+      - supabase/tests/database/backend_remote_readiness.test.sql
       - docs/project/gate-definitions/local/G-PROVIDER-DPA.yaml
       - docs/project/gate-definitions/local/G-PROVIDER-SUBPROCESSORS.yaml
       - docs/project/audits/2026-08-12-provider-governance-gates-assessment.md
@@ -488,7 +492,7 @@ improvements:
       - IMP-COMP-005
       - IMP-COMP-006
       - IMP-COMP-007
-    next_action: Provider-Governance-Stand per PR integrieren, Owner-Entscheidungen belegen und danach Remote-Deployment samt Integrationstests ausfuehren
+    next_action: Forward-only-Haertung per PR integrieren, kontrolliert remote anwenden und danach RLS-/RPC-Negativtests gegen das weiterhin deaktivierte Development-Schema belegen
 
   - id: IMP-DEV-003
     layer: development

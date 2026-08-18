@@ -129,7 +129,7 @@ Die Designsprache folgt ScanFair: warm, vertrauenswürdig, reduziert, entscheidu
 | Produktdaten | Open Food Facts API v3 | Produktdaten plus feldgenaue Evidenz-Provenienz |
 | Umwelt-LCA | AGRIBALYSE 3.2 | offizieller Kategorieproxy mit DQR; aktuell via OFF transportiert |
 | Traceability | evidenzbasierte Entity-/Relationship-Schicht | GTIN, Rohstoff, Herkunft, Marke und spaeter Rechtstraeger getrennt aufloesen |
-| Backend / Cache | Supabase/PostgreSQL + Edge Function | lokal validierter Trusted Writer und read-only Cache; Remote deaktiviert |
+| Backend / Cache | Supabase/PostgreSQL + Edge Function | Frankfurt-Schema deployed; Trusted Writer, App-Zugriff und Remote-Runtime deaktiviert |
 | Lokaler Cache | geplant | Offline-Grundmodus und letzte Scans |
 
 ```text
@@ -260,7 +260,7 @@ als technische Fertigstellung.
 
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
-M2  Backend- und Datenanbindung           [##############------]  70%
+M2  Backend- und Datenanbindung           [###############-----]  75%
 M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | lokales Supabase-Schema, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 151 pgTAP-Tests sowie provisioniertes und lokal verknuepftes Frankfurt-Development-Projekt | DPA-/Unterauftragsverarbeiter-Freigabe, Benachrichtigung, Plan-Evidenz, Deployment, Remote-Integration und unabhaengige Reviews |
+| M2 | zehn lokal reproduzierbare Migrationen, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache, 172 pgTAP-Tests sowie neun reconciled Migrationen im Frankfurt-Development-Schema | Forward-only-Migration per PR und kontrolliert remote anwenden; danach DPA-/Unterauftragsverarbeiter-Freigabe, Runtime-Integration und unabhaengige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -288,8 +288,8 @@ Die Pakete werden erst bei nachweisbarer Implementierung fortgeschrieben:
 N0  Compliance-/Security-Baseline        [#################---]  85%
 N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
 N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
-N3  EU-Supabase-Projekt verbinden         [########------------]  40%
-N4  Server-Writer und Flutter-Cache       [################----]  80%
+N3  EU-Supabase-Projekt verbinden         [############--------]  60%
+N4  Server-Writer und Flutter-Cache       [#################---]  85%
 N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
 N6  ILAB-Social-Risikomapping             [--------------------]   0%
 N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
@@ -306,7 +306,9 @@ Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Der
 Trusted Writer, die serverseitigen RPCs und der read-only Flutter-Cache sind
 lokal implementiert und getestet, aber nicht remote aktiviert. Das dedizierte
 Supabase-Development-Projekt `scanfair-dev` ist in Frankfurt provisioniert und
-lokal verknuepft; ein Dry Run bestaetigt die sieben vorgesehenen Migrationen.
+lokal verknuepft; neun Migrationen sind remote registriert, Schema-Diff und
+DB-Lint sind sauber. Die zehnte Forward-only-Haertung ist lokal validiert und
+noch nicht remote angewandt.
 Vor der Remote-Aktivierung folgen DPA- und Unterauftragsverarbeiter-Freigabe,
 Benachrichtigungs- und Plan-Evidenz, unabhaengige Reviews sowie das kontrollierte
 Deployment. Erst danach werden WRI, ILAB und GLEIF/BRIS
@@ -382,12 +384,12 @@ implementiert.
 | Umweltquelle | AGRIBALYSE 3.2 liefert offiziellen GHG-Kategorieproxy, DQR und Attribution; noch nicht score-aktiv |
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Nährwerte erscheinen neutral ohne Health-Score oder Fortschrittsbalken |
-| Methodik | Formel v1.0 aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Neun Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 151 pgTAP-Tests und DB-Lint bestanden |
-| Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote deaktiviert |
+| Methodik | Formel v1.1 evidence-only mit partialScore aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
+| Datenbank | Zehn lokale Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 172 pgTAP-Tests und DB-Lint bestanden |
+| Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote-Schema deployed, Runtime deaktiviert |
 | Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
 | Provider Governance | Frankfurt-Region verifiziert; DPA-, Unterauftragsverarbeiter- und Kosten-Gates bestehen fail-closed fuer die lokale Entwicklung; Owner-Freigaben und Remote-Aktivierung bleiben offen |
-| Tests | 101/101 Flutter-Tests bestanden; Line Coverage 84,26% |
+| Tests | 121/121 Flutter-Tests bestanden; Line Coverage 84,15% |
 | Traceability | Rohstoff-, Produktherkunfts- und Markenhinweise werden mit Quelle, Assertion-Klasse und Confidence modelliert; OFF-Hinweise bleiben noch nicht score-aktiv |
 | Supply Chain | 59 Dart-Pakete, 2 iOS-Plugins und 16 Action-Referenzen inventarisiert; OSV meldet 0 bekannte Schwachstellen |
 | Fallbacks | Manuelle Eingabe, Demo-Daten, Not Found, Low Data, Permission- und API-Fehler vorhanden |
@@ -494,7 +496,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-PROVIDER-DPA` | Aktuelle Supabase-DPA-, Regions-, Verarbeitungs- und Freigabegrenze pruefen |
 | `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter, Aenderungserkennung und Owner-Freigabe pruefen |
 | `G-COST-CONTROL` | Free-Plan-, Add-on-, Quoten- und Kostenfreigabegrenzen pruefen |
-| `G-DATA-RLS` | Neun Migrationen real abspielen, 151 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
+| `G-DATA-RLS` | Zehn Migrationen real abspielen, 172 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |
@@ -505,8 +507,9 @@ Methodik `2.0-draft`. Sie erklaeren Formel v1.0 nicht nachtraeglich fuer
 wissenschaftlich kalibriert oder rechtlich ESG-konform; deren S-/G-Anteile
 bleiben als heuristischer MVP-Stand gekennzeichnet.
 
-Das Backend-Development-Profil beweist die lokal getestete Implementierung bei
-deaktiviertem Remote-Pfad. Es ist kein Deployment-Nachweis. `remote_backend` verlangt drei Implementierungs- und
+Das Backend-Development-Profil beweist die lokal getestete Implementierung und
+das reconciled, aber runtime-deaktivierte Frankfurt-Schema. Es ist kein
+Aktivierungs- oder Verarbeitungsnachweis. `remote_backend` verlangt drei Implementierungs- und
 Betriebsreviews; `release_candidate` verlangt zusaetzlich und unabhaengig vom
 Aktivierungsstatus einen an den geprueften Commit gebundenen Security-Review.
 

@@ -72,7 +72,7 @@ else
     "scan owner policy" => "(select auth.uid()) = user_id",
     "account deletion cascade" => "references auth.users(id) on delete cascade",
     "cache expiry policy" => "expires_at > timezone('utc', now())",
-    "published evidence policy" => "published_at is not null",
+    "published-row filter" => "published_at is not null",
     "evidence retrieval channel" => "retrieved_via_source_id",
     "published methodology policy" => "status = 'published'",
     "active source mapping policy" => "status = 'active'",
@@ -103,6 +103,13 @@ else
     "bounded single-product read" => "get_fresh_cached_product",
     "cache list access revoked" =>
       "revoke select on table public.cached_products from anon, authenticated",
+    "evidence list access revoked" =>
+      "revoke select on table public.product_evidence from anon, authenticated",
+    "snapshot list access revoked" =>
+      "revoke select on table public.score_snapshots from anon, authenticated",
+    "bounded product evidence read" => "get_published_product_evidence",
+    "bounded score snapshot read" => "get_published_score_snapshot",
+    "partial score persistence" => "'partial_score'",
     "writer capacity function" => "claim_writer_capacity",
     "transactional writer function" => "publish_off_product",
     "writer outcome audit function" => "record_writer_outcome",

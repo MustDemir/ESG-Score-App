@@ -1,0 +1,68 @@
+id: 0035
+title: Forward-only hardening for the applied remote development schema
+date: 2026-08-17
+status: accepted
+deciders: [Mustafa]
+tags: [backend, database, migrations, supabase, security, auditability]
+
+context: |
+  The linked Frankfurt development project contains all nine migrations
+  through 20260813000200. A linked schema diff is empty and the linked lint is
+  clean. Earlier project records incorrectly described the schema as not
+  deployed. Changing an already applied migration would create checksum and
+  environment-reproducibility risk.
+
+  The remote database contains only non-personal source and methodology seed
+  metadata. The mobile app, trusted writer, accounts and personal-data paths
+  remain disabled. Schema deployment therefore does not constitute runtime,
+  privacy, provider or release approval.
+
+options_considered:
+  - name: Edit the historical policy migrations
+    pros: [the final schema would be visible in the original files]
+    cons:
+      - applied migration history would diverge from source control
+      - clean environment replay and linked state could no longer be trusted
+  - name: Add a forward-only hardening migration
+    pros:
+      - preserves immutable history and reproducible deployment order
+      - makes direct-read revocation and bounded RPCs independently reviewable
+      - supports a controlled linked deployment after pull-request approval
+    cons:
+      - the effective schema must be understood as the ordered migration set
+
+decision: |
+  Applied migrations are immutable. All corrections use a new additive
+  migration. Public evidence and score access is restricted to explicit,
+  barcode-scoped RPCs; direct table SELECT is revoked. The database score-state
+  constraint is extended to formula v1.1 partial_score without changing old
+  migrations.
+
+  Remote runtime activation remains fail-closed. Retention, scheduled cleanup
+  and public read-rate limiting require separate privacy, operations and abuse-
+  risk decisions and are not inferred from schema deployment.
+
+rationale: |
+  Forward-only migrations preserve the audit trail and avoid environment drift.
+  Bounded RPCs reduce enumeration and over-fetching while retaining the
+  read-only mobile boundary. Separating technical schema state from activation
+  evidence prevents an accidental go-live through documentation ambiguity.
+
+implementation:
+  migration: supabase/migrations/20260817000100_backend_remote_readiness.sql
+  tests: supabase/tests/database/backend_remote_readiness.test.sql
+  assessment: docs/project/audits/2026-08-17-remote-schema-state-assessment.md
+  deployment_state: local_validated_not_yet_applied_remotely
+  runtime_state: disabled
+
+consequences:
+  - Historical migrations must not be rewritten after remote application.
+  - The new migration requires normal PR review and all quality gates before a
+    linked deployment.
+  - Flutter is not connected to Supabase by this decision.
+  - No writer, account, scan history or personal-data processing is activated.
+  - TODO-037 remains open for retention, cleanup and read-rate-limit decisions.
+
+supersedes: null
+superseded_by: null
+related: [0002, 0020, 0022, 0032, 0033, 0034]

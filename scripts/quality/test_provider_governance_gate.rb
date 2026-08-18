@@ -124,7 +124,7 @@ class ProviderGovernanceSelfTest
       repo_root: root,
       gate: gate,
       profile: profile,
-      today: Date.new(2026, 8, 12),
+      today: Date.new(2026, 8, 17),
     )
   end
 

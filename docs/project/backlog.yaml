@@ -208,6 +208,10 @@ todos:
       - Read-only Flutter-Cache mit Miss-, Stale-, Offline- und Provider-Fallback getestet
       - Lokalen Edge-Wrapper mit 401, 400, Publication, Replay und Read-RPC validiert
       - Dediziertes scanfair-dev Projekt in eu-central-1 provisioniert, verifiziert und lokal verknuepft
+      - Neun Migrationen bis 20260813000200 remote registriert; Linked-Diff
+        ohne Schemaabweichung und Linked-Lint ohne Befund
+      - Remote-Laufzeittabellen leer; nur drei Quellen- und zwei
+        Methodik-Metadatensaetze vorhanden, keine Personendaten
       - Aktuelle DPA-, Subprocessor- und Kostenquellen versioniert geprueft
       - G-GATE-DEFINITION-QUALITY, G-PROVIDER-DPA,
         G-PROVIDER-SUBPROCESSORS und G-COST-CONTROL integriert
@@ -215,13 +219,14 @@ todos:
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
-      - Feature-Branch ueber PR und geschuetztes main integrieren
-      - Migrationen und Writer erst danach remote deployen
+      - Neue Forward-only-Migration 20260817000100 ueber PR integrieren und
+        erst nach gruenen Gates kontrolliert remote anwenden
+      - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
-    updated: 2026-08-12
+    updated: 2026-08-17
     created: 2026-05-19
 
   - id: TODO-005
@@ -963,12 +968,21 @@ todos:
       - RLS auf allen fuenf private-Tabellen aktiviert (nicht forced) plus default-privileges-Revoke
       - Unique-Index auf score_snapshots (barcode, formula_version, input_fingerprint)
       - PII-Default-User-Agent aus beiden Spike-Skripten entfernt; README-Testzahlen korrigiert
+      - Remote-Iststand mit neun angewandten Migrationen und ohne Schema-Diff abgeglichen;
+        DB-Lint sauber und keine Runtime-/Personendaten vorhanden
+      - ADR 0035 fuer unveraenderliche angewandte Migrationen und ausschliesslich
+        vorwaertsgerichtete Korrekturen akzeptiert
+      - Forward-only-Migration 20260817000100 mit partial_score-DB-Paritaet,
+        direktem SELECT-Revoke und zwei barcode-begrenzten Read-RPCs erstellt
+      - 21 negative und positive pgTAP-Assertions fuer Grants, Policies,
+        Barcode-Isolation, Publikationsstatus und Formelversion ergaenzt
+      - Lokaler Replay mit zehn Migrationen, 172/172 pgTAP und DB-Lint bestanden
     remaining_parts:
       - Retention/Archivierung fuer writer_audit_log (Zeit-Partitionierung) und Sweeps fuer writer_rate_windows/abgelaufene cached_products — braucht Retention-ADR
-      - Bounded-RPCs statt direkter anon-Listen-Endpoints fuer Evidenz-/Snapshot-Tabellen
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
-      - create-policy-Statements der Migrationen 1/2/4 idempotent machen (vor Remote-Deploy)
-    updated: 2026-08-13
+      - Migration 20260817000100 erst nach PR-Review und vollstaendigen Gates
+        remote anwenden; historische Migrationen nicht veraendern
+    updated: 2026-08-17
     created: 2026-08-13
 
   - id: TODO-038

@@ -107,8 +107,8 @@ The local migrations define:
 |---|---|---|
 | `data_sources` | source, license and API metadata | read active rows |
 | `cached_products` | allowlisted source payload cache | no direct table access; fresh single-barcode RPC only |
-| `product_evidence` | normalized, published evidence | read published rows |
-| `score_snapshots` | reproducible formula output | read published rows |
+| `product_evidence` | normalized, published evidence | bounded barcode RPC only |
+| `score_snapshots` | reproducible formula output | latest published barcode RPC only |
 | `scans` | account-linked scan history | owner only |
 | `methodology_versions` | formula lifecycle and publication state | read published rows |
 | `parameters` | versioned ESG and confidence definitions | read published rows |

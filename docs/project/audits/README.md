@@ -31,3 +31,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-08-11 | [Backend Threat Model Assessment](2026-08-11-backend-threat-model-assessment.md) | STRIDE/OWASP API threats, trusted-writer contract and fail-closed EU-Supabase activation |
 | 2026-08-12 | [EU Supabase Local Integration Assessment](2026-08-12-eu-supabase-local-integration-assessment.md) | Local Edge writer, server-only RPCs, RLS, cache fallback and real wrapper integration |
 | 2026-08-12 | [Provider Governance Gates Assessment](2026-08-12-provider-governance-gates-assessment.md) | Gate schema, DPA, subprocessors, Free Plan cost controls and fail-closed remote activation |
+| 2026-08-17 | [Remote Schema State Assessment](2026-08-17-remote-schema-state-assessment.md) | Linked migration reconciliation, schema drift, remote data state and activation boundary |

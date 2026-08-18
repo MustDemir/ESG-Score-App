@@ -1,8 +1,8 @@
 # Backend Security Source of Truth
 
-This directory contains the security source of truth for the locally
-implemented remote data path. It does not represent a deployed or enabled
-backend.
+This directory contains the security source of truth for the remote data path.
+The Frankfurt development schema is deployed and reconciled; its writer, app
+access and runtime processing remain disabled.
 
 - `backend-threat-model.yaml` is the machine-readable STRIDE/OWASP API threat
   and abuse-case model.
@@ -23,9 +23,9 @@ ruby scripts/quality/validate_backend_boundary.rb --profile development
 ```
 
 The development profile covers the local writer, database and Flutter read
-adapter while keeping remote activation disabled. The `remote_backend` profile
-is expected to fail until a dedicated Frankfurt development environment is
-provisioned and all three activation-review contracts are closed.
+adapter plus the deployed-but-disabled schema state. The `remote_backend`
+profile is expected to fail until all three activation-review contracts are
+closed and runtime access is explicitly enabled.
 `release_candidate` always
 requires a fourth, release-specific security review bound to the reviewed
 commit. No credentials belong in this directory.

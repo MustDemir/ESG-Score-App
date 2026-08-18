@@ -29,7 +29,7 @@ class BackendBoundaryGateSelfTest
       check = validator(root, "development")
       assert(!check.run, "development must reject remote activation")
       assert(
-        check.violations.any? { |entry| entry.include?("remote backend must remain disabled") },
+        check.violations.any? { |entry| entry.include?("deployed schema must remain runtime-disabled") },
         "development failure should identify remote activation",
       )
     end
@@ -148,7 +148,7 @@ class BackendBoundaryGateSelfTest
       copy(root, "esg_app/test/services/supabase_product_cache_service_test.dart")
       copy(root, "supabase/migrations")
       copy(root, "supabase/functions")
-      copy(root, "supabase/tests/database/trusted_writer_cache_path.test.sql")
+      copy(root, "supabase/tests/database")
       copy(root, "scripts/quality/run_edge_writer_integration_gate.sh")
       copy(root, ".github/workflows/quality-gates.yml")
       yield root

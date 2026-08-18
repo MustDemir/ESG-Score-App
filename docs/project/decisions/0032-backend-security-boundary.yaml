@@ -50,7 +50,7 @@ implementation:
   diagram: docs/project/security/backend-threat-model.md
   gate: G-BACKEND-BOUNDARY
   profiles: [development, remote_backend, release_candidate]
-  current_state: local_implementation_validated_remote_disabled
+  current_state: remote_schema_deployed_runtime_disabled
 
 consequences:
   - The iOS app cannot invoke the trusted writer or contain privileged keys.
@@ -60,6 +60,8 @@ consequences:
   - NEXT-05 may implement only the contracts defined here and must produce typed hash-bound evidence before remote activation.
   - The local implementation includes a bounded Edge Function, server-only RPCs,
     append-only audit, a single-record read RPC and direct-provider fallback.
+  - The Frankfurt development schema is deployed, reconciled and empty of
+    runtime or personal data; ADR 0035 governs all later forward-only changes.
   - A development gate PASS proves design completeness, not deployment or security approval.
 
 supersedes: null

@@ -4,13 +4,14 @@
 
 This document visualizes the machine-readable threat model in
 `backend-threat-model.yaml`. It defines the secure shape of the planned EU
-Supabase development path. It does not provision a project, deploy a function,
-connect Flutter or approve remote processing.
+Supabase development path. The Frankfurt database schema is deployed and
+reconciled, but this model does not enable a writer, connect Flutter, permit
+personal data or approve remote runtime processing.
 
 ```mermaid
 flowchart LR
   App["iOS app\nPublishable key only"]
-  Public["Supabase public API\nForced RLS and SELECT only"]
+  Public["Supabase public API\nBounded read RPCs"]
   Cache["Published cache, evidence\nand score snapshots"]
   Scheduler["Scheduled job or\naudited operator replay"]
   Writer["Trusted server writer\nManaged runtime secrets"]
@@ -18,7 +19,7 @@ flowchart LR
   Audit["Append-only writer audit"]
 
   App -->|"one barcode, explicit columns"| Public
-  Public -->|"published and fresh rows"| Cache
+  Public -->|"published, barcode-scoped rows"| Cache
   Scheduler -->|"server-side invocation identity"| Writer
   Writer -->|"HTTPS GET, fixed host/path"| Upstream
   Upstream -->|"untrusted bounded payload"| Writer
