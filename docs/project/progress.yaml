@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 75
-      next: review_merge_and_apply_service_role_least_privilege_then_reverify_remote
+      progress_percent: 80
+      next: decide_retention_cleanup_and_read_abuse_controls_before_runtime_reviews
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -41,7 +41,7 @@ roadmap_progress:
     - id: N2-product-commodity-origin-links
       progress_percent: 100
     - id: N3-eu-supabase-project
-      progress_percent: 60
+      progress_percent: 65
     - id: N4-server-writer-flutter-cache
       progress_percent: 85
     - id: N5-wri-aqueduct
@@ -62,20 +62,20 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-18
   session_closed_at: null
-  branch: feature/service-role-least-privilege
-  status: migration_10_verified_remote_migration_11_local_validation_complete
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/24
+  branch: docs/service-role-remote-evidence
+  status: migrations_10_and_11_remote_verified_runtime_disabled
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/25
   pull_request: null
   git_state:
     committed: false
     pushed: false
     working_tree_clean: false
     commits:
+      - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
+      - a86ed2b security: enforce RPC-only service role access
       - cd64718 Merge pull request 24 from MustDemir/feature/backend-remote-readiness
       - 5711779 feat: harden remote schema read boundaries
-      - 6e9202f Merge pull request 23 from MustDemir/feature/audit-2026-08-13-hardening
-      - 9c7e398 docs: clean audit report formatting
-    reason: PR 24 ist nach sechs gruenen Jobs gemergt und Migration 10 remote verifiziert. Die daraus abgeleitete service_role-Haertung ist lokal implementiert und validiert, aber noch nicht committed, gepusht, reviewt oder remote angewandt. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
+    reason: PR 25 ist nach sechs gruenen Jobs gemergt. Migration 11 wurde kontrolliert remote angewandt; Migrationshistorie, Lint, leerer Schema-Diff, RPC-only service_role und null verbliebene Fixtures sind belegt. Nur der nachgelagerte SSOT-Nachweis ist auf diesem Branch noch nicht committed. Runtime und App-Zugriff bleiben deaktiviert; .claude bleibt unangetastet.
   latest_validation:
     executed_at: "2026-08-18T10:55:43Z"
     development_quality_gates: 29/29 PASS
@@ -86,9 +86,13 @@ session_handoff:
     database_pgtap: 180/180 PASS
     database_lint: PASS
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
+    remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
+    remote_migrations: 11/11 RECONCILED
+    remote_schema_diff: EMPTY
     remote_database_lint: PASS
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
-    service_role_hardening_remote: PENDING_PR_REVIEW_AND_DEPLOYMENT
+    service_role_hardening_remote: PASS
+    remote_verification_fixtures_retained: 0
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
     claims_privacy_gate_self_tests: 18/18 PASS
@@ -111,6 +115,11 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Pull Request 25 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 83ee6f4
+    - Migration 20260818000100 kontrolliert remote angewandt; elf lokale und Remote-Migrationen stimmen ueberein
+    - Remote-Dry-Run meldet up to date, Linked-Lint ist sauber und Schema-Diff public/private ist leer
+    - service_role besitzt keine direkten App-Tabellen-/Sequenzrechte und kann nur die vier Writer-RPCs ausfuehren
+    - Bounded Read-RPCs und Publikationsfilter remote bestanden; Verifier hinterliess null Fixtures
     - Pull Request 24 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit cd64718
     - Migration 20260817000100 remote als angewandt beobachtet und bei deaktivierter Runtime verifiziert
     - Remote-Lint, bounded RPCs, Grant-Negativtests, partial_score und Fixture-Rollback bestanden
@@ -187,11 +196,10 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - service_role-Haertung mit vollstaendiger Development-Pipeline pruefen
-    - Aenderungen committen, pushen und in einem separaten PR reviewen
-    - Migration 20260818000100 erst nach gruenem Merge kontrolliert remote anwenden
-    - Remote Schema-Diff, Lint sowie service_role-/RPC-Negativtests bei deaktivierter Runtime belegen
-    - Danach Retention-/Cleanup-ADR und Read-Rate-Limit als getrennte TODO-037-Restpunkte bearbeiten
+    - Post-Deployment-Evidenzbranch committen, pushen und per Doku-PR integrieren
+    - Retention-/Cleanup-ADR fuer writer_audit_log, Rate-Fenster und Cache-Sweeps erarbeiten
+    - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
+    - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe

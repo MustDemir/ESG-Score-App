@@ -52,7 +52,7 @@ pgTAP suite remains reproducible against the local Supabase stack.
 ## Finding RDV-01: Broad service_role Grants
 
 - Severity: high before writer activation
-- Status: remediation locally validated; remote application pending
+- Status: resolved in the disabled development environment
 - Risk: direct table writes could bypass validation, idempotency, ordering,
   publication and append-only audit controls
 - Decision: ADR 0036 requires RPC-only least privilege
@@ -61,11 +61,21 @@ pgTAP suite remains reproducible against the local Supabase stack.
 - Tests: 8 new pgTAP assertions, 180/180 total, DB lint and Edge writer
   integration gate pass locally
 
-The mobile backend and trusted writer remain disabled. Migration 11 must pass
-normal pull-request review and GitHub Actions before controlled remote
-application. After deployment, the versioned remote verifier must prove that
-all direct service-role table/sequence privileges are absent and the four
-bounded writer RPCs remain executable.
+Pull Request 25 passed all six jobs in GitHub Actions run `32129355126` and
+was merged as `83ee6f4`.
+Migration 11 was then applied through the controlled linked migration path.
+The post-deployment verification established:
+
+1. local and linked histories contain the same eleven migrations;
+2. a repeated deployment dry run reports the remote database as up to date;
+3. linked lint reports no schema errors;
+4. linked schema diff for `public,private` is empty;
+5. the versioned verifier rejects every direct service-role app table/sequence
+   privilege while preserving the four bounded writer RPC grants; and
+6. evidence and snapshot fixture counts remain zero after verification.
+
+The mobile backend and trusted writer remain disabled. This technical closure
+does not constitute provider, privacy, operational or release approval.
 
 ## Remaining Boundaries
 
