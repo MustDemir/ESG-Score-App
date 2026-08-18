@@ -68,7 +68,7 @@ key_and_identity_contract:
     privileged_key_location: managed_supabase_project_secrets_only
     repository_storage: prohibited
     client_distribution: prohibited
-    privilege: minimum_required_server_write_path
+    privilege: rpc_execute_only_no_direct_table_or_sequence_privileges
   operator:
     identity: individual_MFA_protected_account
     shared_dashboard_accounts: prohibited
@@ -214,10 +214,10 @@ incident_contract:
 
 implementation_evidence:
   state: remote_schema_deployed_runtime_disabled
-  validated_on: 2026-08-17
-  remote_deployment_evidence: docs/project/audits/2026-08-17-remote-schema-state-assessment.md
+  validated_on: 2026-08-18
+  remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
-  database_tests: 172/172 PASS
+  database_tests: 180/180 PASS
   flutter_cache_and_fallback_tests: 15/15 PASS
   gate_definition_tests: 11/11 PASS
   provider_governance_tests: 26 assertions PASS
@@ -230,6 +230,9 @@ implementation_evidence:
     - supabase/tests/database/trusted_writer_cache_path.test.sql
     - supabase/migrations/20260817000100_backend_remote_readiness.sql
     - supabase/tests/database/backend_remote_readiness.test.sql
+    - supabase/migrations/20260818000100_service_role_least_privilege.sql
+    - supabase/tests/database/service_role_least_privilege.test.sql
+    - scripts/quality/verify_remote_backend_readiness.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
     - docs/project/gate-definitions/gate-definition-schema.yaml
@@ -238,6 +241,7 @@ implementation_evidence:
     - node --test supabase/functions/_shared/writer_contract.test.mjs
     - bash scripts/quality/run_data_database_gate.sh
     - bash scripts/quality/run_edge_writer_integration_gate.sh
+    - supabase db query --linked --file scripts/quality/verify_remote_backend_readiness.sql
     - flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - ruby scripts/quality/test_gate_definition_gate.rb
     - ruby scripts/quality/test_provider_governance_gate.rb

@@ -110,6 +110,14 @@ else
     "bounded product evidence read" => "get_published_product_evidence",
     "bounded score snapshot read" => "get_published_score_snapshot",
     "partial score persistence" => "'partial_score'",
+    "service role evidence access revoked" =>
+      "revoke all privileges on table public.product_evidence from service_role",
+    "service role snapshot access revoked" =>
+      "revoke all privileges on table public.score_snapshots from service_role",
+    "service role private access revoked" =>
+      "revoke all privileges on all tables in schema private from service_role",
+    "service role future table grants revoked" =>
+      "alter default privileges for role postgres in schema public",
     "writer capacity function" => "claim_writer_capacity",
     "transactional writer function" => "publish_off_product",
     "writer outcome audit function" => "record_writer_outcome",

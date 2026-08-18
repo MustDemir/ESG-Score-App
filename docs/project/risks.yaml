@@ -1,4 +1,4 @@
-last_updated: 2026-08-13
+last_updated: 2026-08-18
 
 # Bewertung:
 #   likelihood: L (low) | M (medium) | H (high)
@@ -347,16 +347,18 @@ risks:
       barcode-begrenzten Read-RPCs verhindern Listenabfragen, haben vor einer
       Runtime-Aktivierung aber noch keinen Edge-basierten Abuse-Schutz.
     mitigation: |
-      Indizes, service_role-Revoke, TTL-Cap, private RLS, Trigger-Haertung und
-      direkte Listen-SELECTs sind technisch geschlossen. ADR 0035 schuetzt die
-      angewandte Migrationshistorie. Vor Runtime-Aktivierung folgen ein
-      gepruefter Retention-/Cleanup-ADR, reproduzierbare Sweeps und ein
-      Read-Rate-Limit mit Negativtests. Details: Audit 2026-08-13 und Remote-
-      Schema-Assessment 2026-08-17.
+      Indizes, TTL-Cap, private RLS, Trigger-Haertung und direkte Listen-SELECTs
+      sind technisch geschlossen. ADR 0035 schuetzt die angewandte
+      Migrationshistorie. ADR 0036 und Migration 20260818000100 entziehen der
+      Hosted service_role alle direkten App-Tabellen-/Sequenzrechte und lassen
+      nur vier gepruefte Writer-RPCs zu; die Remote-Anwendung steht noch aus.
+      Vor Runtime-Aktivierung folgen zudem ein gepruefter Retention-/Cleanup-
+      ADR, reproduzierbare Sweeps und ein Read-Rate-Limit mit Negativtests.
+      Details: Audits 2026-08-13, 2026-08-17 und 2026-08-18.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
-    related_decisions: [0032, 0035]
+    related_decisions: [0032, 0035, 0036]
     status: open
     owner: Engineering
     created: 2026-08-13
-    updated: 2026-08-17
+    updated: 2026-08-18

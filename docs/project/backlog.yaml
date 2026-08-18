@@ -1,4 +1,4 @@
-last_updated: 2026-08-13
+last_updated: 2026-08-18
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -216,17 +216,23 @@ todos:
       - G-GATE-DEFINITION-QUALITY, G-PROVIDER-DPA,
         G-PROVIDER-SUBPROCESSORS und G-COST-CONTROL integriert
       - 11 Gate-Schema- und 26 Provider-Governance-Selbsttestassertionen bestanden
+      - Pull Request 24 gemergt und Migration 20260817000100 remote mit
+        Linked-Lint und transaktionalen Grant-/RPC-Tests verifiziert
+      - service_role Least-Privilege als ADR 0036, Forward-only-Migration 11,
+        acht pgTAP-Assertions und versionierten Remote-Verifier umgesetzt
+      - Lokaler Replay mit elf Migrationen, 180/180 pgTAP, DB-Lint und
+        Edge-Writer-Integration bestanden
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
-      - Neue Forward-only-Migration 20260817000100 ueber PR integrieren und
-        erst nach gruenen Gates kontrolliert remote anwenden
+      - Forward-only-Migration 20260818000100 ueber separaten PR integrieren,
+        nach gruenem Merge kontrolliert remote anwenden und erneut verifizieren
       - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
-    updated: 2026-08-17
+    updated: 2026-08-18
     created: 2026-05-19
 
   - id: TODO-005
@@ -977,12 +983,22 @@ todos:
       - 21 negative und positive pgTAP-Assertions fuer Grants, Policies,
         Barcode-Isolation, Publikationsstatus und Formelversion ergaenzt
       - Lokaler Replay mit zehn Migrationen, 172/172 pgTAP und DB-Lint bestanden
+      - Pull Request 24 nach sechs gruenen GitHub-Actions-Jobs gemergt
+      - Migration 20260817000100 remote als angewandt beobachtet; Linked-Lint,
+        Grant-/RPC-Negativtests und transaktionale Fixture-Rollback-Pruefung bestanden
+      - Provider-default service_role-Tabellenrechte als RDV-01 erkannt und
+        ADR 0036 mit RPC-only Least-Privilege-Grenze akzeptiert
+      - Forward-only-Migration 20260818000100 entzieht direkte Tabellen- und
+        Sequenzrechte und erhaelt nur vier explizite Writer-RPC-Ausfuehrungsrechte
+      - Lokaler Replay mit elf Migrationen, 180/180 pgTAP, DB-Lint und
+        Edge-Writer-Integration bestanden
     remaining_parts:
       - Retention/Archivierung fuer writer_audit_log (Zeit-Partitionierung) und Sweeps fuer writer_rate_windows/abgelaufene cached_products — braucht Retention-ADR
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
-      - Migration 20260817000100 erst nach PR-Review und vollstaendigen Gates
-        remote anwenden; historische Migrationen nicht veraendern
-    updated: 2026-08-17
+      - Migration 20260818000100 erst nach PR-Review und vollstaendigen Gates
+        remote anwenden und mit dem versionierten Remote-Verifier belegen
+      - Historische Migrationen nicht veraendern
+    updated: 2026-08-18
     created: 2026-08-13
 
   - id: TODO-038

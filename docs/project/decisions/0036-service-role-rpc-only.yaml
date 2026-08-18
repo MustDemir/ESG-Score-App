@@ -1,0 +1,62 @@
+id: 0036
+title: RPC-only least privilege for the hosted Supabase service role
+date: 2026-08-18
+status: accepted
+deciders: [Mustafa]
+tags: [backend, security, least-privilege, supabase, database, auditability]
+
+context: |
+  Supabase grants the hosted service_role broad privileges on public objects
+  by default. The ScanFair writer boundary is narrower: validation,
+  idempotency, ordering, publication and audit controls live in four
+  SECURITY DEFINER RPCs. Direct table or sequence access could bypass those
+  controls even though the current writer and mobile runtime remain disabled.
+
+options_considered:
+  - name: Keep provider-default service_role grants
+    pros: [maximum compatibility with generic Supabase clients]
+    cons:
+      - violates the documented minimum-privilege writer boundary
+      - permits bypass of transactional validation and audit controls
+  - name: Remove direct data privileges and retain only bounded RPC execution
+    pros:
+      - enforces the documented writer contract in PostgreSQL
+      - keeps publication and audit invariants mandatory
+      - is testable locally and against the linked development environment
+    cons:
+      - generic direct-table service_role clients cannot be introduced silently
+
+decision: |
+  The hosted service_role receives no direct privileges on ScanFair public or
+  private application tables and sequences. It may execute only the four
+  bounded writer RPCs required by the trusted writer. PostgreSQL default
+  privileges are changed so future public/private tables and sequences do not
+  silently recreate the broad provider default.
+
+  The correction is forward-only. It does not activate the writer, mobile
+  backend, accounts, personal data, staging, production or release paths.
+
+rationale: |
+  Database-enforced least privilege is stronger and more reviewable than a
+  convention in application code. Keeping the RPC permission while revoking
+  table access also avoids an unnecessarily restrictive control that would
+  make the approved writer architecture unusable.
+
+implementation:
+  migration: supabase/migrations/20260818000100_service_role_least_privilege.sql
+  local_tests: supabase/tests/database/service_role_least_privilege.test.sql
+  remote_verifier: scripts/quality/verify_remote_backend_readiness.sql
+  assessment: docs/project/audits/2026-08-18-remote-deployment-verification.md
+  deployment_state: local_validated_remote_application_pending_pr_merge
+  runtime_state: disabled
+
+consequences:
+  - New trusted write capabilities require a reviewed RPC and explicit grant.
+  - Direct service_role table clients are prohibited by design.
+  - Migration replay and remote verification must check both denial and the
+    explicitly allowed RPC execution path.
+  - Retention, cleanup and public read-rate limiting remain separate open work.
+
+supersedes: null
+superseded_by: null
+related: [0002, 0008, 0020, 0022, 0032, 0035]

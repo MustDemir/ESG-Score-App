@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-08-17
+Letztes Update: 2026-08-18
 
 ## Aktive ADRs
 
@@ -43,6 +43,7 @@ Letztes Update: 2026-08-17
 | [0033](0033-cache-budget-ttl-alignment.yaml) | Cache-Frische vom Upstream-Refresh-Budget entkoppeln | accepted | 2026-08-13 | backend, cache, supabase, scaling, open-food-facts | 0022, 0032 |
 | [0034](0034-score-integrity-no-fabricated-signals.yaml) | Keine fabrizierten Saeulenwerte, kein Full-Score aus Teilevidenz | accepted | 2026-08-13 | scoring, esg, methodology, transparency, data-quality | 0010, 0011, 0027 |
 | [0035](0035-forward-only-remote-schema-hardening.yaml) | Forward-only-Haertung des angewandten Remote-Development-Schemas | accepted | 2026-08-17 | backend, database, migrations, supabase, security, auditability | 0002, 0020, 0022, 0032, 0033, 0034 |
+| [0036](0036-service-role-rpc-only.yaml) | RPC-only Least Privilege fuer die Hosted-Supabase-Service-Role | accepted | 2026-08-18 | backend, security, least-privilege, supabase, database, auditability | 0002, 0008, 0020, 0022, 0032, 0035 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -55,7 +56,7 @@ Letztes Update: 2026-08-17
 
 | Status | Anzahl |
 |---|---|
-| accepted | 30 |
+| accepted | 31 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 2 |
@@ -65,12 +66,12 @@ Letztes Update: 2026-08-17
 
 - **architecture** → 0001, 0014, 0015, 0016, 0022
 - **scanner / ios** → 0017
-- **backend / database** → 0002, 0022, 0032, 0033, 0035
+- **backend / database** → 0002, 0022, 0032, 0033, 0035, 0036
 - **data / api** → 0003, 0016, 0022, 0024, 0025, 0028, 0030
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
 - **ci-cd / testing** → 0007, 0020, 0021, 0026, 0029
-- **security / dsgvo** → 0008, 0026, 0032, 0035
+- **security / dsgvo** → 0008, 0026, 0032, 0035, 0036
 - **methodology** → 0009, 0011, 0023, 0025, 0028, 0029
 - **scoring / esg** → 0010, 0011, 0023, 0025, 0027, 0028, 0034
 - **compliance / governance** → 0009, 0029, 0030, 0031, 0032
