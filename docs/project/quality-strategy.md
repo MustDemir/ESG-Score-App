@@ -146,8 +146,11 @@ Flutter zugelassen ist und RLS-/Grant-Schutz in den Migrationen bestehen bleibt.
 ADR 0037 ergaenzt denselben Gate-Pfad um feste technische Aufbewahrungsfristen,
 einen taeglichen owner-ausgefuehrten pg_cron-Job, begrenzte Loeschbatches und
 einen privaten Replay-Watermark. Das Development-Profil verlangt die lokale
-Implementierung; Remote-Aktivierung bleibt bis Cron-, Monitoring- und Cleanup-
-Drill-Evidenz gesperrt. Persoenliche Zugriffslogs sind davon nicht freigegeben.
+Implementierung. Migration, Cron-Identitaet und kontrollierter Cleanup-Drill
+sind mit `scripts/quality/verify_remote_retention_cleanup.sql` remote belegt;
+Remote-Aktivierung bleibt bis Beobachtung eines echten geplanten Laufs sowie
+Monitoring- und Alarmierungsevidenz gesperrt. Persoenliche Zugriffslogs sind
+davon nicht freigegeben.
 `release_candidate` verlangt unabhaengig vom Aktivierungsstatus einen vierten,
 release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
 Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.

@@ -14,7 +14,7 @@ roadmap_progress:
       next: complete_with_current_integration
     - id: M2-backend-data-integration
       progress_percent: 85
-      next: review_and_deploy_retention_cleanup_then_implement_read_abuse_controls
+      next: observe_scheduled_cleanup_and_add_monitoring_then_implement_read_abuse_controls
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -62,23 +62,25 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-18
   session_closed_at: null
-  branch: feature/retention-cleanup
-  status: retention_cleanup_locally_committed_remote_pending
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/27
+  branch: docs/retention-remote-evidence
+  status: retention_cleanup_remote_verified_evidence_ready_for_review
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/28
   pull_request: null
   git_state:
     committed: true
-    pushed: false
+    pushed: true
     working_tree_clean: false
     commits:
+      - 92537a6 Merge pull request 28 from MustDemir/feature/retention-cleanup
+      - 64593f0 feat: add bounded retention cleanup
       - bcc55e4 Merge pull request 27 from MustDemir/docs/finalize-remote-evidence-handoff
       - ff67807 docs: finalize remote hardening handoff
       - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
-    reason: Migration 12, ADR 0037 und die Retention-Tests sind lokal auf einem Feature-Branch fertiggestellt und als gepruefter Checkpoint committed. Remote bleiben elf Migrationen unveraendert; Runtime und App-Zugriff sind deaktiviert. Der Branch ist nicht gepusht, und das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
+    reason: PR 28 ist gemergt und Migration 12 wurde auf scanfair-dev kontrolliert angewandt. Alle zwoelf Migrationen, Cron-Identitaet, Cleanup-Grenzen und Replay-Schutz sind remote verifiziert; Runtime und App-Zugriff bleiben deaktiviert. Der Evidence-Branch dokumentiert diesen Stand, waehrend das nutzereigene untracked Verzeichnis .claude unangetastet bleibt.
   latest_validation:
-    executed_at: "2026-08-18T12:24:42Z"
+    executed_at: "2026-08-18T19:09:04Z"
     development_quality_gates: 29/29 PASS
     flutter_tests: 121/121 PASS
     flutter_line_coverage: 84.15 percent
@@ -88,17 +90,21 @@ session_handoff:
     database_lint: PASS
     local_migrations: 12/12 REPLAYED
     retention_cleanup_local: PASS
-    retention_migration_remote: NOT_APPLIED
-    retention_migration_remote_dry_run: PASS_ONLY_MIGRATION_12_PENDING
-    remote_pg_cron: AVAILABLE_1.6.4_NOT_INSTALLED
+    retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
+    retention_migration_remote_dry_run: UP_TO_DATE
+    remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
-    remote_migrations: 11/11 RECONCILED
+    remote_migrations: 12/12 RECONCILED
     remote_schema_diff: EMPTY
     remote_database_lint: PASS
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
     service_role_hardening_remote: PASS
     remote_verification_fixtures_retained: 0
+    retention_cleanup_remote_verification: PASS
+    retention_verification_fixtures_retained: 0
+    retention_pr_github_actions_run: 32173551869 six_of_six PASS
+    retention_post_merge_github_actions_run: 32173898928 six_of_six PASS
     security_pr_github_actions_run: 32129355126 six_of_six PASS
     evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
@@ -123,6 +129,12 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Pull Request 28 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 92537a6
+    - Post-Merge-main-Lauf 32173898928 mit allen sechs Jobs bestanden
+    - Migration 20260818000200 kontrolliert remote angewandt; zwoelf lokale und Remote-Migrationen stimmen ueberein
+    - pg_cron 1.6.4 und genau ein aktiver postgres-eigener Cleanup-Job mit exakter Identitaet und Zeitplan remote belegt
+    - Transaktionaler Remote-Verifier fuer Berechtigung, Retention-Grenzen, Cleanup-Zaehlungen und Replay-Schutz bestanden; null Fixtures behalten
+    - Linked-Dry-Run up to date, Datenbank-Lint sauber und public/private-Schema-Diff leer
     - ADR 0037 mit festen technischen Retention-Fristen, begrenzten Cleanup-Batches und messbaren Partitionierungs-Triggern akzeptiert
     - Dauerhaften privaten Writer-Watermark fuer Replay- und Out-of-order-Integritaet nach Cache-/Idempotenz-Cleanup implementiert
     - Taeglichen postgres-owned pg_cron-Cleanup fuer Rate-Fenster, Cache, Idempotenz, Audit, Tagesnutzung und Cron-Historie lokal eingerichtet
@@ -210,8 +222,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Retention-Branch pushen und per PR mit allen GitHub-Checks reviewen
-    - Migration 20260818000200 erst nach Merge kontrolliert remote anwenden und Cron-/Cleanup-Evidenz erfassen
+    - Ersten echten geplanten Retention-Cleanup-Lauf beobachten und dokumentieren
+    - Cleanup-Fehleralarm und Eligible-Backlog-Monitor als Betriebsevidenz umsetzen
     - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
     - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:

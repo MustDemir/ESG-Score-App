@@ -71,8 +71,9 @@ implementation:
   migration: supabase/migrations/20260818000200_retention_cleanup.sql
   tests: supabase/tests/database/retention_cleanup.test.sql
   assessment: docs/project/audits/2026-08-18-retention-cleanup-assessment.md
+  remote_verifier: scripts/quality/verify_remote_retention_cleanup.sql
   local_state: validated_213_of_213_pgtap
-  remote_state: not_applied_pending_pull_request_review
+  remote_state: applied_and_verified_remotely_2026-08-18
   runtime_state: disabled
 
 verification:
@@ -88,7 +89,7 @@ consequences:
   - Cleanup-job success, duration, deleted counts and backlog require operational monitoring before runtime activation.
   - Source offboarding must decide and document when its durable watermarks are deleted.
   - Any personal access logging reopens the privacy, legal-basis, rights and retention gates.
-  - Remote application requires the normal reviewed forward-only migration path.
+  - The forward-only migration was applied through reviewed PR 28; runtime activation remains a separate decision.
   - Public read-abuse protection remains a separate TODO-037 work item.
 
 primary_sources:

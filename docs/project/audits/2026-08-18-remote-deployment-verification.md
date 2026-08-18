@@ -81,5 +81,7 @@ does not constitute provider, privacy, operational or release approval.
 
 - Runtime, mobile app access and accounts remain disabled.
 - DPA and subprocessor owner approval remain pending.
-- Retention/cleanup and public read-rate limiting remain open in TODO-037.
+- Retention migration, cron identity and a controlled cleanup drill are covered
+  by the follow-up retention assessment; scheduled-run monitoring, failure
+  alerting and public read-rate limiting remain open in TODO-037.
 - Staging, production, TestFlight and App Store release are not authorized.
