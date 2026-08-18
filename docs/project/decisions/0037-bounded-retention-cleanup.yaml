@@ -1,0 +1,102 @@
+id: 0037
+title: Bounded retention cleanup with durable writer watermarks
+date: 2026-08-18
+status: accepted
+deciders: [Mustafa]
+tags: [backend, database, retention, privacy, operations, supabase, auditability]
+
+context: |
+  The trusted writer creates short-lived rate windows, cache rows,
+  idempotency events, audit records, daily usage counters and pg_cron run
+  history. Without explicit retention these tables grow indefinitely. Deleting
+  cache and idempotency rows alone would, however, remove the ordering evidence
+  needed to reject an older or conflicting upstream observation.
+
+  The current backend contains public-source product data and technical writer
+  metadata only. Runtime access and personal-data processing remain disabled.
+  Any future personal access log or account history requires its own lawful-
+  basis, rights and retention approval before activation.
+
+options_considered:
+  - name: Keep all operational rows indefinitely
+    pros: [maximum forensic history]
+    cons:
+      - violates storage-minimisation and predictable-cost objectives
+      - creates unbounded table and pg_cron-history growth
+  - name: Partition every operational table immediately
+    pros: [efficient bulk expiry at very high volume]
+    cons:
+      - adds lifecycle and migration complexity before measured need
+      - does not by itself preserve replay ordering after expiry
+  - name: Daily bounded deletion plus a durable ordering watermark
+    pros:
+      - enforces explicit and testable retention periods
+      - preserves replay and out-of-order protection with one small row per source record
+      - limits lock duration and supports later partitioning on measured triggers
+    cons:
+      - requires monitoring for cleanup backlog and job failure
+      - watermark deletion needs an explicit source-offboarding process
+
+decision: |
+  Install pg_cron and run one owner-executed cleanup job daily at 03:20 UTC.
+  Delete at most 10,000 eligible rows per large table and execution. Retain
+  writer rate windows for one hour, expired cache rows for one additional day,
+  idempotency events for 30 days, writer audit records for 90 days, daily usage
+  counters for 400 days and pg_cron run history for 30 days.
+
+  Preserve one private, hash-bound writer watermark per source record while
+  that source record remains active. Publication ordering uses this watermark,
+  so cleanup cannot re-enable older or same-timestamp conflicting payloads.
+  Exact hash-matching replays may restore or repair the disposable cache.
+
+  Audit records remain append-only for application and service roles. Only the
+  private SECURITY DEFINER cleanup function, executed by the postgres-owned
+  cron job, may delete records after the 90-day boundary. The function is not
+  executable by anon, authenticated or service_role.
+
+  Time partitioning is deferred until a review is triggered by any of:
+  1,000,000 writer-audit rows, cleanup duration above two seconds in three
+  consecutive daily runs, or an eligible-row backlog that remains above the
+  daily 10,000-row batch for seven days. A triggered review must choose and
+  test partition creation, expiry, backup and rollback procedures before use.
+
+rationale: |
+  The periods cover near-term incident investigation and annual usage review
+  without retaining disposable operational events indefinitely. Bounded
+  deletion is proportionate to the current hard writer budget and disabled MVP
+  runtime. The watermark separates integrity evidence from event history and
+  prevents retention from weakening publication safety.
+
+implementation:
+  migration: supabase/migrations/20260818000200_retention_cleanup.sql
+  tests: supabase/tests/database/retention_cleanup.test.sql
+  assessment: docs/project/audits/2026-08-18-retention-cleanup-assessment.md
+  local_state: validated_213_of_213_pgtap
+  remote_state: not_applied_pending_pull_request_review
+  runtime_state: disabled
+
+verification:
+  - migration replay installs pg_cron and exactly one named UTC job
+  - direct audit deletion and service_role cleanup execution fail
+  - boundary rows survive while expired rows are removed
+  - watermark survives cleanup and rejects older or conflicting observations
+  - exact replay restores the hash-bound disposable cache
+  - future fetch clocks cannot extend the retention boundary
+  - database lint reports no schema error
+
+consequences:
+  - Cleanup-job success, duration, deleted counts and backlog require operational monitoring before runtime activation.
+  - Source offboarding must decide and document when its durable watermarks are deleted.
+  - Any personal access logging reopens the privacy, legal-basis, rights and retention gates.
+  - Remote application requires the normal reviewed forward-only migration path.
+  - Public read-abuse protection remains a separate TODO-037 work item.
+
+primary_sources:
+  - EU-GDPR
+  - SUPABASE-CRON
+  - SUPABASE-UPGRADING
+  - SUPABASE-PRODUCTION-CHECKLIST
+
+supersedes: null
+superseded_by: null
+related: [0002, 0008, 0020, 0022, 0032, 0033, 0035, 0036]

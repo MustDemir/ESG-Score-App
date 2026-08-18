@@ -76,6 +76,19 @@ class BackendBoundaryGateSelfTest
     end
 
     with_fixture do |root|
+      contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
+      contract = load_yaml(root, contract_path)
+      contract["retention_cleanup_contract"]["batch_limit_rows"] = 100_000
+      write_yaml(root, contract_path, contract)
+      check = validator(root, "development")
+      assert(!check.run, "gate must reject retention cleanup drift")
+      assert(
+        check.violations.any? { |entry| entry.include?("retention cleanup contract") },
+        "retention failure should identify the cleanup contract",
+      )
+    end
+
+    with_fixture do |root|
       blocked = validator(root, "remote_backend")
       assert(!blocked.run, "remote profile must reject a contract-only environment")
     end

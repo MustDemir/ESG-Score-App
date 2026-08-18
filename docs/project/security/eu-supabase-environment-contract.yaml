@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-17
+last_reviewed: 2026-08-18
 owner: Engineering
 status: accepted_for_definition_of_ready
 implementation_state: remote_schema_deployed_runtime_disabled
@@ -167,8 +167,40 @@ audit_contract:
     - secret_or_service_key
     - raw_personal_payload
     - full_upstream_response
-  retention_status: pending_privacy_and_operations_review
+  retention_status: approved_for_technical_writer_data_runtime_disabled
   clock: UTC
+
+retention_cleanup_contract:
+  state: locally_validated_remote_pending
+  scheduler: pg_cron
+  job_name: scanfair-retention-cleanup
+  schedule_utc: "20 3 * * *"
+  execution_database: postgres
+  execution_role: postgres
+  batch_limit_rows: 10000
+  periods:
+    writer_rate_windows: 1_hour
+    cached_products: 1_day_after_expiry
+    writer_idempotency_keys: 30_days
+    writer_audit_log: 90_days
+    writer_daily_usage: 400_days
+    cron_job_run_details: 30_days
+  integrity_watermark:
+    table: private.writer_record_watermarks
+    retention: source_record_lifecycle
+    purpose: reject_older_and_same_timestamp_conflicting_source_observations
+    maximum_rows: one_per_source_record
+  personal_data_boundary: prohibited_until_separate_privacy_and_operations_approval
+  partition_review_triggers:
+    writer_audit_rows: 1000000
+    cleanup_seconds_for_three_consecutive_runs: 2
+    eligible_backlog_above_batch_days: 7
+  remote_activation_evidence_required:
+    - scheduled_job_identity_and_schedule
+    - successful_cleanup_and_boundary_counts
+    - cleanup_failure_alert
+    - eligible_backlog_monitor
+    - post_upgrade_job_verification
 
 secret_lifecycle:
   maximum_rotation_days: 180
@@ -217,8 +249,11 @@ implementation_evidence:
   validated_on: 2026-08-18
   remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
-  database_tests: 180/180 PASS
+  database_tests: 213/213 PASS
+  local_migrations: 12/12 REPLAYED
   remote_migrations: 11/11 RECONCILED
+  retention_migration_remote_dry_run: PASS_ONLY_MIGRATION_12_PENDING
+  remote_pg_cron: AVAILABLE_1.6.4_NOT_INSTALLED
   remote_schema_diff: EMPTY
   remote_database_lint: PASS
   service_role_rpc_only_verification: PASS
@@ -237,6 +272,10 @@ implementation_evidence:
     - supabase/tests/database/backend_remote_readiness.test.sql
     - supabase/migrations/20260818000100_service_role_least_privilege.sql
     - supabase/tests/database/service_role_least_privilege.test.sql
+    - supabase/migrations/20260818000200_retention_cleanup.sql
+    - supabase/tests/database/retention_cleanup.test.sql
+    - docs/project/decisions/0037-bounded-retention-cleanup.yaml
+    - docs/project/audits/2026-08-18-retention-cleanup-assessment.md
     - scripts/quality/verify_remote_backend_readiness.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
@@ -275,7 +314,7 @@ reviews:
     status: pending_independent_review
     evidence: null
   operational_readiness:
-    status: pending_remote_environment
+    status: pending_remote_cleanup_monitoring_and_drill
     evidence: null
   release_security:
     status: pending_release_candidate
@@ -353,6 +392,7 @@ remote_activation_blocks:
   - independent_writer_security_review_missing
   - privileged_secret_present_in_client_repository_or_logs
   - remote_environment_writer_and_RLS_integration_tests_missing
+  - remote_retention_job_monitoring_and_cleanup_drill_missing
   - secret_rotation_break_glass_or_incident_drill_missing
   - privacy_or_data_license_remote_profile_failing
 
@@ -371,4 +411,6 @@ primary_sources:
   - SUPABASE-SUBPROCESSORS
   - SUPABASE-COST-CONTROL
   - SUPABASE-PRODUCTION-CHECKLIST
+  - SUPABASE-CRON
+  - SUPABASE-UPGRADING
   - EU-GDPR

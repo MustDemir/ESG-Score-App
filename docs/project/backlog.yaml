@@ -227,11 +227,17 @@ todos:
         abgeglichen, Dry-Run aktuell, Linked-Lint sauber und Schema-Diff leer
       - Remote-Verifier fuer service_role-Deny, vier Writer-RPCs und bounded
         Reads bestanden; Evidence-/Snapshot-Fixtures danach jeweils null
+      - ADR 0037 legt technische Retention, begrenzte Cleanup-Batches,
+        dauerhafte Replay-Watermarks und messbare Partitionierungs-Trigger fest
+      - Migration 20260818000200 und 32 neue Retention-pgTAP-Assertions lokal
+        umgesetzt; insgesamt zwoelf Migrationen und 213/213 Datenbanktests
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
       - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
+      - Migration 20260818000200 nach PR-Freigabe remote anwenden und Cron-Job,
+        Cleanup-Ergebnis, Backlog-Monitoring und Fehleralarm belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
@@ -948,7 +954,7 @@ todos:
   - id: TODO-037
     title: Backend-Haertung vor Remote-Deploy — Retention, Indizes, service_role-Revoke
     description: |
-      F-10 bis F-12, F-18, F-19: writer_audit_log zeit-partitionieren und
+      F-10 bis F-12, F-18, F-19: writer_audit_log kontrolliert bereinigen und
       indizieren, pg_cron-Sweeps fuer writer_rate_windows und abgelaufene
       cached_products, sechs FK-Indizes ergaenzen, revoke
       insert/update/delete on cached_products from service_role, verwaiste
@@ -997,8 +1003,17 @@ todos:
         Edge-Writer-Integration bestanden
       - Migration 20260818000100 nach PR-Review remote angewandt und mit leerem
         Schema-Diff, sauberem Lint sowie service_role-/RPC-Verifier belegt
+      - ADR 0037 mit begrenzter technischer Retention, taeglichem pg_cron-Job,
+        10.000-Zeilen-Batches und messbaren Partitionierungs-Triggern akzeptiert
+      - Dauerhafte private Writer-Watermarks verhindern, dass Cache- oder
+        Idempotenz-Cleanup aeltere bzw. widerspruechliche Replays wieder zulaesst
+      - Migration 20260818000200 mit Cleanup fuer Rate-Fenster, Cache,
+        Idempotenz, Audit, Tagesnutzung und Cron-Historie erstellt
+      - 33 Retention-Assertions ergaenzt; lokaler Replay mit zwoelf Migrationen,
+        213/213 pgTAP und DB-Lint bestanden
     remaining_parts:
-      - Retention/Archivierung fuer writer_audit_log (Zeit-Partitionierung) und Sweeps fuer writer_rate_windows/abgelaufene cached_products — braucht Retention-ADR
+      - Migration 20260818000200 nach PR-Review remote anwenden; Cron-Identitaet,
+        Cleanup-Lauf, Backlog-Monitor und Fehleralarm als Betriebsevidenz belegen
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
       - Historische Migrationen nicht veraendern
     updated: 2026-08-18

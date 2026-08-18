@@ -33,3 +33,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-08-12 | [Provider Governance Gates Assessment](2026-08-12-provider-governance-gates-assessment.md) | Gate schema, DPA, subprocessors, Free Plan cost controls and fail-closed remote activation |
 | 2026-08-17 | [Remote Schema State Assessment](2026-08-17-remote-schema-state-assessment.md) | Linked migration reconciliation, schema drift, remote data state and activation boundary |
 | 2026-08-18 | [Remote Deployment Verification](2026-08-18-remote-deployment-verification.md) | Migration-10 remote behavior, hosted pgTAP limitation and service-role least-privilege finding |
+| 2026-08-18 | [Retention and Cleanup Assessment](2026-08-18-retention-cleanup-assessment.md) | Bounded technical retention, durable replay watermarks, pg_cron scheduling and activation boundary |

@@ -341,11 +341,11 @@ risks:
     impact: H
     score: 6
     description: |
-      Retention und kontrollierte Loeschbarkeit des Append-only Writer-Audits
-      sind noch nicht fachlich entschieden. Rate-Fenster und abgelaufene
-      Cachezeilen besitzen noch keinen freigegebenen Cleanup-Plan. Die
-      barcode-begrenzten Read-RPCs verhindern Listenabfragen, haben vor einer
-      Runtime-Aktivierung aber noch keinen Edge-basierten Abuse-Schutz.
+      Technische Retention und kontrollierte Loeschbarkeit des Append-only
+      Writer-Audits sind lokal entschieden und getestet, aber noch nicht remote
+      angewandt oder betrieblich ueberwacht. Die barcode-begrenzten Read-RPCs
+      verhindern Listenabfragen, haben vor einer Runtime-Aktivierung aber noch
+      keinen Edge-basierten Abuse-Schutz.
     mitigation: |
       Indizes, TTL-Cap, private RLS, Trigger-Haertung und direkte Listen-SELECTs
       sind technisch geschlossen. ADR 0035 schuetzt die angewandte
@@ -353,12 +353,14 @@ risks:
       Hosted service_role alle direkten App-Tabellen-/Sequenzrechte und lassen
       nur vier gepruefte Writer-RPCs zu; Remote-Diff, Lint und der atomische
       Berechtigungsverifier bestaetigen die wirksame Anwendung.
-      Vor Runtime-Aktivierung folgen zudem ein gepruefter Retention-/Cleanup-
-      ADR, reproduzierbare Sweeps und ein Read-Rate-Limit mit Negativtests.
+      ADR 0037, Migration 20260818000200 und 33 Retention-Assertions definieren
+      reproduzierbare, begrenzte Sweeps sowie dauerhafte Replay-Watermarks.
+      Vor Runtime-Aktivierung folgen Remote-Anwendung, Cleanup-Monitoring und
+      Drill sowie ein Read-Rate-Limit mit Negativtests.
       Details: Audits 2026-08-13, 2026-08-17 und 2026-08-18.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
-    related_decisions: [0032, 0035, 0036]
+    related_decisions: [0032, 0035, 0036, 0037]
     status: open
     owner: Engineering
     created: 2026-08-13

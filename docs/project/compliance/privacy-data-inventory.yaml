@@ -307,7 +307,7 @@ processing_activities:
     region: EU_region_required_before_activation
     legal_basis_candidate: GDPR_Art_6_1_f_candidate_requires_LIA
     legal_basis_status: prohibited_until_review
-    retention: product_cache_source_defined_access_logs_schedule_pending
+    retention: technical_cache_and_writer_schedule_versioned_personal_access_logs_prohibited
     deletion: source_withdrawal_and_log_deletion_process_required
     apple_data_type: product_interaction_or_diagnostics_candidate_for_logs
     linked_to_user: must_remain_false_for_product_cache
@@ -318,6 +318,8 @@ processing_activities:
       - source_partitioning
       - server_writer_only
       - no_service_role_in_app
+      - bounded_pg_cron_cleanup_locally_validated
+      - durable_non_user_writer_watermark_preserves_replay_integrity
 
 data_flow_contract:
   current_path:
@@ -345,6 +347,17 @@ retention_contract:
     expiry: after_frame_processing
   remote_personal_data:
     status: prohibited_until_versioned_schedule_and_verified_deletion
+  remote_technical_writer_data:
+    activation_status: runtime_disabled_remote_migration_pending
+    writer_rate_windows: 1_hour
+    cached_products: 1_day_after_expiry
+    writer_idempotency_keys: 30_days
+    writer_audit_log: 90_days
+    writer_daily_usage: 400_days
+    cron_job_run_details: 30_days
+    source_record_watermarks: source_record_lifecycle_one_row_per_record
+    personal_access_logs: prohibited
+    decision: docs/project/decisions/0037-bounded-retention-cleanup.yaml
 
 data_subject_rights:
   current_scanfair_server_records: none
@@ -399,3 +412,4 @@ primary_sources:
   - APPLE-APP-PRIVACY
   - APPLE-APP-PRIVACY-DETAILS
   - APPLE-ARG
+  - SUPABASE-CRON

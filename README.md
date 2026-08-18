@@ -260,7 +260,7 @@ als technische Fertigstellung.
 
 ```text
 M1  Lokaler MVP und Integrationsbaseline [####################] 100%
-M2  Backend- und Datenanbindung           [################----]  80%
+M2  Backend- und Datenanbindung           [#################---]  85%
 M3  Kaffee als Referenzfall               [#########-----------]  45%
 M4  Umwelt-, Social- und Governance-Daten [###-----------------]  15%
 M5  Kalibrierte Methodik 2.0              [###-----------------]  15%
@@ -272,7 +272,7 @@ M8  TestFlight, Submission und Release    [--------------------]   0%
 | Meilenstein | Bereits erreicht | Noch bis 100% |
 | --- | --- | --- |
 | M1 | iOS-Kernflow, Datenarchitektur, Quality Gates und gruener Integrationsbranch | mit diesem Integrationsstand abgeschlossen |
-| M2 | elf lokal reproduzierbare und remote abgeglichene Migrationen, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache und 180 pgTAP-Tests; RPC-only service_role remote verifiziert | Retention, Cleanup und Read-Abuse-Schutz entscheiden; danach DPA-/Unterauftragsverarbeiter-Freigabe, Runtime-Integration und unabhaengige Reviews |
+| M2 | elf remote abgeglichene plus eine lokal validierte Retention-Migration, Trusted Writer, begrenzte Read-/Write-RPCs, read-only Flutter-Cache und 213 pgTAP-Tests; RPC-only service_role remote verifiziert | Retention-Migration kontrolliert remote anwenden und ueberwachen, danach Read-Abuse-Schutz, DPA-/Unterauftragsverarbeiter-Freigabe, Runtime-Integration und unabhaengige Reviews |
 | M3 | drei reproduzierbare Kaffee-GTINs, offizieller Deklarationsnachweis und produktgebundene Rohstoff-/Herkunftslinks | Umwelt-/Social-/Governance-Faktoren, versionierter Score-Snapshot und fachliche Kalibrierung |
 | M4 | Quellenregister und Kandidaten fuer Wasser, Social-Risiko und Rechtstraeger | technische Anbindung, Mapping-, Lizenz- und Claim-Pruefung je Quelle |
 | M5 | 26 Parameter, Safety Controls und ausgesetzte Aktivierungsregeln | Gewichte, Normalisierung, Testkorpus, Kalibrierung und Expertenreview |
@@ -288,8 +288,8 @@ Die Pakete werden erst bei nachweisbarer Implementierung fortgeschrieben:
 N0  Compliance-/Security-Baseline        [#################---]  85%
 N1  Kaffee-Pilotprodukte festlegen        [####################] 100%
 N2  Produkt -> Rohstoff -> Herkunft       [####################] 100%
-N3  EU-Supabase-Projekt verbinden         [############--------]  60%
-N4  Server-Writer und Flutter-Cache       [#################---]  85%
+N3  EU-Supabase-Projekt verbinden         [#############-------]  65%
+N4  Server-Writer und Flutter-Cache       [##################--]  90%
 N5  WRI-Aqueduct-Wasserrisiko             [--------------------]   0%
 N6  ILAB-Social-Risikomapping             [--------------------]   0%
 N7  GLEIF/BRIS-Rechtstraegermapping       [--------------------]   0%
@@ -306,9 +306,10 @@ Herkunfts-, Evidenz- und Backend-Sicherheitsvertraege sind jetzt stabil. Der
 Trusted Writer, die serverseitigen RPCs und der read-only Flutter-Cache sind
 lokal implementiert und getestet, aber nicht remote aktiviert. Das dedizierte
 Supabase-Development-Projekt `scanfair-dev` ist in Frankfurt provisioniert und
-lokal verknuepft; neun Migrationen sind remote registriert, Schema-Diff und
-DB-Lint sind sauber. Die zehnte Forward-only-Haertung ist lokal validiert und
-noch nicht remote angewandt.
+lokal verknuepft; elf Migrationen sind remote registriert, Schema-Diff und
+DB-Lint sind sauber. Die zwoelfte Forward-only-Migration fuer begrenzte
+Retention, taegliches Cleanup und dauerhafte Replay-Watermarks ist lokal mit
+213 pgTAP-Tests validiert und noch nicht remote angewandt.
 Vor der Remote-Aktivierung folgen DPA- und Unterauftragsverarbeiter-Freigabe,
 Benachrichtigungs- und Plan-Evidenz, unabhaengige Reviews sowie das kontrollierte
 Deployment. Erst danach werden WRI, ILAB und GLEIF/BRIS
@@ -385,8 +386,8 @@ implementiert.
 | Scoring | ESG-Gesamtscore sowie E-/S-/G-Details werden regelbasiert berechnet |
 | Ergebnis-UX | Resultat, Detailinformationen und Quellen sind sichtbar; Nährwerte erscheinen neutral ohne Health-Score oder Fortschrittsbalken |
 | Methodik | Formel v1.1 evidence-only mit partialScore aktiv; v2-Parameterkatalog mit 26 Parametern und vier Profilen als gepruefter Entwurf |
-| Datenbank | Elf lokale und remote abgeglichene Migrationen, dreizehn RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 180 pgTAP-Tests, leerer Remote-Schema-Diff und DB-Lint bestanden |
-| Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, Out-of-order-Schutz und Append-only Audit lokal validiert; Remote-Schema deployed, Runtime deaktiviert |
+| Datenbank | Elf remote abgeglichene plus eine lokale Retention-Migration, dreizehn öffentliche RLS-Tabellen sowie private Writer-Kontrollen reproduzierbar; 213 pgTAP-Tests und DB-Lint lokal bestanden, Remote-Diff fuer Migrationen 1-11 leer |
+| Backend / Cache | Trusted Edge Writer, getrennte Invoker-Secrets, SSRF-/Payload-Grenzen, Rate-/Tagesbudget, Circuit Breaker, Idempotenz, dauerhafte Replay-Watermarks, begrenzte Retention und Append-only Audit lokal validiert; Remote-Schema deployed, Runtime deaktiviert |
 | Flutter-Datenpfad | Frischer Einzel-Cache-Hit wird gelesen; Miss, Stale, Offline und Backendfehler fallen auf Open Food Facts zurueck |
 | Provider Governance | Frankfurt-Region verifiziert; DPA-, Unterauftragsverarbeiter- und Kosten-Gates bestehen fail-closed fuer die lokale Entwicklung; Owner-Freigaben und Remote-Aktivierung bleiben offen |
 | Tests | 121/121 Flutter-Tests bestanden; Line Coverage 84,15% |
@@ -500,7 +501,7 @@ Das Script erzeugt `.quality/quality-gate-report.md` und fuehrt diese Gates aus:
 | `G-PROVIDER-DPA` | Aktuelle Supabase-DPA-, Regions-, Verarbeitungs- und Freigabegrenze pruefen |
 | `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter, Aenderungserkennung und Owner-Freigabe pruefen |
 | `G-COST-CONTROL` | Free-Plan-, Add-on-, Quoten- und Kostenfreigabegrenzen pruefen |
-| `G-DATA-RLS` | Elf Migrationen real abspielen, 180 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint ausfuehren |
+| `G-DATA-RLS` | Zwoelf Migrationen real abspielen, 213 pgTAP-RLS-/Writer-/Retention-Tests und PostgreSQL-Lint ausfuehren |
 | `G-PROJECT-CONTROL` | Lifecycle-Gaps, Improvements, Quellen-/Risiko-Mappings und Feature-Status gegen Drift pruefen |
 | `G-DOC-TRACE` | README/Workflow-Dokumentation gegen Drift pruefen |
 | `G-DOC-YAML` | Alle YAML-Dateien der Projekt-SSOT syntaktisch validieren |

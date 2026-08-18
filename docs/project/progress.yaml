@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 80
-      next: decide_retention_cleanup_and_read_abuse_controls_before_runtime_reviews
+      progress_percent: 85
+      next: review_and_deploy_retention_cleanup_then_implement_read_abuse_controls
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -43,7 +43,7 @@ roadmap_progress:
     - id: N3-eu-supabase-project
       progress_percent: 65
     - id: N4-server-writer-flutter-cache
-      progress_percent: 85
+      progress_percent: 90
     - id: N5-wri-aqueduct
       progress_percent: 0
     - id: N6-ilab-social-risk
@@ -62,30 +62,35 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-18
   session_closed_at: null
-  branch: main
-  status: service_role_remote_hardening_complete_runtime_disabled
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/26
+  branch: feature/retention-cleanup
+  status: retention_cleanup_locally_committed_remote_pending
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/27
   pull_request: null
   git_state:
     committed: true
-    pushed: true
+    pushed: false
     working_tree_clean: false
     commits:
+      - bcc55e4 Merge pull request 27 from MustDemir/docs/finalize-remote-evidence-handoff
+      - ff67807 docs: finalize remote hardening handoff
       - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
-      - a86ed2b security: enforce RPC-only service role access
-      - cd64718 Merge pull request 24 from MustDemir/feature/backend-remote-readiness
-    reason: PR 25 implementiert die RPC-only service_role-Haertung; PR 26 dokumentiert den nachgelagerten Remote-Nachweis. Beide PRs sind nach jeweils sechs gruenen GitHub-Actions-Jobs gemergt. Migration 11 ist remote angewandt und verifiziert. Runtime und App-Zugriff bleiben deaktiviert; nur das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
+    reason: Migration 12, ADR 0037 und die Retention-Tests sind lokal auf einem Feature-Branch fertiggestellt und als gepruefter Checkpoint committed. Remote bleiben elf Migrationen unveraendert; Runtime und App-Zugriff sind deaktiviert. Der Branch ist nicht gepusht, und das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
   latest_validation:
-    executed_at: "2026-08-18T10:55:43Z"
+    executed_at: "2026-08-18T12:24:42Z"
     development_quality_gates: 29/29 PASS
     flutter_tests: 121/121 PASS
     flutter_line_coverage: 84.15 percent
     database_migration_replay: PASS
-    database_validation_executed_at: "2026-08-18T10:56:42Z"
-    database_pgtap: 180/180 PASS
+    database_validation_executed_at: "2026-08-18T12:18:18Z"
+    database_pgtap: 213/213 PASS
     database_lint: PASS
+    local_migrations: 12/12 REPLAYED
+    retention_cleanup_local: PASS
+    retention_migration_remote: NOT_APPLIED
+    retention_migration_remote_dry_run: PASS_ONLY_MIGRATION_12_PENDING
+    remote_pg_cron: AVAILABLE_1.6.4_NOT_INSTALLED
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migrations: 11/11 RECONCILED
@@ -103,7 +108,7 @@ session_handoff:
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
-    backend_boundary_gate_self_tests: 16/16 PASS
+    backend_boundary_gate_self_tests: 18/18 PASS
     writer_contract_tests: 12/12 PASS
     edge_wrapper_integration: PASS with automated invalid-secret and cross-actor 401, schema 400, plus controlled 201 publication, idempotent replay and bounded public read
     backend_development_profile: PASS
@@ -118,6 +123,11 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - ADR 0037 mit festen technischen Retention-Fristen, begrenzten Cleanup-Batches und messbaren Partitionierungs-Triggern akzeptiert
+    - Dauerhaften privaten Writer-Watermark fuer Replay- und Out-of-order-Integritaet nach Cache-/Idempotenz-Cleanup implementiert
+    - Taeglichen postgres-owned pg_cron-Cleanup fuer Rate-Fenster, Cache, Idempotenz, Audit, Tagesnutzung und Cron-Historie lokal eingerichtet
+    - Direkte Audit-Loeschung bleibt blockiert; nur der private Cleanup-Pfad darf 90 Tage alte technische Auditzeilen entfernen
+    - Zwoelf lokale Migrationen, 213/213 pgTAP, DB-Lint, 18 Backend-Gate-Selbsttests und Edge-Writer-Integration bestanden
     - Pull Request 25 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 83ee6f4
     - Pull Request 26 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit c5b61e6
     - Migration 20260818000100 kontrolliert remote angewandt; elf lokale und Remote-Migrationen stimmen ueberein
@@ -200,7 +210,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Retention-/Cleanup-ADR fuer writer_audit_log, Rate-Fenster und Cache-Sweeps erarbeiten
+    - Retention-Branch pushen und per PR mit allen GitHub-Checks reviewen
+    - Migration 20260818000200 erst nach Merge kontrolliert remote anwenden und Cron-/Cleanup-Evidenz erfassen
     - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
     - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:

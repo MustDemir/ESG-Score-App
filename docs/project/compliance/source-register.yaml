@@ -1,5 +1,5 @@
 schema_version: "1.1"
-last_verified: 2026-08-12
+last_verified: 2026-08-18
 next_review_due: 2026-09-09
 review_owner: Release owner
 
@@ -151,6 +151,20 @@ sources:
     version: current-web
     normative_weight: PROVIDER_SECURITY_GUIDANCE
     scope: RLS, performance, load testing, backups, availability and operational readiness
+  - id: SUPABASE-CRON
+    authority: Supabase
+    title: Supabase Cron
+    url: https://supabase.com/docs/guides/cron
+    version: current-web
+    normative_weight: PROVIDER_OPERATIONAL_GUIDANCE
+    scope: pg_cron installation, scheduled database jobs, concurrency and duration guidance
+  - id: SUPABASE-UPGRADING
+    authority: Supabase
+    title: Upgrading
+    url: https://supabase.com/docs/guides/platform/upgrading
+    version: current-web
+    normative_weight: PROVIDER_OPERATIONAL_GUIDANCE
+    scope: pg_cron history cleanup and post-upgrade application validation
   - id: EU-GDPR
     authority: European Union
     title: General Data Protection Regulation
