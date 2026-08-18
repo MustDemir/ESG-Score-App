@@ -218,6 +218,11 @@ implementation_evidence:
   remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
   database_tests: 180/180 PASS
+  remote_migrations: 11/11 RECONCILED
+  remote_schema_diff: EMPTY
+  remote_database_lint: PASS
+  service_role_rpc_only_verification: PASS
+  remote_verification_fixtures_retained: 0
   flutter_cache_and_fallback_tests: 15/15 PASS
   gate_definition_tests: 11/11 PASS
   provider_governance_tests: 26 assertions PASS

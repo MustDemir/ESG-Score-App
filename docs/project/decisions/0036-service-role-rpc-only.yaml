@@ -47,7 +47,7 @@ implementation:
   local_tests: supabase/tests/database/service_role_least_privilege.test.sql
   remote_verifier: scripts/quality/verify_remote_backend_readiness.sql
   assessment: docs/project/audits/2026-08-18-remote-deployment-verification.md
-  deployment_state: local_validated_remote_application_pending_pr_merge
+  deployment_state: applied_and_verified_remotely_2026-08-18
   runtime_state: disabled
 
 consequences:

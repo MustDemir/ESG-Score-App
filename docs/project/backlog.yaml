@@ -222,11 +222,14 @@ todos:
         acht pgTAP-Assertions und versionierten Remote-Verifier umgesetzt
       - Lokaler Replay mit elf Migrationen, 180/180 pgTAP, DB-Lint und
         Edge-Writer-Integration bestanden
+      - Pull Request 25 mit sechs gruenen GitHub-Actions-Jobs gemergt
+      - Migration 20260818000100 kontrolliert remote angewandt; elf Migrationen
+        abgeglichen, Dry-Run aktuell, Linked-Lint sauber und Schema-Diff leer
+      - Remote-Verifier fuer service_role-Deny, vier Writer-RPCs und bounded
+        Reads bestanden; Evidence-/Snapshot-Fixtures danach jeweils null
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
-      - Forward-only-Migration 20260818000100 ueber separaten PR integrieren,
-        nach gruenem Merge kontrolliert remote anwenden und erneut verifizieren
       - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
@@ -992,11 +995,11 @@ todos:
         Sequenzrechte und erhaelt nur vier explizite Writer-RPC-Ausfuehrungsrechte
       - Lokaler Replay mit elf Migrationen, 180/180 pgTAP, DB-Lint und
         Edge-Writer-Integration bestanden
+      - Migration 20260818000100 nach PR-Review remote angewandt und mit leerem
+        Schema-Diff, sauberem Lint sowie service_role-/RPC-Verifier belegt
     remaining_parts:
       - Retention/Archivierung fuer writer_audit_log (Zeit-Partitionierung) und Sweeps fuer writer_rate_windows/abgelaufene cached_products — braucht Retention-ADR
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
-      - Migration 20260818000100 erst nach PR-Review und vollstaendigen Gates
-        remote anwenden und mit dem versionierten Remote-Verifier belegen
       - Historische Migrationen nicht veraendern
     updated: 2026-08-18
     created: 2026-08-13

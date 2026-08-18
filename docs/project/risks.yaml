@@ -351,7 +351,8 @@ risks:
       sind technisch geschlossen. ADR 0035 schuetzt die angewandte
       Migrationshistorie. ADR 0036 und Migration 20260818000100 entziehen der
       Hosted service_role alle direkten App-Tabellen-/Sequenzrechte und lassen
-      nur vier gepruefte Writer-RPCs zu; die Remote-Anwendung steht noch aus.
+      nur vier gepruefte Writer-RPCs zu; Remote-Diff, Lint und der atomische
+      Berechtigungsverifier bestaetigen die wirksame Anwendung.
       Vor Runtime-Aktivierung folgen zudem ein gepruefter Retention-/Cleanup-
       ADR, reproduzierbare Sweeps und ein Read-Rate-Limit mit Negativtests.
       Details: Audits 2026-08-13, 2026-08-17 und 2026-08-18.
