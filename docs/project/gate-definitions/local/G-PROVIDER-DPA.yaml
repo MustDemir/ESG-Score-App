@@ -81,5 +81,6 @@ links:
 sources: [SUPABASE-DPA, SUPABASE-REGIONS, EU-GDPR]
 
 notes: |
-  Development PASS confirms a current, non-personal and remotely disabled
-  state. It is not legal advice and does not approve production processing.
+  Development PASS confirms a current, non-personal schema with runtime and
+  app access disabled. It is not legal advice and does not approve production
+  processing.

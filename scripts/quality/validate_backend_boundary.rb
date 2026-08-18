@@ -193,8 +193,8 @@ class BackendBoundaryValidator
 
     activation = @threat_model.fetch("activation_boundary", {})
     unless activation["remote_backend_enabled"] == false &&
-           activation["implementation_state"] == "local_implementation_validated"
-      violations << "#{label}: threat-model activation boundary must remain locally validated and remotely disabled"
+           activation["implementation_state"] == "remote_schema_deployed_runtime_disabled"
+      violations << "#{label}: threat-model activation boundary must keep the deployed schema runtime disabled"
     end
   end
 
@@ -254,10 +254,10 @@ class BackendBoundaryValidator
   def validate_local_implementation_evidence(label)
     evidence = @environment.fetch("implementation_evidence", {})
     expected = {
-      "state" => "local_implementation_validated",
-      "remote_deployment_evidence" => "absent",
+      "state" => "remote_schema_deployed_runtime_disabled",
+      "remote_deployment_evidence" => "docs/project/audits/2026-08-17-remote-schema-state-assessment.md",
       "writer_contract_tests" => "12/12 PASS",
-      "database_tests" => "123/123 PASS",
+      "database_tests" => "172/172 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -425,7 +425,7 @@ class BackendBoundaryValidator
       end
     end
     adr = read("docs/project/decisions/0032-backend-security-boundary.yaml")
-    unless adr.include?("G-BACKEND-BOUNDARY") && adr.include?("current_state: local_implementation_validated_remote_disabled")
+    unless adr.include?("G-BACKEND-BOUNDARY") && adr.include?("current_state: remote_schema_deployed_runtime_disabled")
       violations << "ADR 0032: backend gate or disabled current state is missing"
     end
 
@@ -513,6 +513,18 @@ class BackendBoundaryValidator
         writer\ circuit
         append-only
       ],
+      "supabase/migrations/20260817000100_backend_remote_readiness.sql" => %w[
+        get_published_product_evidence
+        get_published_score_snapshot
+        partial_score
+        limit\ 100
+      ],
+      "supabase/tests/database/backend_remote_readiness.test.sql" => %w[
+        plan(21)
+        cannot\ enumerate\ product\ evidence
+        latest\ published\ snapshot
+        unpublished\ formula\ versions\ stay\ hidden
+      ],
       "scripts/quality/run_edge_writer_integration_gate.sh" => %w[
         writer_unauthorized
         audited_operator_replay
@@ -540,8 +552,8 @@ class BackendBoundaryValidator
     enabled = @environment["remote_backend_enabled"] == true
     if @profile == "development"
       unless !enabled &&
-             @environment["implementation_state"] == "local_implementation_validated"
-        violations << "development: remote backend must remain disabled with a locally validated implementation"
+             @environment["implementation_state"] == "remote_schema_deployed_runtime_disabled"
+        violations << "development: deployed schema must remain runtime-disabled"
       end
       return
     end

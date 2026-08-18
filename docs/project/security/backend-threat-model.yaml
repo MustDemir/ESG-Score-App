@@ -7,8 +7,9 @@ scope: |
   Threat model for the locally implemented ScanFair EU Supabase data path.
   It covers public read access, trusted ingestion, upstream retrieval,
   privileged database writes, auditability and operator access. The writer,
-  database and read adapter are validated locally; the remote backend is not
-  provisioned, deployed or enabled by this decision.
+  database and read adapter are validated locally. The Frankfurt development
+  schema is deployed and reconciled, while the writer, app access, accounts,
+  personal-data paths and runtime backend remain disabled.
 
 methodology:
   primary: STRIDE
@@ -356,9 +357,9 @@ residual_risks:
 
 activation_boundary:
   remote_backend_enabled: false
-  implementation_state: local_implementation_validated
+  implementation_state: remote_schema_deployed_runtime_disabled
   blocked_until:
-    - EU_development_project_and_DPA_evidence
+    - DPA_and_subprocessor_owner_approval
     - independent_writer_security_review
     - secret_rotation_and_break_glass_drill
     - remote_migration_and_RLS_validation

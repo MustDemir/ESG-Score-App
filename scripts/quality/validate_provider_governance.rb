@@ -110,9 +110,9 @@ class ProviderGovernanceValidator
 
     if @profile == "development"
       unless @environment["remote_backend_enabled"] == false &&
-             @register["remote_schema_deployed"] == false &&
+             @register["remote_schema_deployed"] == true &&
              @register["remote_app_access_enabled"] == false
-        violations << "development profile must remain remotely disabled and undeployed"
+        violations << "development profile must record the deployed schema with runtime app access disabled"
       end
     end
 
@@ -221,7 +221,8 @@ class ProviderGovernanceValidator
   def validate_strict_profile
     unless @environment["remote_backend_enabled"] == true &&
            @environment["implementation_state"] == "deployed_to_eu_development" &&
-           @register["remote_schema_deployed"] == true
+           @register["remote_schema_deployed"] == true &&
+           @register["remote_app_access_enabled"] == true
       violations << "#{@profile}: remote backend must be deployed and explicitly enabled"
     end
     case @gate

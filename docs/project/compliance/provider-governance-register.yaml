@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-12
+last_reviewed: 2026-08-17
 owner: Mustafa Demir
 environment: development
 provider: Supabase
@@ -12,7 +12,7 @@ region_verification:
   method: authenticated_supabase_cli_project_metadata
 data_classification: public_source_and_synthetic_test_data_only
 personal_data_allowed: false
-remote_schema_deployed: false
+remote_schema_deployed: true
 remote_app_access_enabled: false
 
 reviews:

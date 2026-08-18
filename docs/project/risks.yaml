@@ -336,28 +336,27 @@ risks:
     created: 2026-08-13
 
   - id: RISK-015
-    title: Backend-Betriebslücken — Retention, FK-Indizes und service_role-Direktpfad
+    title: Backend-Betriebsluecken — Retention, Cleanup und Read-Abuse-Schutz
     likelihood: M
     impact: H
     score: 6
     description: |
-      Fünf Tabellen wachsen unbegrenzt ohne Retention (writer_rate_windows
-      ~1M Zeilen/Jahr; writer_audit_log ist durch den eigenen Append-Only-
-      Trigger unlöschbar und hat keine Indizes). Sechs FK-Spalten haben
-      keinen Index (Parent-Deletes werden Seq-Scans unter Lock). service_role
-      behält direkten Tabellen-Write auf cached_products und kann damit
-      Idempotenz, Payload-Bound und Audit-Insert der RPC umgehen (THR-006 nur
-      prozedural erfüllt). Dazu latente Härtungslücken: verwaiste RLS-Policy,
-      6 anon-Listen-Endpoints, kein Read-Rate-Limit, kein TTL-Cap.
+      Retention und kontrollierte Loeschbarkeit des Append-only Writer-Audits
+      sind noch nicht fachlich entschieden. Rate-Fenster und abgelaufene
+      Cachezeilen besitzen noch keinen freigegebenen Cleanup-Plan. Die
+      barcode-begrenzten Read-RPCs verhindern Listenabfragen, haben vor einer
+      Runtime-Aktivierung aber noch keinen Edge-basierten Abuse-Schutz.
     mitigation: |
-      Vor Remote-Deploy (TODO-004-Restpunkte): writer_audit_log
-      zeit-partitionieren, pg_cron-Sweeps, FK-Indizes ergänzen, revoke
-      insert/update/delete on cached_products from service_role, verwaiste
-      Policy droppen, TTL-Obergrenze im RPC. Details siehe Audit 2026-08-13
-      (F-10, F-11, F-12, F-18, F-19).
+      Indizes, service_role-Revoke, TTL-Cap, private RLS, Trigger-Haertung und
+      direkte Listen-SELECTs sind technisch geschlossen. ADR 0035 schuetzt die
+      angewandte Migrationshistorie. Vor Runtime-Aktivierung folgen ein
+      gepruefter Retention-/Cleanup-ADR, reproduzierbare Sweeps und ein
+      Read-Rate-Limit mit Negativtests. Details: Audit 2026-08-13 und Remote-
+      Schema-Assessment 2026-08-17.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
-    related_decisions: [0032]
+    related_decisions: [0032, 0035]
     status: open
     owner: Engineering
     created: 2026-08-13
+    updated: 2026-08-17
