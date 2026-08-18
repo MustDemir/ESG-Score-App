@@ -583,7 +583,10 @@ class BackendBoundaryValidator
       ],
       "scripts/quality/verify_remote_retention_cleanup.sql" => %w[
         service_role\ can\ execute\ private\ retention\ cleanup
+        v_rate_windows_expected
+        least(count(*),\ 10000)
         retention\ cleanup\ counts\ are\ invalid
+        retention\ fixture\ boundary\ or\ durable\ watermark\ is\ invalid
         SCANFAIR_RETENTION_VERIFICATION_ROLLBACK
         remote\ retention\ verification\ left\ fixtures\ behind
       ],

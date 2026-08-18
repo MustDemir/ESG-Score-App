@@ -3,6 +3,12 @@ declare
   v_now timestamptz := pg_catalog.clock_timestamp();
   v_cleanup jsonb;
   v_status text;
+  v_rate_windows_expected integer;
+  v_cached_products_expected integer;
+  v_idempotency_keys_expected integer;
+  v_audit_records_expected integer;
+  v_daily_usage_expected integer;
+  v_cron_history_expected integer;
 begin
   if not exists (
     select 1
@@ -163,13 +169,43 @@ begin
         end if;
     end;
 
+    select least(count(*), 10000)::integer
+    into v_rate_windows_expected
+    from private.writer_rate_windows
+    where window_started_at < v_now - interval '1 hour';
+
+    select least(count(*), 10000)::integer
+    into v_cached_products_expected
+    from public.cached_products
+    where expires_at < v_now - interval '1 day';
+
+    select least(count(*), 10000)::integer
+    into v_idempotency_keys_expected
+    from private.writer_idempotency_keys
+    where created_at < v_now - interval '30 days';
+
+    select least(count(*), 10000)::integer
+    into v_audit_records_expected
+    from private.writer_audit_log
+    where created_at < v_now - interval '90 days';
+
+    select count(*)::integer
+    into v_daily_usage_expected
+    from private.writer_daily_usage
+    where usage_date < (v_now at time zone 'UTC')::date - 400;
+
+    select least(count(*), 10000)::integer
+    into v_cron_history_expected
+    from cron.job_run_details
+    where end_time < v_now - interval '30 days';
+
     v_cleanup := private.run_retention_cleanup(v_now);
-    if (v_cleanup ->> 'rate_windows_deleted')::integer <> 1
-      or (v_cleanup ->> 'cached_products_deleted')::integer <> 1
-      or (v_cleanup ->> 'idempotency_keys_deleted')::integer <> 1
-      or (v_cleanup ->> 'audit_records_deleted')::integer <> 1
-      or (v_cleanup ->> 'daily_usage_deleted')::integer <> 1
-      or (v_cleanup ->> 'cron_history_deleted')::integer <> 1
+    if (v_cleanup ->> 'rate_windows_deleted')::integer <> v_rate_windows_expected
+      or (v_cleanup ->> 'cached_products_deleted')::integer <> v_cached_products_expected
+      or (v_cleanup ->> 'idempotency_keys_deleted')::integer <> v_idempotency_keys_expected
+      or (v_cleanup ->> 'audit_records_deleted')::integer <> v_audit_records_expected
+      or (v_cleanup ->> 'daily_usage_deleted')::integer <> v_daily_usage_expected
+      or (v_cleanup ->> 'cron_history_deleted')::integer <> v_cron_history_expected
     then
       raise exception 'retention cleanup counts are invalid: %', v_cleanup;
     end if;
@@ -181,8 +217,30 @@ begin
     ) or not exists (
       select 1 from private.writer_record_watermarks
       where source_record_id = '50999997'
+    ) or exists (
+      select 1 from private.writer_rate_windows
+      where actor_type = 'remote-retention-old'
+    ) or not exists (
+      select 1 from private.writer_rate_windows
+      where actor_type = 'remote-retention-fresh'
+    ) or exists (
+      select 1 from private.writer_idempotency_keys
+      where source_record_id = '50999997'
+    ) or exists (
+      select 1 from private.writer_audit_log
+      where request_id = 'remote-retention-expired-audit'
+    ) or exists (
+      select 1 from private.writer_daily_usage
+      where usage_date = (v_now at time zone 'UTC')::date - 401
+    ) or not exists (
+      select 1 from private.writer_daily_usage
+      where usage_date = (v_now at time zone 'UTC')::date - 399
+    ) or exists (
+      select 1 from cron.job_run_details where runid = -9201
+    ) or not exists (
+      select 1 from cron.job_run_details where runid = -9202
     ) then
-      raise exception 'retention boundary or durable watermark is invalid';
+      raise exception 'retention fixture boundary or durable watermark is invalid';
     end if;
 
     v_status := public.publish_off_product(
