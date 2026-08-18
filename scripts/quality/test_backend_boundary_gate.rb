@@ -164,6 +164,7 @@ class BackendBoundaryGateSelfTest
       copy(root, "supabase/tests/database")
       copy(root, "scripts/quality/run_edge_writer_integration_gate.sh")
       copy(root, "scripts/quality/verify_remote_backend_readiness.sql")
+      copy(root, "scripts/quality/verify_remote_retention_cleanup.sql")
       copy(root, ".github/workflows/quality-gates.yml")
       yield root
     end

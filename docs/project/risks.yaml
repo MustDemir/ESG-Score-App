@@ -342,8 +342,8 @@ risks:
     score: 6
     description: |
       Technische Retention und kontrollierte Loeschbarkeit des Append-only
-      Writer-Audits sind lokal entschieden und getestet, aber noch nicht remote
-      angewandt oder betrieblich ueberwacht. Die barcode-begrenzten Read-RPCs
+      Writer-Audits sind lokal und remote kontrolliert getestet, aber noch
+      nicht betrieblich ueberwacht. Die barcode-begrenzten Read-RPCs
       verhindern Listenabfragen, haben vor einer Runtime-Aktivierung aber noch
       keinen Edge-basierten Abuse-Schutz.
     mitigation: |
@@ -355,8 +355,10 @@ risks:
       Berechtigungsverifier bestaetigen die wirksame Anwendung.
       ADR 0037, Migration 20260818000200 und 33 Retention-Assertions definieren
       reproduzierbare, begrenzte Sweeps sowie dauerhafte Replay-Watermarks.
-      Vor Runtime-Aktivierung folgen Remote-Anwendung, Cleanup-Monitoring und
-      Drill sowie ein Read-Rate-Limit mit Negativtests.
+      Migration 12, der postgres-eigene Cron-Job und ein transaktionaler
+      Cleanup-/Replay-Drill sind remote belegt und hinterliessen keine Fixtures.
+      Vor Runtime-Aktivierung folgen Beobachtung eines echten geplanten Laufs,
+      Cleanup-Monitoring und Fehleralarm sowie ein Read-Rate-Limit mit Negativtests.
       Details: Audits 2026-08-13, 2026-08-17 und 2026-08-18.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]

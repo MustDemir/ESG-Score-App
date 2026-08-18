@@ -229,15 +229,21 @@ todos:
         Reads bestanden; Evidence-/Snapshot-Fixtures danach jeweils null
       - ADR 0037 legt technische Retention, begrenzte Cleanup-Batches,
         dauerhafte Replay-Watermarks und messbare Partitionierungs-Trigger fest
-      - Migration 20260818000200 und 32 neue Retention-pgTAP-Assertions lokal
+      - Migration 20260818000200 und 33 neue Retention-pgTAP-Assertions lokal
         umgesetzt; insgesamt zwoelf Migrationen und 213/213 Datenbanktests
+      - Pull Request 28 mit sechs gruenen GitHub-Actions-Jobs gemergt;
+        Post-Merge-Lauf 32173898928 ebenfalls mit sechs von sechs Jobs gruen
+      - Migration 20260818000200 remote angewandt; alle zwoelf Migrationen
+        abgeglichen, Linked-Lint sauber und public/private-Schema-Diff leer
+      - pg_cron 1.6.4 und genau ein aktiver postgres-eigener Cleanup-Job remote
+        belegt; transaktionaler Cleanup-/Replay-Verifier ohne Rest-Fixtures bestanden
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
       - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
       - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
-      - Migration 20260818000200 nach PR-Freigabe remote anwenden und Cron-Job,
-        Cleanup-Ergebnis, Backlog-Monitoring und Fehleralarm belegen
+      - Ersten echten geplanten Cleanup-Lauf beobachten sowie Backlog-Monitoring
+        und Fehleralarm belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
@@ -816,8 +822,10 @@ todos:
       - GitHub Pull-Request- und Post-Merge-Run
     evidence:
       - https://github.com/MustDemir/ESG-Score-App/actions/runs/30440723805
+      - https://github.com/MustDemir/ESG-Score-App/actions/runs/32173898928
     source: docs/project/audits/2026-07-28-code-quality-accessibility-ci-audit.md
     created: 2026-07-29
+    updated: 2026-08-18
 
   - id: TODO-033
     title: Externe Produktdaten sprachsicher und lokalisiert darstellen
@@ -1011,9 +1019,15 @@ todos:
         Idempotenz, Audit, Tagesnutzung und Cron-Historie erstellt
       - 33 Retention-Assertions ergaenzt; lokaler Replay mit zwoelf Migrationen,
         213/213 pgTAP und DB-Lint bestanden
+      - Pull Request 28 und Post-Merge-main mit jeweils sechs gruenen
+        GitHub-Actions-Jobs abgeschlossen
+      - Migration 20260818000200 remote angewandt; 12/12 Migrationen,
+        Linked-Lint und leerer public/private-Schema-Diff verifiziert
+      - pg_cron 1.6.4, exakte aktive Job-Identitaet und ein kontrollierter
+        Cleanup-/Replay-Drill remote ohne verbleibende Fixtures belegt
     remaining_parts:
-      - Migration 20260818000200 nach PR-Review remote anwenden; Cron-Identitaet,
-        Cleanup-Lauf, Backlog-Monitor und Fehleralarm als Betriebsevidenz belegen
+      - Ersten echten geplanten Cleanup-Lauf beobachten; Backlog-Monitor und
+        Fehleralarm als Betriebsevidenz belegen
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
       - Historische Migrationen nicht veraendern
     updated: 2026-08-18

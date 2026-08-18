@@ -171,7 +171,7 @@ audit_contract:
   clock: UTC
 
 retention_cleanup_contract:
-  state: locally_validated_remote_pending
+  state: remote_schema_verified_runtime_disabled
   scheduler: pg_cron
   job_name: scanfair-retention-cleanup
   schedule_utc: "20 3 * * *"
@@ -251,13 +251,15 @@ implementation_evidence:
   writer_contract_tests: 12/12 PASS
   database_tests: 213/213 PASS
   local_migrations: 12/12 REPLAYED
-  remote_migrations: 11/11 RECONCILED
-  retention_migration_remote_dry_run: PASS_ONLY_MIGRATION_12_PENDING
-  remote_pg_cron: AVAILABLE_1.6.4_NOT_INSTALLED
+  remote_migrations: 12/12 RECONCILED
+  retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
+  remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
+  retention_cleanup_remote_verification: PASS
   remote_schema_diff: EMPTY
   remote_database_lint: PASS
   service_role_rpc_only_verification: PASS
   remote_verification_fixtures_retained: 0
+  retention_verification_fixtures_retained: 0
   flutter_cache_and_fallback_tests: 15/15 PASS
   gate_definition_tests: 11/11 PASS
   provider_governance_tests: 26 assertions PASS
@@ -277,6 +279,7 @@ implementation_evidence:
     - docs/project/decisions/0037-bounded-retention-cleanup.yaml
     - docs/project/audits/2026-08-18-retention-cleanup-assessment.md
     - scripts/quality/verify_remote_backend_readiness.sql
+    - scripts/quality/verify_remote_retention_cleanup.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
     - docs/project/gate-definitions/gate-definition-schema.yaml
@@ -286,6 +289,7 @@ implementation_evidence:
     - bash scripts/quality/run_data_database_gate.sh
     - bash scripts/quality/run_edge_writer_integration_gate.sh
     - supabase db query --linked --file scripts/quality/verify_remote_backend_readiness.sql
+    - supabase db query --linked --file scripts/quality/verify_remote_retention_cleanup.sql
     - flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - ruby scripts/quality/test_gate_definition_gate.rb
     - ruby scripts/quality/test_provider_governance_gate.rb
@@ -308,7 +312,7 @@ activation_profiles:
 
 reviews:
   environment_activation:
-    status: pending_provider_governance_owner_approval_and_remote_deployment
+    status: pending_provider_governance_owner_approval
     evidence: null
   writer_security:
     status: pending_independent_review

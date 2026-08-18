@@ -413,7 +413,7 @@ class BackendBoundaryValidator
       "writer_daily_usage" => "400_days",
       "cron_job_run_details" => "30_days",
     }
-    unless retention["state"] == "locally_validated_remote_pending" &&
+    unless retention["state"] == "remote_schema_verified_runtime_disabled" &&
            retention["scheduler"] == "pg_cron" &&
            retention["job_name"] == "scanfair-retention-cleanup" &&
            retention["schedule_utc"] == "20 3 * * *" &&
@@ -580,6 +580,15 @@ class BackendBoundaryValidator
         service_role\ still\ has\ a\ direct\ application-table\ privilege
         bounded\ evidence\ RPC\ leaked\ or\ omitted\ rows
         SCANFAIR_VERIFICATION_ROLLBACK
+      ],
+      "scripts/quality/verify_remote_retention_cleanup.sql" => %w[
+        service_role\ can\ execute\ private\ retention\ cleanup
+        v_rate_windows_expected
+        least(count(*),\ 10000)
+        retention\ cleanup\ counts\ are\ invalid
+        retention\ fixture\ boundary\ or\ durable\ watermark\ is\ invalid
+        SCANFAIR_RETENTION_VERIFICATION_ROLLBACK
+        remote\ retention\ verification\ left\ fixtures\ behind
       ],
       "scripts/quality/run_edge_writer_integration_gate.sh" => %w[
         writer_unauthorized
