@@ -62,20 +62,21 @@ roadmap_progress:
 session_handoff:
   prepared_at: 2026-08-18
   session_closed_at: null
-  branch: docs/service-role-remote-evidence
-  status: migrations_10_and_11_remote_verified_runtime_disabled
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/25
+  branch: main
+  status: service_role_remote_hardening_complete_runtime_disabled
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/26
   pull_request: null
   git_state:
-    committed: false
-    pushed: false
+    committed: true
+    pushed: true
     working_tree_clean: false
     commits:
+      - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
+      - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
       - a86ed2b security: enforce RPC-only service role access
       - cd64718 Merge pull request 24 from MustDemir/feature/backend-remote-readiness
-      - 5711779 feat: harden remote schema read boundaries
-    reason: PR 25 ist nach sechs gruenen Jobs gemergt. Migration 11 wurde kontrolliert remote angewandt; Migrationshistorie, Lint, leerer Schema-Diff, RPC-only service_role und null verbliebene Fixtures sind belegt. Nur der nachgelagerte SSOT-Nachweis ist auf diesem Branch noch nicht committed. Runtime und App-Zugriff bleiben deaktiviert; .claude bleibt unangetastet.
+    reason: PR 25 implementiert die RPC-only service_role-Haertung; PR 26 dokumentiert den nachgelagerten Remote-Nachweis. Beide PRs sind nach jeweils sechs gruenen GitHub-Actions-Jobs gemergt. Migration 11 ist remote angewandt und verifiziert. Runtime und App-Zugriff bleiben deaktiviert; nur das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
   latest_validation:
     executed_at: "2026-08-18T10:55:43Z"
     development_quality_gates: 29/29 PASS
@@ -93,6 +94,8 @@ session_handoff:
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
     service_role_hardening_remote: PASS
     remote_verification_fixtures_retained: 0
+    security_pr_github_actions_run: 32129355126 six_of_six PASS
+    evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
     claims_privacy_gate_self_tests: 18/18 PASS
@@ -116,6 +119,7 @@ session_handoff:
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
     - Pull Request 25 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 83ee6f4
+    - Pull Request 26 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit c5b61e6
     - Migration 20260818000100 kontrolliert remote angewandt; elf lokale und Remote-Migrationen stimmen ueberein
     - Remote-Dry-Run meldet up to date, Linked-Lint ist sauber und Schema-Diff public/private ist leer
     - service_role besitzt keine direkten App-Tabellen-/Sequenzrechte und kann nur die vier Writer-RPCs ausfuehren
@@ -196,7 +200,6 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Post-Deployment-Evidenzbranch committen, pushen und per Doku-PR integrieren
     - Retention-/Cleanup-ADR fuer writer_audit_log, Rate-Fenster und Cache-Sweeps erarbeiten
     - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
     - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
