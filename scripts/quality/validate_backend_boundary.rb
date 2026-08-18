@@ -202,7 +202,7 @@ class BackendBoundaryValidator
     label = @environment_path
     require_fields(
       @environment,
-      %w[schema_version last_reviewed owner status implementation_state remote_backend_enabled threat_model_ref purpose environment_isolation environments key_and_identity_contract writer_contract resource_protection read_contract audit_contract secret_lifecycle incident_contract implementation_evidence activation_profiles reviews evidence_contracts remote_activation_blocks primary_sources],
+      %w[schema_version last_reviewed owner status implementation_state remote_backend_enabled threat_model_ref purpose environment_isolation environments key_and_identity_contract writer_contract resource_protection read_contract audit_contract retention_cleanup_contract secret_lifecycle incident_contract implementation_evidence activation_profiles reviews evidence_contracts remote_activation_blocks primary_sources],
       label,
     )
     return if @environment.empty?
@@ -257,7 +257,7 @@ class BackendBoundaryValidator
       "state" => "remote_schema_deployed_runtime_disabled",
       "remote_deployment_evidence" => "docs/project/audits/2026-08-18-remote-deployment-verification.md",
       "writer_contract_tests" => "12/12 PASS",
-      "database_tests" => "180/180 PASS",
+      "database_tests" => "213/213 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -404,6 +404,28 @@ class BackendBoundaryValidator
       violations << "#{label}: audit redaction contract is incomplete"
     end
 
+    retention = @environment.fetch("retention_cleanup_contract", {})
+    expected_periods = {
+      "writer_rate_windows" => "1_hour",
+      "cached_products" => "1_day_after_expiry",
+      "writer_idempotency_keys" => "30_days",
+      "writer_audit_log" => "90_days",
+      "writer_daily_usage" => "400_days",
+      "cron_job_run_details" => "30_days",
+    }
+    unless retention["state"] == "locally_validated_remote_pending" &&
+           retention["scheduler"] == "pg_cron" &&
+           retention["job_name"] == "scanfair-retention-cleanup" &&
+           retention["schedule_utc"] == "20 3 * * *" &&
+           retention["execution_database"] == "postgres" &&
+           retention["execution_role"] == "postgres" &&
+           retention["batch_limit_rows"] == 10_000 &&
+           retention["periods"] == expected_periods &&
+           retention.dig("integrity_watermark", "maximum_rows") == "one_per_source_record" &&
+           retention["personal_data_boundary"] == "prohibited_until_separate_privacy_and_operations_approval"
+      violations << "#{label}: retention cleanup contract is incomplete or inconsistent"
+    end
+
     lifecycle = @environment.fetch("secret_lifecycle", {})
     unless lifecycle["maximum_rotation_days"].to_i.between?(1, 180) &&
            lifecycle.dig("break_glass", "maximum_minutes").to_i.between?(1, 30) &&
@@ -462,8 +484,11 @@ class BackendBoundaryValidator
       writer_idempotency_keys
       writer_audit_log
       writer_circuit_state
+      writer_record_watermarks
       reject_writer_audit_mutation
       record_writer_upstream_health
+      run_retention_cleanup
+      cron.schedule
     ]
     required_migration_markers.each do |marker|
       readable = marker.tr("\\", "")
@@ -536,6 +561,20 @@ class BackendBoundaryValidator
         no\ direct\ privileges\ on\ public\ application\ tables
         no\ direct\ privileges\ on\ private\ writer\ tables
         can\ execute\ product\ publication\ RPC
+      ],
+      "supabase/migrations/20260818000200_retention_cleanup.sql" => %w[
+        create\ extension\ if\ not\ exists\ pg_cron
+        writer_record_watermarks
+        run_retention_cleanup
+        limit\ 10000
+        scanfair-retention-cleanup
+      ],
+      "supabase/tests/database/retention_cleanup.test.sql" => %w[
+        plan(33)
+        writer\ cannot\ extend\ retention\ with\ a\ future\ fetch\ timestamp
+        direct\ audit\ deletion\ remains\ blocked
+        watermark\ rejects\ an\ older\ observation
+        exact\ replay\ restores\ the\ hash-bound\ cache\ payload
       ],
       "scripts/quality/verify_remote_backend_readiness.sql" => %w[
         service_role\ still\ has\ a\ direct\ application-table\ privilege

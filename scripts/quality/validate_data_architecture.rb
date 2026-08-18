@@ -123,6 +123,10 @@ else
     "writer outcome audit function" => "record_writer_outcome",
     "append-only writer audit" => "reject_writer_audit_mutation",
     "writer idempotency store" => "writer_idempotency_keys",
+    "durable writer ordering watermark" => "writer_record_watermarks",
+    "bounded retention cleanup" => "run_retention_cleanup",
+    "scheduled retention cleanup" => "scanfair-retention-cleanup",
+    "retention cleanup batch bound" => "limit 10000",
   }
   required_markers.each do |name, marker|
     violations << "Missing #{name}" unless sql.include?(marker)

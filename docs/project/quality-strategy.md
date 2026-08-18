@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-08-12
+Letztes Update: 2026-08-18
 
 ---
 
@@ -81,7 +81,7 @@ uebersprungen.
 | `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy- und Backend-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
-| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 180 pgTAP-RLS-/Writer-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
+| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 213 pgTAP-RLS-/Writer-/Retention-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` | Gate-Schema, DPA-/Unterauftragsverarbeiter-/Kostenregister; geplante und manuelle Laeufe pruefen zusaetzlich offizielle Versionsmarker | Provider-, Gate- und Online-Pruefevidenz |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
@@ -143,6 +143,11 @@ und Regionnachweis sowie drei typisierte, repository-interne und per SHA-256
 gebundene Reviews fuer Umgebung, Writer-Sicherheit und Betriebsbereitschaft.
 Das Gate prueft ausserdem, dass kein privilegierter Supabase-Schluessel in
 Flutter zugelassen ist und RLS-/Grant-Schutz in den Migrationen bestehen bleibt.
+ADR 0037 ergaenzt denselben Gate-Pfad um feste technische Aufbewahrungsfristen,
+einen taeglichen owner-ausgefuehrten pg_cron-Job, begrenzte Loeschbatches und
+einen privaten Replay-Watermark. Das Development-Profil verlangt die lokale
+Implementierung; Remote-Aktivierung bleibt bis Cron-, Monitoring- und Cleanup-
+Drill-Evidenz gesperrt. Persoenliche Zugriffslogs sind davon nicht freigegeben.
 `release_candidate` verlangt unabhaengig vom Aktivierungsstatus einen vierten,
 release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
 Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.

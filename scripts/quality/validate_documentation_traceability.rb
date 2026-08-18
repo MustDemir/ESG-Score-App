@@ -76,6 +76,8 @@ checks = {
     "SUPABASE-DPA",
     "SUPABASE-SUBPROCESSORS",
     "SUPABASE-COST-CONTROL",
+    "SUPABASE-CRON",
+    "SUPABASE-UPGRADING",
   ],
   "docs/project/compliance/provider-governance-register.yaml" => [
     "project_name: scanfair-dev",

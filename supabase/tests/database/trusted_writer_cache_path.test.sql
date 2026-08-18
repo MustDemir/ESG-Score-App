@@ -180,8 +180,8 @@ select lives_ok(
       '4000417025005',
       '{"code":"4000417025005","product_name":"Fresh product"}'::jsonb,
       (select observed_at from writer_test_clock),
-      (select fetched_at + interval '2 hours' from writer_test_clock),
-      (select expires_at + interval '2 hours' from writer_test_clock),
+      (select fetched_at + interval '2 minutes' from writer_test_clock),
+      (select expires_at + interval '2 minutes' from writer_test_clock),
       'v3'
     )
   $$,
@@ -211,7 +211,7 @@ select is(
     from public.cached_products
     where source_id = 'open-food-facts' and barcode = '4000417025005'
   ),
-  (select fetched_at + interval '2 hours' from writer_test_clock),
+  (select fetched_at + interval '2 minutes' from writer_test_clock),
   'idempotent replay advances the successful fetch time'
 );
 select is(
@@ -220,7 +220,7 @@ select is(
     from public.cached_products
     where source_id = 'open-food-facts' and barcode = '4000417025005'
   ),
-  (select expires_at + interval '2 hours' from writer_test_clock),
+  (select expires_at + interval '2 minutes' from writer_test_clock),
   'idempotent replay renews cache freshness without a new key'
 );
 select is(
