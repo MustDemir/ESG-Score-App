@@ -95,6 +95,8 @@ class GateDefinitionSelfTest
       %w[
         docs/project
         scripts
+        supabase/migrations/20260820000100_retention_observability.sql
+        supabase/tests/database/retention_observability.test.sql
         .github/workflows/quality-gates.yml
       ].each { |relative| copy(root, relative) }
       yield root

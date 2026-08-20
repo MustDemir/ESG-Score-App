@@ -172,6 +172,10 @@ gate_backend_boundary() {
     ruby scripts/quality/validate_backend_boundary.rb --profile "$profile"
 }
 
+gate_retention_operations() {
+  cd "$REPO_ROOT" && bash scripts/quality/run_retention_operations_gate.sh
+}
+
 gate_definition_quality() {
   cd "$REPO_ROOT" &&
     ruby scripts/quality/test_gate_definition_gate.rb &&
@@ -267,6 +271,7 @@ run_gate "G-CLAIM-SAFETY" "Customer claim and proxy safety" gate_claim_safety
 run_gate "G-CLAIM-GOVERNANCE" "Versioned claims and nutrition boundary" gate_claim_governance
 run_gate "G-PRIVACY-BOUNDARY" "Actual data-flow and privacy activation boundary" gate_privacy_boundary
 run_gate "G-BACKEND-BOUNDARY" "Trusted writer and EU Supabase activation boundary" gate_backend_boundary
+run_gate "G-RETENTION-OPS" "Retention cleanup health, alert lifecycle and delivery boundary" gate_retention_operations
 run_gate "G-GATE-DEFINITION-QUALITY" "Gate schema, semantics and traceability" gate_definition_quality
 run_gate "G-PROVIDER-DPA" "Supabase DPA and Frankfurt processing boundary" gate_provider_dpa
 run_gate "G-PROVIDER-SUBPROCESSORS" "Supabase subprocessor inventory and change governance" gate_provider_subprocessors

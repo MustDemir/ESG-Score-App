@@ -1,4 +1,4 @@
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -237,17 +237,25 @@ todos:
         abgeglichen, Linked-Lint sauber und public/private-Schema-Diff leer
       - pg_cron 1.6.4 und genau ein aktiver postgres-eigener Cleanup-Job remote
         belegt; transaktionaler Cleanup-/Replay-Verifier ohne Rest-Fixtures bestanden
+      - Zwei echte geplante Cleanup-Laeufe vom 19. und 20. August erfolgreich
+        beobachtet; alle technischen Backlogs und Runtime-Tabellen waren leer
+      - ADR 0038 und Migration 20260820000100 definieren private Health-Historie,
+        deduplizierte Alert-Outbox, Recovery-Aufloesung und taeglichen Monitor
+      - 37 neue Operations-pgTAP-Assertions ergaenzt; lokaler Replay mit
+        dreizehn Migrationen, 250/250 Tests und DB-Lint bestanden
+      - G-RETENTION-OPS mit neun positiven/negativen Selbsttests integriert;
+        Remote-Profil blockiert ohne Monitorlauf und Alarmdrill fail-closed
     remaining:
       - DPA-/Subprocessor-Owner-Entscheidung, Aenderungsabonnement und Dashboard-Tarifnachweis belegen
       - Typisierte Provider-Freigabeevidenz mit Reviewer-Qualifikation, Commit- und SHA-256-Bindung erstellen
       - Writer und App-Zugriff bis zu allen Aktivierungsfreigaben deaktiviert lassen
-      - Remote RLS-/Writer-Integration, Monitoring, Rotation und Incident Drill belegen
-      - Ersten echten geplanten Cleanup-Lauf beobachten sowie Backlog-Monitoring
-        und Fehleralarm belegen
+      - Remote RLS-/Writer-Integration, Rotation und Incident Drill belegen
+      - Migration 20260820000100 remote anwenden, ersten echten geplanten
+        Monitorlauf beobachten und externe Failure-/Recovery-Alarmzustellung belegen
       - Flutter-Remote-Konfiguration erst nach Environment-, Security-, Privacy-
         und Datenlizenz-Freigabe aktivieren
       - Auth-Provider und Account-Loeschung separat umsetzen
-    updated: 2026-08-18
+    updated: 2026-08-20
     created: 2026-05-19
 
   - id: TODO-005
@@ -1025,12 +1033,19 @@ todos:
         Linked-Lint und leerer public/private-Schema-Diff verifiziert
       - pg_cron 1.6.4, exakte aktive Job-Identitaet und ein kontrollierter
         Cleanup-/Replay-Drill remote ohne verbleibende Fixtures belegt
+      - Zwei echte geplante Cleanup-Laeufe erfolgreich beobachtet; Backlog und
+        Runtime-Zeilen waren bei der Beobachtung null
+      - ADR 0038, Migration 13 und 37 pgTAP-Assertions fuer private Health-
+        Historie, Alert-Deduplizierung, Recovery und Monitor-Cron lokal validiert
+      - G-RETENTION-OPS besteht im Development-Profil und blockiert Remote ohne
+        angewandte Migration, echten Monitorlauf und empfangenen Alarmdrill
     remaining_parts:
-      - Ersten echten geplanten Cleanup-Lauf beobachten; Backlog-Monitor und
-        Fehleralarm als Betriebsevidenz belegen
+      - Migration 13 kontrolliert remote anwenden und Remote-Verifier ausfuehren
+      - Ersten echten geplanten Health-Monitorlauf beobachten und externe
+        Failure-/Recovery-Alarmzustellung als Betriebsevidenz belegen
       - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
       - Historische Migrationen nicht veraendern
-    updated: 2026-08-18
+    updated: 2026-08-20
     created: 2026-08-13
 
   - id: TODO-038

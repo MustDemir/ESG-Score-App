@@ -1,4 +1,4 @@
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 
 # Bewertung:
 #   likelihood: L (low) | M (medium) | H (high)
@@ -342,8 +342,10 @@ risks:
     score: 6
     description: |
       Technische Retention und kontrollierte Loeschbarkeit des Append-only
-      Writer-Audits sind lokal und remote kontrolliert getestet, aber noch
-      nicht betrieblich ueberwacht. Die barcode-begrenzten Read-RPCs
+      Writer-Audits sind lokal und remote kontrolliert getestet. Zwei echte
+      Cleanup-Laeufe waren erfolgreich; die lokale Health-/Alert-Mechanik ist
+      noch nicht remote angewandt und besitzt noch keinen externen Empfaenger.
+      Die barcode-begrenzten Read-RPCs
       verhindern Listenabfragen, haben vor einer Runtime-Aktivierung aber noch
       keinen Edge-basierten Abuse-Schutz.
     mitigation: |
@@ -357,13 +359,16 @@ risks:
       reproduzierbare, begrenzte Sweeps sowie dauerhafte Replay-Watermarks.
       Migration 12, der postgres-eigene Cron-Job und ein transaktionaler
       Cleanup-/Replay-Drill sind remote belegt und hinterliessen keine Fixtures.
-      Vor Runtime-Aktivierung folgen Beobachtung eines echten geplanten Laufs,
-      Cleanup-Monitoring und Fehleralarm sowie ein Read-Rate-Limit mit Negativtests.
-      Details: Audits 2026-08-13, 2026-08-17 und 2026-08-18.
+      Zwei echte geplante Laeufe vom 19. und 20. August waren erfolgreich und
+      ohne Backlog. ADR 0038, Migration 13, 37 pgTAP-Tests und G-RETENTION-OPS
+      implementieren lokal private Health-Historie, Alert-Deduplizierung und
+      Recovery. Vor Runtime-Aktivierung folgen Remote-Anwendung, echter
+      Monitorlauf, externe Failure-/Recovery-Alarmierung sowie ein Read-Rate-
+      Limit mit Negativtests. Details: Audits 2026-08-13 bis 2026-08-20.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
-    related_decisions: [0032, 0035, 0036, 0037]
+    related_decisions: [0032, 0035, 0036, 0037, 0038]
     status: open
     owner: Engineering
     created: 2026-08-13
-    updated: 2026-08-18
+    updated: 2026-08-20

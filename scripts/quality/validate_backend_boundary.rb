@@ -257,7 +257,7 @@ class BackendBoundaryValidator
       "state" => "remote_schema_deployed_runtime_disabled",
       "remote_deployment_evidence" => "docs/project/audits/2026-08-18-remote-deployment-verification.md",
       "writer_contract_tests" => "12/12 PASS",
-      "database_tests" => "213/213 PASS",
+      "database_tests" => "250/250 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -575,6 +575,25 @@ class BackendBoundaryValidator
         direct\ audit\ deletion\ remains\ blocked
         watermark\ rejects\ an\ older\ observation
         exact\ replay\ restores\ the\ hash-bound\ cache\ payload
+      ],
+      "supabase/migrations/20260820000100_retention_observability.sql" => %w[
+        retention_health_checks
+        retention_alert_outbox
+        retention_health_snapshot
+        record_retention_health
+        scanfair-retention-health-monitor
+      ],
+      "supabase/tests/database/retention_observability.test.sql" => %w[
+        plan(37)
+        cleanup_latest_run_failed
+        cleanup_backlog_persistent_seven_checks
+        cron.unschedule
+      ],
+      "scripts/quality/verify_remote_retention_observability.sql" => %w[
+        retention\ cron\ identity\ verification\ failed
+        controlled\ failure\ was\ not\ detected
+        controlled\ recovery\ did\ not\ resolve\ the\ alert
+        verification\ fixtures\ were\ retained
       ],
       "scripts/quality/verify_remote_backend_readiness.sql" => %w[
         service_role\ still\ has\ a\ direct\ application-table\ privilege

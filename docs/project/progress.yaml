@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W34
-last_updated: 2026-08-18
+last_updated: 2026-08-20
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -13,8 +13,8 @@ roadmap_progress:
       progress_percent: 100
       next: complete_with_current_integration
     - id: M2-backend-data-integration
-      progress_percent: 85
-      next: observe_scheduled_cleanup_and_add_monitoring_then_implement_read_abuse_controls
+      progress_percent: 90
+      next: deploy_and_verify_retention_observability_then_implement_read_abuse_controls
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -41,7 +41,7 @@ roadmap_progress:
     - id: N2-product-commodity-origin-links
       progress_percent: 100
     - id: N3-eu-supabase-project
-      progress_percent: 65
+      progress_percent: 70
     - id: N4-server-writer-flutter-cache
       progress_percent: 90
     - id: N5-wri-aqueduct
@@ -60,17 +60,20 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-18
+  prepared_at: 2026-08-20
   session_closed_at: null
-  branch: docs/retention-remote-evidence
-  status: retention_cleanup_remote_verified_evidence_ready_for_review
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/28
+  branch: feature/retention-observability
+  status: retention_observability_local_validated_ready_for_review
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/29
   pull_request: null
   git_state:
     committed: true
-    pushed: true
+    pushed: false
     working_tree_clean: false
     commits:
+      - 262d060 Merge pull request 29 from MustDemir/docs/retention-remote-evidence
+      - 1a3c256 test: harden retention verifier for existing rows
+      - f87c001 docs: record remote retention verification
       - 92537a6 Merge pull request 28 from MustDemir/feature/retention-cleanup
       - 64593f0 feat: add bounded retention cleanup
       - bcc55e4 Merge pull request 27 from MustDemir/docs/finalize-remote-evidence-handoff
@@ -78,17 +81,18 @@ session_handoff:
       - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
-    reason: PR 28 ist gemergt und Migration 12 wurde auf scanfair-dev kontrolliert angewandt. Alle zwoelf Migrationen, Cron-Identitaet, Cleanup-Grenzen und Replay-Schutz sind remote verifiziert; Runtime und App-Zugriff bleiben deaktiviert. Der Evidence-Branch dokumentiert diesen Stand, waehrend das nutzereigene untracked Verzeichnis .claude unangetastet bleibt.
+    reason: PR 29 ist gemergt. Zwei echte geplante Cleanup-Laeufe wurden erfolgreich beobachtet. Auf dem Feature-Branch werden Migration 13, private Health-Historie, Alert-Outbox und G-RETENTION-OPS lokal umgesetzt; Remote-Migration und externe Alarmzustellung bleiben bewusst offen. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
   latest_validation:
-    executed_at: "2026-08-18T19:09:04Z"
-    development_quality_gates: 29/29 PASS
+    executed_at: "2026-08-20T07:34:02Z"
+    development_quality_gates: 30/30 PASS
     flutter_tests: 121/121 PASS
     flutter_line_coverage: 84.15 percent
     database_migration_replay: PASS
-    database_validation_executed_at: "2026-08-18T12:18:18Z"
-    database_pgtap: 213/213 PASS
+    database_validation_executed_at: "2026-08-20T07:34:02Z"
+    database_pgtap: 250/250 PASS
     database_lint: PASS
-    local_migrations: 12/12 REPLAYED
+    supply_chain_inventory: 61 Dart packages, 2 iOS plugins, 20 Action references, 0 vulnerabilities
+    local_migrations: 13/13 REPLAYED
     retention_cleanup_local: PASS
     retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     retention_migration_remote_dry_run: UP_TO_DATE
@@ -103,8 +107,18 @@ session_handoff:
     remote_verification_fixtures_retained: 0
     retention_cleanup_remote_verification: PASS
     retention_verification_fixtures_retained: 0
+    retention_scheduled_cleanup_runs: 2/2 SUCCEEDED
+    retention_eligible_backlog_rows: 0
+    retention_runtime_rows: 0
+    retention_observability_local: PASS
+    retention_observability_verifier_local_dry_run: PASS_WITH_ROLLBACK
+    retention_operations_gate_selftests: 9 tests, 22 assertions PASS
+    retention_observability_remote_migration: NOT_APPLIED
+    retention_monitor_scheduled_runs_observed: 0
+    retention_notification_drill: NOT_RUN
     retention_pr_github_actions_run: 32173551869 six_of_six PASS
     retention_post_merge_github_actions_run: 32173898928 six_of_six PASS
+    retention_evidence_post_merge_github_actions_run: 32176444810 six_of_six PASS
     security_pr_github_actions_run: 32129355126 six_of_six PASS
     evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
@@ -120,7 +134,7 @@ session_handoff:
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
     backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
-    gate_definition_validation: PASS for 28 definitions, 4 canonical and 24 compatible legacy
+    gate_definition_validation: PASS for 29 definitions, 5 canonical and 24 compatible legacy
     gate_definition_self_tests: 11 assertions PASS
     provider_governance_self_tests: 26 assertions PASS
     provider_development_profile: 3/3 PASS
@@ -129,6 +143,11 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Pull Request 29 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 262d060
+    - Zwei echte geplante Retention-Cleanup-Laeufe vom 19. und 20. August erfolgreich beobachtet; Backlog und Runtime-Zeilen null
+    - ADR 0038 und Retention-Operations-Vertrag fuer private Health-Historie, Alert-Outbox und externe Zustellgrenze erstellt
+    - Migration 20260820000100 und 37 neue pgTAP-Assertions lokal umgesetzt; 13/13 Migrationen, 250/250 Tests und DB-Lint bestanden
+    - G-RETENTION-OPS mit neun Selbsttests und 22 Assertions integriert; Remote-Profil blockiert fail-closed
     - Pull Request 28 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 92537a6
     - Post-Merge-main-Lauf 32173898928 mit allen sechs Jobs bestanden
     - Migration 20260818000200 kontrolliert remote angewandt; zwoelf lokale und Remote-Migrationen stimmen ueberein
@@ -222,8 +241,10 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Ersten echten geplanten Retention-Cleanup-Lauf beobachten und dokumentieren
-    - Cleanup-Fehleralarm und Eligible-Backlog-Monitor als Betriebsevidenz umsetzen
+    - Feature-Branch vollstaendig lokal und in GitHub Actions validieren und mergen
+    - Migration 20260820000100 kontrolliert auf scanfair-dev anwenden und Remote-Verifier ausfuehren
+    - Ersten echten geplanten Retention-Health-Monitorlauf beobachten
+    - Least-Privilege-Alarmkanal und Failure-/Recovery-Drill als Betriebsevidenz umsetzen
     - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
     - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
