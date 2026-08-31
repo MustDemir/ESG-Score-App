@@ -52,8 +52,18 @@ Herstellerangabe. Bilder und Publikationsinhalte duerfen ohne gesonderte
 Erlaubnis nicht in einen oeffentlichen Cache uebernommen werden.
 
 ## Schriften
-- **Inter** — SIL Open Font License 1.1
-- **Instrument Serif** — SIL Open Font License 1.1
+
+Die App liefert alle verwendeten Schnitte lokal aus und deaktiviert
+Runtime-Fetching. Dadurch entsteht beim App-Start kein zusaetzlicher Abruf bei
+Google Fonts.
+
+| Schrift | Lizenz | Lokaler Nachweis |
+| --- | --- | --- |
+| Inter Regular, SemiBold, Bold | SIL Open Font License 1.1 | `esg_app/assets/fonts/licenses/Inter-OFL.txt` |
+| Instrument Serif Regular | SIL Open Font License 1.1 | `esg_app/assets/fonts/licenses/InstrumentSerif-OFL.txt` |
+
+Quell-URLs und SHA-256-Prüfsummen stehen im versionierten
+[`font-assets.yaml`](project/compliance/font-assets.yaml).
 
 ## Code-Abhängigkeiten
 Wird bei `flutter pub deps` automatisch in `esg_app/pubspec.lock` festgehalten.

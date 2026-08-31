@@ -33,6 +33,9 @@ Current guarantees:
 - Camera images are neither returned by the scanner nor persisted or uploaded.
 - The decoded barcode is sent directly to Open Food Facts only after a user
   scan or manual lookup.
+- Inter and Instrument Serif are bundled with the app. Runtime fetching is
+  disabled, so typography creates no request to Google Fonts or another font
+  provider.
 - ScanFair adds no account, advertising or device identifier to the request.
 - Network infrastructure and Open Food Facts can nevertheless process network
   metadata such as the IP address; provider roles, region and retention still

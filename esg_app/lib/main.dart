@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'screens/home_screen.dart';
 import 'screens/scanner_screen.dart';
 import 'services/esg_score_calculator.dart';
@@ -11,6 +12,9 @@ import 'services/supabase_product_cache_service.dart';
 import 'theme/scanfair_theme.dart';
 
 void main() {
+  // Brand-Fonts muessen aus den gebuendelten Assets kommen. Ein unbemerkter
+  // Laufzeitabruf waere ein zusaetzlicher, nicht freigegebener Datenfluss.
+  GoogleFonts.config.allowRuntimeFetching = false;
   final directSource = OpenFoodFactsProductRepository(
     service: OpenFoodFactsService(),
   );

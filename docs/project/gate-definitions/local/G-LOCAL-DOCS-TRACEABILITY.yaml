@@ -4,12 +4,17 @@ dimension: strategisch
 lifecycle_phase: pre-deployment
 trigger: Local quality run and GitHub quality gate workflow
 policy_checks:
-  - README documents local start
-  - README documents quality gate execution
+  - Public English and German READMEs explain product, current boundary and local validation
+  - Root README documents the minimal local start and quality gate execution
+  - Detailed gate markers remain in the quality strategy instead of inflating the public README
+  - Detailed milestone evidence remains in the project status and machine-readable SSOT
   - esg_app README documents Flutter entrypoints
 evidence_required:
   - README.md
+  - README.de.md
   - esg_app/README.md
+  - docs/project/STATUS.md
+  - docs/project/quality-strategy.md
   - .quality/quality-gate-report.md
 decision: block
 owner: Mustafa

@@ -8,7 +8,9 @@ fuer deterministische Tests verfuegbar. Live-Daten werden in feldgenaue
 `ESGEvidence`-Eintraege mit Quelle, Lizenz, Zeitstempel und Qualitaetsklasse
 ueberfuehrt. AGRIBALYSE-3.2-Klimadaten werden bei vorhandenem AGB-Code als
 offizielle Kategorieevidenz erfasst; Open Food Facts bleibt als
-Retrieval-Channel sichtbar. Dieses Rohmapping veraendert Formel v1.0 nicht.
+Retrieval-Channel sichtbar. Dieses Rohmapping ist noch nicht score-aktiv. Die
+aktive Formel v1.1 erzeugt keine neutralen Ersatzwerte und kennzeichnet
+Gesamtwerte aus weniger als drei belegten Saeulen als partiell.
 
 ## Lokal starten
 
@@ -58,7 +60,8 @@ bash scripts/quality/run_ios_build_gate.sh
 - `lib/models/esg_relationship.dart` modelliert GTIN-, Rohstoff-, Herkunfts-,
   Marken- und Rechtstraegerbeziehungen mit Assertion-Klasse und Confidence.
 - `lib/data_sources/` enthaelt quellenspezifische Mapper.
-- `lib/services/esg_score_calculator.dart` implementiert ADR 0011.
+- `lib/services/esg_score_calculator.dart` implementiert Formel v1.1 aus ADR
+  0011 in Verbindung mit ADR 0027 und ADR 0034.
 - `lib/services/open_food_facts_service.dart` kapselt OFF API v3 mit Timeout,
   Retry, User-Agent und Fehlerklassifikation.
 - `lib/services/product_repository.dart` trennt Live- und Demo-Datenquellen.
@@ -73,7 +76,11 @@ score-aktiv. Eine Rohstoff-Laender-Risikobewertung benoetigt einen belastbaren
 Produkt-Rohstoff-Link und einen separaten Rohstoff-Herkunfts-Link.
 
 Das RLS-gesicherte Supabase-Schema liegt migrationsbasiert unter `../supabase/`.
-Noch nicht verbunden sind ein Remote-Supabase-Projekt, der Flutter-Supabase-
-Client, Auth, TestFlight, App-Store-Release oder Online-Deployment. Xcode 26.6
-und der unsigned iOS-Simulator-Build wurden lokal validiert. Der echte Kamera-
-Smoke-Test muss auf einem angeschlossenen, lokal signierten iPhone erfolgen.
+Das dedizierte Development-Projekt `scanfair-dev` in Frankfurt ist provisioniert
+und sein freigegebener Schemastand remote abgeglichen. Der App-Zugriff und die
+Writer-Runtime bleiben deaktiviert. Die App enthaelt einen optionalen
+read-only REST-/RPC-Cache-Adapter ohne `supabase_flutter`; ohne Build-Konfiguration
+nutzt sie Open Food Facts direkt. Auth, Personendatenpfade, TestFlight,
+App-Store-Release und Online-Deployment sind nicht aktiviert. Xcode 26.6, der
+unsigned iOS-Simulator-Build und der reale Kamera-Flow auf einem lokal
+signierten iPhone wurden validiert.

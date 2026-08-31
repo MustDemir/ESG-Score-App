@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W34
-last_updated: 2026-08-20
+current_week: 2026-W36
+last_updated: 2026-08-31
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -60,17 +60,19 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-20
+  prepared_at: 2026-08-31
   session_closed_at: null
-  branch: feature/retention-observability
-  status: retention_observability_local_validated_ready_for_review
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/29
+  branch: docs/project-status-2026-08-31
+  status: public_readme_restructured_and_validated
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/30
   pull_request: null
   git_state:
-    committed: true
+    committed: false
     pushed: false
     working_tree_clean: false
     commits:
+      - 98d2da3 Merge pull request 30 from MustDemir/feature/retention-observability
+      - 1b8af83 feat: add retention operations monitoring
       - 262d060 Merge pull request 29 from MustDemir/docs/retention-remote-evidence
       - 1a3c256 test: harden retention verifier for existing rows
       - f87c001 docs: record remote retention verification
@@ -81,12 +83,13 @@ session_handoff:
       - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
-    reason: PR 29 ist gemergt. Zwei echte geplante Cleanup-Laeufe wurden erfolgreich beobachtet. Auf dem Feature-Branch werden Migration 13, private Health-Historie, Alert-Outbox und G-RETENTION-OPS lokal umgesetzt; Remote-Migration und externe Alarmzustellung bleiben bewusst offen. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
+    reason: PR 30 ist mit sechs gruenen GitHub-Actions-Jobs gemergt. Die oeffentliche README ist als englische technische Fallstudie mit deutscher Fassung, App-Screenshot und ausgelagertem Detailstatus neu strukturiert. Stack-, Runtime-, Formel- und Testangaben sind gegen Code und SSOT abgeglichen. Brand Fonts sind lokal gebuendelt und Runtime-Fetching ist deaktiviert. Migration 13, echter Monitorlauf und externe Alarmzustellung bleiben bewusst offen. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
   latest_validation:
-    executed_at: "2026-08-20T07:34:02Z"
+    executed_at: "2026-08-31T13:25:57Z"
+    validation_scope: Public README restructure, local font privacy hardening, local 30-gate development pipeline, PR 30 GitHub Actions and integrated 2026-08-20 evidence baseline
     development_quality_gates: 30/30 PASS
-    flutter_tests: 121/121 PASS
-    flutter_line_coverage: 84.15 percent
+    flutter_tests: 122/122 PASS
+    flutter_line_coverage: 84.33 percent
     database_migration_replay: PASS
     database_validation_executed_at: "2026-08-20T07:34:02Z"
     database_pgtap: 250/250 PASS
@@ -116,7 +119,8 @@ session_handoff:
     retention_observability_remote_migration: NOT_APPLIED
     retention_monitor_scheduled_runs_observed: 0
     retention_notification_drill: NOT_RUN
-    retention_pr_github_actions_run: 32173551869 six_of_six PASS
+    retention_pr_github_actions_run: 33203141284 six_of_six PASS
+    retention_pr_merged: true at 98d2da3
     retention_post_merge_github_actions_run: 32173898928 six_of_six PASS
     retention_evidence_post_merge_github_actions_run: 32176444810 six_of_six PASS
     security_pr_github_actions_run: 32129355126 six_of_six PASS
@@ -143,6 +147,16 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - Oeffentliche README von interner Projektdokumentation getrennt; englische Hauptfassung und deutsche Zielleserfassung erstellt
+    - Produktnutzen, Differenzierung, Scoring-Grenzen, Methoden, Tech Stack, Quality Evidence und Release-Grenze adressatengerecht verdichtet
+    - Detaillierten menschenlesbaren Projektstatus nach docs/project/STATUS.md ausgelagert und mit progress.yaml sowie backlog.yaml verknuepft
+    - Vollstaendigen lokalen 30-Gate-Katalog in die Quality-Strategie verlagert und G-DOC-TRACE auf die neue Dokumentationsarchitektur umgestellt
+    - Tatsächlichen Flutter-Ergebnisscreen als README-Visual reproduzierbar erzeugt
+    - Inter und Instrument Serif lokal mit SIL-OFL-Nachweisen, Quell-URLs und SHA-256-Provenienz gebuendelt, Runtime-Fetching deaktiviert und per Regressionstest belegt
+    - Development Quality Pipeline nach Dokumentations- und Font-Haertung mit 30/30 Gates, 122/122 Flutter-Tests und 84.33 Prozent Coverage bestanden
+    - Pull Request 30 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 98d2da3
+    - Retention-Observability, private Health-Historie, Alert-Outbox und G-RETENTION-OPS in main integriert
+    - Compliance-Horizon-Deep-Dive fuer aktuelle Apple-, EU- und deutsche Anforderungen abgeschlossen; Umsetzung als TODO-039 geplant
     - Pull Request 29 mit sechs gruenen GitHub-Actions-Jobs gemergt; Merge-Commit 262d060
     - Zwei echte geplante Retention-Cleanup-Laeufe vom 19. und 20. August erfolgreich beobachtet; Backlog und Runtime-Zeilen null
     - ADR 0038 und Retention-Operations-Vertrag fuer private Health-Historie, Alert-Outbox und externe Zustellgrenze erstellt
@@ -241,7 +255,11 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Feature-Branch vollstaendig lokal und in GitHub Actions validieren und mergen
+    - Dokumentations- und SSOT-Update validieren, reviewen und mergen
+    - Feature-Branch feature/compliance-horizon-2026 vom aktualisierten main erstellen
+    - Offizielle Quellenabdeckung und Wirksamkeitsdaten in einem versionierten Coverage-Audit festhalten
+    - Kanonisches Gate-Schema erweitern und acht Apple-Legacy-Gates migrieren
+    - G-COMPLIANCE-HORIZON, G-REGULATORY-APPLICABILITY und G-UWG-COMPARISON-TRANSPARENCY implementieren
     - Migration 20260820000100 kontrolliert auf scanfair-dev anwenden und Remote-Verifier ausfuehren
     - Ersten echten geplanten Retention-Health-Monitorlauf beobachten
     - Least-Privilege-Alarmkanal und Failure-/Recovery-Drill als Betriebsevidenz umsetzen
@@ -291,8 +309,8 @@ session_handoff:
           - Remote-Implementierung ist definition-of-ready
       - sequence: 5
         id: NEXT-05-eu-supabase-server-writer
-        status: in_progress_provider_governance_validated
-        branch: feature/eu-supabase-data-path
+        status: in_progress_remote_activation_pending
+        branch: null
         focus: EU-Supabase, vertrauenswürdigen Server-Writer und read-only Flutter-Cache implementieren
         suggested_branch: feature/eu-supabase-data-path
         completed_parts:
@@ -303,7 +321,10 @@ session_handoff:
           - Dediziertes Development-Projekt scanfair-dev in Frankfurt provisioniert und lokal verknuepft
           - Sieben lokale Migrationen per Remote-Dry-Run reproduzierbar aufgeloest
           - Gate-Metadaten, DPA, Unterauftragsverarbeiter und Kostenkontrolle als vier Gates integriert
-          - Development 29/29 und Provider-Online-Marker 3/3 bestanden
+          - Development 30/30 und Provider-Online-Marker 3/3 bestanden
+          - Dreizehn Migrationen und 250/250 pgTAP-Tests lokal bestanden
+          - Zwoelf Migrationen remote abgeglichen; Migration 13 bleibt deaktiviert
+          - Pull Request 30 mit Retention-Observability in main gemergt
         remaining:
           - DPA- und Unterauftragsverarbeiter-Owner-Freigabe
           - Aenderungsbenachrichtigung und Free-Plan-Dashboard-Evidenz bestaetigen
@@ -315,6 +336,17 @@ session_handoff:
           - Remote-nahe Migration-, RLS- und Integrationstests bestehen
           - Service-Role bleibt außerhalb der App
           - Cache-, Offline-, Stale-Data- und Fehlerverhalten sind getestet
+      - sequence: 5.1
+        id: NEXT-05A-compliance-horizon-2026
+        status: planned
+        focus: Aktuelle Apple-, EU- und deutsche Anforderungen in kanonische, profilgesteuerte Gates ueberfuehren
+        suggested_branch: feature/compliance-horizon-2026
+        exit_criteria:
+          - Offizielle Quellen, Versionen, Wirksamkeitsdaten und Reviewfristen sind vollstaendig registriert
+          - Acht Apple-Gates verwenden das kanonische Schema und behalten die sieben Kernattribute
+          - Drei neue Horizon-, Anwendbarkeits- und UWG-Gates besitzen positive und negative Selbsttests
+          - Development bleibt bei nicht faelliger Release-Evidenz arbeitsfaehig
+          - Release-Candidate scheitert fail-closed an jeder anwendbaren offenen MUST-Evidenz
       - sequence: 6
         id: NEXT-06-wri-aqueduct
         focus: WRI-Aqueduct-Wasserrisiko für Kaffee integrieren
