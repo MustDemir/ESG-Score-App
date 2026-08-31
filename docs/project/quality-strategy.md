@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-08-18
+Letztes Update: 2026-08-20
 
 ---
 
@@ -46,6 +46,7 @@ Letztes Update: 2026-08-18
 | Öffentliche Claims und Nährwertgrenze | Inventar-, Runtime-, Evidenz- und Aktivierungsprofile | `G-CLAIM-GOVERNANCE` |
 | Privacy-Datenfluss und Aktivierung | Datenmatrix-, Code-, DPIA- und Review-Evidenz | `G-PRIVACY-BOUNDARY` |
 | Backend- und Writer-Sicherheitsgrenze | STRIDE-/Abuse-Case-Modell, Umgebungsvertrag und Aktivierungsevidenz | `G-BACKEND-BOUNDARY` |
+| Retention-Betriebsfaehigkeit | Echte Cron-Laeufe, private Health-Historie, Alert-Lifecycle und externe Zustellgrenze | `G-RETENTION-OPS` |
 | Gate-Definitionen | Sieben Kernattribute, erlaubte Werte, Referenzen und positive/negative Selbsttests | `G-GATE-DEFINITION-QUALITY` |
 | Provider Governance | DPA, Unterauftragsverarbeiter, Frankfurt-Region, Plan und Kostenfreigaben | `G-PROVIDER-DPA`, `G-PROVIDER-SUBPROCESSORS`, `G-COST-CONTROL` |
 | Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
@@ -81,12 +82,12 @@ uebersprungen.
 | `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy- und Backend-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
-| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 213 pgTAP-RLS-/Writer-/Retention-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
+| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 250 pgTAP-RLS-/Writer-/Retention-/Operations-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` | Gate-Schema, DPA-/Unterauftragsverarbeiter-/Kostenregister; geplante und manuelle Laeufe pruefen zusaetzlich offizielle Versionsmarker | Provider-, Gate- und Online-Pruefevidenz |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt neunundzwanzig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-
+Sie deckt dreissig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-
 und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
@@ -148,9 +149,14 @@ einen taeglichen owner-ausgefuehrten pg_cron-Job, begrenzte Loeschbatches und
 einen privaten Replay-Watermark. Das Development-Profil verlangt die lokale
 Implementierung. Migration, Cron-Identitaet und kontrollierter Cleanup-Drill
 sind mit `scripts/quality/verify_remote_retention_cleanup.sql` remote belegt;
-Remote-Aktivierung bleibt bis Beobachtung eines echten geplanten Laufs sowie
-Monitoring- und Alarmierungsevidenz gesperrt. Persoenliche Zugriffslogs sind
-davon nicht freigegeben.
+zwei echte geplante Cleanup-Laeufe wurden am 20. August 2026 erfolgreich
+beobachtet. `G-RETENTION-OPS` prueft zusaetzlich Migration 13 mit privater
+Health-Historie, deduplizierter Alert-Outbox, automatischer Recovery-Aufloesung
+und stabilen Fehlercodes. Das Development-Profil besteht nur bei deaktivierter
+Runtime und darf keine externe Alarmzustellung behaupten. Remote bleibt bis
+zur angewandten Migration, einem echten Monitorlauf und einem empfangenen
+Failure-/Recovery-Drill gesperrt. Persoenliche Zugriffslogs sind davon nicht
+freigegeben.
 `release_candidate` verlangt unabhaengig vom Aktivierungsstatus einen vierten,
 release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
 Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.

@@ -1,0 +1,125 @@
+schema_version: "1.0"
+last_reviewed: 2026-08-20
+owner: Engineering
+status: accepted_for_local_implementation
+implementation_state: local_observability_validated_remote_pending
+runtime_state: disabled
+
+purpose: |
+  Detect silent cleanup failure, stale execution, excessive duration and
+  eligible retention backlog while preserving the disabled remote-runtime and
+  least-privilege boundaries.
+
+scheduled_cleanup_observation:
+  environment: scanfair-dev
+  region: eu-central-1
+  observed_at_utc: 2026-08-20T07:14:00Z
+  evidence: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+  cleanup_runs_observed: 2
+  successful_runs_observed: 2
+  latest_run_started_at_utc: 2026-08-20T03:20:00Z
+  latest_run_status: succeeded
+  eligible_backlog_rows: 0
+  runtime_rows: 0
+
+health_monitor:
+  scheduler: pg_cron
+  job_name: scanfair-retention-health-monitor
+  schedule_utc: "30 3 * * *"
+  command: select private.record_retention_health();
+  execution_database: postgres
+  execution_role: postgres
+  maximum_cleanup_success_age_hours: 36
+  history_retention_days: 90
+  tables:
+    health_history: private.retention_health_checks
+    alert_outbox: private.retention_alert_outbox
+  functions:
+    snapshot: private.retention_health_snapshot(timestamptz)
+    recorder: private.record_retention_health(timestamptz)
+  forbidden_roles: [anon, authenticated, service_role]
+
+detection_contract:
+  critical:
+    - cleanup_job_configuration_invalid
+    - monitor_job_configuration_invalid
+    - cleanup_success_stale
+    - cleanup_latest_run_failed
+    - cleanup_backlog_persistent_seven_checks
+  warning:
+    - cleanup_backlog_at_or_above_batch
+    - cleanup_duration_partition_review
+    - writer_audit_partition_review
+  thresholds:
+    cleanup_batch_rows: 10000
+    persistent_backlog_checks: 7
+    slow_cleanup_seconds: 2
+    consecutive_slow_runs: 3
+    writer_audit_rows: 1000000
+
+alert_outbox:
+  one_open_alert_per_code: true
+  occurrence_counter: required
+  recovery_resolution: automatic
+  resolved_retention_days: 400
+  payload_contains_secrets: prohibited
+  payload_contains_personal_data: prohibited
+
+external_delivery:
+  state: not_configured_runtime_disabled
+  reason: no_approved_least_privilege_channel_and_no_repository_secret
+  prohibited_shortcuts:
+    - broad_long_lived_supabase_management_token_for_routine_monitoring
+    - paid_log_drain_without_cost_and_provider_approval
+    - mobile_or_service_role_access_to_operational_tables
+  activation_requires:
+    - named_delivery_owner
+    - least_privilege_delivery_identity
+    - environment_scoped_secret_storage_and_rotation
+    - cost_and_subprocessor_review
+    - controlled_failure_notification_received
+    - recovery_notification_received
+    - delivery_failure_negative_test
+
+profiles:
+  development:
+    expected_state: local_observability_validated_remote_pending
+    runtime_must_be_disabled: true
+    external_delivery_must_be_unconfigured: true
+  remote_backend:
+    expected_state: remote_observability_verified
+    scheduled_monitor_run_required: true
+    external_delivery_required: true
+    notification_drill_required: true
+  release_candidate:
+    inherits: remote_backend
+    independent_operations_review_required: true
+
+implementation_evidence:
+  local_migrations: 13/13 REPLAYED
+  database_tests: 250/250 PASS
+  database_lint: PASS
+  remote_verifier_local_dry_run: PASS_WITH_ROLLBACK
+  remote_migration: NOT_APPLIED
+  monitor_scheduled_runs_observed: 0
+  notification_drill: NOT_RUN
+  artifacts:
+    - supabase/migrations/20260820000100_retention_observability.sql
+    - supabase/tests/database/retention_observability.test.sql
+    - docs/project/decisions/0038-retention-observability-and-alert-delivery.yaml
+    - docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+    - scripts/quality/validate_retention_operations.rb
+    - scripts/quality/test_retention_operations_gate.rb
+
+remote_activation_blocks:
+  - retention_observability_migration_not_applied
+  - scheduled_health_monitor_run_not_observed
+  - external_alert_delivery_not_configured
+  - failure_and_recovery_notification_drill_missing
+  - independent_operational_readiness_review_missing
+
+primary_sources:
+  - SUPABASE-CRON
+  - SUPABASE-LOG-DRAINS
+  - SUPABASE-COST-CONTROL
+  - SUPABASE-PRODUCTION-CHECKLIST

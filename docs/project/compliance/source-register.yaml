@@ -158,6 +158,13 @@ sources:
     version: current-web
     normative_weight: PROVIDER_OPERATIONAL_GUIDANCE
     scope: pg_cron installation, scheduled database jobs, concurrency and duration guidance
+  - id: SUPABASE-LOG-DRAINS
+    authority: Supabase
+    title: Log Drains
+    url: https://supabase.com/docs/guides/monitoring-and-debugging/log-drains
+    version: current-web
+    normative_weight: PROVIDER_OPERATIONAL_GUIDANCE
+    scope: External log delivery, supported destinations, plan availability and alert integrations
   - id: SUPABASE-UPGRADING
     authority: Supabase
     title: Upgrading

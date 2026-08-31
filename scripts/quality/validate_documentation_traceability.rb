@@ -19,6 +19,7 @@ checks = {
     "G-CLAIM-GOVERNANCE",
     "G-PRIVACY-BOUNDARY",
     "G-BACKEND-BOUNDARY",
+    "G-RETENTION-OPS",
     "G-GATE-DEFINITION-QUALITY",
     "G-PROVIDER-DPA",
     "G-PROVIDER-SUBPROCESSORS",
@@ -77,6 +78,7 @@ checks = {
     "SUPABASE-SUBPROCESSORS",
     "SUPABASE-COST-CONTROL",
     "SUPABASE-CRON",
+    "SUPABASE-LOG-DRAINS",
     "SUPABASE-UPGRADING",
   ],
   "docs/project/compliance/provider-governance-register.yaml" => [

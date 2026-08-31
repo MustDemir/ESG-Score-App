@@ -1,0 +1,85 @@
+id: 0038
+title: Private retention health monitoring with fail-closed alert delivery
+date: 2026-08-20
+status: accepted
+deciders: [Mustafa]
+tags: [backend, operations, observability, alerting, supabase, cost-control]
+
+context: |
+  The retention cleanup has completed two real scheduled runs, but a cron job
+  can later fail, become stale or leave a bounded-deletion backlog. Runtime
+  activation therefore needs durable health observations and alert lifecycle
+  evidence. The development project is on the Supabase Free Plan and has no
+  configured GitHub secret or external monitoring destination.
+
+options_considered:
+  - name: Supabase Log Drain to an external observability provider
+    pros: [near-real-time external logs, mature dashboards and notifications]
+    cons:
+      - unavailable on the current Free Plan
+      - currently requires a paid Log Drain add-on plus downstream service
+      - would create cost and provider-governance decisions before runtime need
+  - name: Scheduled GitHub query with a Supabase management token
+    pros: [simple repository-visible schedule]
+    cons:
+      - no repository secret is configured
+      - a broad long-lived management token is disproportionate for one health query
+      - pull-request and secret-rotation boundaries would need additional controls
+  - name: Private database health history and alert outbox with later delivery adapter
+    pros:
+      - detects failure, staleness, slow cleanup and eligible backlog at the data source
+      - keeps mobile and service roles outside the operational trust boundary
+      - costs no additional provider add-on in the disabled development environment
+      - preserves a typed delivery boundary for a later least-privilege channel
+    cons:
+      - database-only alert records do not notify an operator externally
+      - the monitor still needs independent scheduled-run evidence
+
+decision: |
+  Add a private retention health snapshot, durable health history and
+  deduplicated alert outbox. A postgres-owned pg_cron job records health daily
+  at 03:30 UTC, ten minutes after cleanup. Critical conditions include invalid
+  job configuration, no successful cleanup within 36 hours, a latest failed
+  run and batch-sized backlog persisting for seven checks. Warning conditions
+  include one batch-sized backlog, three consecutive cleanup runs over two
+  seconds and one million writer-audit rows.
+
+  No mobile, authenticated or service_role principal may read, write or invoke
+  the private observability path. Outbound alert delivery remains explicitly
+  `not_configured_runtime_disabled`. Remote backend activation cannot pass
+  until a separately approved least-privilege delivery channel has produced a
+  controlled failure-and-recovery notification drill. A paid Log Drain and a
+  broad GitHub management token are not authorized by this decision.
+
+rationale: |
+  This closes silent database-side failure detection without hiding a missing
+  operator notification channel or creating premature provider costs. It also
+  preserves separation between technical schema readiness and operational
+  runtime approval.
+
+implementation:
+  migration: supabase/migrations/20260820000100_retention_observability.sql
+  tests: supabase/tests/database/retention_observability.test.sql
+  contract: docs/project/security/retention-observability-contract.yaml
+  gate: docs/project/gate-definitions/local/G-RETENTION-OPS.yaml
+  observation: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+  local_state: validated_250_of_250_pgtap
+  remote_state: not_applied_pending_pull_request_review
+  runtime_state: disabled
+
+consequences:
+  - A health record and deduplicated alert lifecycle are available without app access.
+  - Resolved alerts are retained for 400 days and health checks for 90 days.
+  - External delivery and a notification drill remain blocking remote-activation evidence.
+  - The health-monitor cron needs a real scheduled-run observation after remote application.
+  - Provider-plan or delivery-channel changes reopen cost, DPA, subprocessor and secret review.
+
+primary_sources:
+  - SUPABASE-CRON
+  - SUPABASE-LOG-DRAINS
+  - SUPABASE-COST-CONTROL
+  - SUPABASE-PRODUCTION-CHECKLIST
+
+supersedes: null
+superseded_by: null
+related: [0008, 0020, 0022, 0032, 0035, 0037]

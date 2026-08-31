@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-18
+last_reviewed: 2026-08-20
 owner: Engineering
 status: accepted_for_definition_of_ready
 implementation_state: remote_schema_deployed_runtime_disabled
@@ -202,6 +202,23 @@ retention_cleanup_contract:
     - eligible_backlog_monitor
     - post_upgrade_job_verification
 
+retention_observability_contract:
+  state: local_validated_remote_migration_pending
+  contract_ref: docs/project/security/retention-observability-contract.yaml
+  scheduled_cleanup_observation: two_successful_runs_zero_eligible_backlog
+  observation_evidence: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+  monitor_job_name: scanfair-retention-health-monitor
+  monitor_schedule_utc: "30 3 * * *"
+  health_history: private.retention_health_checks
+  alert_outbox: private.retention_alert_outbox
+  external_delivery: not_configured_runtime_disabled
+  remote_activation_requires:
+    - migration_13_applied_and_verified
+    - first_real_scheduled_monitor_run_observed
+    - least_privilege_external_delivery_configured
+    - failure_and_recovery_notifications_received
+    - delivery_failure_negative_test
+
 secret_lifecycle:
   maximum_rotation_days: 180
   immediate_rotation_triggers:
@@ -246,15 +263,21 @@ incident_contract:
 
 implementation_evidence:
   state: remote_schema_deployed_runtime_disabled
-  validated_on: 2026-08-18
+  validated_on: 2026-08-20
   remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
-  database_tests: 213/213 PASS
-  local_migrations: 12/12 REPLAYED
+  database_tests: 250/250 PASS
+  local_migrations: 13/13 REPLAYED
   remote_migrations: 12/12 RECONCILED
   retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
   remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
   retention_cleanup_remote_verification: PASS
+  scheduled_cleanup_runs_observed: 2/2 SUCCEEDED
+  retention_observability_local: PASS
+  retention_observability_verifier_local_dry_run: PASS_WITH_ROLLBACK
+  retention_observability_remote_migration: NOT_APPLIED
+  retention_monitor_scheduled_runs_observed: 0
+  retention_notification_drill: NOT_RUN
   remote_schema_diff: EMPTY
   remote_database_lint: PASS
   service_role_rpc_only_verification: PASS
@@ -280,6 +303,13 @@ implementation_evidence:
     - docs/project/audits/2026-08-18-retention-cleanup-assessment.md
     - scripts/quality/verify_remote_backend_readiness.sql
     - scripts/quality/verify_remote_retention_cleanup.sql
+    - supabase/migrations/20260820000100_retention_observability.sql
+    - supabase/tests/database/retention_observability.test.sql
+    - docs/project/security/retention-observability-contract.yaml
+    - docs/project/decisions/0038-retention-observability-and-alert-delivery.yaml
+    - docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+    - scripts/quality/validate_retention_operations.rb
+    - scripts/quality/verify_remote_retention_observability.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
     - docs/project/gate-definitions/gate-definition-schema.yaml
@@ -290,6 +320,8 @@ implementation_evidence:
     - bash scripts/quality/run_edge_writer_integration_gate.sh
     - supabase db query --linked --file scripts/quality/verify_remote_backend_readiness.sql
     - supabase db query --linked --file scripts/quality/verify_remote_retention_cleanup.sql
+    - bash scripts/quality/run_retention_operations_gate.sh
+    - supabase db query --linked --file scripts/quality/verify_remote_retention_observability.sql
     - flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - ruby scripts/quality/test_gate_definition_gate.rb
     - ruby scripts/quality/test_provider_governance_gate.rb
@@ -396,7 +428,7 @@ remote_activation_blocks:
   - independent_writer_security_review_missing
   - privileged_secret_present_in_client_repository_or_logs
   - remote_environment_writer_and_RLS_integration_tests_missing
-  - remote_retention_job_monitoring_and_cleanup_drill_missing
+  - remote_retention_observability_migration_monitor_run_and_notification_drill_missing
   - secret_rotation_break_glass_or_incident_drill_missing
   - privacy_or_data_license_remote_profile_failing
 
@@ -416,5 +448,6 @@ primary_sources:
   - SUPABASE-COST-CONTROL
   - SUPABASE-PRODUCTION-CHECKLIST
   - SUPABASE-CRON
+  - SUPABASE-LOG-DRAINS
   - SUPABASE-UPGRADING
   - EU-GDPR

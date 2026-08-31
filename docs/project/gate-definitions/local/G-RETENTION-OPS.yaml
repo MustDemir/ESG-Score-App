@@ -1,0 +1,110 @@
+schema_version: "1.0"
+schema_profile: scanfair-gate-v1
+id: G-RETENTION-OPS
+title: Retention cleanup operational health and alert delivery
+status: active
+dimension: operations
+lifecycle_phase: backend-operations-and-remote-activation
+automation: HYBRID
+owner: Engineering and operations owner
+profile_scope: [development, remote_backend, release_candidate]
+
+trigger:
+  - retention_migration_change
+  - cron_schedule_change
+  - remote_backend_activation
+  - alert_delivery_change
+  - provider_plan_change
+  - release_candidate
+
+criteria:
+  - id: RETOPS-001
+    statement: Cleanup and health-monitor jobs have exact names, UTC schedules, commands, database and postgres execution role.
+    verification: AUTO
+    severity: BLOCK
+  - id: RETOPS-002
+    statement: Health history, alert outbox and evaluator functions remain private and unavailable to mobile and service roles.
+    verification: AUTO
+    severity: BLOCK
+  - id: RETOPS-003
+    statement: Stale success, failed latest run, slow execution, batch-sized backlog and persistent backlog have tested stable breach codes.
+    verification: AUTO
+    severity: BLOCK
+  - id: RETOPS-004
+    statement: Alerts deduplicate, count occurrences, resolve on recovery and obey explicit retention.
+    verification: AUTO
+    severity: BLOCK
+  - id: RETOPS-005
+    statement: Remote activation has a least-privilege external delivery channel and a received failure-and-recovery notification drill.
+    verification: HYBRID
+    severity: BLOCK
+  - id: RETOPS-006
+    statement: Paid Log Drains or new monitoring subprocessors require explicit cost and provider approval.
+    verification: HYBRID
+    severity: BLOCK
+
+artifacts:
+  - id: RETOPS-A01
+    type: repository_input
+    path: docs/project/security/retention-observability-contract.yaml
+    required_for: [development, remote_backend, release_candidate]
+  - id: RETOPS-A02
+    type: repository_input
+    path: supabase/migrations/20260820000100_retention_observability.sql
+    required_for: [development, remote_backend, release_candidate]
+  - id: RETOPS-A03
+    type: repository_input
+    path: supabase/tests/database/retention_observability.test.sql
+    required_for: [development, remote_backend, release_candidate]
+  - id: RETOPS-A04
+    type: repository_input
+    path: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+    required_for: [development, remote_backend, release_candidate]
+  - id: RETOPS-A05
+    type: generated_evidence
+    path: .quality/retention-operations/report.json
+    required_for: [development, remote_backend, release_candidate]
+  - id: RETOPS-A06
+    type: manual_evidence
+    path: docs/project/security/evidence/retention-alert-delivery.yaml
+    required_for: [remote_backend, release_candidate]
+
+decision:
+  pass: The selected profile has complete, tested and non-contradictory retention operations evidence.
+  fail: Job identity, private access, health detection, alert lifecycle or required strict-profile delivery evidence is missing.
+  manual_review: External notification receipt, provider impact and operational ownership require qualified human review.
+
+enforcement:
+  development: block
+  remote_backend: block
+  release_candidate: block
+
+audit:
+  validator: scripts/quality/validate_retention_operations.rb
+  tests: scripts/quality/test_retention_operations_gate.rb
+  local_runner: scripts/quality/run_retention_operations_gate.sh
+  ci_workflow: .github/workflows/quality-gates.yml
+  evidence_output: .quality/retention-operations/report.json
+
+waiver:
+  allowed: false
+  conditions: []
+  maximum_days: null
+
+links:
+  requirements: []
+  improvements: []
+  gaps: []
+  risks: [RISK-015]
+  related_adrs: [0037, 0038]
+
+sources:
+  - SUPABASE-CRON
+  - SUPABASE-LOG-DRAINS
+  - SUPABASE-COST-CONTROL
+  - SUPABASE-PRODUCTION-CHECKLIST
+
+notes: |
+  Development PASS confirms a locally tested, remotely disabled implementation
+  and accepts no outbound-delivery claim. Strict profiles remain blocked until
+  remote migration, real monitor execution and notification drill evidence.
