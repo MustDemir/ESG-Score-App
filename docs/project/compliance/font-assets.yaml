@@ -1,0 +1,27 @@
+schema_version: "1.0"
+last_verified: 2026-08-31
+owner: Engineering
+runtime_fetching_allowed: false
+runtime_control: esg_app/lib/main.dart
+asset_manifest: esg_app/pubspec.yaml
+fonts:
+  - family: Inter
+    license: SIL Open Font License 1.1
+    license_file: esg_app/assets/fonts/licenses/Inter-OFL.txt
+    files:
+      - path: esg_app/assets/fonts/Inter-Regular.ttf
+        source: https://fonts.gstatic.com/s/a/ecdb53099b1a68cd24c6900ea5beeafec81bd3c8cb9d0f3c51b9986583ba3982.ttf
+        sha256: ecdb53099b1a68cd24c6900ea5beeafec81bd3c8cb9d0f3c51b9986583ba3982
+      - path: esg_app/assets/fonts/Inter-SemiBold.ttf
+        source: https://fonts.gstatic.com/s/a/d7ba633bab7f40576e539a7e934a1301d7618dceea59c743de477c2c493462fc.ttf
+        sha256: d7ba633bab7f40576e539a7e934a1301d7618dceea59c743de477c2c493462fc
+      - path: esg_app/assets/fonts/Inter-Bold.ttf
+        source: https://fonts.gstatic.com/s/a/b7e339223d56e8c4210c86f1ba87b3d43d6c47e03956ea56f0a7a938ae61b2a3.ttf
+        sha256: b7e339223d56e8c4210c86f1ba87b3d43d6c47e03956ea56f0a7a938ae61b2a3
+  - family: Instrument Serif
+    license: SIL Open Font License 1.1
+    license_file: esg_app/assets/fonts/licenses/InstrumentSerif-OFL.txt
+    files:
+      - path: esg_app/assets/fonts/InstrumentSerif-Regular.ttf
+        source: https://fonts.gstatic.com/s/a/309aadf6d6254529fbfb5451b0905820ca2f4b9eccbb58fefcc161ae51020c72.ttf
+        sha256: 309aadf6d6254529fbfb5451b0905820ca2f4b9eccbb58fefcc161ae51020c72

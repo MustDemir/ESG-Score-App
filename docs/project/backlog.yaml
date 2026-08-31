@@ -1,4 +1,4 @@
-last_updated: 2026-08-20
+last_updated: 2026-08-31
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -1086,3 +1086,48 @@ todos:
       - Einstellungen-Deeplink fuer Kamera-Berechtigung (app_settings/permission_handler)
     updated: 2026-08-13
     created: 2026-08-13
+
+  - id: TODO-039
+    title: Compliance-Horizon 2026 und kanonische Apple-Gate-Migration
+    description: |
+      Den regulatorischen Quellen- und Gate-Bestand auf den Stand 31. August
+      2026 heben. Die sieben Kernattribute bleiben verbindlich; Kriterien
+      erhalten zusaetzlich eine explizite Pflichtklasse, Pipelinewirkung,
+      Anwendbarkeit, Wirksamkeitsdatum, Verifikationsart, Evidenzstufe,
+      Implementierungsstatus und einen pruefbaren Negativfall. Neue Regeln
+      duerfen normale Entwicklung nur blockieren, wenn sie objektiv,
+      anwendbar und im aktiven Profil faellig sind.
+    phase: phase-1-mvp
+    priority: P0
+    effort: L
+    status: planned
+    owner: Compliance and release owner
+    analysis_completed:
+      - Thesis-Tag thesis-v1.0 und aktuelles Referenz-Template bestaetigen sieben Gate-Kernattribute
+      - ScanFair besitzt acht Apple-Entscheidungsgates und 19 Apple-Requirements
+      - Die acht Apple-Gates verwenden noch das akzeptierte Legacy-Profil
+      - Aktuelle 2026-Luecken fuer Apple, EU-Vertrieb und deutsche Nachhaltigkeitsvergleiche klassifiziert
+    implementation_scope:
+      - Offizielle Apple-, EU- und deutsche Quellen mit Version, Wirksamkeitsdatum und Reviewfrist registrieren
+      - ScanFair-Gate-Schema auf eine rueckwaertskompatible Version 2 erweitern
+      - Acht Apple-Gates in das kanonische Profil migrieren
+      - G-COMPLIANCE-HORIZON fuer Quellenabdeckung, Aenderungen und Fristen implementieren
+      - G-REGULATORY-APPLICABILITY fuer Feature-, Storefront- und Geschaeftsmodelltrigger implementieren
+      - G-UWG-COMPARISON-TRANSPARENCY fuer Methode, Vergleichsmenge, Lieferanten und Aktualisierung implementieren
+      - Bestehende Build-, Metadata-, Review-, Support-, Privacy- und Claim-Gates aktualisieren
+      - Bedingte Trigger fuer Age Assurance, BFSG/EAA, AI Act, EUDR und Medizinproduktstatus dokumentieren
+      - Positive, negative, N/A-, Frist-, Profil- und Evidenzmanipulationstests ergaenzen
+      - GitHub Actions um eine nicht-flaky Quellenbeobachtung mit manueller Aenderungsbewertung erweitern
+      - K8s und Gatekeeper ausdruecklich nicht uebernehmen
+    acceptance_criteria:
+      - Jede neue oder geaenderte Pflicht ist von offizieller Quelle bis Gate-Evidenz rueckverfolgbar
+      - Development blockiert nur anwendbare objektive MUSTs und interne akzeptierte MUSTs
+      - Release-Candidate und Submission blockieren bei faelliger oder ungeklaerter MUST-Evidenz
+      - Nichtanwendbarkeit besitzt Begruendung, Owner, Reviewdatum und Reaktivierungstrigger
+      - AUTO prueft nur deterministische Tatsachen; Rechts-, Claim- und Releaseurteile bleiben HYBRID
+      - Alle Gate-Schema-, Rego-, Dokumentations- und CI-Selbsttests bestehen
+      - Release-Rehearsal scheitert ausschliesslich an transparent dokumentierter echter Release-Evidenz
+    related_todos: [TODO-021, TODO-024, TODO-025]
+    related_risks: [RISK-003, RISK-010]
+    created: 2026-08-31
+    updated: 2026-08-31

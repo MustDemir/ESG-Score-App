@@ -86,6 +86,50 @@ uebersprungen.
 | `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` | Gate-Schema, DPA-/Unterauftragsverarbeiter-/Kostenregister; geplante und manuelle Laeufe pruefen zusaetzlich offizielle Versionsmarker | Provider-, Gate- und Online-Pruefevidenz |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
+### Vollständiger lokaler Gate-Katalog
+
+Die öffentliche Repository-README zeigt nur repräsentative Kontrollen. Diese
+Strategie hält den vollständigen lokal ausführbaren Development-Katalog und
+seine Verantwortung fest:
+
+| Gate | Kontrollzweck |
+| --- | --- |
+| `G-FLT-DEPS` | reproduzierbare Flutter-Abhängigkeitsauflösung |
+| `G-FLT-FORMAT` | Dart-Format ohne Drift |
+| `G-FLT-ANALYZE` | statische Analyse mit fatalen Infos |
+| `G-FLT-TEST` | Unit-, Service-, Mapper- und Widgettests |
+| `G-FLT-COVERAGE` | Line-Coverage-Baseline von mindestens 60 Prozent |
+| `G-CMP-SCHEMA` | Compliance-Katalog, Schema und Cross-Links |
+| `G-REG-UNIT` | Rego-Policy-Unit-Tests |
+| `G-CMP-APPLE` | acht Apple-Gate-Gruppen inklusive `G-AS-CLAIMS-TRANSPARENCY` |
+| `G-CMP-EVIDENCE` | Integrität der Compliance-Evidence-Hash-Chain |
+| `G-DATA-ARCH` | Evidenzschema, RLS, Lizenzfelder und AGRIBALYSE 3.2 Mapping |
+| `G-DATA-LICENSE` | ODbL-Komposition und Quellentrennung |
+| `G-METHOD-CATALOG` | Methodikkatalog, Profile und inaktive Draft-Regeln |
+| `G-LINK-INTEGRITY` | produkt- und kontextgebundene Evidenzbeziehungen |
+| `G-MISSING-DATA` | keine positive, neutrale oder Null-Imputation |
+| `G-RED-FLAG` | nicht kompensierbare schwere Risikokontrollen |
+| `G-SCORE-REPRO` | versionierte und reproduzierbare Score-Inputs |
+| `G-CLAIM-SAFETY` | evidenzbegrenzte Kundenaussagen und Proxy-Kennzeichnung |
+| `G-CLAIM-GOVERNANCE` | versioniertes Claim-Inventar und Nutrition-Grenze |
+| `G-PRIVACY-BOUNDARY` | Ist-Datenfluss, DPIA-Screening und Aktivierungsgrenze |
+| `G-BACKEND-BOUNDARY` | Trusted Writer, bounded RPCs und EU-Umgebungsvertrag |
+| `G-RETENTION-OPS` | Cleanup-Health, Alert-Lifecycle und Zustellgrenze |
+| `G-GATE-DEFINITION-QUALITY` | sieben Gate-Kernattribute, Semantik und Selbsttests |
+| `G-MASVS` | risikobasierte OWASP-MASVS-2.1-iOS-Baseline |
+| `G-PROVIDER-DPA` | DPA- und Frankfurt-Verarbeitungsgrenze |
+| `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter und Änderungsgovernance |
+| `G-COST-CONTROL` | Plan-, Quota- und Paid-Change-Schutz |
+| `G-PROJECT-CONTROL` | Gap-, Improvement- und Feature-State-Traceability |
+| `G-SUPPLY-CHAIN` | OSV, Lizenzen, native Plugins und unveränderliche Action-SHAs |
+| `G-DOC-TRACE` | öffentliche und interne Dokumentations-Traceability |
+| `G-DOC-YAML` | Syntax aller projektsteuernden YAML-Artefakte |
+
+`G-IOS-COMPILE`, der vollständige Git-History-Secret-Scan und der echte
+PostgreSQL-/RLS-Replay laufen als zusätzliche dedizierte CI-Jobs. Sie werden
+nicht als weitere lokale Runner-Zeilen gezählt, damit die Aussage `30/30`
+eindeutig bleibt.
+
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
 Sie deckt dreissig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-
 und Doku-Gates ab.

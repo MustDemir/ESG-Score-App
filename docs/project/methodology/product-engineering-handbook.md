@@ -140,7 +140,7 @@ Fehlerbehandlung + iOS-first Device Validation.
 
 **Bei ScanFair umgesetzt**
 
-- aktive MVP-Formel v1.0 und getrennte E-/S-/G-Darstellung
+- aktive MVP-Formel v1.1 und getrennte E-/S-/G-Darstellung
 - Environmental-Evidenz ist Voraussetzung für einen Gesamt-ESG-Score
 - fehlende Säulen werden weder positiv noch neutral noch als null imputiert
 - 39 gezielte Calculator-Fälle für Precedence, Grenzwerte, Zweige und ungültige
@@ -173,7 +173,8 @@ evidence-bounded Claims.
   score-aktiv
 - normalisierte Entitäten für Produkt, Rohstoff, Herkunft, Marke und
   Rechtsträger
-- lokales Supabase-/PostgreSQL-Schema mit RLS, Migrationen und privaten Scans
+- lokales Supabase-/PostgreSQL-Schema mit RLS und Migrationen sowie ein
+  abgeglichenes Frankfurt-Development-Schema bei deaktivierter Runtime
 - drei reproduzierbare GEPA-Kaffee-GTINs mit offizieller
   Produktdeklarationsquelle, URL, SHA-256 und Confidence
 - produktgebundene Kette `GTIN -> Kaffee -> Herkunft`; ein Ursprung eines
@@ -201,11 +202,11 @@ und versionierte Datenverträge.
 
 | Testebene | Belegter Stand | Schützt vor |
 | --- | ---: | --- |
-| Flutter Unit/Widget/Service | 85/85, 82,43 % Line Coverage | Logik-, Mapping-, UI- und Fallback-Regressionen |
+| Flutter Unit/Widget/Service | 122/122, 84,33 % Line Coverage | Logik-, Mapping-, UI-, Font-Asset- und Fallback-Regressionen |
 | Calculator-Entscheidungsmatrix | 39/39 Fälle | falsche Precedence, Grenzwerte und Imputation |
 | Rego-Policy-Tests | automatisiert grün | fehlerhafte Compliance-Entscheidungen |
 | Validator-Selbsttests | pro kritischem Gate | Gate-Bypässe und falsche Positiventscheidungen |
-| PostgreSQL/pgTAP | 55/55 | RLS-, Constraint- und Relationship-Fehler |
+| PostgreSQL/pgTAP | 250/250 | RLS-, Constraint-, Writer-, Retention- und Relationship-Fehler |
 | Static/Format | `analyze --fatal-infos`, `dart format` | statische Fehler und Formatdrift |
 | iOS Compile/Privacy Audit | eigener macOS-CI-Job | native Plugin-, Build- und Manifest-Fehler |
 | Physisches iPhone | Scanner, Permissions, A11y und Start geprüft | reale Lifecycle- und Bedienungsfehler |
@@ -318,8 +319,9 @@ human-in-the-loop AI Engineering.
 
 **Noch offen**
 
-Remote-Umgebungen, Monitoring, Betriebsprozesse, TestFlight, finale
-App-Store-Evidenz und die kontrollierte Releaseentscheidung.
+Remote-Runtime-Aktivierung, externe Alarmzustellung, vollständige
+Betriebsprozesse, TestFlight, finale App-Store-Evidenz und die kontrollierte
+Releaseentscheidung.
 
 ## 4. Die fünf ScanFair-Kontrollschleifen
 
@@ -550,27 +552,28 @@ entwickeln, ohne uns selbst eine falsche App-Store-Reife zu bescheinigen.
 | Lokaler iOS-MVP | stark | reale Kamera, API, Ergebnis und Fallbacks funktionieren |
 | Automated Quality | stark | breite App-, Policy-, DB-, Supply-Chain- und CI-Abdeckung |
 | Accessibility | stark für MVP | automatisiert und auf echtem Gerät geprüft; Release-Reaudit bleibt nötig |
-| Datenarchitektur | solide Grundlage | Provenienz, RLS und Relationships stehen; Remote-Backend fehlt |
+| Datenarchitektur | solide Grundlage | Provenienz, RLS, Relationships und Development-Schema stehen; Remote-Runtime bleibt deaktiviert |
 | Kaffee-Referenzfall | belastbare Basis | Produkt und Herkunft stehen; E-/S-/G-Faktoren fehlen noch |
 | Scoring-Methodik | kontrollierter Entwurf | Safety gut; Kalibrierung, Gewichtung und Fachreview offen |
 | Compliance | sehr gute Development-Baseline | strenge Release-Evidenz ist bewusst noch nicht geschlossen |
-| Betrieb | frühe Phase | Monitoring, Incident, Backup/Restore und Supportprozess fehlen |
+| Betrieb | frühe Phase | Retention-Monitoring ist lokal validiert; externe Zustellung, Incident, Backup/Restore und Supportprozess bleiben offen |
 | App-Store-Release | nicht begonnen | kein TestFlight, keine Submission, kein Online-Release |
 
 ## 10. Nächste Reifestufen
 
-### Stufe 1: Aktuellen Kaffee-Slice integrieren
+### Stufe 1: Lokale Produkt- und Integrationsbaseline
 
-- `feature/coffee-reference-case` committen, pushen, PR prüfen und nach grüner
-  CI mergen
-- Post-Merge-Pipeline und Fortschritts-SSOT bestätigen
+- Kaffee-Referenzpfad und lokale iOS-Integration sind abgeschlossen
+- Post-Merge-Pipelines und Fortschritts-SSOT sind bestätigt
 
-### Stufe 2: Vertrauenswürdigen Datenpfad aufbauen
+### Stufe 2: Vertrauenswürdigen Datenpfad operationalisieren
 
-- EU-Supabase-Projekt und Umgebungsgrenzen einrichten
-- Schreibzugriffe ausschließlich serverseitig erlauben
-- read-only Flutter-Cache mit Datenfrische und sicheren Fallbacks anbinden
-- Backup, Restore, Migration und Rollback prüfen
+- vorhandenes EU-Supabase-Development-Schema und Umgebungsgrenzen beibehalten
+- lokalen Trusted Writer und read-only Flutter-Cache erst nach den
+  Aktivierungsnachweisen remote freigeben
+- Retention-Observability-Migration, echten Monitorlauf und Notification Drill
+  remote nachweisen
+- Read-Abuse-Schutz, Backup, Restore, Migration und Rollback prüfen
 
 ### Stufe 3: Kaffee fachlich vervollständigen
 

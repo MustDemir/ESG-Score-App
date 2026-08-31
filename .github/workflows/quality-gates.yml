@@ -7,6 +7,7 @@ on:
     paths:
       # G-DOC-TRACE validates the repository README as a release-relevant artifact.
       - 'README.md'
+      - 'README.de.md'
       - 'esg_app/**'
       - 'docs/**'
       - 'supabase/**'
@@ -17,6 +18,7 @@ on:
       - main
     paths:
       - 'README.md'
+      - 'README.de.md'
       - 'esg_app/**'
       - 'docs/**'
       - 'supabase/**'

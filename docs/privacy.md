@@ -49,8 +49,9 @@ ScanFair-Konto noch einen ScanFair-Cloudspeicher.
 
 Im aktuellen MVP sind keine Analytics-, Tracking-, Werbe-, Standort- oder
 Crash-Reporting-SDKs aktiviert. Es werden keine nutzergenerierten Inhalte und
-keine Gesundheitsdaten angefordert. Ein Supabase-Backend, Accounts und eine
-persistente Historie sind technisch geplant, aber nicht verbunden oder aktiv.
+keine Gesundheitsdaten angefordert. Ein separates Supabase-Development-Schema
+ist provisioniert; App-Zugriff, Remote-Runtime, Accounts und persistente
+Nutzerhistorie sind jedoch nicht verbunden oder aktiv.
 
 ## Empfänger und Drittanbieter
 
@@ -61,6 +62,10 @@ persistente Historie sind technisch geplant, aber nicht verbunden oder aktiv.
 - **Apple:** verarbeitet Daten im Rahmen von iOS und einer späteren
   App-Store- oder TestFlight-Nutzung nach eigenen Bedingungen.
 - **Supabase:** im aktuellen MVP nicht verbunden und kein aktueller Empfänger.
+
+Die verwendeten Schriften Inter und Instrument Serif sind in der App
+gebündelt. Runtime-Fetching ist technisch deaktiviert; Google Fonts ist daher
+kein Empfänger beim App-Start oder bei der Nutzung.
 
 ## Rechtsgrundlage und Transparenzstatus
 

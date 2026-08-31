@@ -9,6 +9,7 @@ Designartefakte (Wireframes, Brand, Screens) liegen eine Ebene höher in `docs/`
 ```
 docs/project/
 ├── README.md              # diese Datei — Übersicht
+├── STATUS.md              # menschenlesbarer aktueller Projekt- und Reifegradstand
 ├── methodology/           # WIE wir dokumentieren (Prozess-Dokus)
 │   ├── README.md
 │   ├── product-engineering-handbook.md
@@ -99,6 +100,18 @@ Fach- und DPIA-Evidenz stehen im
 Das [Backend Threat Model Assessment](audits/2026-08-11-backend-threat-model-assessment.md)
 dokumentiert die Trust Boundaries, priorisierten Missbrauchsfaelle und die
 fail-closed Freigabegrenze fuer den geplanten EU-Supabase-Serverpfad.
+
+## Öffentliche und interne Dokumentation
+
+Die Root-Dateien [`README.md`](../../README.md) und
+[`README.de.md`](../../README.de.md) sind öffentliche technische Fallstudien
+für Recruiting sowie Fach- und Engineering-Verantwortliche. Operative
+Fortschritts- und Gate-Details bleiben in diesem Ordner. Dadurch muss die
+öffentliche Darstellung nicht zugleich als internes Projekthandbuch dienen.
+
+Der aktuelle menschenlesbare Stand liegt in [`STATUS.md`](STATUS.md), die
+maschinenlesbare Wahrheit in [`progress.yaml`](progress.yaml) und
+[`backlog.yaml`](backlog.yaml).
 
 ## Schnellzugriff für Claude Code
 

@@ -1,4 +1,4 @@
-last_updated: 2026-07-28
+last_updated: 2026-08-31
 
 # Tech-Stack-Inventar. Bei Versions-Update hier ändern.
 # Bei großen Wechseln: ADR schreiben.
@@ -10,39 +10,49 @@ frontend:
   language_version: 3.12.0
   state_management: Flutter-native StatefulWidget + Constructor Injection (ADR 0015)
   key_packages:
+    - name: cupertino_icons
+      purpose: iOS-nahe Standardsymbole
+      version: 1.0.9
     - name: mobile_scanner
       purpose: Barcode-Scanning
       version: 7.3.0
     - name: google_fonts
-      purpose: Inter + Instrument Serif laden
-      version: TBD
-    - name: freezed
-      purpose: Immutable Datenmodelle generieren
-      version: TBD
-    - name: json_serializable
-      purpose: JSON ↔ Dart Mapping
-      version: TBD
-    - name: supabase_flutter
-      purpose: Supabase-Client
-      version: TBD
+      purpose: lokal gebuendelte Inter- und Instrument-Serif-Assets verwenden; Runtime-Fetching deaktiviert
+      version: 6.3.3
     - name: http
       purpose: HTTP-Client für OFF-API
       version: 1.6.0
+  deliberately_not_used:
+    - name: supabase_flutter
+      reason: Read-only Cache nutzt begrenzte REST-RPCs ohne neue native Abhängigkeit
+    - name: freezed
+      reason: Datenmodelle sind im aktuellen MVP klein und manuell typisiert
+    - name: json_serializable
+      reason: Quellenspezifisches Mapping bleibt explizit und evidenznah
 
 backend:
   provider: Supabase
   region: EU Central (Frankfurt)
-  database: PostgreSQL 15+
-  extensions:
-    - name: pgvector
-      purpose: Vektor-Suche für Phase 2 (Embeddings)
-      enabled: false  # erst in Phase 2 aktivieren
+  project: scanfair-dev
+  database: PostgreSQL
+  local_cli_major_version: 17
+  state: remote_schema_deployed_runtime_disabled
+  access:
+    mobile: bounded read-only RPCs, aktuell nicht remote aktiviert
+    writer: server-only Edge Function mit RPC-only service_role
+  testing:
+    - versionierte SQL-Migrationen
+    - Row Level Security und Grant-Negativtests
+    - pgTAP
+    - Datenbank-Lint und Schema-Diff
   auth:
-    providers:
+    status: not_activated
+    planned_providers:
       - email
       - apple_sign_in
   storage:
-    purpose: ggf. User-Avatare in Phase 3, MVP nutzt nichts
+    status: not_used
+    planned_purpose: ggf. User-Avatare in einer spaeteren Phase
 
 apis:
   - name: Open Food Facts
@@ -50,7 +60,7 @@ apis:
     url: https://world.openfoodfacts.org/api/v3/product/<EAN>.json
     auth: keine
     rate_limit: "freundlich nutzen, kein hartes Limit"
-    license: CC BY-SA
+    license: ODbL 1.0 Datenbank, DbCL 1.0 Inhalte, CC BY-SA 3.0 Bilder
     decision_ref: 0003
 
 dev_tools:
@@ -74,6 +84,15 @@ dev_tools:
     purpose: Versionskontrolle
   - name: Claude Code
     purpose: KI-gestützte Entwicklung
+  - name: Supabase CLI
+    version: 2.110.0
+    purpose: Migration-Replay, lokale Datenbanktests und kontrollierte Remote-Verifikation
+  - name: OPA
+    version: 1.14.1
+    purpose: Rego-Policy-Tests
+  - name: Conftest
+    version: 0.62.0
+    purpose: Policy-as-Code-Entscheidungen gegen strukturierte Artefakte
 
 ci_cd:
   status: active-local-and-github-actions
@@ -84,18 +103,23 @@ ci_cd:
     - GitHub Dependency Review fuer neue PR-Abhaengigkeiten
 
 monitoring_logging:
-  status: TBD für Phase 2
-  candidates:
-    - Sentry (Crashlytics + Error-Tracking)
-    - Supabase Logs (für Backend)
+  status: retention_observability_local_validated_remote_pending
+  implemented:
+    - private Retention-Health-Historie
+    - deduplizierte Alert-Outbox
+    - geplanter pg_cron Cleanup und Health Monitor
+  not_configured:
+    - externe Alarmzustellung
+    - produktives Mobile-Crash-Reporting
 
 distribution:
   ios:
-    method: TestFlight (Phase 1) → App Store (Phase 3)
-    apple_dev_account: TBD ($99/Jahr — siehe TODO-003)
+    current: lokal signierter Build auf physischem iPhone
+    planned: TestFlight und App Store erst nach separater Release-Freigabe
+    apple_dev_account: active
   android:
-    method: Google Play Internal Testing (Phase 3)
-    play_console_account: TBD ($25 einmalig)
+    current: out_of_scope
+    planned: spaetere Phase nach iOS
 
 ai_layer:
   # Erst Phase 2 — aktuell nur Vor-Entscheidung
