@@ -32,6 +32,14 @@ Beide sind Drafts, kein Merge oder Remote-Deployment wurde ausgefuehrt.
 Vor dem Cache-Merge ist nach Integration der Basis das Ziel auf main zu
 setzen und die reguläre PR-CI erneut auszufuehren. Post-Merge-Evidenz bleibt offen.
 
+CI-Nacharbeit vom 23.09.: Ein sporadischer Abbruch der SQL-Frischefixture
+ist lokal korrigiert. Zwei getrennte Uhrabfragen hatten die maximal erlaubten
+sieben Tage um eine Mikrosekunde ueberschritten. Stabiler Zeitbezug und zwei
+Grenztests bestehen jetzt mit **305/305 SQL-Tests** und fehlerfreiem DB-Lint.
+Produktionslogik und Migrationen bleiben unveraendert. Der erneute GitHub-
+Nachweis sowie die Merge-/Post-Merge-Freigaben stehen noch aus; Details im
+[bestehenden Cache-Pruefbericht](audits/2026-09-23-cache-frische-validation.md).
+
 ## Validierte Baseline
 
 | Bereich | Evidenzstand |

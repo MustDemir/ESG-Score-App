@@ -78,3 +78,53 @@ Die Tests sichern die Frist pro Lookup. Sie sind kein Live-OFF-, Hosted-
 Backend-, Device- oder kontinuierlicher Aktualisierungstest bereits
 angezeigter Produktansichten. PR-/Post-Merge-Nachweis bleibt offen;
 TKT-038-01 steht deshalb auf **review**, nicht done.
+
+## CI-Nacharbeit: deterministische SQL-Frischefixture
+
+Der GitHub-Lauf [35829050967](https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967)
+auf `64f4e864bdbfea342bd810ee2c555e1a216869e9` scheiterte nicht an der
+Dart-Reparatur, sondern beim Anlegen der SQL-Testfixture in
+`stale_serving_window.test.sql`. Getrennte `clock_timestamp()`-Aufrufe
+erzeugten `fetched_at=06:57:13.840718` und
+`expires_at=06:57:13.840719` sieben Tage spaeter (UTC, 23./30.09.2026).
+Die unveraenderte Datenbankregel wies sieben Tage plus eine Mikrosekunde
+korrekt ab. Der Lauf brach nach 299 ausgefuehrten Tests ab; die danach
+angeordneten HTTP-Tests wurden nicht ausgefuehrt.
+
+Freigegebene, begrenzte Nacharbeit im selben Ticket:
+
+- Die Fixture verwendet den transaktionsstabilen `current_timestamp`.
+- `lives_ok` belegt die Annahme von genau sieben Tagen.
+- `throws_ok` verlangt fuer sieben Tage plus eine Mikrosekunde SQLSTATE
+  `23514` und ausdruecklich `cached_products_ttl_bound_check` als Ursache.
+- Auch die beiden spaeteren Fixture-Updates verwenden den stabilen Zeitbezug.
+- Keine Produktionslogik, Migration, Frist oder Freigaberegel wurde geaendert.
+
+Lokaler Nachweis am 23.09.2026 auf der wiederhergestellten isolierten
+Testinstanz `scanfair-http-review-20260923` (API 55321 / DB 55322):
+
+- Gezielt: **7/7 pgTAP PASS**.
+- Zehn weitere gezielte Wiederholungen: jeweils **7/7 PASS**; danach
+  **0** verbleibende Fixture-Zeilen fuer `open-food-facts` / `40123400`.
+- Vollstaendige SQL-Suite: **305/305 PASS**, neun Dateien.
+- DB-Lint mit `--level warning --fail-on warning`: keine Befunde, Exit 0.
+- Ticket-/PR-Bindungs-Selbsttests: **31 Tests / 85 Assertions PASS**;
+  Projektkontrolle, Dokumentationsverweise und Syntax aller 150 YAML-Dateien PASS.
+
+Reproduktion ohne Reset der regulaeren Entwicklungsdatenbank:
+
+```text
+supabase test db /Users/mustafademir/ESG-Score-App/supabase/tests/database/stale_serving_window.test.sql --workdir /private/tmp/scanfair-http-review.0BZdsc --local
+supabase test db /Users/mustafademir/ESG-Score-App/supabase/tests/database --workdir /private/tmp/scanfair-http-review.0BZdsc --local
+supabase db lint --workdir /private/tmp/scanfair-http-review.0BZdsc --local --level warning --fail-on warning
+```
+
+Die Testinstanz benoetigte einen deaktivierten Mail-Testdienst wegen eines
+Portkonflikts; nur ihre temporaere Konfiguration wurde angepasst. Die laufende
+Instanz `scanfair-local` und die entfernte Datenbank wurden nicht veraendert.
+Die Testtransaktionen werden zurueckgerollt; es wurde kein lokaler Reset
+ausgefuehrt. Die isolierte Instanz wurde danach mit Backup gestoppt;
+`scanfair-local` lief unveraendert weiter. Der anschliessende GitHub-Lauf muss den Neuaufbau und die
+nachgelagerten HTTP-Pruefungen erneut belegen. Ein manueller Branch-Lauf
+ersetzt nicht die regulaere PR-CI nach Umstellung von PR #36 auf `main`.
+DOD-04 bleibt bis PR-/Post-Merge-Abschluss offen.

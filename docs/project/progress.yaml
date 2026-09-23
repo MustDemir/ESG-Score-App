@@ -91,6 +91,16 @@ session_handoff:
     automatic_merge: false
     remote_database_changed: false
     excluded_local_files: .codex/ remains untracked and was not pushed
+  cache_ci_followup_2026_09_23:
+    ticket: TKT-038-01
+    failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
+    cause: Separate wall-clock reads in the SQL fixture exceeded the seven-day TTL by one microsecond.
+    repair: Transaction-stable fixture time plus exact-boundary acceptance and one-microsecond-overrun rejection tests.
+    local_evidence: docs/project/audits/2026-09-23-cache-frische-validation.md
+    local_results: 7 targeted pgTAP tests and all 305 database tests PASS; strict database lint PASS.
+    next: Publish the test correction and rerun GitHub checks; merge approval and post-merge evidence remain required.
+    production_logic_changed: false
+    remote_database_changed: false
   control_review_2026_09_22:
     ticket: TKT-040-01
     report: docs/project/audits/2026-09-22-agent-control-review.md
@@ -940,6 +950,19 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W39
+    summary: Gezielte CI-Nacharbeit an der SQL-Frischefixture nach lokalem Backend- und Cache-Abschlussreview.
+    done:
+      - Sporadischen CI-Abbruch auf eine um eine Mikrosekunde ueberschrittene Test-TTL zurueckgefuehrt
+      - Stabilen Zeitbezug und zwei explizite Sieben-Tage-Grenztests in TKT-038-01 ergaenzt
+      - 305 SQL-Tests und strikten DB-Lint in separater Testinstanz erfolgreich ausgefuehrt
+    blockers:
+      - Erneuter GitHub-Nachweis und gesonderte Merge-Freigabe sowie Post-Merge-Pruefungen stehen aus
+      - Privacy-Entscheidung, Remote-Aktivierung und externer Alarmnachweis bleiben gesperrt
+    next_week:
+      - Backend-PR nach Freigabe integrieren und Post-Merge pruefen
+      - Cache-PR danach gegen main erneut pruefen und kontrolliert uebernehmen
+
   - week: 2026-W36
     summary: |
       TODO-039 operationalisiert die regulatorische Horizon-Pruefung ohne

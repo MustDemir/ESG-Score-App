@@ -15,6 +15,7 @@ scope:
   in:
     - stale_after als Pflichtfeld samt zeitlicher Konsistenz pruefen
     - expires_at bis zum Repository mitfuehren und unmittelbar vor staleServed erneut pruefen
+    - Zeitabhaengige SQL-Testfixture stabilisieren und die unveraenderte Sieben-Tage-Grenze pruefen
   out:
     - Keine Remote-Aktivierung und keine Methodikaenderung
     - Keine Erweiterung der vereinbarten Speicherfristen
@@ -61,6 +62,12 @@ acceptance_criteria:
     evidence: [docs/project/audits/2026-09-23-cache-frische-validation.md]
     verification: [Bestehende Service- und Repositorytests ausfuehren]
     evidence_required: [Gruene Flutter-Suite]
+  - id: AC-04
+    criterion: Die SQL-Frischefixture verwendet einen stabilen Zeitbezug; genau sieben Tage werden akzeptiert und sieben Tage plus eine Mikrosekunde abgewiesen.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-cache-frische-validation.md]
+    verification: [Gezielter pgTAP-Grenztest und vollstaendige Datenbank-Suite in isolierter Testumgebung]
+    evidence_required: [SQL-Testprotokoll]
 definition_of_done:
   status: not_done
   criteria:
