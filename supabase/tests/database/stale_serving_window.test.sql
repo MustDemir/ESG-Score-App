@@ -2,7 +2,7 @@ begin;
 
 create extension if not exists pgtap with schema extensions;
 
-select plan(5);
+select plan(7);
 
 select has_column(
   'public',
@@ -11,7 +11,10 @@ select has_column(
   'cached_products carries a freshness marker'
 );
 
+-- current_timestamp is stable within this transaction. Separate wall-clock
+-- reads can accidentally exceed the seven-day bound by a microsecond.
 -- The freshness window is computed server-side on every write.
+select lives_ok($$
 insert into public.cached_products (
   source_id,
   barcode,
@@ -25,9 +28,21 @@ insert into public.cached_products (
   '40123400',
   '{"product_name":"fresh fixture"}'::jsonb,
   repeat('e', 64),
-  clock_timestamp(),
-  clock_timestamp(),
-  clock_timestamp() + interval '7 days'
+  current_timestamp,
+  current_timestamp,
+  current_timestamp + interval '7 days'
+)
+$$, 'cache TTL accepts exactly seven days');
+
+select throws_ok(
+  $$
+    update public.cached_products
+    set expires_at = fetched_at + interval '7 days 1 microsecond'
+    where source_id = 'open-food-facts' and barcode = '40123400'
+  $$,
+  '23514',
+  'new row for relation "cached_products" violates check constraint "cached_products_ttl_bound_check"',
+  'cache TTL rejects seven days plus one microsecond'
 );
 
 select is(
@@ -47,8 +62,8 @@ select is(
 -- A stale-but-unexpired row keeps being served (ADR 0033) …
 update public.cached_products
 set
-  fetched_at = clock_timestamp() - interval '2 days',
-  expires_at = clock_timestamp() + interval '1 day'
+  fetched_at = current_timestamp - interval '2 days',
+  expires_at = current_timestamp + interval '1 day'
 where source_id = 'open-food-facts' and barcode = '40123400';
 
 select is(
@@ -71,8 +86,8 @@ select ok(
 -- … while a row past its hard expiry stays hidden.
 update public.cached_products
 set
-  fetched_at = clock_timestamp() - interval '3 days',
-  expires_at = clock_timestamp() - interval '1 day'
+  fetched_at = current_timestamp - interval '3 days',
+  expires_at = current_timestamp - interval '1 day'
 where source_id = 'open-food-facts' and barcode = '40123400';
 
 select is(

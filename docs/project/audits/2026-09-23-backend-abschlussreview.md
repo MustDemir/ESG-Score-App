@@ -67,3 +67,29 @@ d3889ebb441916ef19556ee3d4b1140bf15e6f92ab9dcd407b9f854b536c71fb  scripts/qualit
 Der Skill `security-best-practices` wurde fuer Risikopriorisierung und
 Negativpruefungen verwendet. Fuer PostgREST/Deno gibt es im Skill keinen
 passenden Spezialleitfaden; die konkreten Belege stammen aus Code und Tests.
+
+## Gezielte CI-Nacharbeit vor dem Backend-Merge
+
+Im aufbauenden Cache-Branch scheiterte Lauf
+[35829050967](https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967)
+an der bereits hier vorhandenen SQL-Fixture `stale_serving_window.test.sql`:
+Zwei `clock_timestamp()`-Aufrufe ergaben sieben Tage plus eine Mikrosekunde.
+Der Constraint `cached_products_ttl_bound_check` reagierte korrekt.
+
+Die freigegebene Testkorrektur aus `b4ba6f9` wird deshalb vor einem Merge
+auch im Backend-PR bereitgestellt. Die SQL-Datei ist bytegleich mit der
+lokal geprueften Fassung: stabiler Transaktionszeitpunkt, explizite Annahme
+von genau sieben Tagen und Ablehnung von sieben Tagen plus einer Mikrosekunde
+mit SQLSTATE `23514` und namentlich geprueftem Constraint. Migrationen und
+Produktionslogik bleiben unveraendert.
+
+Die identische SQL-Suite bestand auf der isolierten Instanz
+`scanfair-http-review-20260923` mit **305/305 Tests**, gezielt **7/7** und
+zehn weiteren erfolgreichen Wiederholungen. Strikter DB-Lint war fehlerfrei;
+keine Fixture-Zeile blieb zurueck. Die Testinstanz wurde mit Backup gestoppt.
+Die regulaere lokale und die entfernte Datenbank wurden nicht veraendert.
+
+Das ist eine begrenzte CI-Nacharbeit unter TKT-037-05, kein neuer Gesamtreview.
+Die frueheren gruenen PR-Ergebnisse gelten fuer `f33f758`; der neue Backend-
+Commit benoetigt seinen eigenen GitHub-Nachweis. Merge-Freigabe und
+Post-Merge-Pruefung bleiben ausstehend.
