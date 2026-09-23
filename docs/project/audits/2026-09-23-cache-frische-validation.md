@@ -76,8 +76,8 @@ Befund im vereinbarten lokalen Scope nach der Parser-Nacharbeit.
 
 Die Tests sichern die Frist pro Lookup. Sie sind kein Live-OFF-, Hosted-
 Backend-, Device- oder kontinuierlicher Aktualisierungstest bereits
-angezeigter Produktansichten. PR-/Post-Merge-Nachweis bleibt offen;
-TKT-038-01 steht deshalb auf **review**, nicht done.
+angezeigter Produktansichten. Der spaetere PR-/Post-Merge-Abschluss ist im
+Abschnitt "PR- und Post-Merge-Abschluss" belegt.
 
 ## CI-Nacharbeit: deterministische SQL-Frischefixture
 
@@ -127,7 +127,7 @@ ausgefuehrt. Die isolierte Instanz wurde danach mit Backup gestoppt;
 `scanfair-local` lief unveraendert weiter. Der anschliessende GitHub-Lauf muss den Neuaufbau und die
 nachgelagerten HTTP-Pruefungen erneut belegen. Ein manueller Branch-Lauf
 ersetzt nicht die regulaere PR-CI nach Umstellung von PR #36 auf `main`.
-DOD-04 bleibt bis PR-/Post-Merge-Abschluss offen.
+DOD-04 blieb bis zum unten dokumentierten PR-/Post-Merge-Abschluss offen.
 
 ## Integration der Backend-Basis
 
@@ -143,6 +143,21 @@ Der Cache-Branch wurde anschliessend mit diesem `main` synchronisiert. Bei der
 inhaltlichen Konfliktaufloesung wurden die staerkeren Nachweise beider Seiten
 bewahrt: **144/144 Flutter-Tests**, **42/42 fokussierte Cache-/Repositorytests**
 und **305/305 pgTAP**. TKT-037-05 ist damit done; TKT-037-01 ist als naechstes
-Privacy-Ticket ready, bleibt aber bis zum Abschluss dieses Cache-PRs und einer
-qualifizierten menschlichen Entscheidung unangetastet. Fuer TKT-038-01 fehlen
-weiter die regulaere PR-CI gegen `main`, die Merge-Freigabe und Post-Merge-CI.
+Privacy-Ticket ready und bleibt bis zu einer qualifizierten menschlichen
+Entscheidung ohne Remote-Wirkung.
+
+## PR- und Post-Merge-Abschluss
+
+PR [#36](https://github.com/MustDemir/ESG-Score-App/pull/36) wurde nach zwei
+behobenen Dokumentationshinweisen, geschlossenen Review-Threads und dem
+vollstaendig gruenen finalen PR-Lauf
+[35841888268](https://github.com/MustDemir/ESG-Score-App/actions/runs/35841888268)
+regulaer ohne Admin-Umgehung in `main` integriert. Der gepruefte Kopfstand war
+`00cdc41`; der Merge-Commit ist `8c88b3a`.
+
+Der anschliessende Post-Merge-Lauf
+[35842444594](https://github.com/MustDemir/ESG-Score-App/actions/runs/35842444594)
+bestand alle sechs anwendbaren Jobs: Development-Gates, 305/305 pgTAP samt
+realen HTTP-/Writer-Pfaden, iOS-Compile, Lieferkette, Provider-Governance und
+Secret-Scan. Damit ist DOD-04 erfuellt und TKT-038-01 `done`. Es erfolgte kein
+Remote-Deployment, keine entfernte Migration und keine App-Aktivierung.

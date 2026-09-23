@@ -25,22 +25,24 @@ Der separate technische Review ist dokumentiert. Backend-PR #35 und sein
 Post-Merge-Lauf sind abgeschlossen; ein erster Post-Merge-Datenbankjob traf
 einen belegten Portkonflikt des GitHub-Testrechners, der zweite Versuch lief
 vollstaendig gruen.
-Die zwei Cache-Frischefehler sind in [TKT-038-01 lokal repariert und reviewt](audits/2026-09-23-cache-frische-validation.md), ebenfalls noch ohne PR-/Post-Merge-Abschluss. Lokale HTTP-Evidenz
-ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
+Die zwei Cache-Frischefehler sind in [TKT-038-01 repariert, reviewt und
+integriert](audits/2026-09-23-cache-frische-validation.md). Lokale HTTP-Evidenz
+und gruene CI ersetzen weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 
 [Kontroll-/Backend-PR #35](https://github.com/MustDemir/ESG-Score-App/pull/35)
 ist in `main` integriert. Der darauf aufbauende
-[Cache-PR #36](https://github.com/MustDemir/ESG-Score-App/pull/36) wird jetzt
-gegen `main` synchronisiert und regulaer neu geprueft. Kein Remote-Deployment
-und keine App-Aktivierung wurden ausgefuehrt.
+[Cache-PR #36](https://github.com/MustDemir/ESG-Score-App/pull/36) ist als
+`8c88b3a` in `main` integriert; der Post-Merge-Lauf 35842444594 bestand alle
+sechs anwendbaren Jobs. Kein Remote-Deployment und keine App-Aktivierung
+wurden ausgefuehrt.
 
 CI-Nacharbeit vom 23.09.: Ein sporadischer Abbruch der SQL-Frischefixture
 ist lokal korrigiert. Zwei getrennte Uhrabfragen hatten die maximal erlaubten
 sieben Tage um eine Mikrosekunde ueberschritten. Stabiler Zeitbezug und zwei
 Grenztests bestehen jetzt mit **305/305 SQL-Tests** und fehlerfreiem DB-Lint.
-Produktionslogik und Migrationen bleiben unveraendert. Der GitHub-Nachweis
-fuer den Cache-PR sowie dessen Merge-/Post-Merge-Freigaben stehen noch aus; Details im
-[bestehenden Cache-Pruefbericht](audits/2026-09-23-cache-frische-validation.md).
+Produktionslogik und Migrationen bleiben unveraendert. PR-, Merge- und
+Post-Merge-Nachweis stehen im
+[Cache-Pruefbericht](audits/2026-09-23-cache-frische-validation.md).
 
 ## Validierte Baseline
 
@@ -48,7 +50,7 @@ fuer den Cache-PR sowie dessen Merge-/Post-Merge-Freigaben stehen noch aus; Deta
 | --- | --- |
 | Development Quality Gates | 33/33 PASS, 23. September 2026; keine Release-Freigabe |
 | TODO-039 Kontrollpaket | 3/3 neue Horizon-Gates, 32 Gate-Definitionen (11 v2 kanonisch), Frist- und Quellen-Durchsetzung sowie zugehörige Selbsttests PASS, 4. September 2026 |
-| Ticket-Arbeitsmodell | 7 Tickets; 32 Selbsttests mit 87 Assertions PASS; terminale Tickets werden in offenen PRs abgewiesen; Backend-PR-/Post-Merge-Nachweis geschlossen |
+| Ticket-Arbeitsmodell | 7 Tickets; 32 Selbsttests mit 87 Assertions PASS; terminale Tickets werden in offenen PRs abgewiesen; Backend- und Cache-PR-/Post-Merge-Nachweise geschlossen |
 | Flutter | 144/144 Tests PASS, 84,74 % Line Coverage; 42 Cache-/Repositorytests PASS |
 | Datenbank lokal | 15/15 Migrationen replayed, 305/305 pgTAP PASS, DB-Lint PASS; isolierter Neuaufbau am 23.09. |
 | Datenbank remote | 13/13 freigegebene Migrationen abgeglichen, Schema-Diff leer, DB-Lint PASS |
@@ -57,7 +59,7 @@ fuer den Cache-PR sowie dessen Merge-/Post-Merge-Freigaben stehen noch aus; Deta
 | Public-Read-Abuse-Schutz | 53/53 pgTAP, 292 HTTP-Assertions und erfolgreicher Edge-Writer-/Read-Rundlauf PASS; Migration 15 korrigiert Integration und Header-Spoofing. Remote unveraendert |
 | iOS | Unsigned Simulator Compile und Privacy-Manifest-Audit PASS; physischer iPhone-Flow validiert |
 | Supply Chain | 61 Dart-Pakete, 2 iOS-Plugins, 20 gepinnte Actions, 0 bekannte Schwachstellen |
-| GitHub Actions | Backend-PR #35 und Post-Merge-Lauf 35838485511 (Versuch 2) mit allen sechs anwendbaren Jobs PASS |
+| GitHub Actions | Backend-PR #35/Post-Merge 35838485511 und Cache-PR #36/Post-Merge 35842444594 mit allen sechs anwendbaren Jobs PASS |
 
 `PASS` bezeichnet hier das Development-Profil. Das Profil
 `release_candidate`
@@ -108,9 +110,9 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 
 ### Aktuelle Ausführungsreihenfolge
 
-Vorrangiger technischer Pfad seit 22.09.: TKT-040-01 PR-/CI-Nachweis,
-TKT-037-05 PostgREST-Reparatur, TKT-038-01 Cache-Frische, anschliessend
-TKT-037-01 bis TKT-037-04. Die fachlichen Quellen-/Review-Aufgaben unten
+Backend- und Cache-Reparatur sind abgeschlossen. Der vorrangige Pfad beginnt
+jetzt mit TKT-037-01 Privacy-Pruefung und fuehrt danach kontrolliert ueber
+TKT-037-02 bis TKT-037-04. Die fachlichen Quellen-/Review-Aufgaben unten
 bleiben offen. Docker muss fuer den echten lokalen API-/DB-Test laufen.
 
 1. Die sechs im aktuellen Quellenbericht offenen Signale manuell bewerten und
