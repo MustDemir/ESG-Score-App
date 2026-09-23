@@ -13,6 +13,7 @@ Für ISO-Wochen: `2026-W21`.
 | ADR | `NNNN` (4-stellig) | `0001` |
 | Idee | `IDEA-NNN` | `IDEA-001` |
 | TODO | `TODO-NNN` | `TODO-001` |
+| Ticket | `TKT-NNN-NN` | `TKT-037-01` |
 | Risiko | `RISK-NNN` | `RISK-001` |
 | Meilenstein | `MNN` | `M01` |
 
@@ -22,6 +23,7 @@ Für ISO-Wochen: `2026-W21`.
 
 - ADRs: `NNNN-kurzer-titel-kebab-case.yaml`
 - YAML allgemein: `kebab-case.yaml`
+- Tickets: `tkt-NNN-NN-kurzer-titel.yaml`
 - Markdown: `kebab-case.md`
 
 ## YAML-Stil

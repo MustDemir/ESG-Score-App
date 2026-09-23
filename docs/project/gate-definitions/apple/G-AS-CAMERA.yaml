@@ -1,26 +1,65 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
 id: G-AS-CAMERA
 name: Camera permission and barcode-scanner behavior
+title: Camera permission purpose, consent and fallback
+status: active
 dimension: regulatorisch
 lifecycle_phase: pre-deployment
 source_type: apple
-trigger: Every scanner, permission text or localization change; on-device test before release
+trigger: [scanner_change, permission_text_change, localization_change, release_candidate, submission]
 automation: HYBRID
+profile_scope: [development, release_candidate, submission]
 policy_checks: [policy_camera]
 criteria:
-  - NSCameraUsageDescription clearly explains barcode/product scanning
-  - System consent and visible recording indication are verified on a physical iPhone
-  - Manual barcode entry remains usable when permission is denied
-evidence_required:
-  - esg_app/ios/Runner/Info.plist
-  - localized permission strings
-  - on-device test protocol and screenshots
-decision: manual_review
-enforcement: {development: block_objective_findings, release_candidate: block, submission: block}
+  - id: ASCAM-001
+    statement: NSCameraUsageDescription explains barcode or product scanning in the shipped app.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASCAM-N01, statement: An absent or generic camera purpose string is rejected.}
+  - id: ASCAM-002
+    statement: Consent, the recording indication and localized purpose text are reviewed on a physical iPhone.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: always
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASCAM-N02, statement: Missing device evidence blocks a release candidate.}
+  - id: ASCAM-003
+    statement: Manual barcode entry stays available after camera permission is denied.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: mixed
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASCAM-N03, statement: A denied-permission flow without manual entry fails.}
+evidence_required: [esg_app/ios/Runner/Info.plist, localized permission strings, on-device test protocol and screenshots]
+artifacts:
+  - {id: ASCAM-A01, type: repository_input, path: esg_app/ios/Runner/Info.plist, required_for: [development, release_candidate, submission]}
+  - {id: ASCAM-A02, type: repository_input, path: esg_app/lib/screens/scanner_screen.dart, required_for: [development, release_candidate, submission]}
+  - {id: ASCAM-A03, type: generated_evidence, path: .quality/compliance-gate-summary.md, required_for: [development, release_candidate, submission]}
+  - {id: ASCAM-A04, type: manual_evidence, path: docs/project/audits/2026-08-10-ios-device-accessibility-validation.md, required_for: [release_candidate, submission]}
+decision:
+  pass: The purpose string and fallback are valid; strict profiles additionally require device evidence.
+  fail: Camera use is unexplained, the fallback is absent or required device evidence is missing.
+  manual_review: iOS feature owner verifies runtime consent and localized behavior on-device.
+enforcement: {development: block, release_candidate: block, submission: block}
 owner: iOS feature owner
 audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-CAMERA"}
-waiver: {allowed: false, requires: null}
-links:
-  requirements: [R-AS-03, R-AS-04]
-  apple_guideline_refs: ["2.5.14", "5.1.1(iii)", "5.1.1(iv)"]
+audit: {validator: scripts/compliance/validate_compliance_catalog.rb, tests: docs/project/policies/apple/policy_gate_groups_test.rego, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-gate-summary.md}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-03, R-AS-04], improvements: [IMP-DEV-004], gaps: [GAP-008], risks: [RISK-001], related_adrs: [0008, 0021]}
 sources: [APPLE-ARG, APPLE-PLIST-CAMERA]
-notes: Text presence is automated; runtime behavior and localization are hybrid evidence.
+notes: Automated text checks cannot establish consent UX or localization quality; both remain hybrid evidence.

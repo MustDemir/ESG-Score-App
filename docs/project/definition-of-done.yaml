@@ -1,4 +1,4 @@
-last_updated: 2026-08-12
+last_updated: 2026-09-22
 
 # =============================================================================
 # Definition of Done
@@ -17,6 +17,8 @@ last_updated: 2026-08-12
 
 # Allgemeine Regeln, gelten IMMER (egal welcher Task-Typ):
 universal_checks:
+  - id: U-0
+    check: Ausfuehrbare Aenderung besitzt vor Beginn ein schema-valides Ticket mit Parent-TODO und Ticket-ID
   - id: U-1
     check: progress.yaml wurde aktualisiert (Milestones / weekly_log / stats)
   - id: U-2
@@ -33,6 +35,10 @@ universal_checks:
     check: Neue oder verschärfte Lücke wurde in gap-register.yaml und improvement-register.yaml verankert
   - id: U-8
     check: Account, Payment, UGC, Analytics, Standort und AI/ML wurden als Capability-Trigger geprüft
+  - id: U-9
+    check: Ticket-Akzeptanzkriterien, DoD, Evidenzen und zugeordnete Gates sind vor Status done geschlossen
+  - id: U-10
+    check: Bei Review-Trigger gemaess workflows/control-assurance-review.md sind Befunde, Regressionstests, Reparaturtickets und profilbezogene Aktivierungsblocker dokumentiert
 
 # =============================================================================
 # TASK-TYPEN

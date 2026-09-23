@@ -1,32 +1,65 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
 id: G-AS-BUILD-INTEGRITY
 name: iOS build and platform integrity
+title: iOS build, privacy manifest and platform integrity
+status: active
 dimension: technisch
 lifecycle_phase: pre-deployment
 source_type: apple
-trigger: Every pull request; release_candidate and submission profiles before App Store upload
+trigger: [pull_request, dependency_change, ios_platform_change, release_candidate, submission]
 automation: HYBRID
+profile_scope: [development, release_candidate, submission]
 policy_checks: [policy_build_integrity]
 criteria:
-  - Native iOS compile succeeds with the required Xcode and iOS SDK baseline
-  - Privacy manifest and required-reason API declarations match the shipped binary and SDKs
-  - Listed binary SDK publisher signatures are validated on the signed release archive
-  - Only supported public APIs and justified background modes are used
-evidence_required:
-  - esg_app/ios/Runner/PrivacyInfo.xcprivacy
-  - docs/project/compliance/ios-privacy-sdk-review.json
-  - evidence-store/ios_privacy_audit.json
-  - native iOS build log
-  - signed archive SDK signature validation record
-decision: manual_review
-enforcement:
-  development: warn_release_evidence
-  release_candidate: block
-  submission: block
+  - id: ASBI-001
+    statement: The native iOS build, PrivacyInfo.xcprivacy and required-reason API declarations are valid for the current dependency set.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: generated
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASBI-N01, statement: A missing or invalid privacy manifest fails the iOS audit.}
+  - id: ASBI-002
+    statement: The versioned privacy-SDK review is bound to the current dependency inputs.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASBI-N02, statement: A changed lockfile, manifest or registrant invalidates the review binding.}
+  - id: ASBI-003
+    statement: Publisher-signature continuity for listed binary SDKs is reviewed on the signed release archive.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASBI-N03, statement: A release candidate without signed-archive evidence is blocked.}
+evidence_required: [esg_app/ios/Runner/PrivacyInfo.xcprivacy, docs/project/compliance/ios-privacy-sdk-review.json, evidence-store/ios_privacy_audit.json, signed archive SDK signature validation record]
+artifacts:
+  - {id: ASBI-A01, type: repository_input, path: esg_app/ios/Runner/PrivacyInfo.xcprivacy, required_for: [development, release_candidate, submission]}
+  - {id: ASBI-A02, type: repository_input, path: docs/project/compliance/ios-privacy-sdk-review.json, required_for: [development, release_candidate, submission]}
+  - {id: ASBI-A03, type: generated_evidence, path: .quality/compliance-gate-summary.md, required_for: [development, release_candidate, submission]}
+  - {id: ASBI-A04, type: manual_evidence, path: docs/project/compliance/evidence/ios-signed-archive-review.yaml, required_for: [release_candidate, submission]}
+decision:
+  pass: Objective build and privacy-manifest checks pass; strict profiles also require the manual signed-archive review.
+  fail: A required manifest, reviewed input binding or release-archive record is missing or contradictory.
+  manual_review: Release owner validates SDK publisher signatures only on the signed archive.
+enforcement: {development: block, release_candidate: block, submission: block}
 owner: Release owner
 audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-BUILD-INTEGRITY"}
-waiver: {allowed: false, requires: null}
-links:
-  requirements: [R-AS-04, R-AS-13]
-  apple_guideline_refs: ["1.6", "2.4.2", "2.5.1", "2.5.2", "2.5.4"]
-sources: [APPLE-ARG, APPLE-SUBMISSION, APPLE-PRIVACY-MANIFEST, APPLE-REQUIRED-REASON-API, APPLE-THIRD-PARTY-SDK]
-notes: Simulator framework signatures prove bundle integrity but not publisher continuity; signed release archive validation remains mandatory.
+audit: {validator: scripts/compliance/validate_compliance_catalog.rb, tests: docs/project/policies/apple/policy_gate_groups_test.rego, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-gate-summary.md}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-04, R-AS-13], improvements: [IMP-COMP-002], gaps: [GAP-005], risks: [RISK-008], related_adrs: [0008, 0021]}
+sources: [APPLE-ARG, APPLE-PRIVACY-MANIFEST, APPLE-REQUIRED-REASON-API, APPLE-THIRD-PARTY-SDK]
+notes: Simulator evidence proves bundle integrity only; it never substitutes signed-release archive validation.

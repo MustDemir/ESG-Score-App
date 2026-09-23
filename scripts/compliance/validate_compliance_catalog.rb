@@ -106,8 +106,15 @@ gates.each do |file_id, gate|
     errors << "#{file_id}: missing or empty #{field}" if value.nil? || (value.respond_to?(:empty?) && value.empty?)
   end
   errors << "#{file_id}: id must match filename" unless gate["id"] == file_id
+  errors << "#{file_id}: every Apple gate must use scanfair-gate-v2" unless gate["schema_profile"] == "scanfair-gate-v2" && gate["schema_version"] == "2.0"
   errors << "#{file_id}: automation must be AUTO or HYBRID" unless %w[AUTO HYBRID].include?(gate["automation"])
-  errors << "#{file_id}: decision must be a real action" unless %w[block warn manual_review].include?(gate["decision"])
+  decision = gate["decision"]
+  valid_decision = if decision.is_a?(Hash)
+                     %w[pass fail manual_review].all? { |field| decision[field] && !decision[field].to_s.empty? }
+                   else
+                     %w[block warn manual_review].include?(decision)
+                   end
+  errors << "#{file_id}: decision must declare an actionable automated and manual boundary" unless valid_decision
 
   enforcement = gate.fetch("enforcement", {})
   profiles.each do |required_profile|

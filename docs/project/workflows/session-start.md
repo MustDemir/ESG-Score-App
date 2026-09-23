@@ -22,6 +22,7 @@ Lies in dieser Reihenfolge:
 | 3 | [`backlog.yaml`](../backlog.yaml) | TODOs mit Status `in_progress` und `priority: P0/P1` |
 | 4 | [`risks.yaml`](../risks.yaml) | Risiken mit Status `open` |
 | 5 | [`implementation-plan.yaml`](../implementation-plan.yaml) | Aktuelles Block + nächste 2-3 Steps |
+| 6 | [`tickets/ticket-index.yaml`](../tickets/ticket-index.yaml) | Aktives/naechstes Ticket, Reihenfolge und Arbeitsgrenze |
 
 ### S2 — Dashboard rendern (pflicht)
 
@@ -63,6 +64,7 @@ Aus `implementation-plan.yaml`:
 
 Bevor User „GO" sagt: sicherstellen dass der Step ready ist:
 
+- [ ] Ausfuehrbares Ticket existiert, ist schema-valide und im Index eingeordnet
 - [ ] Akzeptanzkriterien klar (Step hat `description` + `target`)
 - [ ] Architektur-relevant: existiert ADR oder muss eine geschrieben werden?
 - [ ] `depends_on`-Items erfüllt
@@ -96,6 +98,8 @@ pflicht:
   - docs/project/backlog.yaml
   - docs/project/risks.yaml
   - docs/project/implementation-plan.yaml
+  - docs/project/tickets/ticket-index.yaml
+  - docs/project/tickets/ticket-schema.yaml
 kontext:
   - docs/project/decisions/INDEX.md
   - docs/project/failure-modes.yaml

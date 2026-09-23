@@ -4,7 +4,7 @@
 > Grundsatz-Entscheidung: [ADR 0007](decisions/0007-cicd-ct-strategy.yaml).
 > Sicherheits-Baseline: [ADR 0008](decisions/0008-security-baseline.yaml).
 
-Letztes Update: 2026-08-20
+Letztes Update: 2026-09-22
 
 ---
 
@@ -47,7 +47,9 @@ Letztes Update: 2026-08-20
 | Privacy-Datenfluss und Aktivierung | Datenmatrix-, Code-, DPIA- und Review-Evidenz | `G-PRIVACY-BOUNDARY` |
 | Backend- und Writer-Sicherheitsgrenze | STRIDE-/Abuse-Case-Modell, Umgebungsvertrag und Aktivierungsevidenz | `G-BACKEND-BOUNDARY` |
 | Retention-Betriebsfaehigkeit | Echte Cron-Laeufe, private Health-Historie, Alert-Lifecycle und externe Zustellgrenze | `G-RETENTION-OPS` |
-| Gate-Definitionen | Sieben Kernattribute, erlaubte Werte, Referenzen und positive/negative Selbsttests | `G-GATE-DEFINITION-QUALITY` |
+| Gate-Definitionen | Sieben Kernattribute, v2-Kriterienmetadaten, Referenzen und positive/negative Selbsttests | `G-GATE-DEFINITION-QUALITY` |
+| Regulierungs-Horizon | Offizielle Quellen, Wirksamkeitsdaten, erzwungene Reviewfristen, Feature-Trigger und menschliche Änderungsbewertung | `G-COMPLIANCE-HORIZON`, `G-REGULATORY-APPLICABILITY` |
+| Öffentliche Nachhaltigkeitsvergleiche | Methode, Vergleichsmenge, Quellenfrische und qualifiziertes Review | `G-UWG-COMPARISON-TRANSPARENCY` |
 | Provider Governance | DPA, Unterauftragsverarbeiter, Frankfurt-Region, Plan und Kostenfreigaben | `G-PROVIDER-DPA`, `G-PROVIDER-SUBPROCESSORS`, `G-COST-CONTROL` |
 | Supabase-Schema und RLS | Migration-Replay + pgTAP | `supabase test db` |
 | Native iOS-Integration | Compile-Gate + physischer Smoke-Test | Xcode + `flutter build ios` |
@@ -67,6 +69,22 @@ Coverage ist **Indikator, nicht Ziel**. Ein Test der nur Coverage erzeugt ist Sc
 
 ## 3. CI/CT-Pipeline
 
+**Ticket before change:** `G-PROJECT-CONTROL` prueft vor und waehrend einer
+Aenderung das repo-native Ticket gegen DoR, Akzeptanzkriterien, DoD,
+Abhaengigkeiten, Parent-TODO, Risiken, ADRs und erforderliche Gates. Dieselbe
+Pruefung laeuft lokal und im GitHub-Workflow.
+
+Der [Kontroll- und Agent-Review](workflows/control-assurance-review.md)
+ergaenzt die bestehenden Tests bei Aenderungen an Gates, CI, Security,
+Datenfluss oder Datenqualitaet sowie vor Remote-/Release-Aktivierung.
+Er sucht fehlende Testfaelle und falsche Annahmen. Bestaetigte Befunde werden
+zu Reparaturtickets und deterministischen Regressionstests. Agent-Urteile
+sind keine automatischen Freigaben. Der erste dokumentierte Durchlauf steht
+im [Audit vom 22.09.2026](audits/2026-09-22-agent-control-review.md).
+
+Die PR-Bindung wird auch bei `edited` erneut geprueft. Pull Requests nach
+main haben keinen Pfadfilter, damit jede Aenderung ein Ticket benoetigt.
+
 Die verbindliche Workflow-Datei ist
 [`quality-gates.yml`](../../.github/workflows/quality-gates.yml). Sie laeuft
 bei Pushes nach `main`, bei Pull Requests nach `main` sowie manuell via
@@ -82,7 +100,7 @@ uebersprungen.
 | `Local CI quality gates` | Flutter Dependencies, Format, Analyse, Tests, Coverage >= 60 %, MASVS, OPA, Conftest/Evidence-Log, Datenarchitektur, Methodikkatalog, Claim-/Privacy- und Backend-Grenzen, Projektsteuerung, Doku-Trace und YAML | Gate-Report + Compliance- und MASVS-Artefakte |
 | `G-SUPPLY-CHAIN dependency and Action security` | OSV fuer alle gelockten Dart-Pakete, Lizenz- und iOS-Plugin-Inventar, unveraenderliche Action-SHAs sowie Dependency Review bei PRs | Supply-Chain-Inventar + OSV-Evidenz |
 | `G-IOS-COMPILE native iOS build` | Unsigned Simulator-Build plus Audit aller gebuendelten Privacy Manifests auf macOS | `Runner.app` und `ios_privacy_audit.json` |
-| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 250 pgTAP-RLS-/Writer-/Retention-/Operations-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
+| `G-DATA-RLS migration and policy tests` | Supabase-Migration-Replay, 277 pgTAP-RLS-/Writer-/Retention-/Operations-/Abuse-Tests und PostgreSQL-Lint | Pipeline-Abbruch bei Schema-/Policy-Fehlern |
 | `G-PROVIDER-GOVERNANCE DPA, subprocessors and cost` | Gate-Schema, DPA-/Unterauftragsverarbeiter-/Kostenregister; geplante und manuelle Laeufe pruefen zusaetzlich offizielle Versionsmarker | Provider-, Gate- und Online-Pruefevidenz |
 | `Secret scan gate` | Vollstaendiger Git-History-Scan mit Gitleaks | Pipeline-Abbruch bei Secrets |
 
@@ -100,6 +118,9 @@ seine Verantwortung fest:
 | `G-FLT-TEST` | Unit-, Service-, Mapper- und Widgettests |
 | `G-FLT-COVERAGE` | Line-Coverage-Baseline von mindestens 60 Prozent |
 | `G-CMP-SCHEMA` | Compliance-Katalog, Schema und Cross-Links |
+| `G-COMPLIANCE-HORIZON` | offizielle Quellen, Wirksamkeitsdaten und Verbot automatischer Rechts-/Releasefreigaben |
+| `G-REGULATORY-APPLICABILITY` | Feature- und Geschäftsmodelltrigger mit begründeter Nichtanwendbarkeit |
+| `G-UWG-COMPARISON-TRANSPARENCY` | Methodik-, Vergleichs- und Quellenfrischegrenze für öffentliche Nachhaltigkeitsaussagen |
 | `G-REG-UNIT` | Rego-Policy-Unit-Tests |
 | `G-CMP-APPLE` | acht Apple-Gate-Gruppen inklusive `G-AS-CLAIMS-TRANSPARENCY` |
 | `G-CMP-EVIDENCE` | Integrität der Compliance-Evidence-Hash-Chain |
@@ -120,19 +141,19 @@ seine Verantwortung fest:
 | `G-PROVIDER-DPA` | DPA- und Frankfurt-Verarbeitungsgrenze |
 | `G-PROVIDER-SUBPROCESSORS` | Unterauftragsverarbeiter und Änderungsgovernance |
 | `G-COST-CONTROL` | Plan-, Quota- und Paid-Change-Schutz |
-| `G-PROJECT-CONTROL` | Gap-, Improvement- und Feature-State-Traceability |
+| `G-PROJECT-CONTROL` | Ticket-Schema, DoR/DoD, Abhaengigkeiten sowie Gap-, Improvement- und Feature-State-Traceability |
 | `G-SUPPLY-CHAIN` | OSV, Lizenzen, native Plugins und unveränderliche Action-SHAs |
 | `G-DOC-TRACE` | öffentliche und interne Dokumentations-Traceability |
 | `G-DOC-YAML` | Syntax aller projektsteuernden YAML-Artefakte |
 
 `G-IOS-COMPILE`, der vollständige Git-History-Secret-Scan und der echte
 PostgreSQL-/RLS-Replay laufen als zusätzliche dedizierte CI-Jobs. Sie werden
-nicht als weitere lokale Runner-Zeilen gezählt, damit die Aussage `30/30`
-eindeutig bleibt.
+nicht als weitere lokale Runner-Zeilen gezaehlt. Die aktuelle Zahl `33/33`
+bezeichnet ausschliesslich den lokalen Runner und nicht diese Zusatzjobs.
 
 Die lokale Entsprechung ist `bash scripts/quality/run_quality_gates.sh`.
-Sie deckt dreissig Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-
-und Doku-Gates ab.
+Sie deckt 33 Engineering-, Schema-, Policy-, Evidence-, Security-, Scoring-Safety-, Provider-,
+Regulierungs-Horizon- und Doku-Gates ab.
 Der native iOS-Compile-Job, der echte lokale PostgreSQL-/RLS-Test und der
 vollstaendige Git-History-Scan erfolgen zusaetzlich in GitHub Actions. Der
 Datenbanktest ist lokal ueber
@@ -197,20 +218,39 @@ zwei echte geplante Cleanup-Laeufe wurden am 20. August 2026 erfolgreich
 beobachtet. `G-RETENTION-OPS` prueft zusaetzlich Migration 13 mit privater
 Health-Historie, deduplizierter Alert-Outbox, automatischer Recovery-Aufloesung
 und stabilen Fehlercodes. Das Development-Profil besteht nur bei deaktivierter
-Runtime und darf keine externe Alarmzustellung behaupten. Remote bleibt bis
-zur angewandten Migration, einem echten Monitorlauf und einem empfangenen
-Failure-/Recovery-Drill gesperrt. Persoenliche Zugriffslogs sind davon nicht
-freigegeben.
+Runtime und darf keine externe Alarmzustellung behaupten. Migration 13, vier
+echte Monitorlaeufe und ein rollback-sauberer Failure-/Recovery-Lifecycle-
+Verifier sind remote belegt. Remote bleibt bis zu einem least-privilege
+Alarmkanal und einem empfangenen Failure-/Recovery-Drill gesperrt. Persoenliche
+Zugriffslogs sind davon nicht freigegeben.
 `release_candidate` verlangt unabhaengig vom Aktivierungsstatus einen vierten,
 release-spezifischen Security-Review, dessen Evidenz an den geprueften Commit,
 Threat Model, Umgebungsvertrag und Review-Artefakt gebunden ist.
 
 `G-GATE-DEFINITION-QUALITY` validiert fuer alle Gate-Dateien die normalisierten
 sieben Kernattribute `trigger`, `criteria`, `artifacts`, `decision`, `owner`,
-`audit` und `waiver`. Bestehende Definitionen bleiben nur ueber deklarierte
-Legacy-Aliase kompatibel; neue Definitionen muessen `scanfair-gate-v1`
-verwenden. Positive und negative Selbsttests verhindern, dass ein formal
-vorhandenes, aber semantisch unvollstaendiges Gate akzeptiert wird.
+`audit` und `waiver`. Das kanonische Profil `scanfair-gate-v2` verlangt je
+Kriterium zusätzlich Pflichtklasse, Pipelinewirkung, Anwendbarkeit,
+Wirksamkeitsdatum, Evidenzstufe, Implementierungsstatus und einen reproduzierbaren
+Negativfall. Bestehende v1- und Legacy-Definitionen bleiben nur über deklarierte
+Kompatibilitätsprofile lesbar; neue Definitionen müssen v2 verwenden. Positive
+und negative Selbsttests verhindern, dass ein formal vorhandenes, aber semantisch
+unvollständiges Gate akzeptiert wird.
+
+`G-COMPLIANCE-HORIZON`, `G-REGULATORY-APPLICABILITY` und
+`G-UWG-COMPARISON-TRANSPARENCY` trennen objektive Repository-Fakten von
+Rechts-, Claim- und Releaseurteilen. Überfällige Voll-, Kontroll- und
+Rechtsreviewfristen warnen in `development` und blockieren
+`release_candidate` sowie `submission`. Der wöchentliche GitHub-Job vergleicht
+offizielle Quellen gegen eine versionierte technische Baseline aus
+HTTP-Markern und einem begrenzten Inhaltsmarker. Fehlende oder nicht
+auswertbare Inhalte erzeugen einen Prüfauftrag, niemals ein stillschweigendes
+„unverändert“ oder eine Freigabe. Ein separater Deklarationsvertrag überprüft
+alle ausgelieferten `feature_*`-Angaben mit statischen Indikatoren oder
+benannter manueller Evidenz. Strenge Profile erzeugen zusätzlich einen frischen
+Quellenbericht und verlangen für jedes technische Signal einen nachgelagerten,
+signaturgebundenen manuellen Review-Datensatz; `development` bleibt ohne
+Netzwerkabhängigkeit ausführbar.
 
 Die Provider-Gates trennen drei Ebenen. Im Profil `development` darf ein Gate
 nur bestehen, wenn das Frankfurt-Projekt ohne Personendaten, Remote-Schema und

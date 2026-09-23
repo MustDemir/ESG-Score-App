@@ -1,4 +1,4 @@
-last_updated: 2026-08-31
+last_updated: 2026-09-23
 
 # =============================================================================
 # IDEAS — langfristige Konzepte, nicht für aktuelle Phase
@@ -985,6 +985,12 @@ todos:
     owner: Engineering
     related_risks: [RISK-015, RISK-008]
     related: [TODO-004, 0032]
+    tickets:
+      - TKT-037-01
+      - TKT-037-02
+      - TKT-037-03
+      - TKT-037-04
+      - TKT-037-05
     source: docs/project/audits/2026-08-13-technical-risk-audit.md
     completed_parts:
       - Migration 20260813000100_backend_hardening mit 23 neuen pgTAP-Assertions
@@ -1037,18 +1043,33 @@ todos:
         Runtime-Zeilen waren bei der Beobachtung null
       - ADR 0038, Migration 13 und 37 pgTAP-Assertions fuer private Health-
         Historie, Alert-Deduplizierung, Recovery und Monitor-Cron lokal validiert
+      - Migration 20260820000100 remote angewandt und mit dem kontrollierten
+        Observability-Verifier belegt; Failure-/Recovery-Fixtures werden
+        transaktional zurueckgerollt
+      - Vier echte taegliche Health-Monitorlaeufe vom 1. bis 4. September 2026
+        erfolgreich beobachtet; beide Cron-Jobs laufen als postgres
       - G-RETENTION-OPS besteht im Development-Profil und blockiert Remote ohne
-        angewandte Migration, echten Monitorlauf und empfangenen Alarmdrill
+        externe Alarmzustellung und empfangenen Failure-/Recovery-Alarmdrill
+      - Migration 20260906000100 fuer fail-closed PostgREST-Read-Abuse-Schutz
+        erstellt; rollback-only Linked-Verifier bestaetigt Hook, Rechte,
+        30-pro-Minute-Grenze, GET-/Identity-Negativfaelle und null Persistenz
+      - Migration 14 nach gesichertem lokalen Reset vollständig replayed;
+        27/27 Read-Abuse-Assertions, insgesamt 277/277 pgTAP-Tests,
+        Datenbank-Lint und 33/33 Development-Gates bestanden
     remaining_parts:
-      - Migration 13 kontrolliert remote anwenden und Remote-Verifier ausfuehren
-      - Ersten echten geplanten Health-Monitorlauf beobachten und externe
-        Failure-/Recovery-Alarmzustellung als Betriebsevidenz belegen
-      - Read-Rate-Limit auf Edge-Ebene im Umgebungsvertrag verankern
+      - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
+        Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
+      - TKT-037-05 behebt vor Privacy-Review die Hook-Rechte, Pfadpruefung und
+        PostgREST-Transaktionsart; echte HTTP-Tests ergaenzen die SQL-Tests
+      - Migration 14 nur nach Privacy-Review kontrolliert remote anwenden und
+        den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
-    updated: 2026-08-20
+    updated: 2026-09-07
     created: 2026-08-13
 
   - id: TODO-038
+    tickets:
+      - TKT-038-01
     title: UX-/Client-Fixes aus Audit — Doppel-Tap, Permission-Recovery, Offline-Cache
     description: |
       F-04, F-05, F-06, F-08, F-15 bis F-17, F-20 bis F-22: Navigations-
@@ -1079,12 +1100,14 @@ todos:
       - Gesamtdeadline pro Lookup (12s) und Retry-After-Header im OFF-Service
       - Cache-Circuit-Breaker im Read-Through (3 Fehler, 2 Minuten Cooldown)
       - Pilot-Fallback und Stale-Cache als DataFreshnessNotice gekennzeichnet
+      - Inter und Instrument Serif als lokale OFL-Assets gebuendelt; der
+        Runtime-Fetch von Google Fonts ist in main.dart deaktiviert und per
+        Widget-Test abgesichert
     remaining_parts:
       - Lokaler On-Device-Produktcache mit Stale-Kennzeichnung
-      - Fonts als Assets buendeln statt Google-Fonts-Laufzeit-Fetch
       - Response-code gegen angefragten Barcode verifizieren
       - Einstellungen-Deeplink fuer Kamera-Berechtigung (app_settings/permission_handler)
-    updated: 2026-08-13
+    updated: 2026-09-04
     created: 2026-08-13
 
   - id: TODO-039
@@ -1100,7 +1123,7 @@ todos:
     phase: phase-1-mvp
     priority: P0
     effort: L
-    status: planned
+    status: done
     owner: Compliance and release owner
     analysis_completed:
       - Thesis-Tag thesis-v1.0 und aktuelles Referenz-Template bestaetigen sieben Gate-Kernattribute
@@ -1127,7 +1150,61 @@ todos:
       - AUTO prueft nur deterministische Tatsachen; Rechts-, Claim- und Releaseurteile bleiben HYBRID
       - Alle Gate-Schema-, Rego-, Dokumentations- und CI-Selbsttests bestehen
       - Release-Rehearsal scheitert ausschliesslich an transparent dokumentierter echter Release-Evidenz
+    completed_parts:
+      - Quellenregister um offizielle Apple-, EU- und deutsche Primaerquellen inklusive Wirksamkeitsdaten und Reviewfristen erweitert
+      - Rueckwaertskompatibles `scanfair-gate-v2` eingefuehrt; alle acht Apple-Gates in das kanonische Profil migriert
+      - Regulatory Horizon mit sieben anwendungs- und fristgesteuerten Kontrollen sowie drei lokalen v2-Gates implementiert
+      - Positive, negative, Profil-, Frist- und Evidenzmanipulationstests fuer Horizon und Gate-Schema integriert
+      - Ueberfaellige Voll-, Kontroll- und qualifizierte Rechtsreviewfristen warnen in Development und blockieren strenge Profile
+      - Woechentliche GitHub-Quellenbeobachtung vergleicht eine versionierte technische Baseline; fehlende oder nicht auswertbare Inhalte fordern manuelle Aenderungsbewertung und koennen nie freigeben
+      - Strenge Profile gleichen jede aktuelle Quellen-Signatur gegen einen spaeteren manuellen Review-Datensatz ab und blockieren ohne exakten Nachweis
+      - Alle 16 Feature-Deklarationen gegen statische Indikatoren oder benannte manuelle Evidenz verifiziert; adversarialer KI-Endpunkt-Negativtest integriert
+      - Unabhaengiger Control-Assurance-Review mit OPA-, NIST-SSDF- und SLSA-orientiertem Pruefmaßstab dokumentiert
+      - K8s und Gatekeeper bleiben ausserhalb des lokalen App-Quality-Gate-Scopes
     related_todos: [TODO-021, TODO-024, TODO-025]
     related_risks: [RISK-003, RISK-010]
     created: 2026-08-31
-    updated: 2026-08-31
+    updated: 2026-09-04
+
+  - id: TODO-040
+    title: Verbindlichen Ticket-Workflow in das Delivery Operating Model integrieren
+    description: |
+      Ausfuehrbare Aenderungen als repo-native Child-Tickets mit eigener ID,
+      Scope, DoR, Akzeptanzkriterien, DoD, Evidenz, Abhaengigkeiten und Gates
+      kontrollieren. Schema- und Zustandsdrift lokal sowie in CI blockieren.
+    phase: phase-1-mvp
+    priority: P0
+    effort: S
+    status: parked
+    owner: Mustafa Demir
+    related_risks:
+      - RISK-016
+    related:
+      - "0009"
+      - "0029"
+      - "0041"
+    tickets:
+      - TKT-040-01
+    acceptance_criteria:
+      - Ticket-Schema, Vorlage und Index sind versioniert
+      - Bestehende DoR-, DoD-, Backlog-, Risiko-, ADR- und Gate-Mechanismen bleiben SSOT
+      - G-PROJECT-CONTROL prueft Ticketstruktur, Referenzen, Abhaengigkeiten und Zustandslogik
+      - Pull Requests muessen eine existierende Ticket-ID und das passende Parent-TODO referenzieren
+      - Positive und negative Selbsttests sowie die Development-Pipeline bestehen
+    verification:
+      - ruby scripts/quality/test_ticket_gate.rb
+      - ruby scripts/quality/test_pr_ticket_binding.rb
+      - ruby scripts/quality/validate_project_control.rb
+      - bash scripts/quality/run_quality_gates.sh
+    completed_parts:
+      - ADR 0041, Ticket-Schema, Index, Vorlage und vier TODO-037-Child-Tickets erstellt
+      - Arbeitsmodell, Session-Start, DoD, Konventionen und PR-Vorlage integriert
+      - G-PROJECT-CONTROL um Ticket-Validator und Negativtests erweitert
+      - PR-Binding-Validator und GitHub-Actions-Schritt erzwingen genau eine
+        reviewfaehige Ticket-ID mit passendem Parent-TODO
+      - 11 Ticket-Tests mit 23 Assertions, 8 PR-Binding-Tests mit 15
+        Assertions und 33/33 Development-Gates lokal bestanden
+    remaining_parts:
+      - Post-Merge-CI nach Integration pruefen und Ticket schliessen
+    created: 2026-09-11
+    updated: 2026-09-11

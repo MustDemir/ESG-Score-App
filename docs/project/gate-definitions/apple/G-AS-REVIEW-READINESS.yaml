@@ -1,27 +1,65 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
 id: G-AS-REVIEW-READINESS
 name: Complete and reviewable release candidate
+title: Complete, reviewable and accessible release candidate
+status: active
 dimension: technisch
 lifecycle_phase: deployment
 source_type: apple
-trigger: Release-candidate build and final submission rehearsal
+trigger: [release_candidate, submission, backend_change, high_impact_feature_change]
 automation: HYBRID
+profile_scope: [development, release_candidate, submission]
 policy_checks: [policy_review_readiness]
 criteria:
-  - App and backend are complete with no placeholder or hidden functionality
-  - Review notes include a known barcode and account access when needed
-  - Physical-device and IPv6-only network tests pass
-  - Apple HIG and accessibility behavior are reviewed as SHOULD evidence
-evidence_required:
-  - release checklist and review notes
-  - physical-device smoke-test log
-  - IPv6-only test result
-decision: manual_review
-enforcement: {development: warn_release_evidence, release_candidate: block, submission: block}
+  - id: ASRR-001
+    statement: A release candidate is complete, uses a reviewable backend, includes review notes and supplies a known barcode or account when applicable.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASRR-N01, statement: An incomplete app or unavailable review flow blocks release.}
+  - id: ASRR-002
+    statement: Physical-device and IPv6-only network test evidence is retained for the submitted build.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASRR-N02, statement: Missing physical-device or IPv6 evidence blocks release.}
+  - id: ASRR-003
+    statement: High-impact features activate their capability-specific Apple review, including age assurance where required.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASRR-N03, statement: An enabled chatbot, UGC or age-rated software feature without review fails.}
+evidence_required: [release checklist, review notes, physical-device smoke-test log, IPv6-only test result]
+artifacts:
+  - {id: ASRR-A01, type: repository_input, path: docs/project/compliance/compliance-manifest.json, required_for: [development, release_candidate, submission]}
+  - {id: ASRR-A02, type: repository_input, path: docs/project/compliance/regulatory-horizon.yaml, required_for: [development, release_candidate, submission]}
+  - {id: ASRR-A03, type: generated_evidence, path: .quality/compliance-gate-summary.md, required_for: [development, release_candidate, submission]}
+  - {id: ASRR-A04, type: manual_evidence, path: docs/project/compliance/evidence/release-review-readiness.yaml, required_for: [release_candidate, submission]}
+decision:
+  pass: Development can expose pending release evidence as warnings; strict profiles require a complete reviewable release candidate.
+  fail: Required review access, device/network testing or activated-feature controls are incomplete.
+  manual_review: Release owner attests the reviewer journey and accessibility evidence.
+enforcement: {development: warn, release_candidate: block, submission: block}
 owner: Release owner
 audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-REVIEW-READINESS"}
-waiver: {allowed: false, requires: null}
-links:
-  requirements: [R-AS-09, R-AS-13, R-AS-14, R-AS-28, R-AS-29]
-  apple_guideline_refs: ["2.1(a)", "2.3.1", "2.5.5", "4.2", "4.3(b)", "5.6.4"]
+audit: {validator: scripts/compliance/validate_compliance_catalog.rb, tests: docs/project/policies/apple/policy_gate_groups_test.rego, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-gate-summary.md}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-09, R-AS-13, R-AS-14, R-AS-28, R-AS-29], improvements: [IMP-COMP-004], gaps: [GAP-008, GAP-009], risks: [RISK-002, RISK-009], related_adrs: [0021]}
 sources: [APPLE-ARG, APPLE-SUBMISSION, APPLE-HIG]
-notes: A green development build is not equivalent to App Store submission readiness.
+notes: Development success never indicates App Store submission readiness.

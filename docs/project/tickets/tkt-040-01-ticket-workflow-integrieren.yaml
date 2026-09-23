@@ -1,0 +1,157 @@
+schema_version: scanfair-ticket-v1
+id: TKT-040-01
+title: Repo-nativen Ticket-Workflow in Arbeitsmodell und CI integrieren
+summary: |
+  Die vorhandenen Backlog-, DoR-, DoD-, Risiko-, ADR- und Gate-Mechanismen um
+  kleine schema-validierte Child-Tickets und eine verpflichtende PR-Bindung
+  ergaenzen.
+parent_todo: TODO-040
+ticket_type: documentation
+dod_task_types:
+  - documentation
+  - architecture_decision
+priority: P0
+status: parked
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-11
+updated: 2026-09-23
+scope:
+  in:
+    - Ticket-Schema, Index, Vorlage, Validator und Negativtests integrieren
+    - Operating Model, Session-Start, DoD, Konventionen und PR-Workflow anbinden
+    - Vier verbleibende TODO-037-Aktionen als Child-Tickets erfassen
+    - Bestaetigte Agent-Befunde als Reparaturtickets mit blockierenden Abhaengigkeiten erfassen
+    - Review-Nacharbeit an Ticket- und PR-Kontrollen mit Regressionstests
+    - Risikobasierten Agent-Review in den bestehenden Ticket- und Gate-Workflow einordnen
+  out:
+    - Kein externes Ticket-System und kein neuer Provider
+    - Keine automatische menschliche Rechts-, Privacy- oder Releasefreigabe
+    - Keine Umsetzung der fachlichen TODO-037-Tickets in diesem Ticket
+dependencies: []
+links:
+  risks:
+    - RISK-016
+  decisions:
+    - "0009"
+    - "0029"
+    - "0041"
+  requirements: []
+definition_of_ready:
+  status: ready
+  criteria:
+    - id: DOR-01
+      criterion: Bestehendes Backlog-, DoR-, DoD- und Gate-Modell wurde analysiert.
+      status: satisfied
+      evidence:
+        - docs/project/delivery-operating-model.md
+        - docs/project/definition-of-done.yaml
+    - id: DOR-02
+      criterion: Die Prozessluecke ist in Gap, Improvement und Risiko verankert.
+      status: satisfied
+      evidence:
+        - docs/project/gap-register.yaml
+        - docs/project/improvement-register.yaml
+        - docs/project/risks.yaml
+    - id: DOR-03
+      criterion: Owner, Entscheidung und Scope sind benannt.
+      status: satisfied
+      evidence:
+        - docs/project/decisions/0041-ticket-based-execution-control.yaml
+    - id: DOR-04
+      criterion: Keine externe Plattform oder produktive Aktivierung ist erforderlich.
+      status: satisfied
+      evidence:
+        - docs/project/decisions/0041-ticket-based-execution-control.yaml
+acceptance_criteria:
+  - id: AC-01
+    criterion: Ticket-Schema, Index und Vorlage operationalisieren die vorhandene DoR und DoD.
+    status: satisfied
+    verification:
+      - Schema- und Ticket-Validator gegen reale Tickets ausfuehren
+    evidence_required:
+      - Schema, Index, Vorlage und erfolgreicher Validator
+    evidence:
+      - docs/project/tickets/ticket-schema.yaml
+      - docs/project/tickets/ticket-index.yaml
+      - docs/project/tickets/_ticket-template.yaml
+  - id: AC-02
+    criterion: Vier verbleibende TODO-037-Aktionen besitzen getrennte, vollstaendige Child-Tickets.
+    status: satisfied
+    verification:
+      - Backlog-Rueckverweis und Ticket-Index maschinell pruefen
+    evidence_required:
+      - Vier schema-valide TKT-037-Tickets
+    evidence:
+      - docs/project/tickets/tkt-037-01-privacy-pruefung-ip-pseudonyme.yaml
+      - docs/project/tickets/tkt-037-02-migration-14-remote-anwenden.yaml
+      - docs/project/tickets/tkt-037-03-remote-verifier-ausfuehren.yaml
+      - docs/project/tickets/tkt-037-04-externer-retention-alarmkanal.yaml
+  - id: AC-03
+    criterion: G-PROJECT-CONTROL blockiert strukturelle und logische Ticketfehler.
+    status: satisfied
+    verification:
+      - Positive und negative Ticket-Selbsttests ausfuehren
+    evidence_required:
+      - Validator und Negativtest-Suite
+    evidence:
+      - scripts/quality/validate_tickets.rb
+      - scripts/quality/test_ticket_gate.rb
+  - id: AC-04
+    criterion: Pull Requests muessen Ticket-ID und passendes Parent-TODO nennen.
+    status: satisfied
+    verification:
+      - PR-Binding-Validator mit positiven und negativen Ereignis-Fixtures testen
+    evidence_required:
+      - CI-Schritt, Validator und Selbsttests
+    evidence:
+      - .github/workflows/quality-gates.yml
+      - scripts/quality/validate_pr_ticket_binding.rb
+      - scripts/quality/test_pr_ticket_binding.rb
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Arbeitsmodell, DoR, DoD, Session-Start und PR-Vorlage sind konsistent.
+      status: satisfied
+      evidence:
+        - docs/project/delivery-operating-model.md
+        - docs/project/definition-of-done.yaml
+        - docs/project/session-start-protocol.md
+        - .github/PULL_REQUEST_TEMPLATE.md
+    - id: DOD-02
+      criterion: Ticket- und PR-Binding-Negativtests bestehen.
+      status: satisfied
+      evidence:
+        - scripts/quality/test_ticket_gate.rb
+        - scripts/quality/test_pr_ticket_binding.rb
+    - id: DOD-03
+      criterion: Vollstaendige Development-Pipeline besteht mit integriertem Ticket-Gate.
+      status: satisfied
+      evidence:
+        - docs/project/audits/2026-09-11-ticket-workflow-control-validation.md
+    - id: DOD-04
+      criterion: Pull-Request- und Post-Merge-CI sind gruen; Fortschritt ist aktualisiert.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/test_ticket_gate.rb
+    - ruby scripts/quality/test_pr_ticket_binding.rb
+    - ruby scripts/quality/validate_project_control.rb
+    - bash scripts/quality/run_quality_gates.sh
+evidence:
+  - docs/project/audits/2026-09-22-agent-control-review.md
+  - docs/project/workflows/control-assurance-review.md
+  - docs/project/decisions/0041-ticket-based-execution-control.yaml
+  - docs/project/tickets/ticket-schema.yaml
+  - scripts/quality/validate_tickets.rb
+  - docs/project/audits/2026-09-11-ticket-workflow-control-validation.md
+rollback:
+  strategy: Ticket-Pruefung aus dem Runner entfernen und Arbeitsmodell auf den vorherigen Backlog-/DoR-/DoD-Stand zurueckfuehren.
+  verification: Vorherige 33-Gate-Pipeline bleibt reproduzierbar; keine Produkt- oder Remote-Daten sind betroffen.
+activation_boundary: Workflow gilt erst als done, wenn PR-Bindung, lokale Pipeline und Post-Merge-CI belegt sind. Am 23.09. fuer dringende Backend-Reparatur geparkt; PR-Nachweis bleibt offen.

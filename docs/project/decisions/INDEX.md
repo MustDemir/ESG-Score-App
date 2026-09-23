@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-08-18
+Letztes Update: 2026-09-06
 
 ## Aktive ADRs
 
@@ -45,6 +45,10 @@ Letztes Update: 2026-08-18
 | [0035](0035-forward-only-remote-schema-hardening.yaml) | Forward-only-Haertung des angewandten Remote-Development-Schemas | accepted | 2026-08-17 | backend, database, migrations, supabase, security, auditability | 0002, 0020, 0022, 0032, 0033, 0034 |
 | [0036](0036-service-role-rpc-only.yaml) | RPC-only Least Privilege fuer die Hosted-Supabase-Service-Role | accepted | 2026-08-18 | backend, security, least-privilege, supabase, database, auditability | 0002, 0008, 0020, 0022, 0032, 0035 |
 | [0037](0037-bounded-retention-cleanup.yaml) | Begrenztes Retention-Cleanup mit dauerhaften Writer-Watermarks | accepted | 2026-08-18 | backend, database, retention, privacy, operations, supabase, auditability | 0002, 0008, 0020, 0022, 0032, 0033, 0035, 0036 |
+| [0038](0038-retention-observability-and-alert-delivery.yaml) | Private Retention-Health-Überwachung mit fail-closed Alert-Delivery | accepted | 2026-08-20 | backend, operations, observability, alerting, supabase, cost-control | 0008, 0020, 0022, 0032, 0035, 0037 |
+| [0039](0039-compliance-horizon-and-gate-schema-v2.yaml) | Compliance-Horizon und kanonisches Gate-Schema v2 | accepted | 2026-09-04 | compliance, governance, policy-as-code, quality-gates, apple, eu, germany, release-readiness | 0013, 0020, 0021, 0029, 0031 |
+| [0040](0040-public-read-abuse-protection.yaml) | Fail-closed Public-Read-Abuse-Schutz im PostgREST Pre-Request-Pfad | accepted_for_local_implementation | 2026-09-06 | backend, security, availability, privacy, supabase, postgrest, rate-limit | 0002, 0032, 0035, 0036, 0037, 0038 |
+| [0041](0041-ticket-based-execution-control.yaml) | Ticket-basierte Ausfuehrung im bestehenden Arbeitsmodell | accepted | 2026-09-11 | process, governance, tickets, quality-gates, traceability | 0007, 0009, 0029 |
 
 ## Geplante ADRs (im Backlog)
 
@@ -57,7 +61,7 @@ Letztes Update: 2026-08-18
 
 | Status | Anzahl |
 |---|---|
-| accepted | 32 |
+| accepted | 35 |
 | rejected | 1 |
 | proposed | 0 |
 | superseded | 2 |
@@ -67,15 +71,15 @@ Letztes Update: 2026-08-18
 
 - **architecture** → 0001, 0014, 0015, 0016, 0022
 - **scanner / ios** → 0017
-- **backend / database** → 0002, 0022, 0032, 0033, 0035, 0036, 0037
+- **backend / database** → 0002, 0022, 0032, 0033, 0035, 0036, 0037, 0040
 - **data / api** → 0003, 0016, 0022, 0024, 0025, 0028, 0030
 - **ai / scope** → 0004, 0005, 0006
 - **monetization** → 0006
-- **ci-cd / testing** → 0007, 0020, 0021, 0026, 0029
-- **security / dsgvo** → 0008, 0026, 0032, 0035, 0036, 0037
+- **ci-cd / testing** → 0007, 0020, 0021, 0026, 0029, 0039
+- **security / dsgvo** → 0008, 0026, 0032, 0035, 0036, 0037, 0040
 - **methodology** → 0009, 0011, 0023, 0025, 0028, 0029
 - **scoring / esg** → 0010, 0011, 0023, 0025, 0027, 0028, 0034
-- **compliance / governance** → 0009, 0029, 0030, 0031, 0032
+- **compliance / governance** → 0009, 0013, 0021, 0029, 0030, 0031, 0032, 0039
 
 ## Wartung
 

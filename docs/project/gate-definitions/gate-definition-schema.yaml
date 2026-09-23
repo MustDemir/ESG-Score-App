@@ -1,5 +1,5 @@
-schema_version: "1.0"
-profile: scanfair-gate-v1
+schema_version: "2.0"
+profile: scanfair-gate-v2
 owner: Engineering
 status: active
 
@@ -10,6 +10,7 @@ scope:
   exclude:
     - docs/project/gate-definitions/gate-definition-schema.yaml
   compatibility_profiles:
+    - scanfair-gate-v1
     - legacy_local_v0
     - legacy_apple_v1
 
@@ -43,6 +44,25 @@ canonical_metadata:
     profiles: [development, remote_backend, release_candidate, submission]
     enforcement: [block, warn, manual_review, not_applicable]
     artifact_type: [repository_input, generated_evidence, manual_evidence]
+    obligation: [MUST, SHOULD]
+    pipeline_effect: [block, warn, manual_review, not_applicable]
+    applicability: [always, conditional, not_applicable]
+    evidence_level: [repository, generated, manual, mixed]
+    implementation_status: [implemented, pending_review, planned, not_applicable]
+
+criterion_contract_v2:
+  required:
+    - id
+    - statement
+    - obligation
+    - pipeline_effect
+    - applicability
+    - effective_date
+    - verification
+    - evidence_level
+    - implementation_status
+    - severity
+    - negative_case
 
 core_attributes:
   trigger:
@@ -70,6 +90,9 @@ core_attributes:
 canonical_rules:
   - Gate ID must match the filename and pattern G-[A-Z0-9-]+.
   - Every criterion has a stable ID, statement, verification type and severity.
+  - scanfair-gate-v2 criteria additionally declare obligation, pipeline effect,
+    applicability, effective date, evidence level, implementation status and a
+    reproducible negative case.
   - AUTO gates contain only AUTO criteria.
   - HYBRID gates contain at least one HYBRID or MANUAL criterion.
   - Repository input artifacts exist; generated evidence stays below .quality/.
@@ -78,3 +101,4 @@ canonical_rules:
   - A prohibited waiver has no conditions or validity period.
   - Manual approvals cannot be inferred from a successful automated check.
   - Development PASS may validate a fail-closed pending state without approving remote activation.
+  - A source-observation result can require human reassessment but can never approve a legal, scientific or release decision automatically.

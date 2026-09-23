@@ -1,0 +1,9 @@
+schema_version: "1.0"
+owner: Compliance and release owner
+purpose: |
+  Versionsgebundenes Protokoll der menschlichen Bewertung eines technischen
+  Quellen-Signals. Ein Eintrag darf erst nach fachlicher Prüfung des konkreten
+  beobachteten Zustands erstellt werden. Er ist keine automatische Rechts-,
+  Claim- oder Release-Freigabe.
+automatic_approval: prohibited
+entries: []

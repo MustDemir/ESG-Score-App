@@ -1,0 +1,137 @@
+schema_version: scanfair-ticket-v1
+id: TKT-037-01
+title: Privacy-Pruefung fuer pseudonymisierte IP-Rate-Limit-Daten
+summary: |
+  Technische Datenschutzbewertung vorbereiten und eine qualifizierte
+  menschliche Entscheidung einholen, bevor Migrationen 14 und 15 remote angewandt werden.
+parent_todo: TODO-037
+ticket_type: documentation
+dod_task_types:
+  - documentation
+  - provider_governance
+priority: P1
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-11
+updated: 2026-09-23
+scope:
+  in:
+    - Zweck, Datenfluss, Zugriff, Pseudonymisierung, Frist und Loeschung bewerten
+    - Rechtsgrundlage, Erforderlichkeit und Transparenz qualifiziert pruefen lassen
+    - Privacy-Inventar, Umgebungsvertrag und Aktivierungsstatus synchronisieren
+  out:
+    - Keine Rechtsberatung oder automatische Rechtsfreigabe durch Codex
+    - Keine Remote-Anwendung von Migrationen 14 und 15
+    - Keine Verarbeitung echter App-Nutzerdaten
+dependencies:
+  - TKT-037-05
+links:
+  risks:
+    - RISK-005
+    - RISK-015
+  decisions:
+    - "0031"
+    - "0040"
+    - "0041"
+  requirements:
+    - R-DSGVO-01
+    - R-DSGVO-07
+definition_of_ready:
+  status: not_ready
+  criteria:
+    - id: DOR-01
+      criterion: Datenfluss und technische Schutzfunktion sind versioniert.
+      status: satisfied
+      evidence:
+        - docs/project/security/eu-supabase-environment-contract.yaml
+        - docs/project/decisions/0040-public-read-abuse-protection.yaml
+    - id: DOR-02
+      criterion: Remote-Runtime bleibt bis zur Entscheidung deaktiviert.
+      status: satisfied
+      evidence:
+        - docs/project/security/eu-supabase-environment-contract.yaml
+    - id: DOR-03
+      criterion: Entscheidungs- und Engineering-Owner sind benannt.
+      status: satisfied
+      evidence:
+        - docs/project/tickets/tkt-037-01-privacy-pruefung-ip-pseudonyme.yaml
+    - id: DOR-04
+      criterion: TKT-037-05 ist done; echte HTTP-Wirksamkeit sowie Ablauf- und Loeschverhalten sind belegt.
+      status: pending
+      evidence: []
+acceptance_criteria:
+  - id: AC-01
+    criterion: |
+      Erhobene, transient verarbeitete und gespeicherte Daten sowie Empfaenger,
+      Zugriff und Loeschfristen sind widerspruchsfrei dokumentiert.
+    status: pending
+    verification:
+      - Privacy-Inventar gegen Migration und Umgebungsvertrag abgleichen
+    evidence_required:
+      - Aktualisiertes Privacy-Dateninventar mit exakten technischen Feldern
+  - id: AC-02
+    not_applicable_allowed: false
+    criterion: |
+      Ein qualifizierter Reviewer bewertet Rechtsgrundlage, Erforderlichkeit,
+      Verhaeltnismaessigkeit, Informationspflicht und DPIA-Schwelle.
+    status: pending
+    verification:
+      - Review mit Identitaet, Qualifikation, Datum, Scope und Entscheidung pruefen
+    evidence_required:
+      - Signatur- oder Hash-gebundener Privacy-Review
+  - id: AC-03
+    criterion: |
+      Raw-IP-Speicherung bleibt verboten. Pseudonym, Minutenfenster und Zaehler
+      sowie eine Stunde Ablaufzeit sind dokumentiert; tatsaechliche Loeschfrist,
+      Cron-Verzoegerung und Batch-/Ausfallrisiko sind getrennt bewertet.
+    status: pending
+    verification:
+      - Migration, pgTAP und Dateninventar gemeinsam pruefen
+    evidence_required:
+      - 53/53 pgTAP-Nachweis, reale HTTP-Tests und Privacy-Mapping aus TKT-037-05
+  - id: AC-04
+    criterion: |
+      Bei fehlender oder negativer Freigabe bleibt die Remote-Aktivierung
+      technisch und dokumentarisch blockiert.
+    status: pending
+    verification:
+      - G-PRIVACY-BOUNDARY und G-BACKEND-BOUNDARY in passendem Profil ausfuehren
+    evidence_required:
+      - Gate-Berichte mit fail-closed Entscheidung
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Alle Akzeptanzkriterien besitzen nachvollziehbare Evidenz.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      not_applicable_allowed: false
+      criterion: Qualifizierte menschliche Privacy-Entscheidung ist versioniert.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Privacy-SSOT, Risiko, Backlog und Ticketstatus sind synchron.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: Relevante Development-Gates sind gruen; strengere Profile bleiben ehrlich.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-PRIVACY-BOUNDARY
+    - G-BACKEND-BOUNDARY
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - ruby scripts/quality/validate_claims_privacy_boundaries.rb --gate privacy --profile development
+    - ruby scripts/quality/validate_backend_boundary.rb --profile development
+evidence: []
+rollback:
+  strategy: Negative oder unklare Entscheidung behaelt Remote-Runtime deaktiviert und verhindert Remote-Anwendung von Migrationen 14 und 15.
+  verification: Remote-Migrationsliste und Runtime-Feature-Flags bleiben unveraendert.
+activation_boundary: Nur eine qualifizierte Freigabe darf TKT-037-02 ready setzen.

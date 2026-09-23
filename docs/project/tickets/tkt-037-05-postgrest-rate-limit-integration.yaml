@@ -1,0 +1,116 @@
+schema_version: scanfair-ticket-v1
+id: TKT-037-05
+title: Public-Read-Schutz unter realen PostgREST-Bedingungen reparieren
+summary: |
+  Review-Befunde AR-04 bis AR-06 sowie AR-09/10 zu Hook-Rechten, HTTP-Pfaden,
+  Transaktionen, Header-Spoofing und Fehlerantworten vor Privacy ueber HTTP absichern.
+parent_todo: TODO-037
+ticket_type: supabase_change
+dod_task_types: [supabase_change, provider_governance]
+priority: P1
+status: review
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-22
+updated: 2026-09-23
+scope:
+  in:
+    - Hook unter tatsaechlichen Request-Rollen und Pfaden ausfuehren
+    - Schreibenden Rate-Zaehler und RPC-Transaktionsmodus zusammen reparieren
+    - HTTP-Regression fuer drei Read-RPCs und erfolgreichen Writer-Pfad
+    - Ablaufzeit, Loeschverzoegerung, Hash-Eigenschaften und Gateway-Vertrauen dokumentieren
+  out:
+    - Keine Remote-Anwendung oder App-Aktivierung
+    - Keine Veraenderung bereits angewandter historischer Migrationen
+    - Kein Reset eines bestehenden lokalen Datenbestands ohne gesicherten Wiederherstellungsweg
+dependencies: []
+links:
+  risks: [RISK-008, RISK-015]
+  decisions: ["0035", "0040", "0041"]
+  requirements: []
+definition_of_ready:
+  status: ready
+  criteria:
+    - id: DOR-01
+      criterion: Befunde und PostgREST-Vertragsabweichungen sind nachvollziehbar dokumentiert.
+      status: satisfied
+      evidence: [docs/project/audits/2026-09-22-agent-control-review.md]
+    - id: DOR-02
+      criterion: Bestehende Migration und SQL-Tests sind als Reparaturbasis vorhanden.
+      status: satisfied
+      evidence: [supabase/migrations/20260906000100_public_read_abuse_protection.sql, supabase/tests/database/public_read_abuse_protection.test.sql]
+    - id: DOR-03
+      criterion: Remote-Anwendung und Runtime bleiben bis zu Folgetickets gesperrt.
+      status: satisfied
+      evidence: [docs/project/security/eu-supabase-environment-contract.yaml]
+    - id: DOR-04
+      criterion: Owner, lokaler Scope und synthetische HTTP-Testmatrix sind festgelegt.
+      status: satisfied
+      evidence: [docs/project/tickets/tkt-037-05-postgrest-rate-limit-integration.yaml]
+acceptance_criteria:
+  - id: AC-01
+    criterion: Hook laeuft als anon und authenticated; legitime service_role-Writer werden nicht gesperrt, direkte Tabellenrechte bleiben entzogen.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    verification: [Rollenbezogene SQL-Negativtests und echte HTTP-Aufrufe]
+    evidence_required: [Testprotokoll mit Rollen, HTTP-Status und unveraenderten Least-Privilege-Grenzen]
+  - id: AC-02
+    criterion: Alle drei echten RPC-Pfade akzeptieren 30 POSTs je synthetischer Identitaet und Minute; der 31. liefert 429 samt Retry-After.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    verification: [HTTP-Grenzwerttest fuer jeden Pfad sowie alternative Pfadkodierungen]
+    evidence_required: [HTTP-Protokoll und persistierender Zaehlernachweis]
+  - id: AC-03
+    criterion: GET, fehlende oder ungueltige Identitaet werden abgewiesen; manipulierbare Forwarded-Header erlauben keinen Bypass.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    verification: [Tests ueber den lokalen Gateway- und PostgREST-Pfad mit synthetischen Headern]
+    evidence_required: [Negativtestbericht mit Gateway-Version und Vertrauensgrenze]
+  - id: AC-04
+    criterion: Guter Writer-Request publiziert kontrolliert Daten und der Flutter-kompatible Read kann diese lesen; Testdaten werden entfernt.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    verification: [Erfolgreicher Writer-zu-Datenbank-zu-Read-HTTP-Test und Fixture-Nachkontrolle]
+    evidence_required: [End-to-End-Testbericht und Null-Fixture-Nachweis]
+  - id: AC-05
+    criterion: Ablauf nach einer Stunde und tatsaechliche physische Loeschung sind getrennt messbar; Batch- und Cron-Ausfallgrenzen sind fuer Privacy dokumentiert.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md, docs/project/security/eu-supabase-environment-contract.yaml]
+    verification: [Cleanup-Grenzfaelle und Datenflussabgleich]
+    evidence_required: [Korrigierter Retention-Vertrag und Privacy-Review-Input]
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Alle Akzeptanzkriterien besitzen aktuelle Ausfuehrungsevidenz.
+      status: satisfied
+      evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    - id: DOD-02
+      criterion: SQL-Replay, pgTAP, Lint und echter HTTP-Test bestehen auf der reparierten Fassung.
+      status: satisfied
+      evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md]
+    - id: DOD-03
+      criterion: Separater Review bestaetigt die Korrektur der drei P1-Befunde und aktualisierte Verifier.
+      status: satisfied
+      evidence: [docs/project/audits/2026-09-23-backend-abschlussreview.md]
+    - id: DOD-04
+      criterion: PR- und Post-Merge-Nachweis sind dokumentiert; Privacy-Folgeticket ist erst dann ready.
+      status: pending
+      evidence: []
+gates:
+  required: [G-PROJECT-CONTROL, G-BACKEND-BOUNDARY, G-DATA-RLS, G-DOC-TRACE, G-DOC-YAML]
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - ruby scripts/quality/validate_backend_boundary.rb --profile development
+    - bash scripts/quality/run_data_database_gate.sh
+    - bash scripts/quality/run_edge_writer_integration_gate.sh
+    - node scripts/quality/test_public_read_http.mjs --workdir DISPOSABLE_STACK
+    - node scripts/quality/test_edge_writer_http.mjs --workdir DISPOSABLE_STACK
+evidence:
+  - docs/project/audits/2026-09-23-backend-abschlussreview.md
+  - docs/project/audits/2026-09-22-agent-control-review.md
+  - docs/project/audits/2026-09-23-public-read-http-validation.md
+rollback:
+  strategy: Lokale Aenderung isoliert reviewen; Remote bleibt deaktiviert. Bereits angewandte Migrationen nur durch neue Korrekturmigration ergaenzen.
+  verification: Migrationshistorie und deaktivierte Runtime pruefen; vor lokalem Reset vorhandene Daten sichern oder isolierte Testinstanz nutzen.
+activation_boundary: Keine Remote-Anwendung bis HTTP-Nachweis, Privacy-Entscheidung und anschliessendem Migrations-Ticket.

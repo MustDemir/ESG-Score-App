@@ -21,6 +21,7 @@ Decisions vergessen, weekly_log fehlt, nächste Session startet im Blindflug.
 - [ ] `flutter test` grün, Coverage erfüllt Sprint-Ziel
 - [ ] PR erstellt oder direkt auf Branch (je nach Workflow)
 - [ ] CI grün (oder bewusst aufgeschoben mit Begründung)
+- [ ] Bei passendem Trigger [Kontrollreview](control-assurance-review.md) dokumentiert; bestaetigte Befunde mit Regressionstest oder offenem Reparaturticket erfasst
 
 ### B — Feature-State aktualisieren
 

@@ -1,0 +1,134 @@
+schema_version: "1.0"
+owner: Product and release owner
+scope: |
+  Verbindet die Release-Featuredeklaration mit deterministisch sichtbaren
+  App-, Paket- und iOS-Indikatoren. Statische Abwesenheit ist ein Schutz gegen
+  unbeabsichtigt nicht deklarierte Aktivierung, aber keine Rechts- oder
+  Geschäftsmodellentscheidung. Nicht technisch ableitbare Rollen bleiben
+  explizit manuell bewertet.
+
+rules:
+  - flag: feature_accounts_enabled
+    mode: static_absence
+    owner: Privacy and release owner
+    rationale: The shipped client has no account or social-auth package.
+    reactivation_trigger: Add account creation, sign-in or identity-provider integration.
+    forbidden_indicators:
+      - {id: auth_package, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'firebase_auth|supabase_flutter|sign_in_with_apple|google_sign_in'}
+
+  - flag: feature_tracking_enabled
+    mode: static_absence
+    owner: Privacy and release owner
+    rationale: No tracking SDK or ATT integration is present in the shipped app.
+    reactivation_trigger: Add analytics, advertising, attribution or ATT code.
+    forbidden_indicators:
+      - {id: tracking_sdk, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'firebase_analytics|app_tracking_transparency|amplitude|mixpanel'}
+
+  - flag: feature_location_enabled
+    mode: static_absence
+    owner: Privacy and release owner
+    rationale: The iOS bundle declares no location permission and the client has no location package.
+    reactivation_trigger: Add location collection, a location SDK or an iOS location permission.
+    forbidden_indicators:
+      - {id: location_package_or_permission, paths: [esg_app/pubspec.yaml, esg_app/lib, esg_app/ios/Runner/Info.plist], pattern: 'geolocator|(?m:^\s*location\s*:)|NSLocation(WhenInUse|Always)UsageDescription'}
+
+  - flag: feature_in_app_purchases_enabled
+    mode: static_absence
+    owner: Product and release owner
+    rationale: The client has no purchase SDK or StoreKit integration.
+    reactivation_trigger: Add a digital purchase, subscription or StoreKit integration.
+    forbidden_indicators:
+      - {id: purchase_sdk, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'in_app_purchase|purchases_flutter|revenuecat|storekit'}
+
+  - flag: feature_social_login_enabled
+    mode: static_absence
+    owner: Privacy and release owner
+    rationale: The client has no social-login package or provider integration.
+    reactivation_trigger: Add Apple, Google or another social-login provider.
+    forbidden_indicators:
+      - {id: social_login_sdk, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'firebase_auth|sign_in_with_apple|google_sign_in'}
+
+  - flag: feature_third_party_ai_enabled
+    mode: static_absence
+    owner: AI and legal owner
+    rationale: The client contains no recognised third-party AI endpoint or SDK.
+    reactivation_trigger: Add an AI provider, model endpoint or AI content processing.
+    forbidden_indicators:
+      - {id: ai_provider, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'api\.openai\.com|api\.anthropic\.com|api\.mistral\.ai|generativelanguage\.googleapis\.com|openai_dart|langchain'}
+
+  - flag: feature_chatbot_enabled
+    mode: static_absence
+    owner: AI and legal owner
+    rationale: The client has no chat UI package or chatbot route.
+    reactivation_trigger: Add a conversational interface or chatbot route.
+    forbidden_indicators:
+      - {id: chatbot_ui, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'flutter_chat_ui|dash_chat|chatview|ChatBotScreen'}
+
+  - flag: feature_user_generated_content_enabled
+    mode: manual_attestation
+    owner: Product and release owner
+    rationale: Whether content is user-generated depends on the product and moderation model, not on one reliable static token.
+    reactivation_trigger: Add user-authored reviews, comments, uploads or shared content.
+    evidence: docs/project/compliance/apple-review-relevance.md
+
+  - flag: feature_review_prompt_enabled
+    mode: static_absence
+    owner: Product and release owner
+    rationale: The client contains no App Store review-prompt package or API call.
+    reactivation_trigger: Add an App Store review prompt.
+    forbidden_indicators:
+      - {id: review_prompt_api, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'in_app_review|SKStoreReviewController|requestReview'}
+
+  - flag: feature_push_notifications_enabled
+    mode: static_absence
+    owner: Privacy and release owner
+    rationale: The client contains no push SDK or iOS notification registration.
+    reactivation_trigger: Add remote or local notification delivery or registration.
+    forbidden_indicators:
+      - {id: notification_sdk, paths: [esg_app/pubspec.yaml, esg_app/lib, esg_app/ios/Runner], pattern: 'firebase_messaging|flutter_local_notifications|UNUserNotificationCenter|registerForRemoteNotifications'}
+
+  - flag: feature_age_restricted_creator_content_enabled
+    mode: manual_attestation
+    owner: Product and release owner
+    rationale: Creator-content and age-rating scope need product and App Store classification, not keyword detection.
+    reactivation_trigger: Add creator content or content that can exceed the selected App Store age rating.
+    evidence: docs/project/compliance/apple-review-relevance.md
+
+  - flag: feature_consumer_ecommerce_contract_enabled
+    mode: static_absence
+    owner: Product and release owner
+    rationale: The client has no payment or purchase SDK.
+    reactivation_trigger: Offer paid membership, checkout or another consumer contract through the app.
+    forbidden_indicators:
+      - {id: payment_sdk, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'in_app_purchase|purchases_flutter|revenuecat|stripe|payment_sheet'}
+
+  - flag: feature_ai_system_enabled
+    mode: static_absence
+    owner: AI and legal owner
+    rationale: The client has no recognised AI provider or model endpoint.
+    reactivation_trigger: Generate, alter or present AI-produced content, or let a user interact with an AI system.
+    forbidden_indicators:
+      - {id: ai_system_provider, paths: [esg_app/pubspec.yaml, esg_app/lib], pattern: 'api\.openai\.com|api\.anthropic\.com|api\.mistral\.ai|generativelanguage\.googleapis\.com|openai_dart|langchain'}
+
+  - flag: feature_eudr_operator_or_trader_enabled
+    mode: manual_attestation
+    owner: Data governance and legal owner
+    rationale: Operator or trader status is a business role and cannot be inferred reliably from mobile-client code.
+    reactivation_trigger: Become an EUDR operator or trader, or assume due-diligence duties for an in-scope commodity.
+    evidence: docs/project/compliance/regulatory-horizon.yaml
+
+  - flag: feature_medical_purpose_claims_enabled
+    mode: static_absence
+    owner: Product methodology and legal owner
+    rationale: The runtime contains no diagnosis, treatment or medical-advice language.
+    reactivation_trigger: Add a health, diagnosis, treatment, medical-risk or medical-purpose feature or claim.
+    forbidden_indicators:
+      - {id: medical_runtime_language, paths: [esg_app/lib], pattern: 'Diagnose|diagnostic|Behandlung|treatment|medical advice'}
+
+  - flag: feature_public_environmental_comparison_enabled
+    mode: static_presence
+    owner: Product methodology and legal owner
+    rationale: The shipped runtime exposes an ESG aggregate result and therefore activates the comparison transparency horizon.
+    reactivation_trigger: Remove every consumer-facing environmental or sustainability score, ranking, comparison and marketing claim.
+    required_indicators:
+      - {id: aggregate_esg_score, paths: [esg_app/lib/widgets/score_widgets.dart], pattern: 'ESG-Gesamtscore'}

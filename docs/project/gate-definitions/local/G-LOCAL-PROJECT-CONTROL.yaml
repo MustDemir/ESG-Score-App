@@ -1,5 +1,5 @@
 id: G-LOCAL-PROJECT-CONTROL
-name: Local project control traceability
+name: Local project and ticket control traceability
 dimension: strategisch
 lifecycle_phase: pre-deployment
 trigger: Local quality run and GitHub quality gate workflow
@@ -11,6 +11,11 @@ policy_checks:
   - P0 and P1 gaps map to known improvements, risks and primary sources
   - Full lifecycle gap review is not overdue
   - Feature overview matches each feature state.yaml
+  - Executable tickets satisfy the repo-native ticket schema and filename contract
+  - Ticket DoR, acceptance criteria, DoD, dependencies and lifecycle state are consistent
+  - Every ticket maps to its parent TODO, existing risks, ADRs, DoD task types and required gates
+  - Ticket index enforces a complete dependency-ordered queue and at most one in-progress ticket
+  - Pull requests reference exactly one reviewable ticket and its matching parent TODO
 evidence_required:
   - docs/project/improvement-register.yaml
   - docs/project/gap-register.yaml
@@ -20,6 +25,12 @@ evidence_required:
   - docs/project/features/scanner/state.yaml
   - docs/project/features/scoring/state.yaml
   - docs/project/features/results/state.yaml
+  - docs/project/tickets/ticket-schema.yaml
+  - docs/project/tickets/ticket-index.yaml
+  - scripts/quality/validate_tickets.rb
+  - scripts/quality/test_ticket_gate.rb
+  - scripts/quality/validate_pr_ticket_binding.rb
+  - scripts/quality/test_pr_ticket_binding.rb
   - .quality/quality-gate-report.md
 decision: block
 owner: Mustafa
@@ -41,5 +52,5 @@ sources:
   - docs/project/methodology/gap-analysis-process.md
 notes: |
   Blocks drift between lifecycle gaps, the assessed improvement roadmap and
-  the repo-native feature status model without claiming to automate legal,
-  scientific or release approval.
+  the repo-native feature and ticket status models without claiming to
+  automate legal, scientific, privacy or release approval.

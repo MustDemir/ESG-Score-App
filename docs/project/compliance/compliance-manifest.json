@@ -1,7 +1,7 @@
 {
   "_comment": "Release evidence declarations. Extracted app state overrides matching declarations. False/null values are visible warnings in development and blockers in release_candidate/submission.",
   "_schema_version": "2.0",
-  "_last_updated": "2026-08-11",
+  "_last_updated": "2026-09-04",
 
   "apple_guidelines_version": "2026-06-08",
   "app_name_pubspec": "ScanFair",
@@ -18,6 +18,12 @@
   "feature_user_generated_content_enabled": false,
   "feature_review_prompt_enabled": false,
   "feature_push_notifications_enabled": false,
+  "feature_age_restricted_creator_content_enabled": false,
+  "feature_consumer_ecommerce_contract_enabled": false,
+  "feature_ai_system_enabled": false,
+  "feature_eudr_operator_or_trader_enabled": false,
+  "feature_medical_purpose_claims_enabled": false,
+  "feature_public_environmental_comparison_enabled": true,
 
   "privacy_policy_url": null,
   "in_app_privacy_link_present": false,
@@ -78,6 +84,8 @@
 
   "_field_docs": {
     "feature_*": "Activates conditional requirements. A false feature flag must reflect the shipped binary.",
+    "feature_declaration_contract": "Every feature flag has either deterministic implementation indicators or explicit manual-attestation evidence in capability-declaration-contract.yaml.",
+    "feature_public_environmental_comparison_enabled": "Activates the sustainability-comparison transparency horizon and its qualified legal review before the effective date.",
     "*_reviewed": "Hybrid evidence. Set only after the named review has been performed and retained.",
     "privacy_policy_url": "Public HTTPS URL used in the app and App Store Connect.",
     "review_sample_barcode": "Known product barcode supplied in App Review notes.",

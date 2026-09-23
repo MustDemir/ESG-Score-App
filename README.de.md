@@ -150,10 +150,10 @@ Gatekeeper sind für dieses Mobile-Projekt bewusst ausgeschlossen.
 
 | Evidenz | Validiertes Ergebnis |
 | --- | ---: |
-| Lokale Development-Gates | 30/30 PASS |
+| Lokale Development-Gates | 33/33 PASS |
 | Flutter-Tests | 122/122 PASS |
 | Flutter Line Coverage | 84,33 % |
-| Lokaler Datenbank-Replay und pgTAP | 13 Migrationen, 250/250 PASS |
+| Lokaler Datenbank-Replay und pgTAP | 14 Migrationen, 277/277 PASS |
 | Supply-Chain-Inventar | 61 Dart-Pakete, 2 iOS-Plugins, 20 gepinnte Action-Referenzen, 0 bekannte Schwachstellen |
 | Pull Request 30 GitHub Actions | 6/6 Jobs PASS |
 
@@ -201,9 +201,9 @@ Scan-to-Detail-MVP, evidence-first Datenmodell, Kaffee-Referenzpfad,
 Accessibility-Härtung, lokales/CI-Quality-System und abgeglichenes
 Frankfurt-Development-Schema.
 
-**In Arbeit:** Remote Retention Observability, Read-Abuse-Schutz,
-qualifizierte DPA-/Lizenz-/Privacy-Reviews und das Compliance-Horizon-Update
-2026.
+**In Arbeit:** externe Retention-Alarmzustellung, Privacy-geprüfte
+Remote-Aktivierung des Read-Abuse-Schutzes sowie qualifizierte
+DPA-/Lizenz-/Privacy-Reviews.
 
 **Nächste Produktdaten-Meilensteine:** WRI Aqueduct als Umweltkontext, ILAB
 für Social-/Rohstoff-Länderrisiken, GLEIF/BRIS für Rechtsträger-Mapping sowie

@@ -1,0 +1,188 @@
+schema_version: "1.0"
+last_reviewed: 2026-09-04
+next_full_review_due: 2026-10-04
+owner: Compliance and release owner
+scope: |
+  Versionierter Horizon fuer Regeln, deren Anwendbarkeit sich aus dem
+  tatsaechlich ausgelieferten Funktionsumfang von ScanFair ergibt. Er ersetzt
+  keine Rechtsberatung und darf eine menschliche Rechts- oder Claim-Freigabe
+  niemals automatisch erteilen.
+review_policy:
+  official_sources_only: true
+  source_observation: baseline_compared_non_blocking_manual_change_assessment
+  strict_profile_source_signal: fresh_observation_requires_signature_bound_manual_review
+  automatic_approval: prohibited
+  development: objective_repository_findings_block; pending legal evidence_warns
+  release_candidate: applicable_due_must_without_evidence_blocks
+  submission: applicable_due_must_without_evidence_blocks
+capability_inventory:
+  path: docs/project/compliance/compliance-manifest.json
+  contract_path: docs/project/compliance/capability-declaration-contract.yaml
+  owner: Product and release owner
+  assertion: Feature flags describe the shipped binary and are re-reviewed for every release candidate.
+
+controls:
+  - id: HZN-APPLE-APP-REVIEW
+    title: Apple App Review Guidelines and conditional feature controls
+    source_refs: [APPLE-ARG]
+    obligation: MUST
+    effective_date: 2026-06-08
+    applicability:
+      kind: release_profile
+      current_state: applicable
+      reactivation_trigger: Any App Store, TestFlight or alternative iOS distribution submission.
+    owner: Release owner
+    implementation_status: implemented
+    linked_gates: [G-AS-BUILD-INTEGRITY, G-AS-PRIVACY, G-AS-CAMERA, G-AS-METADATA, G-AS-REVIEW-READINESS, G-AS-CLAIMS-TRANSPARENCY, G-AS-THIRD-PARTY-RIGHTS, G-AS-SUPPORT-IDENTITY]
+    release_evidence_status: governed_by_linked_gate
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/compliance/apple-review-relevance.md
+      automatic_approval: false
+    next_review_due: 2026-09-18
+
+  - id: HZN-APPLE-AGE-ASSURANCE
+    title: Apple age-assurance control for creator content, mini apps and age-rated software
+    source_refs: [APPLE-ARG]
+    obligation: MUST
+    effective_date: 2026-06-08
+    applicability:
+      kind: any_flag_true
+      flags: [feature_age_restricted_creator_content_enabled, feature_chatbot_enabled, feature_user_generated_content_enabled]
+      current_state: not_applicable
+      rationale: ScanFair ships no creator content, mini apps, chatbot or user-generated content.
+      reactivation_trigger: Enable creator content, remotely supplied mini-app software, chatbot or UGC that can exceed the App Store age rating.
+    owner: Product and release owner
+    implementation_status: not_applicable
+    linked_gates: [G-AS-REVIEW-READINESS, G-AS-PRIVACY]
+    release_evidence_status: not_applicable
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/compliance/apple-review-relevance.md
+      automatic_approval: false
+    next_review_due: 2026-09-18
+
+  - id: HZN-EU-GREEN-TRANSITION
+    title: Consumer-facing environmental-comparison transparency
+    source_refs: [EU-ECGT-2024-825, DE-UWG-EMP-CO]
+    obligation: MUST
+    effective_date: 2026-09-27
+    applicability:
+      kind: any_flag_true
+      flags: [feature_public_environmental_comparison_enabled]
+      current_state: applicable
+      reactivation_trigger: The released app exposes an environmental score, ranking, comparison or marketing claim to consumers.
+    owner: Product methodology and legal owner
+    implementation_status: pending_review
+    linked_gates: [G-UWG-COMPARISON-TRANSPARENCY, G-AS-CLAIMS-TRANSPARENCY, G-CLAIM-GOVERNANCE]
+    release_evidence_status: not_due
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/compliance/regulatory-horizon.yaml
+      automatic_approval: false
+    comparison_contract:
+      methodology_path: docs/ESG-SCORING-MODELL-v1.md
+      comparison_scope: evidence_limited_product_information_not_certification
+      comparison_population: Products only receive an aggregate result where required environmental evidence exists; partial results remain marked as partial.
+      source_freshness_contract: docs/project/methodology-catalog/scoring-controls.yaml
+      legal_review_status: pending_qualified_review
+      legal_review_due: 2026-09-18
+    next_review_due: 2026-09-18
+
+  - id: HZN-DE-BFSG-EAA
+    title: German accessibility law for consumer e-commerce services
+    source_refs: [DE-BFSG, EU-EAA-2019-882]
+    obligation: MUST
+    effective_date: 2025-06-28
+    applicability:
+      kind: all_flags_true
+      flags: [feature_consumer_ecommerce_contract_enabled]
+      current_state: not_applicable
+      rationale: The local MVP provides information only and does not conclude consumer contracts through the app.
+      reactivation_trigger: Offer a consumer contract, paid membership or other e-commerce service through the app or its linked purchase flow.
+    owner: Accessibility and legal owner
+    implementation_status: not_applicable
+    linked_gates: [G-REGULATORY-APPLICABILITY, G-AS-REVIEW-READINESS]
+    release_evidence_status: not_applicable
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/accessibility/voiceover-language-policy.md
+      automatic_approval: false
+    next_review_due: 2026-10-04
+
+  - id: HZN-EU-AI-ACT-ART50
+    title: AI-system transparency and AI-generated-content disclosure
+    source_refs: [EU-AIA-2024-1689, EC-AIA-ART50-FAQ]
+    obligation: MUST
+    effective_date: 2026-08-02
+    applicability:
+      kind: any_flag_true
+      flags: [feature_ai_system_enabled, feature_third_party_ai_enabled, feature_chatbot_enabled]
+      current_state: not_applicable
+      rationale: Phase 1 ships no AI system, third-party AI integration or chatbot.
+      reactivation_trigger: Generate, alter or present AI-produced content, or let users interact with an AI system.
+    owner: AI and legal owner
+    implementation_status: not_applicable
+    linked_gates: [G-REGULATORY-APPLICABILITY, G-AS-PRIVACY, G-AS-REVIEW-READINESS]
+    release_evidence_status: not_applicable
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/decisions/0004-no-ai-phase-1.yaml
+      automatic_approval: false
+    next_review_due: 2026-10-04
+
+  - id: HZN-EU-EUDR
+    title: EUDR operator or trader obligations for relevant commodities
+    source_refs: [EU-EUDR-2023-1115]
+    obligation: MUST
+    effective_date: 2026-12-30
+    applicability:
+      kind: any_flag_true
+      flags: [feature_eudr_operator_or_trader_enabled]
+      current_state: not_applicable
+      rationale: ScanFair is not an operator or trader placing coffee, cocoa or other EUDR-relevant commodities on the EU market.
+      reactivation_trigger: ScanFair becomes an EUDR operator or trader, or takes on due-diligence obligations for an in-scope commodity supply chain.
+    owner: Data governance and legal owner
+    implementation_status: not_applicable
+    linked_gates: [G-REGULATORY-APPLICABILITY, G-DATA-ARCH]
+    release_evidence_status: not_applicable
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/data/environmental-source-assessment.yaml
+      automatic_approval: false
+    next_review_due: 2026-11-30
+
+  - id: HZN-EU-MEDICAL-DEVICE
+    title: Medical-device qualification boundary for health or medical claims
+    source_refs: [EU-MDR-2017-745, MDCG-2019-11-REV1]
+    obligation: MUST
+    effective_date: 2021-05-26
+    applicability:
+      kind: any_flag_true
+      flags: [feature_medical_purpose_claims_enabled]
+      current_state: not_applicable
+      rationale: ScanFair provides no diagnosis, prevention, monitoring, prediction, prognosis, treatment or medical-purpose claim.
+      reactivation_trigger: Add any health, diagnosis, treatment, medical-risk or medical-purpose feature or claim.
+    owner: Product methodology and legal owner
+    implementation_status: not_applicable
+    linked_gates: [G-REGULATORY-APPLICABILITY, G-AS-CLAIMS-TRANSPARENCY, G-CLAIM-GOVERNANCE]
+    release_evidence_status: not_applicable
+    manual_change_assessment:
+      status: reviewed
+      reviewed_at: 2026-09-04
+      reviewer_role: Compliance and release owner
+      evidence: docs/project/compliance/claim-inventory.yaml
+      automatic_approval: false
+    next_review_due: 2026-10-04

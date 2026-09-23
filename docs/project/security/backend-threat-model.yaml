@@ -300,7 +300,7 @@ threats:
     verification:
       - timeout_rate_limit_stale_cache_and_offline_tests
     implementation_status: partially_implemented
-  - id: THR-012
+  - id: THR-013
     category: elevation_of_privilege
     title: Operator or CI control-plane compromise
     severity: critical
@@ -317,6 +317,25 @@ threats:
       - branch_protection_and_access_review_evidence
       - break_glass_tabletop_test
     implementation_status: contract_defined
+  - id: THR-012
+    category: denial_of_service
+    title: Barcode enumeration or public-read quota exhaustion
+    severity: high
+    boundary: TB-05
+    assets: [AST-001, AST-002, AST-003]
+    attack: A hostile client repeatedly invokes bounded public RPCs for many barcode candidates.
+    controls:
+      - direct_table_enumeration_denied
+      - exact_barcode_bounded_RPCS_only
+      - postgrest_pre_request_post_only_enforcement
+      - per_ip_per_minute_rate_limit
+      - private_one_hour_pseudonymous_security_telemetry
+      - fail_closed_missing_or_invalid_gateway_identity
+    verification:
+      - public_read_abuse_protection_pgtap_negative_tests
+      - linked_remote_pre_request_verifier_before_runtime_activation
+      - privacy_review_for_pseudonymous_security_telemetry
+    implementation_status: transactionally_verified_remote_apply_pending_privacy
 
 abuse_cases:
   - id: ABUSE-001
@@ -324,7 +343,7 @@ abuse_cases:
     expected_result: denied_and_audited_without_data_change
   - id: ABUSE-002
     scenario: Bot enumerates barcodes or requests an unbounded result set.
-    expected_result: bounded_single_product_read_or_rate_limited
+    expected_result: bounded_single_product_read_and_post_only_per_ip_rate_limited
   - id: ABUSE-003
     scenario: Writer receives an arbitrary URL, localhost, private IP or redirect.
     expected_result: rejected_before_network_access

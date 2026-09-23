@@ -1,0 +1,62 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
+id: G-REGULATORY-APPLICABILITY
+title: Capability-triggered regulatory applicability and fail-closed activation
+status: active
+dimension: compliance-governance
+lifecycle_phase: definition-and-pull-request
+automation: HYBRID
+owner: Product and release owner
+profile_scope: [development, release_candidate, submission]
+trigger: [capability_change, manifest_change, regulatory_horizon_change, release_candidate, submission]
+criteria:
+  - id: APP-GATE-001
+    statement: Every conditional regulation names deterministic capability flags, and every shipped declaration has a static or explicitly manual evidence contract.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-09-04
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: APP-GATE-N01, statement: A missing declaration or a disabled feature with a recognised implementation indicator fails.}
+  - id: APP-GATE-002
+    statement: A non-applicable regulation has a rationale, owner, review date and reactivation trigger.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-09-04
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: APP-GATE-N02, statement: An N/A assertion without reactivation details fails.}
+  - id: APP-GATE-003
+    statement: Due applicable MUST evidence blocks strict profiles; legal classification stays human review.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-09-04
+    verification: HYBRID
+    evidence_level: mixed
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: APP-GATE-N03, statement: A due applicable MUST with no evidence fails release candidate.}
+artifacts:
+  - {id: APP-A01, type: repository_input, path: docs/project/compliance/regulatory-horizon.yaml, required_for: [development, release_candidate, submission]}
+  - {id: APP-A02, type: repository_input, path: docs/project/compliance/compliance-manifest.json, required_for: [development, release_candidate, submission]}
+  - {id: APP-A03, type: repository_input, path: docs/project/compliance/capability-declaration-contract.yaml, required_for: [development, release_candidate, submission]}
+  - {id: APP-A04, type: generated_evidence, path: .quality/compliance-horizon/capability-declarations.json, required_for: [development, release_candidate, submission]}
+  - {id: APP-A05, type: generated_evidence, path: .quality/compliance-horizon/G-REGULATORY-APPLICABILITY.json, required_for: [development, release_candidate, submission]}
+decision:
+  pass: Capability states and legally scoped applicability are explicit; strict profiles reject due unproven MUSTs.
+  fail: A feature bypasses its trigger, a non-applicable state is unexplained or due evidence is missing.
+  manual_review: Product and legal owners classify new capabilities before activation.
+enforcement: {development: block, release_candidate: block, submission: block}
+audit: {validator: scripts/quality/validate_compliance_horizon.rb, tests: scripts/quality/test_capability_declarations.rb, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-horizon/G-REGULATORY-APPLICABILITY.json}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-28], improvements: [IMP-PROC-003], gaps: [GAP-011], risks: [RISK-010], related_adrs: [0013, 0021, 0039]}
+sources: [APPLE-ARG, EU-AIA-2024-1689, DE-BFSG, EU-EUDR-2023-1115, EU-MDR-2017-745]
+notes: |
+  The validator checks declared facts and trigger completeness; it does not infer legal classification from a heuristic.

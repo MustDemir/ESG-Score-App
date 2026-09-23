@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_updated: 2026-08-11
+last_updated: 2026-09-22
 owner: Mustafa Demir
 purpose: |
   Zentrales Register der aus der Gesamtbewertung abgeleiteten Verbesserungen.
@@ -35,6 +35,7 @@ allowed_values:
     - submission
 
 execution_order:
+  - IMP-PROC-004
   - IMP-PROC-003
   - IMP-COMP-004
   - IMP-COMP-005
@@ -133,12 +134,63 @@ improvements:
       - docs/project/gate-definitions/gate-definition-schema.yaml
       - docs/project/gate-definitions/local/G-GATE-DEFINITION-QUALITY.yaml
       - scripts/quality/validate_gate_definitions.rb
+      - docs/project/compliance/regulatory-horizon.yaml
+      - docs/project/gate-definitions/local/G-COMPLIANCE-HORIZON.yaml
+      - docs/project/gate-definitions/local/G-REGULATORY-APPLICABILITY.yaml
+      - scripts/quality/validate_compliance_horizon.rb
+      - scripts/quality/observe_compliance_sources.rb
+      - docs/project/compliance/source-observation-baseline.yaml
+      - docs/project/compliance/capability-declaration-contract.yaml
+      - scripts/quality/validate_capability_declarations.rb
+      - docs/project/audits/2026-09-04-control-assurance-review.md
     verification:
       - G-PROJECT-CONTROL validiert Gap-Struktur und Cross-Links
+      - G-COMPLIANCE-HORIZON und G-REGULATORY-APPLICABILITY validieren Quellen-, Frist- und Capability-Status einschließlich negativer Frist-, Delta- und Deklarationsfälle
       - Vollständiger Audit wird bei Phasenwechsel und mindestens quartalsweise wiederholt
     dependencies:
       - IMP-PROC-002
-    next_action: Legacy-Gate-Metadaten schrittweise auf scanfair-gate-v1 migrieren und weitere externe Quellen in die Freshness-Ueberwachung aufnehmen
+    next_action: Den ersten wöchentlichen Quellen-Snapshot manuell gegen die letzte qualifizierte Bewertung prüfen; relevante Deltas als Requirement, ADR oder begründetes No-Impact dokumentieren
+
+  - id: IMP-PROC-004
+    layer: process
+    title: Verbindliche repo-native Tickets fuer jede ausfuehrbare Aenderung
+    status: in_progress
+    priority: P0
+    risk: H
+    owner: Mustafa Demir
+    target_profile: development
+    rationale: |
+      Backlog, DoR, DoD und Gates sind vorhanden, aber kleine Aktionen waren
+      teilweise nur als Freitext dokumentiert. Eigene Child-Tickets machen
+      Scope, Vorbedingungen, Akzeptanz, Evidenz und Abschluss ueber Sessions
+      und Pull Requests hinweg eindeutig kontrollierbar.
+    acceptance_criteria:
+      - Ticket-Schema, Vorlage, Index und Arbeitsregel sind versioniert
+      - Jedes Ticket referenziert Parent-TODO, Risiken, ADRs, DoD-Tasktypen und Gates
+      - G-PROJECT-CONTROL validiert Pflichtfelder, DoR, Akzeptanzkriterien, DoD, Abhaengigkeiten, Evidenz und Reihenfolge
+      - Negative Selbsttests beweisen, dass unvollstaendige oder widerspruechliche Tickets blockieren
+      - Session-Start, Operating Model, DoD und Quality-Strategie verlangen das Ticket vor einer Aenderung
+    evidence:
+      - docs/project/tickets/ticket-schema.yaml
+      - docs/project/tickets/ticket-index.yaml
+      - docs/project/tickets/README.md
+      - docs/project/decisions/0041-ticket-based-execution-control.yaml
+      - scripts/quality/validate_tickets.rb
+      - scripts/quality/test_ticket_gate.rb
+      - scripts/quality/validate_pr_ticket_binding.rb
+      - scripts/quality/test_pr_ticket_binding.rb
+      - docs/project/audits/2026-09-11-ticket-workflow-control-validation.md
+      - docs/project/delivery-operating-model.md
+      - docs/project/definition-of-done.yaml
+      - .github/PULL_REQUEST_TEMPLATE.md
+      - .github/workflows/quality-gates.yml
+    verification:
+      - Ticket-Gate-Selbsttests bestehen positive und negative Faelle
+      - G-PROJECT-CONTROL und vollständige Development-Pipeline bestehen
+      - GitHub Actions fuehrt dieselbe lokale Gate-Funktion aus
+    dependencies:
+      - IMP-PROC-002
+    next_action: TKT-040-01 Review-Nacharbeit und echte PR-CI schliessen; danach TKT-037-05 und TKT-038-01 vor Privacy/Remote abarbeiten
 
   - id: IMP-COMP-001
     layer: compliance

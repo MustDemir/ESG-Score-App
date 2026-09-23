@@ -9,7 +9,11 @@ require "time"
 require "yaml"
 
 class GateDefinitionValidator
-  CANONICAL_PROFILE = "scanfair-gate-v1"
+  CANONICAL_PROFILE = "scanfair-gate-v2"
+  COMPATIBLE_CANONICAL_PROFILES = {
+    "scanfair-gate-v1" => "1.0",
+    "scanfair-gate-v2" => "2.0",
+  }.freeze
   GATE_ID_PATTERN = /\AG-[A-Z0-9-]+\z/
   CORE_ALIASES = {
     "trigger" => %w[trigger],
@@ -88,8 +92,8 @@ class GateDefinitionValidator
 
   def validate_schema
     label = "gate-definition-schema.yaml"
-    unless @schema["schema_version"] == "1.0" && @schema["profile"] == CANONICAL_PROFILE
-      violations << "#{label}: expected schema version 1.0 and profile #{CANONICAL_PROFILE}"
+    unless @schema["schema_version"] == "2.0" && @schema["profile"] == CANONICAL_PROFILE
+      violations << "#{label}: expected schema version 2.0 and profile #{CANONICAL_PROFILE}"
     end
     required = Array(@schema.dig("canonical_metadata", "required"))
     CORE_ALIASES.each_key do |field|
@@ -112,12 +116,13 @@ class GateDefinitionValidator
     validate_identity(gate, file)
     validate_core_attributes(gate, file)
     validate_sources(gate, file)
-    validate_canonical(gate, file) if gate["schema_profile"] == CANONICAL_PROFILE
+    profile = gate["schema_profile"]
+    validate_canonical(gate, file, profile) if COMPATIBLE_CANONICAL_PROFILES.key?(profile)
 
-    if gate["schema_profile"].nil?
+    if profile.nil?
       warnings << "#{file}: accepted through an explicit legacy compatibility profile"
-    elsif gate["schema_profile"] != CANONICAL_PROFILE
-      violations << "#{file}: unsupported schema_profile #{gate['schema_profile'].inspect}"
+    elsif !COMPATIBLE_CANONICAL_PROFILES.key?(profile)
+      violations << "#{file}: unsupported schema_profile #{profile.inspect}"
     end
 
     @gate_results << {
@@ -163,19 +168,23 @@ class GateDefinitionValidator
     end
   end
 
-  def validate_canonical(gate, file)
+  def validate_canonical(gate, file, profile)
     required = Array(@schema.dig("canonical_metadata", "required"))
     required.each do |field|
       violations << "#{file}: canonical metadata missing #{field}" if !gate.key?(field) || blank?(gate[field], allow_empty: allowed_empty?(field))
     end
-    return unless gate["schema_version"] == "1.0"
+    expected_version = COMPATIBLE_CANONICAL_PROFILES.fetch(profile)
+    unless gate["schema_version"] == expected_version
+      violations << "#{file}: #{profile} requires schema_version #{expected_version}"
+      return
+    end
 
     allowed = @schema.dig("canonical_metadata", "allowed_values") || {}
     validate_allowed(gate, file, "status", allowed["status"])
     validate_allowed(gate, file, "automation", allowed["automation"])
     validate_profiles(gate, file, allowed)
     validate_triggers(gate, file)
-    validate_criteria(gate, file, allowed)
+    validate_criteria(gate, file, allowed, profile)
     validate_artifacts(gate, file, allowed)
     validate_decision(gate, file)
     validate_audit(gate, file)
@@ -216,7 +225,7 @@ class GateDefinitionValidator
     end
   end
 
-  def validate_criteria(gate, file, allowed)
+  def validate_criteria(gate, file, allowed, profile)
     criteria = gate["criteria"]
     unless criteria.is_a?(Array) && !criteria.empty?
       violations << "#{file}: canonical criteria must be a non-empty list"
@@ -231,7 +240,9 @@ class GateDefinitionValidator
         violations << "#{label} must be an object"
         next
       end
-      %w[id statement verification severity].each do |field|
+      required_fields = %w[id statement verification severity]
+      required_fields += Array(@schema.dig("criterion_contract_v2", "required")) if profile == CANONICAL_PROFILE
+      required_fields.uniq.each do |field|
         violations << "#{label} missing #{field}" if blank?(criterion[field])
       end
       if ids.include?(criterion["id"])
@@ -244,6 +255,7 @@ class GateDefinitionValidator
       unless Array(allowed["severity"]).include?(criterion["severity"])
         violations << "#{label} invalid severity #{criterion['severity'].inspect}"
       end
+      validate_v2_criterion(criterion, label, allowed) if profile == CANONICAL_PROFILE
       verification_types << criterion["verification"]
     end
 
@@ -254,6 +266,26 @@ class GateDefinitionValidator
     if automation == "HYBRID" && verification_types.all? { |value| value == "AUTO" }
       violations << "#{file}: HYBRID gate needs at least one HYBRID or MANUAL criterion"
     end
+  end
+
+  def validate_v2_criterion(criterion, label, allowed)
+    validate_allowed_value(criterion, label, "obligation", allowed["obligation"])
+    validate_allowed_value(criterion, label, "pipeline_effect", allowed["pipeline_effect"])
+    validate_allowed_value(criterion, label, "applicability", allowed["applicability"])
+    validate_allowed_value(criterion, label, "evidence_level", allowed["evidence_level"])
+    validate_allowed_value(criterion, label, "implementation_status", allowed["implementation_status"])
+    unless criterion["effective_date"].to_s.match?(/\A\d{4}-\d{2}-\d{2}\z/)
+      violations << "#{label} effective_date must be an ISO date"
+    end
+    unless criterion["negative_case"].is_a?(Hash) && !blank?(criterion.dig("negative_case", "id")) && !blank?(criterion.dig("negative_case", "statement"))
+      violations << "#{label} negative_case needs stable id and statement"
+    end
+  end
+
+  def validate_allowed_value(record, label, field, values)
+    return if Array(values).include?(record[field])
+
+    violations << "#{label} invalid #{field} #{record[field].inspect}"
   end
 
   def validate_artifacts(gate, file, allowed)
@@ -368,15 +400,17 @@ class GateDefinitionValidator
   end
 
   def build_report
-    canonical = @gate_results.count { |gate| gate["schema_profile"] == CANONICAL_PROFILE }
+    canonical_v2 = @gate_results.count { |gate| gate["schema_profile"] == CANONICAL_PROFILE }
+    canonical_v1 = @gate_results.count { |gate| gate["schema_profile"] == "scanfair-gate-v1" }
     @report = {
       "schema_version" => "1.0",
       "generated_at" => Time.now.utc.iso8601,
       "decision" => violations.empty? ? "PASS" : "FAIL",
       "counts" => {
         "gates" => @gate_results.length,
-        "canonical" => canonical,
-        "legacy_compatible" => @gate_results.length - canonical,
+        "canonical_v2" => canonical_v2,
+        "canonical_v1_compatible" => canonical_v1,
+        "legacy_compatible" => @gate_results.length - canonical_v2 - canonical_v1,
         "violations" => violations.length,
         "warnings" => warnings.length,
       },
@@ -406,7 +440,7 @@ if $PROGRAM_NAME == __FILE__
   validator = GateDefinitionValidator.new(**options)
   if validator.run
     counts = validator.report["counts"]
-    puts "Gate definition quality PASS: #{counts['gates']} gates, #{counts['canonical']} canonical, #{counts['legacy_compatible']} compatible legacy"
+    puts "Gate definition quality PASS: #{counts['gates']} gates, #{counts['canonical_v2']} v2 canonical, #{counts['canonical_v1_compatible']} v1 compatible, #{counts['legacy_compatible']} legacy compatible"
     exit 0
   end
 
