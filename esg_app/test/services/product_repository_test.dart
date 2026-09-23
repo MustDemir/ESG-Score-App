@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:esg_app/models/product.dart';
 import 'package:esg_app/services/product_lookup_failure.dart';
 import 'package:esg_app/services/product_repository.dart';
 import 'package:esg_app/services/supabase_product_cache_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 
 void main() {
   late DemoProductRepository repository;
@@ -219,18 +224,134 @@ void main() {
       throwsA(isA<ProductLookupFailure>()),
     );
   });
+
+  for (final offset in [-1, 0, 1]) {
+    test(
+      'stale fallback respects hard expiry at offset $offset microseconds',
+      () async {
+        var now = DateTime.utc(2026, 9, 23, 12);
+        final expiresAt = now.add(const Duration(seconds: 1));
+        final outcomes = <ProductCacheOutcome>[];
+        final fallback = _DeferredProductRepository();
+        final cache = SupabaseProductCacheService(
+          configuration: SupabaseProductCacheConfiguration.fromValues(
+            projectUrl: 'https://project.supabase.co',
+            publishableKey: const [
+              'sb',
+              'publishable',
+              'test-fixture-only-000000000000',
+            ].join('_'),
+          )!,
+          clock: () => now,
+          client: MockClient(
+            (_) async => http.Response(
+              jsonEncode([
+                {
+                  'payload': {'product_name': 'Awaited cached product'},
+                  'fetched_at': '2026-09-21T12:00:00Z',
+                  'stale_after': '2026-09-22T12:00:00Z',
+                  'expires_at': expiresAt.toIso8601String(),
+                },
+              ]),
+              200,
+            ),
+          ),
+        );
+        final readThrough = ReadThroughProductRepository(
+          cache: cache,
+          fallback: fallback,
+          clock: () => now,
+          onCacheOutcome: outcomes.add,
+        );
+        final lookup = readThrough.findByBarcode('4000417025005');
+        await fallback.called.future;
+        now = expiresAt.add(Duration(microseconds: offset));
+        const failure = ProductLookupFailure(
+          type: ProductLookupFailureType.server,
+          message: 'original fallback failure',
+        );
+        final check = offset < 0
+            ? expectLater(
+                lookup,
+                completion(
+                  isA<ScanFairProduct>().having(
+                    (product) => product.servedFromStaleCache,
+                    'stale warning',
+                    isTrue,
+                  ),
+                ),
+              )
+            : expectLater(lookup, throwsA(same(failure)));
+        fallback.result.completeError(failure);
+        await check;
+        expect(outcomes, [
+          ProductCacheOutcome.stale,
+          if (offset < 0) ProductCacheOutcome.staleServed,
+        ]);
+        if (offset >= 0) expect(readThrough.recentProducts(), isEmpty);
+      },
+    );
+  }
+
+  for (final stale in [false, true]) {
+    test('expired lookup is a miss even when isStale is $stale', () async {
+      final now = DateTime.utc(2026, 9, 23);
+      final cachedProduct = await repository.findByBarcode('4000417025005');
+      final fallback = _TrackingProductRepository(repository);
+      final outcomes = <ProductCacheOutcome>[];
+      final readThrough = ReadThroughProductRepository(
+        cache: _FixedProductCache(
+          cachedProduct,
+          isStale: stale,
+          expiresAt: now,
+        ),
+        fallback: fallback,
+        clock: () => now,
+        onCacheOutcome: outcomes.add,
+      );
+      expect(await readThrough.findByBarcode('4000417025005'), isNotNull);
+      expect(outcomes, [ProductCacheOutcome.miss]);
+      expect(fallback.lookups, 1);
+    });
+  }
+}
+
+class _DeferredProductRepository implements ProductRepository {
+  final called = Completer<void>();
+  final result = Completer<ScanFairProduct?>();
+
+  @override
+  Future<ScanFairProduct?> findByBarcode(String barcode) {
+    called.complete();
+    return result.future;
+  }
+
+  @override
+  List<ScanFairProduct> recentProducts() => const [];
+
+  @override
+  ScanFairProduct? suggestAlternativeFor(ScanFairProduct product) => null;
 }
 
 class _FixedProductCache implements ProductCache {
-  const _FixedProductCache(this.product, {this.isStale = false});
+  const _FixedProductCache(
+    this.product, {
+    this.isStale = false,
+    this.expiresAt,
+  });
 
   final ScanFairProduct? product;
   final bool isStale;
+  final DateTime? expiresAt;
 
   @override
   Future<ProductCacheLookup?> findByBarcode(String barcode) async {
     if (product == null) return null;
-    return ProductCacheLookup(product: product!, isStale: isStale);
+    return ProductCacheLookup(
+      product: product!,
+      isStale: isStale,
+      expiresAt: expiresAt ?? DateTime.utc(2100),
+    );
   }
 }
 

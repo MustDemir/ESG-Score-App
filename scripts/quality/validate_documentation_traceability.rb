@@ -56,7 +56,7 @@ checks = {
   ],
   "docs/project/STATUS.md" => [
     "33/33 PASS",
-    "122/122",
+    "144/144",
     "305/305",
     "release_candidate",
     "TODO-039",

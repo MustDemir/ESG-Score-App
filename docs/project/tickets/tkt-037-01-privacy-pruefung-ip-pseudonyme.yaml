@@ -38,7 +38,7 @@ links:
     - R-DSGVO-01
     - R-DSGVO-07
 definition_of_ready:
-  status: not_ready
+  status: ready
   criteria:
     - id: DOR-01
       criterion: Datenfluss und technische Schutzfunktion sind versioniert.
@@ -58,8 +58,11 @@ definition_of_ready:
         - docs/project/tickets/tkt-037-01-privacy-pruefung-ip-pseudonyme.yaml
     - id: DOR-04
       criterion: TKT-037-05 ist done; echte HTTP-Wirksamkeit sowie Ablauf- und Loeschverhalten sind belegt.
-      status: pending
-      evidence: []
+      status: satisfied
+      evidence:
+        - docs/project/tickets/tkt-037-05-postgrest-rate-limit-integration.yaml
+        - docs/project/audits/2026-09-23-backend-abschlussreview.md
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
 acceptance_criteria:
   - id: AC-01
     criterion: |

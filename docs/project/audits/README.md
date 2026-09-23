@@ -41,3 +41,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-09-22 | [Agent- und Kontrollreview](2026-09-22-agent-control-review.md) | Ticket-/CI-Nacharbeit, PostgREST-Integrationsluecken und Cache-Frischegrenzen |
 | 2026-09-23 | [Public-Read HTTP Validation](2026-09-23-public-read-http-validation.md) | Migration 15, echte Gateway-Quoten und erfolgreicher Edge-/Datenbank-Rundlauf in isolierter Instanz |
 | 2026-09-23 | [Backend-Abschlussreview](2026-09-23-backend-abschlussreview.md) | Separater technischer Pruefdurchgang, erneute Laufzeittests und explizite Hosted-/Privacy-Grenzen |
+| 2026-09-23 | [Cache-Frische Validation](2026-09-23-cache-frische-validation.md) | AR-07/08, negative Metadaten, deterministische Ablaufgrenzen und technischer Nachreview |

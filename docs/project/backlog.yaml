@@ -1056,15 +1056,16 @@ todos:
       - Migration 14 nach gesichertem lokalen Reset vollständig replayed;
         27/27 Read-Abuse-Assertions, insgesamt 277/277 pgTAP-Tests,
         Datenbank-Lint und 33/33 Development-Gates bestanden
+      - TKT-037-05 mit 305/305 pgTAP-Tests, 292 HTTP-Assertions und allen
+        lokalen Gates abgeschlossen; PR 35 gemergt und Post-Merge-Lauf
+        35838485511 im zweiten Versuch vollständig bestanden
     remaining_parts:
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
-      - TKT-037-05 behebt vor Privacy-Review die Hook-Rechte, Pfadpruefung und
-        PostgREST-Transaktionsart; echte HTTP-Tests ergaenzen die SQL-Tests
-      - Migration 14 nur nach Privacy-Review kontrolliert remote anwenden und
+      - Migrationen 14 und 15 nur nach Privacy-Review kontrolliert remote anwenden und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
-    updated: 2026-09-07
+    updated: 2026-09-23
     created: 2026-08-13
 
   - id: TODO-038
@@ -1103,6 +1104,10 @@ todos:
       - Inter und Instrument Serif als lokale OFL-Assets gebuendelt; der
         Runtime-Fetch von Google Fonts ist in main.dart deaktiviert und per
         Widget-Test abgesichert
+      - TKT-038-01 repariert lokal AR-07/08 mit strikten Frischemetadaten und
+        erneuter Ablaufpruefung nach Fallback; 42 fokussierte Tests PASS,
+        technischer Review und regulaerer PR-CI-Lauf erfolgt; Review-Nacharbeit,
+        Merge-Freigabe und Post-Merge-Evidenz bleiben offen
     remaining_parts:
       - Lokaler On-Device-Produktcache mit Stale-Kennzeichnung
       - Response-code gegen angefragten Barcode verifizieren

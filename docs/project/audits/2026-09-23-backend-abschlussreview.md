@@ -119,5 +119,22 @@ vollstaendige Development-Runner bestand danach mit **33/33 Gates**. Ein
 erster Sandbox-Lauf war wegen fehlender Schreibrechte am installierten
 Flutter-SDK-Cache und gesperrter OSV-Netzwerkauflösung technisch unvollstaendig;
 derselbe Runner lief mit den benoetigten lokalen Zugriffsrechten vollstaendig
-gruen. Der neue Commit benoetigt noch einen frischen GitHub-PR-Lauf; danach
-werden die Threads mit den konkreten Nachweisen beantwortet.
+gruen. Der neue Commit bestand anschliessend den frischen GitHub-PR-Lauf;
+alle sieben Threads wurden mit den konkreten Nachweisen beantwortet.
+
+## PR- und Post-Merge-Abschluss
+
+PR #35 wurde nach erfolgreichem Lauf
+[35837738124](https://github.com/MustDemir/ESG-Score-App/actions/runs/35837738124),
+beantworteten sieben Review-Threads und ohne Admin-Bypass als Merge-Commit
+`65b9463cef4657153ae4fbc4b78a99f96497fb0c` in `main` uebernommen.
+
+Der erste Versuch des Post-Merge-Laufs
+[35838485511](https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511)
+traf vor den pgTAP-Tests einen belegten Portkonflikt beim ungenutzten lokalen
+Mail-Testdienst (`54324`). Migrationen waren angewandt, aber die Supabase-
+Testcontainer konnten deshalb nicht vollstaendig starten. Die anderen fuenf
+anwendbaren Jobs bestanden. Der gezielte zweite Versuch auf einem frischen
+Runner bestand Datenbank-Neuaufbau, **305/305 pgTAP**, DB-Lint, Writer- und
+beide realen HTTP-Suites. Damit sind alle sechs anwendbaren Post-Merge-Jobs
+erfolgreich. Keine Remote-Datenbank wurde dabei angesprochen oder veraendert.

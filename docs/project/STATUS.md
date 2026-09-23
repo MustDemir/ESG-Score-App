@@ -21,9 +21,26 @@ Der [Agent-Review vom 22.09.2026](audits/2026-09-22-agent-control-review.md)
 hat drei PostgREST-Integrationsprobleme und zwei Cache-Frischefehler gefunden.
 Die Backend-Probleme und zwei weitere HTTP-Befunde sind lokal repariert und
 in [TKT-037-05 nachgewiesen](audits/2026-09-23-public-read-http-validation.md).
-Der separate technische Review ist dokumentiert; PR-/Post-Merge-Evidenz fehlt noch.
-Die zwei Cache-Frischefehler bleiben in TKT-038-01 offen. Lokale HTTP-Evidenz
+Der separate technische Review ist dokumentiert. Backend-PR #35 und sein
+Post-Merge-Lauf sind abgeschlossen; ein erster Post-Merge-Datenbankjob traf
+einen belegten Portkonflikt des GitHub-Testrechners, der zweite Versuch lief
+vollstaendig gruen.
+Die zwei Cache-Frischefehler sind in [TKT-038-01 lokal repariert und reviewt](audits/2026-09-23-cache-frische-validation.md), ebenfalls noch ohne PR-/Post-Merge-Abschluss. Lokale HTTP-Evidenz
 ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
+
+[Kontroll-/Backend-PR #35](https://github.com/MustDemir/ESG-Score-App/pull/35)
+ist in `main` integriert. Der darauf aufbauende
+[Cache-PR #36](https://github.com/MustDemir/ESG-Score-App/pull/36) wird jetzt
+gegen `main` synchronisiert und regulaer neu geprueft. Kein Remote-Deployment
+und keine App-Aktivierung wurden ausgefuehrt.
+
+CI-Nacharbeit vom 23.09.: Ein sporadischer Abbruch der SQL-Frischefixture
+ist lokal korrigiert. Zwei getrennte Uhrabfragen hatten die maximal erlaubten
+sieben Tage um eine Mikrosekunde ueberschritten. Stabiler Zeitbezug und zwei
+Grenztests bestehen jetzt mit **305/305 SQL-Tests** und fehlerfreiem DB-Lint.
+Produktionslogik und Migrationen bleiben unveraendert. Der GitHub-Nachweis
+fuer den Cache-PR sowie dessen Merge-/Post-Merge-Freigaben stehen noch aus; Details im
+[bestehenden Cache-Pruefbericht](audits/2026-09-23-cache-frische-validation.md).
 
 ## Validierte Baseline
 
@@ -31,8 +48,8 @@ ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 | --- | --- |
 | Development Quality Gates | 33/33 PASS, 23. September 2026; keine Release-Freigabe |
 | TODO-039 Kontrollpaket | 3/3 neue Horizon-Gates, 32 Gate-Definitionen (11 v2 kanonisch), Frist- und Quellen-Durchsetzung sowie zugehörige Selbsttests PASS, 4. September 2026 |
-| Ticket-Arbeitsmodell | 7 Tickets; 31 Selbsttests mit 85 Assertions PASS; N/A-/Evidenz-/Datumsfehler korrigiert, PR-Body-Edit-Trigger ergaenzt; echter PR-/Post-Merge-Nachweis offen |
-| Flutter | 122/122 Tests PASS, 84,33 % Line Coverage |
+| Ticket-Arbeitsmodell | 7 Tickets; 32 Selbsttests mit 87 Assertions PASS; terminale Tickets werden in offenen PRs abgewiesen; Backend-PR-/Post-Merge-Nachweis geschlossen |
+| Flutter | 144/144 Tests PASS, 84,74 % Line Coverage; 42 Cache-/Repositorytests PASS |
 | Datenbank lokal | 15/15 Migrationen replayed, 305/305 pgTAP PASS, DB-Lint PASS; isolierter Neuaufbau am 23.09. |
 | Datenbank remote | 13/13 freigegebene Migrationen abgeglichen, Schema-Diff leer, DB-Lint PASS |
 | Retention Cleanup remote | Zwei geplante Läufe erfolgreich, keine offenen Cleanup-Zeilen |
@@ -40,7 +57,7 @@ ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 | Public-Read-Abuse-Schutz | 53/53 pgTAP, 292 HTTP-Assertions und erfolgreicher Edge-Writer-/Read-Rundlauf PASS; Migration 15 korrigiert Integration und Header-Spoofing. Remote unveraendert |
 | iOS | Unsigned Simulator Compile und Privacy-Manifest-Audit PASS; physischer iPhone-Flow validiert |
 | Supply Chain | 61 Dart-Pakete, 2 iOS-Plugins, 20 gepinnte Actions, 0 bekannte Schwachstellen |
-| GitHub Actions | Pull Request 30 und Post-Merge-Läufe mit jeweils 6/6 Jobs PASS |
+| GitHub Actions | Backend-PR #35 und Post-Merge-Lauf 35838485511 (Versuch 2) mit allen sechs anwendbaren Jobs PASS |
 
 `PASS` bezeichnet hier das Development-Profil. Das Profil
 `release_candidate`

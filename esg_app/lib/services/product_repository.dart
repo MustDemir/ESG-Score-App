@@ -128,6 +128,10 @@ class ReadThroughProductRepository implements ProductRepository {
     } else {
       try {
         cached = await cache.findByBarcode(barcode);
+        // The lookup itself may cross the hard serving deadline.
+        if (cached != null && !cached.expiresAt.isAfter(_clock())) {
+          cached = null;
+        }
         _consecutiveCacheFailures = 0;
         _skipCacheUntil = null;
         if (cached == null) {
@@ -153,9 +157,9 @@ class ReadThroughProductRepository implements ProductRepository {
       try {
         product = await fallback.findByBarcode(barcode);
       } on ProductLookupFailure {
-        // Ein veralteter Cache-Eintrag ist besser als gar keine Antwort:
-        // gekennzeichnet servieren statt Fehler zeigen (ADR 0033).
-        if (cached == null) rethrow;
+        // ADR 0033 permits labeled stale data only before the hard deadline.
+        // Recheck after the awaited fallback; preserve its original failure.
+        if (cached == null || !cached.expiresAt.isAfter(_clock())) rethrow;
         onCacheOutcome?.call(ProductCacheOutcome.staleServed);
         product = cached.product.withDataQualityWarning(
           ScanFairProduct.staleCacheWarning,
