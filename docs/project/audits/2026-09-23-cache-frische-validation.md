@@ -128,3 +128,21 @@ ausgefuehrt. Die isolierte Instanz wurde danach mit Backup gestoppt;
 nachgelagerten HTTP-Pruefungen erneut belegen. Ein manueller Branch-Lauf
 ersetzt nicht die regulaere PR-CI nach Umstellung von PR #36 auf `main`.
 DOD-04 bleibt bis PR-/Post-Merge-Abschluss offen.
+
+## Integration der Backend-Basis
+
+Backend-PR #35 wurde nach sieben beantworteten Review-Threads und vollstaendig
+gruenem PR-Lauf als `65b9463` in `main` integriert. Der Post-Merge-Lauf
+[35838485511](https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511)
+bestand im zweiten Versuch alle sechs anwendbaren Jobs. Der erste Versuch war
+vor pgTAP durch einen fremden lokalen Portkonflikt des GitHub-Testrechners am
+ungenutzten Mail-Testdienst blockiert; die Wiederholung bestand 305/305 pgTAP,
+DB-Lint, Writer- und beide HTTP-Suites.
+
+Der Cache-Branch wurde anschliessend mit diesem `main` synchronisiert. Bei der
+inhaltlichen Konfliktaufloesung wurden die staerkeren Nachweise beider Seiten
+bewahrt: **144/144 Flutter-Tests**, **42/42 fokussierte Cache-/Repositorytests**
+und **305/305 pgTAP**. TKT-037-05 ist damit done; TKT-037-01 ist als naechstes
+Privacy-Ticket ready, bleibt aber bis zum Abschluss dieses Cache-PRs und einer
+qualifizierten menschlichen Entscheidung unangetastet. Fuer TKT-038-01 fehlen
+weiter die regulaere PR-CI gegen `main`, die Merge-Freigabe und Post-Merge-CI.

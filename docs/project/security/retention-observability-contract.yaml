@@ -103,7 +103,7 @@ profiles:
 
 implementation_evidence:
   local_migrations: 15/15 REPLAYED
-  database_tests: 303/303 PASS
+  database_tests: 305/305 PASS
   local_revalidation: docs/project/audits/2026-09-23-public-read-http-validation.md
   database_lint: PASS
   remote_verifier_local_dry_run: PASS_WITH_ROLLBACK

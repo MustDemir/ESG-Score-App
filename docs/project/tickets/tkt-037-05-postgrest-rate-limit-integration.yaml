@@ -8,7 +8,7 @@ parent_todo: TODO-037
 ticket_type: supabase_change
 dod_task_types: [supabase_change, provider_governance]
 priority: P1
-status: parked
+status: done
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-22
@@ -19,6 +19,7 @@ scope:
     - Schreibenden Rate-Zaehler und RPC-Transaktionsmodus zusammen reparieren
     - HTTP-Regression fuer drei Read-RPCs und erfolgreichen Writer-Pfad
     - Ablaufzeit, Loeschverzoegerung, Hash-Eigenschaften und Gateway-Vertrauen dokumentieren
+    - Blockierende PR-Review-Befunde mit Negativtests und konsistenter Evidenz schliessen
   out:
     - Keine Remote-Anwendung oder App-Aktivierung
     - Keine Veraenderung bereits angewandter historischer Migrationen
@@ -78,8 +79,14 @@ acceptance_criteria:
     evidence: [docs/project/audits/2026-09-23-public-read-http-validation.md, docs/project/security/eu-supabase-environment-contract.yaml]
     verification: [Cleanup-Grenzfaelle und Datenflussabgleich]
     evidence_required: [Korrigierter Retention-Vertrag und Privacy-Review-Input]
+  - id: AC-06
+    criterion: Die sieben blockierenden Review-Threads zu Quellenreview, Self-Test-Durchsetzung, Ticketbindung, Gate-Bericht und Entwicklungsbaseline sind korrigiert und nachvollziehbar beantwortet.
+    status: satisfied
+    evidence: [docs/project/audits/2026-09-23-backend-abschlussreview.md]
+    verification: [Gezielte Negativtests, Development-Gates und erneuter PR-Review]
+    evidence_required: [Review-Kommentar-Mapping und GitHub-PR-CI]
 definition_of_done:
-  status: not_done
+  status: done
   criteria:
     - id: DOD-01
       criterion: Alle Akzeptanzkriterien besitzen aktuelle Ausfuehrungsevidenz.
@@ -95,8 +102,10 @@ definition_of_done:
       evidence: [docs/project/audits/2026-09-23-backend-abschlussreview.md]
     - id: DOD-04
       criterion: PR- und Post-Merge-Nachweis sind dokumentiert; Privacy-Folgeticket ist erst dann ready.
-      status: pending
-      evidence: []
+      status: satisfied
+      evidence:
+        - https://github.com/MustDemir/ESG-Score-App/pull/35
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
 gates:
   required: [G-PROJECT-CONTROL, G-BACKEND-BOUNDARY, G-DATA-RLS, G-DOC-TRACE, G-DOC-YAML]
   commands:
@@ -111,7 +120,8 @@ evidence:
   - docs/project/audits/2026-09-23-backend-abschlussreview.md
   - docs/project/audits/2026-09-22-agent-control-review.md
   - docs/project/audits/2026-09-23-public-read-http-validation.md
+  - https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
 rollback:
   strategy: Lokale Aenderung isoliert reviewen; Remote bleibt deaktiviert. Bereits angewandte Migrationen nur durch neue Korrekturmigration ergaenzen.
   verification: Migrationshistorie und deaktivierte Runtime pruefen; vor lokalem Reset vorhandene Daten sichern oder isolierte Testinstanz nutzen.
-activation_boundary: Keine Remote-Anwendung bis HTTP-Nachweis, Privacy-Entscheidung und anschliessendem Migrations-Ticket. Technischer Abschlussreview bestanden; fuer die unabhaengige Cache-Reparatur geparkt, PR-/Post-Merge-Nachweis bleibt offen.
+activation_boundary: Lokale Reparatur und PR-/Post-Merge-Nachweis sind abgeschlossen. Keine Remote-Anwendung bis qualifizierter Privacy-Entscheidung und anschliessendem Migrations-Ticket.

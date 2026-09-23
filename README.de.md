@@ -153,7 +153,7 @@ Gatekeeper sind für dieses Mobile-Projekt bewusst ausgeschlossen.
 | Lokale Development-Gates | 33/33 PASS |
 | Flutter-Tests | 122/122 PASS |
 | Flutter Line Coverage | 84,33 % |
-| Lokaler Datenbank-Replay und pgTAP | 14 Migrationen, 277/277 PASS |
+| Lokaler Datenbank-Replay und pgTAP | 15 Migrationen, 305/305 PASS |
 | Supply-Chain-Inventar | 61 Dart-Pakete, 2 iOS-Plugins, 20 gepinnte Action-Referenzen, 0 bekannte Schwachstellen |
 | Pull Request 30 GitHub Actions | 6/6 Jobs PASS |
 

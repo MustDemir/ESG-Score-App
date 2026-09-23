@@ -16,6 +16,12 @@ class ComplianceHorizonSelfTest
   end
 
   def run
+    runner = File.read(File.join(@repo_root, "scripts/quality/run_quality_gates.sh"), encoding: "UTF-8")
+    runner_body = runner[/^gate_compliance_horizon\(\) \{.*?^\}/m].to_s
+    assert(runner_body.include?("! ruby scripts/quality/test_compliance_horizon_gate.rb"), "runner must make the horizon self-test mandatory")
+    assert(runner_body.include?("! ruby scripts/quality/test_compliance_source_observation.rb"), "runner must make the source-observation self-test mandatory")
+    assert(runner_body.index("return 1").to_i < runner_body.index('if [ "$profile" = "development" ]').to_i, "runner must return before profile validation after a failed self-test")
+
     with_fixture do |root|
       assert(validator(root, gate: "horizon").run, "baseline horizon fixture should pass")
       assert(validator(root, gate: "regulatory_applicability").run, "baseline applicability fixture should pass")
@@ -71,6 +77,32 @@ class ComplianceHorizonSelfTest
       File.write(review_log_path, YAML.dump(review_log))
       check = validator(root, gate: "horizon", profile: "release_candidate", source_observation_report_path: report_path)
       assert(check.run, "strict profile accepts a later matching manual source review")
+
+      rerun_report = JSON.parse(File.read(File.join(root, report_path), encoding: "UTF-8"))
+      rerun_report["generated_at"] = "2026-09-05T12:00:00Z"
+      File.write(File.join(root, report_path), JSON.pretty_generate(rerun_report))
+      rerun_check = validator(root, gate: "horizon", profile: "release_candidate", source_observation_report_path: report_path)
+      assert(rerun_check.run, "a fresh run must accept the already reviewed matching source state")
+    end
+
+    with_fixture do |root|
+      report_path = write_source_observation_report(root)
+      review_log_path = File.join(root, "docs/project/compliance/source-observation-review-log.yaml")
+      review_log = YAML.safe_load(File.read(review_log_path), permitted_classes: [Date], aliases: true)
+      review_log["entries"] << {
+        "source_id" => "APPLE-ARG",
+        "observed_state_signature" => "a" * 64,
+        "observation_generated_at" => "2026-09-04T12:00:02Z",
+        "assessment" => "completed",
+        "reviewed_at" => "2026-09-04T12:00:01Z",
+        "reviewer_role" => "Compliance and release owner",
+        "evidence" => "docs/project/compliance/apple-review-relevance.md",
+        "automatic_approval" => false,
+      }
+      File.write(review_log_path, YAML.dump(review_log))
+      check = validator(root, gate: "horizon", profile: "release_candidate", source_observation_report_path: report_path)
+      assert(!check.run, "manual review must not predate its recorded source observation")
+      assert(includes?(check, "manual review predates the observed source state"), "review chronology failure must be named")
     end
 
     mutate_control("HZN-EU-GREEN-TRANSITION", ->(control) { control.dig("comparison_contract")["methodology_path"] = "docs/missing.md" }) do |check|

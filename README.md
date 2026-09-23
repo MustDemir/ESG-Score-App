@@ -150,7 +150,7 @@ are intentionally outside this mobile project.
 | Local development gates | 33/33 PASS |
 | Flutter tests | 122/122 PASS |
 | Flutter line coverage | 84.33% |
-| Local database replay and pgTAP | 14 migrations, 277/277 PASS |
+| Local database replay and pgTAP | 15 migrations, 305/305 PASS |
 | Supply-chain inventory | 61 Dart packages, 2 iOS plugins, 20 pinned Action references, 0 known vulnerabilities |
 | Pull Request 30 GitHub Actions | 6/6 jobs PASS |
 

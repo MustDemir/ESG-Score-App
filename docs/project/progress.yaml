@@ -76,7 +76,7 @@ session_handoff:
   prepared_at: 2026-09-23
   session_closed_at: null
   branch: codex/tkt-038-01-cache-freshness
-  status: backend_and_cache_review_branches_pushed_post_merge_evidence_pending
+  status: backend_done_cache_synchronized_with_main_regular_pr_ci_pending
   delivery_2026_09_23:
     backend_commit: f33f7584e779f450448440042106ac69f7596eca
     cache_commit: ad84070e359462e7587365ac203576fb5be940b3
@@ -91,6 +91,11 @@ session_handoff:
     automatic_merge: false
     remote_database_changed: false
     excluded_local_files: .codex/ remains untracked and was not pushed
+    backend_final_commit: 607e115c1c624be858cbd064620dea500c180f83
+    backend_merge_commit: 65b9463cef4657153ae4fbc4b78a99f96497fb0c
+    backend_pr_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35837738124
+    backend_post_merge_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
+    backend_post_merge_result: Attempt 2 PASS after attempt 1 encountered an unrelated local mail-port collision before pgTAP.
   cache_ci_followup_2026_09_23:
     ticket: TKT-038-01
     failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
@@ -108,23 +113,29 @@ session_handoff:
     method: three_scoped_agent_reviews_and_primary_agent_verification
     resolved_locally: [AR-01, AR-02, AR-03]
     backend_resolved_locally: [AR-04, AR-05, AR-06, AR-09, AR-10]
-    backend_ci_pending: true
+    backend_ci_pending: false
     backend_technical_review: docs/project/audits/2026-09-23-backend-abschlussreview.md
     backend_report: docs/project/audits/2026-09-23-public-read-http-validation.md
     client_resolved_locally: [AR-07, AR-08]
     client_report: docs/project/audits/2026-09-23-cache-frische-validation.md
     client_tests: 42 focused tests; 144 full Flutter tests PASS; coverage 84.74 percent
     ticket_tests: 22 tests, 58 assertions PASS
-    pr_binding_tests: 9 tests, 27 assertions PASS
+    pr_binding_tests: 10 tests, 29 assertions PASS
     ticket_catalog: 7 tickets
     backend_remote_profile: EXPECTED FAIL; activation and required reviews absent
     privacy_remote_profile: EXPECTED FAIL; controller, legal, disclosure and rights evidence absent
     data_license_remote_profile: EXPECTED FAIL; export, correction/deletion and legal evidence absent
     database_http_execution: 292 assertions PASS; real Edge handler publication and replay PASS; isolated stack only
-    database_replay: 15 migrations; 303 pgTAP assertions; lint PASS
+    database_replay: 15 migrations; 305 pgTAP assertions; lint PASS
     development_gates: 33/33 PASS on 2026-09-23
-    next_action: Review draft PRs 35 and 36; finish PR and post-merge evidence in dependency order; privacy and remote remain blocked
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/31
+    pr35_review_followup:
+      threads: 7
+      scope: source-review chronology, self-test fail-closed behavior, terminal-ticket rejection, report contract, and three baseline corrections
+      local_result: targeted regression tests and 33/33 Development gates PASS
+      merge_status: PR 35 merged as 65b9463 after all threads and checks passed; no admin bypass
+      post_merge: Run 35838485511 attempt 2 PASS; attempt 1 had an unrelated local mail-port collision before pgTAP started
+    next_action: Retarget PR 36 to main, run regular PR checks and merge only after approval; privacy and remote remain blocked
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/35
   pull_request: https://github.com/MustDemir/ESG-Score-App/pull/36
   git_state:
     committed: true
