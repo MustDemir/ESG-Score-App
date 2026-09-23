@@ -1,0 +1,77 @@
+id: "0041"
+title: Ticket-basierte Ausfuehrung innerhalb des bestehenden Delivery Operating Models
+date: 2026-09-11
+status: accepted
+deciders:
+  - Mustafa Demir
+tags:
+  - process
+  - governance
+  - tickets
+  - quality-gates
+  - traceability
+
+context: |
+  Backlog, Fortschritts-SSOT, DoR, DoD und Quality Gates sind vorhanden. Kleine
+  ausfuehrbare Aktionen stehen jedoch teilweise nur als Freitext in
+  `remaining_parts`. Dadurch koennen Scope, Vorbedingungen, Akzeptanzkriterien,
+  Abhaengigkeiten und Abschlussnachweise zwischen Sessions verloren gehen.
+
+options_considered:
+  - name: Nur bestehende TODO-Freitexte erweitern
+    pros:
+      - Kein neues Artefakt
+    cons:
+      - Einzelne Aktionen haben keinen eigenen Status oder DoR-/DoD-Nachweis
+      - Abhaengigkeiten und Gate-Zuordnung bleiben schwer maschinell pruefbar
+  - name: Externes Issue-System als neue Source of Truth einfuehren
+    pros:
+      - Umfangreiche UI- und Automationsmoeglichkeiten
+    cons:
+      - Zusaetzlicher Provider und Synchronisationsrisiko
+      - Lokale und CI-Pruefung waere ohne weitere Integration unvollstaendig
+  - name: Repo-native Child-Tickets unter bestehenden TODOs
+    pros:
+      - Nutzt Backlog, DoR, DoD, Risiken, ADRs und Gates weiter
+      - Versionierbar, reviewbar und lokal sowie in CI deterministisch pruefbar
+    cons:
+      - Ein weiteres kleines Artefakt muss pro ausfuehrbarer Aktion gepflegt werden
+
+decision: |
+  Ausfuehrbare Aenderungen erhalten vor Beginn ein repo-natives Ticket unter
+  `docs/project/tickets`. Das Backlog bleibt Portfolio- und Prioritaets-SSOT;
+  Tickets sind kleine Child-Arbeitseinheiten mit Scope, DoR,
+  Akzeptanzkriterien, DoD, Gate-Zuordnung, Evidenz und Rollback. Status und
+  Reihenfolge stehen im Ticket-Index. `G-PROJECT-CONTROL` validiert Schema,
+  Referenzen und Zustandslogik lokal sowie in GitHub Actions.
+
+  Reine Statusabfragen und lesende Diagnosen benoetigen kein Ticket. Tests und
+  technische Einzelkommandos sind Verifikationsschritte eines Tickets und
+  werden nicht als eigene Tickets aufgeblasen. Menschliche Privacy-, Rechts-,
+  Fach- oder Releasefreigaben bleiben menschliche Entscheidungen.
+
+rationale: |
+  Die Ticket-Ebene schliesst die Ausfuehrungsluecke, ohne ein zweites Backlog
+  oder einen neuen externen Provider einzufuehren. Sie macht die bereits
+  bestehenden Workflow-Regeln konkret und automatisch kontrollierbar.
+
+consequences:
+  - Neue Aenderungen referenzieren vor Umsetzung ein valides Ticket.
+  - Der Status planned darf erst bei erfuellter DoR zu in_progress wechseln.
+  - Der Status done verlangt erfuellte Akzeptanzkriterien, DoD, Evidenz und Gates.
+  - Maximal ein Ticket ist gleichzeitig in_progress.
+  - Ticket-ID wird in Branch, Commit oder Pull Request und Fortschritt referenziert.
+
+implementation:
+  schema: docs/project/tickets/ticket-schema.yaml
+  index: docs/project/tickets/ticket-index.yaml
+  validator: scripts/quality/validate_tickets.rb
+  self_tests: scripts/quality/test_ticket_gate.rb
+  enforcing_gate: G-PROJECT-CONTROL
+
+supersedes: null
+superseded_by: null
+related:
+  - "0007"
+  - "0009"
+  - "0029"

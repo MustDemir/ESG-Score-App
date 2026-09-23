@@ -1,0 +1,134 @@
+schema_version: scanfair-ticket-v1
+id: TKT-037-03
+title: Read-Abuse-Schutz nach Remote-Anwendung verifizieren
+summary: |
+  Nach Migrationen 14 und 15 die reale Remote-Konfiguration und Negativfaelle
+  transaktional pruefen und bestaetigen, dass keine Testdaten verbleiben.
+parent_todo: TODO-037
+ticket_type: supabase_change
+dod_task_types:
+  - supabase_change
+  - provider_governance
+priority: P1
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-11
+updated: 2026-09-23
+scope:
+  in:
+    - Hook, Rechte, Cron-Identitaet, Grenzwert und Negativfaelle remote pruefen
+    - Testtransaktion vollstaendig zurueckrollen und Persistenz kontrollieren
+    - Remote-Evidenz und Vertragsanwendung aktualisieren
+    - Hosted-Proxy-Vertrauensgrenze und nicht manipulierbare Client-Zuordnung vor Aktivierung belegen
+  out:
+    - Keine Aktivierung des Flutter-Clients
+    - Keine Last- oder Penetrationstests gegen die Hosted-Umgebung
+    - Keine echte Nutzer-IP oder produktive Nutzlast
+dependencies:
+  - TKT-037-02
+links:
+  risks:
+    - RISK-008
+    - RISK-015
+  decisions:
+    - "0035"
+    - "0040"
+    - "0041"
+  requirements: []
+definition_of_ready:
+  status: not_ready
+  criteria:
+    - id: DOR-01
+      criterion: TKT-037-02 ist done und Migrationen 14 und 15 sind remote sichtbar.
+      status: pending
+      evidence: []
+    - id: DOR-02
+      criterion: Der Verifier ist lokal und rollback-only gegen den Zielvertrag validiert.
+      status: satisfied
+      evidence:
+        - scripts/quality/verify_public_read_abuse_protection.sql
+        - docs/project/audits/2026-09-23-public-read-http-validation.md
+    - id: DOR-03
+      criterion: Es werden ausschließlich synthetische Testidentitaeten verwendet.
+      status: satisfied
+      evidence:
+        - scripts/quality/verify_public_read_abuse_protection.sql
+    - id: DOR-04
+      criterion: Runtime bleibt waehrend der Verifikation deaktiviert.
+      status: satisfied
+      evidence:
+        - docs/project/security/eu-supabase-environment-contract.yaml
+acceptance_criteria:
+  - id: AC-01
+    criterion: Authenticator-Hook, private Tabelle, Rechte und Cleanup-Cron entsprechen exakt dem Vertrag.
+    status: pending
+    verification:
+      - Linked-Verifier gegen scanfair-dev ausfuehren
+    evidence_required:
+      - Erfolgreiches, zeitgestempeltes Verifier-Protokoll
+  - id: AC-02
+    criterion: 30 Requests werden akzeptiert und der 31. Request wird mit dem erwarteten 429-Vertrag abgewiesen.
+    status: pending
+    verification:
+      - Atomaren Zaehler- und Fehlerpfad im Linked-Verifier pruefen
+    evidence_required:
+      - Verifier-Nachweis des Grenzwertverhaltens
+  - id: AC-03
+    criterion: GET sowie fehlende oder ungueltige Client-Identitaet werden fail-closed abgewiesen.
+    status: pending
+    verification:
+      - Negative Verifier-Faelle ausfuehren
+    evidence_required:
+      - Fehlercode- und Payload-Nachweis
+  - id: AC-04
+    criterion: Nach Rollback verbleiben keine Verifier-Zeilen oder sonstigen Fixtures.
+    status: pending
+    verification:
+      - Persistenzzaehlung nach Verifier-Lauf ausfuehren
+    evidence_required:
+      - Null-Fixture-Nachweis
+  - id: AC-05
+    criterion: Hosted-Gateway-Kette liefert eine vertrauenswuerdige Client-Zuordnung; gefaelschte Header umgehen die Quote nicht und verschiedene Clients werden nicht ungeprueft zusammengefasst.
+    status: pending
+    verification:
+      - Provider-Konfiguration und genehmigten begrenzten HTTP-Test nach Privacy-Freigabe separat pruefen
+      - Lokale Tests nicht als Hosted-Nachweis uebernehmen
+    evidence_required:
+      - Gepruefte Gateway-Konfiguration mit versionsbezogenem HTTP-Nachweis und verantwortlichem Reviewer
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Alle Remote-Verifier-Pruefungen bestehen.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      criterion: Remote-Fixture-Persistenz ist null.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Umgebungsvertrag und Audit enthalten den realen Remote-Stand.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: G-BACKEND-BOUNDARY und Dokumentationskontrollen bestehen.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-BACKEND-BOUNDARY
+    - G-DATA-RLS
+    - G-CMP-EVIDENCE
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - supabase db query --linked --file scripts/quality/verify_public_read_abuse_protection.sql
+    - ruby scripts/quality/validate_backend_boundary.rb --profile development
+evidence: []
+rollback:
+  strategy: Verifier laeuft transaktional und rollt alle synthetischen Daten zurueck.
+  verification: Nachlaufende Zaehler bestaetigen null verbleibende Fixtures.
+activation_boundary: Keine Client-Aktivierung allein aufgrund eines bestandenen Verifiers.

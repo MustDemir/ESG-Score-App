@@ -1,0 +1,133 @@
+schema_version: scanfair-ticket-schema-v1
+ticket_schema_version: scanfair-ticket-v1
+owner: Mustafa Demir
+purpose: |
+  Verbindlicher Vertrag fuer kleine, ausfuehrbare Arbeitseinheiten unterhalb
+  eines bestehenden Backlog-TODOs. Das Schema operationalisiert die bereits
+  vorhandene Definition of Ready, Definition of Done und Quality Gates.
+
+file_contract:
+  directory: docs/project/tickets
+  pattern: tkt-NNN-NN-kurzer-titel.yaml
+  id_pattern: TKT-NNN-NN
+  index: docs/project/tickets/ticket-index.yaml
+
+required_fields:
+  - schema_version
+  - id
+  - title
+  - summary
+  - parent_todo
+  - ticket_type
+  - dod_task_types
+  - priority
+  - status
+  - owner
+  - decision_owner
+  - created
+  - updated
+  - scope
+  - dependencies
+  - links
+  - definition_of_ready
+  - acceptance_criteria
+  - definition_of_done
+  - gates
+  - evidence
+  - rollback
+  - activation_boundary
+
+allowed_values:
+  priorities:
+    - P0
+    - P1
+    - P2
+    - P3
+  statuses:
+    - planned
+    - in_progress
+    - draft
+    - review
+    - done
+    - parked
+    - dropped
+  criterion_statuses:
+    - pending
+    - satisfied
+    - not_applicable
+  readiness_statuses:
+    - ready
+    - not_ready
+  completion_statuses:
+    - done
+    - not_done
+  gates:
+    - G-FLT-DEPS
+    - G-FLT-FORMAT
+    - G-FLT-ANALYZE
+    - G-FLT-TEST
+    - G-FLT-COVERAGE
+    - G-SUPPLY-CHAIN
+    - G-MASVS
+    - G-CMP-SCHEMA
+    - G-COMPLIANCE-HORIZON
+    - G-REGULATORY-APPLICABILITY
+    - G-UWG-COMPARISON-TRANSPARENCY
+    - G-REG-UNIT
+    - G-CMP-APPLE
+    - G-CMP-EVIDENCE
+    - G-DATA-ARCH
+    - G-DATA-LICENSE
+    - G-METHOD-CATALOG
+    - G-LINK-INTEGRITY
+    - G-MISSING-DATA
+    - G-RED-FLAG
+    - G-SCORE-REPRO
+    - G-CLAIM-SAFETY
+    - G-CLAIM-GOVERNANCE
+    - G-PROJECT-CONTROL
+    - G-DOC-TRACE
+    - G-DOC-YAML
+    - G-PRIVACY-BOUNDARY
+    - G-BACKEND-BOUNDARY
+    - G-RETENTION-OPS
+    - G-PROVIDER-DPA
+    - G-PROVIDER-SUBPROCESSORS
+    - G-COST-CONTROL
+    - G-DATA-RLS
+    - G-IOS-COMPILE
+    - G-SECRET-SCAN
+
+minimum_items:
+  definition_of_ready: 4
+  acceptance_criteria: 3
+  definition_of_done: 4
+  scope_in: 1
+  scope_out: 1
+  required_gates: 3
+
+required_gates_by_ticket_type:
+  documentation:
+    - G-PROJECT-CONTROL
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  supabase_change:
+    - G-PROJECT-CONTROL
+    - G-BACKEND-BOUNDARY
+    - G-DATA-RLS
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  operations_readiness:
+    - G-PROJECT-CONTROL
+    - G-RETENTION-OPS
+    - G-DOC-TRACE
+    - G-DOC-YAML
+
+state_rules:
+  - not_applicable verlangt not_applicable_reason, decision_owner und Evidenz; not_applicable_allowed false verbietet eine Ausnahme fuer Pflichtfreigaben.
+  - Lokale Evidenz muss eine existierende Datei innerhalb des Repositorys sein; HTTPS-Links sind Referenzen ohne automatische Inhalts- oder Echtheitsbestaetigung.
+  - Ein Ticket darf erst in_progress werden, wenn definition_of_ready ready ist.
+  - Ein Ticket darf erst done werden, wenn alle Akzeptanz- und DoD-Kriterien erfuellt und Evidenzen verlinkt sind.
+  - Offene Abhaengigkeiten blockieren in_progress, draft, review und done.
+  - Maximal ein Ticket darf gleichzeitig in_progress, draft oder review sein.
+  - Menschliche Rechts-, Privacy-, Fach- oder Releasefreigaben werden nie durch ein automatisches Gate ersetzt.

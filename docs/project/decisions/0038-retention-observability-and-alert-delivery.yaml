@@ -6,11 +6,11 @@ deciders: [Mustafa]
 tags: [backend, operations, observability, alerting, supabase, cost-control]
 
 context: |
-  The retention cleanup has completed two real scheduled runs, but a cron job
-  can later fail, become stale or leave a bounded-deletion backlog. Runtime
-  activation therefore needs durable health observations and alert lifecycle
-  evidence. The development project is on the Supabase Free Plan and has no
-  configured GitHub secret or external monitoring destination.
+  The retention cleanup and health monitor have completed real scheduled runs,
+  but a cron job can later fail, become stale or leave a bounded-deletion
+  backlog. Runtime activation therefore needs durable health observations and
+  alert lifecycle evidence. The development project is on the Supabase Free
+  Plan and has no configured GitHub secret or external monitoring destination.
 
 options_considered:
   - name: Supabase Log Drain to an external observability provider
@@ -64,14 +64,16 @@ implementation:
   gate: docs/project/gate-definitions/local/G-RETENTION-OPS.yaml
   observation: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
   local_state: validated_250_of_250_pgtap
-  remote_state: not_applied_pending_pull_request_review
+  remote_state: migration_applied_four_monitor_runs_and_transactional_lifecycle_verifier_passed
+  remote_observation: docs/project/audits/2026-09-04-retention-observability-remote-verification.md
   runtime_state: disabled
 
 consequences:
   - A health record and deduplicated alert lifecycle are available without app access.
   - Resolved alerts are retained for 400 days and health checks for 90 days.
   - External delivery and a notification drill remain blocking remote-activation evidence.
-  - The health-monitor cron needs a real scheduled-run observation after remote application.
+  - Migration 13 and four real health-monitor runs are remotely verified, with
+    a rollback-clean controlled failure/recovery lifecycle verifier.
   - Provider-plan or delivery-channel changes reopen cost, DPA, subprocessor and secret review.
 
 primary_sources:

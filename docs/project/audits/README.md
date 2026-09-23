@@ -34,3 +34,10 @@ what was inaccurate and records the corrected assessment.
 | 2026-08-17 | [Remote Schema State Assessment](2026-08-17-remote-schema-state-assessment.md) | Linked migration reconciliation, schema drift, remote data state and activation boundary |
 | 2026-08-18 | [Remote Deployment Verification](2026-08-18-remote-deployment-verification.md) | Migration-10 remote behavior, hosted pgTAP limitation and service-role least-privilege finding |
 | 2026-08-18 | [Retention and Cleanup Assessment](2026-08-18-retention-cleanup-assessment.md) | Bounded technical retention, durable replay watermarks, pg_cron scheduling and activation boundary |
+| 2026-09-04 | [Retention-Observability Remote Verification](2026-09-04-retention-observability-remote-verification.md) | Migration 13, real health-monitor history and rollback-clean failure/recovery lifecycle verification |
+| 2026-09-04 | [Control-Assurance-Review der Quality Gates](2026-09-04-control-assurance-review.md) | Frist-Erzwingung, Quellen-Deltas, Feature-Deklarationen und Negativtests |
+| 2026-09-06 | [Public-Read Abuse Protection Validation](2026-09-06-public-read-abuse-protection-validation.md) | Rollback-only migration validation, pre-request limiter behavior and no-persistence confirmation |
+| 2026-09-11 | [Ticket Workflow Control Validation](2026-09-11-ticket-workflow-control-validation.md) | Child-Ticket-Schema, DoR/DoD, Abhaengigkeiten, Gate-Mapping, Negativtests und PR-Bindung |
+| 2026-09-22 | [Agent- und Kontrollreview](2026-09-22-agent-control-review.md) | Ticket-/CI-Nacharbeit, PostgREST-Integrationsluecken und Cache-Frischegrenzen |
+| 2026-09-23 | [Public-Read HTTP Validation](2026-09-23-public-read-http-validation.md) | Migration 15, echte Gateway-Quoten und erfolgreicher Edge-/Datenbank-Rundlauf in isolierter Instanz |
+| 2026-09-23 | [Backend-Abschlussreview](2026-09-23-backend-abschlussreview.md) | Separater technischer Pruefdurchgang, erneute Laufzeittests und explizite Hosted-/Privacy-Grenzen |

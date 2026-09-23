@@ -1,19 +1,24 @@
 # Apple App Review Guidelines - Relevanz-Mapping fuer ScanFair
 
 > Historische Vollanalyse: deutsches Apple-PDF vom 6. Februar 2026.
-> Aktueller operativer Stand: offizielle Webfassung vom 8. Juni 2026.
+> Aktueller operativer Stand: offizielle Webfassung vom 8. Juni 2026;
+> die Quelleneinordnung wurde am 4. September 2026 erneut geprüft.
 > Quellen-SSOT: [`source-register.yaml`](source-register.yaml).
 >
 > Methodik aus Master-Thesis-Repo (`genaiops-compliance-gates`) übernommen.
 > Siehe [ADR 0009](../decisions/0009-methodology-adoption.yaml) (Methodik) und
 > [ADR 0012](../decisions/0012-apple-review-compliance.yaml) (Apple-Spezifika).
 >
-> Letzte Verifikation: 2026-07-19
+> Letzte Verifikation: 2026-09-04
 
 Die ausfuehrbaren Artefakte sind 19 Requirements, acht gruppierte Apple-Gates
-und acht produktive Rego-Namespaces. Einzelne Richtlinienabschnitte werden nicht
-automatisch zu eigenen Gates; ein Gate bleibt eine Release-Entscheidungsstelle.
-Siehe [`apple-compliance-control-model.md`](apple-compliance-control-model.md).
+im kanonischen Profil `scanfair-gate-v2` und acht produktive Rego-Namespaces.
+Einzelne Richtlinienabschnitte werden nicht automatisch zu eigenen Gates; ein
+Gate bleibt eine Release-Entscheidungsstelle. Der Horizon-Katalog ergänzt die
+Apple-Gates um Wirksamkeitsdatum, Reaktivierungstrigger und die verpflichtende
+menschliche Bewertung von Quellenänderungen; er erteilt keine automatische
+Freigabe. Siehe [`apple-compliance-control-model.md`](apple-compliance-control-model.md)
+und [`regulatory-horizon.yaml`](regulatory-horizon.yaml).
 
 ## Bewertungs-Legende
 
@@ -141,7 +146,7 @@ Wahrheits- und Nachvollziehbarkeitskontrolle der ESG-Aussagen. R-AS-28 stellt
 sicher, dass spaetere Hochrisiko-Features ihre bedingten Regeln aktivieren.
 R-AS-29 fuehrt Apple HIG und Accessibility bewusst als SHOULD-Evidenz.
 
-| R-AS-ID | Titel | Apple-Ref | Gate-ID (geplant) | Phase |
+| R-AS-ID | Titel | Apple-Ref | Gate-ID | Phase |
 |---|---|---|---|---|
 | **R-AS-01/02/04/05/07/15** | Privacy, Consent und bedingte Datenkontrollen | 5.1 | G-AS-PRIVACY | 1/bedingt |
 | **R-AS-03** | Kamera-Purpose und Laufzeitverhalten | 2.5.14 | G-AS-CAMERA | 1 |
@@ -177,7 +182,7 @@ docs/project/compliance/apple-review-relevance.md  ◄── DIESE DATEI
 docs/project/requirements/R-AS-NN.yaml             ◄── eine pro Anforderung
         │ verlinkt sich mit
         ▼
-docs/project/gate-definitions/apple/G-AS-NAME.yaml ◄── 7-Attribute-Template
+docs/project/gate-definitions/apple/G-AS-NAME.yaml ◄── scanfair-gate-v2 mit Kernattributen und Kriterienmetadaten
         │ implementiert durch
         ▼
 docs/project/policies/apple/policy_NAME.rego       ◄── deny-Rules

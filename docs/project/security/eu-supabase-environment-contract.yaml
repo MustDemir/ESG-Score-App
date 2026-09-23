@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-20
+last_reviewed: 2026-09-04
 owner: Engineering
 status: accepted_for_definition_of_ready
 implementation_state: remote_schema_deployed_runtime_disabled
@@ -145,6 +145,46 @@ read_contract:
   user_scan_access: owner_only_if_accounts_are_activated
   fallback_order: [fresh_remote_cache, direct_Open_Food_Facts, transparent_no_data]
   stale_data_must_be_explicit: true
+  rate_limit:
+    state: locally_verified_remote_apply_pending_privacy
+    remote_verification: not_applied
+    security_telemetry_privacy_review: pending
+    external_rate_limit_alerting_decision: pending
+    hosted_gateway_identity_verification: pending
+    enforcement_layer: postgrest_pre_request
+    enforcement_function: public.enforce_public_read_rate_limit()
+    protected_rpc_paths:
+      - /rpc/get_fresh_cached_product
+      - /rpc/get_published_product_evidence
+      - /rpc/get_published_score_snapshot
+    allowed_method: POST
+    requests_per_ip_per_minute: 30
+    client_identity: trusted_final_ingress_x_forwarded_for_last_address
+    identity_boundary: Final trusted ingress must append its observed peer; untrusted prefixes ignored. Hosted proxy chain and peer uniqueness require separate proof before activation.
+    missing_or_invalid_identity: reject_403
+    rejected_request: reject_429_with_retry_after_60_seconds
+    raw_ip_storage: prohibited
+    stored_subject: sha256_pseudonym_only
+    storage_schema: private.public_read_rate_windows
+    retention: one_hour_expiry_bounded_five_minute_cleanup_no_hard_deletion_sla
+    expiry_seconds: 3600
+    cleanup_batch_limit: 10000
+    deletion_boundary: Under healthy scheduling and no backlog, cleanup occurs at the next five-minute run; backlog and outages extend physical retention without a guaranteed upper bound.
+    hash_boundary: Unkeyed SHA-256 with public constant prefix permits offline IP-candidate checking and correlation across minute windows; not anonymization.
+    cleanup_job:
+      name: scanfair-public-read-rate-cleanup
+      schedule_utc: "*/5 * * * *"
+      command: select private.cleanup_public_read_rate_windows();
+      execution_database: postgres
+      execution_role: postgres
+    runtime_activation_requires:
+      - migrations_14_and_15_applied_and_linked_verifier_passed
+      - local_migration_replay_and_53_pgtap_assertions_pass
+      - real_gateway_http_and_successful_edge_writer_tests_pass
+      - hosted_gateway_identity_verification_approved
+      - public_rpc_post_only_contract_verified
+      - security_telemetry_privacy_review_approved
+      - external_rate_limit_alerting_decision_reviewed
 
 audit_contract:
   append_only: true
@@ -203,18 +243,19 @@ retention_cleanup_contract:
     - post_upgrade_job_verification
 
 retention_observability_contract:
-  state: local_validated_remote_migration_pending
+  state: remote_observability_verified_delivery_pending
   contract_ref: docs/project/security/retention-observability-contract.yaml
   scheduled_cleanup_observation: two_successful_runs_zero_eligible_backlog
-  observation_evidence: docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+  observation_evidence:
+    - docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+    - docs/project/audits/2026-09-04-retention-observability-remote-verification.md
+    - docs/project/audits/2026-09-06-public-read-abuse-protection-validation.md
   monitor_job_name: scanfair-retention-health-monitor
   monitor_schedule_utc: "30 3 * * *"
   health_history: private.retention_health_checks
   alert_outbox: private.retention_alert_outbox
   external_delivery: not_configured_runtime_disabled
   remote_activation_requires:
-    - migration_13_applied_and_verified
-    - first_real_scheduled_monitor_run_observed
     - least_privilege_external_delivery_configured
     - failure_and_recovery_notifications_received
     - delivery_failure_negative_test
@@ -263,21 +304,31 @@ incident_contract:
 
 implementation_evidence:
   state: remote_schema_deployed_runtime_disabled
-  validated_on: 2026-08-20
+  validated_on: 2026-09-07
   remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
-  database_tests: 250/250 PASS
-  local_migrations: 13/13 REPLAYED
-  remote_migrations: 12/12 RECONCILED
+  database_tests: 305/305 PASS
+  local_migrations: 15/15 REPLAYED
+  local_revalidated_on: 2026-09-23
+  remote_migrations: 13/13 RECONCILED
   retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
   remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
   retention_cleanup_remote_verification: PASS
   scheduled_cleanup_runs_observed: 2/2 SUCCEEDED
   retention_observability_local: PASS
   retention_observability_verifier_local_dry_run: PASS_WITH_ROLLBACK
-  retention_observability_remote_migration: NOT_APPLIED
-  retention_monitor_scheduled_runs_observed: 0
+  retention_observability_remote_migration: APPLIED_AND_VERIFIED
+  retention_observability_remote_verifier: PASS_WITH_ROLLBACK
+  retention_monitor_scheduled_runs_observed: 4/4 SUCCEEDED
   retention_notification_drill: NOT_RUN
+  public_read_abuse_local_migration: REPLAYED
+  public_read_abuse_pgtap: 53/53 PASS
+  public_read_abuse_http: 292 assertions PASS
+  edge_writer_success_http: PASS_SYNTHETIC_UPSTREAM_REAL_HANDLER_AND_DATABASE
+  public_read_abuse_local_verifier: PASS_WITH_ROLLBACK
+  public_read_abuse_remote_verifier: PASS_WITH_ROLLBACK_ONLY
+  public_read_abuse_remote_migration: NOT_APPLIED
+  public_read_abuse_privacy_review: PENDING
   remote_schema_diff: EMPTY
   remote_database_lint: PASS
   service_role_rpc_only_verification: PASS
@@ -310,6 +361,13 @@ implementation_evidence:
     - docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
     - scripts/quality/validate_retention_operations.rb
     - scripts/quality/verify_remote_retention_observability.sql
+    - docs/project/audits/2026-09-04-retention-observability-remote-verification.md
+    - supabase/migrations/20260906000100_public_read_abuse_protection.sql
+    - supabase/migrations/20260923000100_public_read_api_integration.sql
+    - scripts/quality/test_public_read_http.mjs
+    - scripts/quality/test_edge_writer_http.mjs
+    - docs/project/audits/2026-09-23-public-read-http-validation.md
+    - supabase/tests/database/public_read_abuse_protection.test.sql
     - esg_app/lib/services/supabase_product_cache_service.dart
     - esg_app/test/services/supabase_product_cache_service_test.dart
     - docs/project/gate-definitions/gate-definition-schema.yaml
@@ -322,6 +380,8 @@ implementation_evidence:
     - supabase db query --linked --file scripts/quality/verify_remote_retention_cleanup.sql
     - bash scripts/quality/run_retention_operations_gate.sh
     - supabase db query --linked --file scripts/quality/verify_remote_retention_observability.sql
+    - supabase test db
+    - supabase db query --linked --file scripts/quality/verify_public_read_abuse_protection.sql
     - flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - ruby scripts/quality/test_gate_definition_gate.rb
     - ruby scripts/quality/test_provider_governance_gate.rb

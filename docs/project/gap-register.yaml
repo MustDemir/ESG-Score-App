@@ -50,7 +50,7 @@ gaps:
     status: in_progress
     priority: P0
     target_profile: release_candidate
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Mustafa Demir
     trigger: Vor Aktivierung der Methodik 2.0 oder öffentlicher Bewerbung eines belastbaren Nachhaltigkeitsscores
@@ -285,7 +285,7 @@ gaps:
     status: open
     priority: P1
     target_profile: release_candidate
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Mustafa Demir
     trigger: Vor externer Beta und Score-Kalibrierung
@@ -397,16 +397,16 @@ gaps:
     status: in_progress
     priority: P1
     target_profile: development
-    maturity_current: 2
+    maturity_current: 3
     maturity_target: 4
     owner: Release owner
     trigger: Monatlich bis Release sowie bei Apple-, EU-, OWASP- oder Provider-Änderungen
     concern: |
-      Das Quellenregister besitzt Review-Daten, aber Änderungserkennung,
-      Diff-Bewertung, Requirement-Impact und Eskalation überfälliger Reviews
-      sind noch nicht fuer alle Quellen als wiederholbarer Prozess und Gate
-      belegt. Supabase-DPA, Subprocessor-Liste und Kostenkontrolle besitzen
-      jetzt eine woechentliche Online-Markerpruefung.
+      Das Quellenregister und der Regulierungs-Horizon besitzen jetzt
+      Wirksamkeitsdaten, Feature-Trigger, Fristen und eine wöchentliche
+      nicht-freigabewirksame Quellenbeobachtung. Offene Restarbeit ist die
+      wiederholbare fachliche Delta-Bewertung mit Requirement-, ADR- oder
+      begründetem No-Impact-Nachweis für jede relevante Beobachtung.
     closure_criteria:
       - jede Primärquelle besitzt Version, Owner, letzten und nächsten Review
       - überfällige Reviews blockieren Release Candidate
@@ -428,6 +428,13 @@ gaps:
       - docs/project/compliance/provider-governance-register.yaml
       - docs/project/audits/2026-08-12-provider-governance-gates-assessment.md
       - scripts/quality/validate_gate_definitions.rb
+      - docs/project/compliance/regulatory-horizon.yaml
+      - scripts/quality/validate_compliance_horizon.rb
+      - scripts/quality/observe_compliance_sources.rb
+      - docs/project/compliance/source-observation-baseline.yaml
+      - docs/project/compliance/capability-declaration-contract.yaml
+      - docs/project/audits/2026-09-04-control-assurance-review.md
+      - .github/workflows/quality-gates.yml
       - scripts/quality/validate_provider_governance.rb
 
   - id: GAP-012
@@ -507,3 +514,34 @@ gaps:
     mapped_risks: []
     source_refs:
       - APPLE-ARG
+
+  - id: GAP-015
+    domain: quality
+    title: Ausfuehrbare Aktionen besitzen noch keine einheitliche Ticket-Closure-Kontrolle
+    gap_type: partial
+    status: in_progress
+    priority: P0
+    target_profile: development
+    maturity_current: 3
+    maturity_target: 4
+    owner: Mustafa Demir
+    trigger: Vor jeder Aenderung an Code, Konfiguration, Datenbank, Compliance- oder Betriebsstatus
+    concern: |
+      Backlog-TODOs koennen mehrere Aktionen enthalten. Ohne einzelne Tickets
+      koennen DoR, Scope, Abhaengigkeiten, Akzeptanzkriterien, DoD und
+      Gate-Evidenz zwischen Sessions oder Pull Requests auseinanderlaufen.
+      Der Agent-Review vom 22.09.2026 reproduzierte zusaetzlich N/A- und
+      Evidenz-Umgehungen sowie eine Luecke im PR-Body-Edit-Trigger. Lokale
+      Korrekturen besitzen Regressionstests; reale PR-CI bleibt nachzuweisen.
+    closure_criteria:
+      - Repo-natives Ticket-Schema und Index sind Teil des Arbeitsmodells
+      - Jede ausfuehrbare Aenderung besitzt vor Beginn ein Child-Ticket
+      - G-PROJECT-CONTROL blockiert fehlende Felder, falsche Referenzen und widerspruechliche Zustaende
+      - Positive und negative Selbsttests belegen die Durchsetzung
+      - Mindestens ein Ticket wurde ueber ready, in_progress, review und done mit realer Evidenz geschlossen
+    mapped_improvements:
+      - IMP-PROC-004
+    mapped_risks:
+      - RISK-016
+    source_refs:
+      - NIST-SSDF-800-218

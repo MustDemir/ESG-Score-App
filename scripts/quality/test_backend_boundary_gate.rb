@@ -89,6 +89,19 @@ class BackendBoundaryGateSelfTest
     end
 
     with_fixture do |root|
+      contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
+      contract = load_yaml(root, contract_path)
+      contract["read_contract"]["rate_limit"]["allowed_method"] = "GET"
+      write_yaml(root, contract_path, contract)
+      check = validator(root, "development")
+      assert(!check.run, "gate must reject public-read rate-limit drift")
+      assert(
+        check.violations.any? { |entry| entry.include?("public read rate-limit contract") },
+        "rate-limit failure should identify the public read contract",
+      )
+    end
+
+    with_fixture do |root|
       blocked = validator(root, "remote_backend")
       assert(!blocked.run, "remote profile must reject a contract-only environment")
     end
@@ -131,6 +144,18 @@ class BackendBoundaryGateSelfTest
       )
     end
 
+    with_fixture do |root|
+      prepare_remote_activation(root)
+      contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
+      contract = load_yaml(root, contract_path)
+      contract["read_contract"]["rate_limit"].delete("hosted_gateway_identity_verification")
+      write_yaml(root, contract_path, contract)
+      check = validator(root, "remote_backend")
+      assert(!check.run, "remote activation requires hosted gateway identity verification")
+      assert(check.violations.any? { |entry| entry.include?("public read rate limit must") },
+        "missing hosted identity proof must block the public read boundary")
+    end
+
     if @failures.empty?
       puts "Backend boundary gate self-tests PASS: #{@assertions} assertions"
       true
@@ -163,6 +188,8 @@ class BackendBoundaryGateSelfTest
       copy(root, "supabase/functions")
       copy(root, "supabase/tests/database")
       copy(root, "scripts/quality/run_edge_writer_integration_gate.sh")
+      copy(root, "scripts/quality/test_public_read_http.mjs")
+      copy(root, "scripts/quality/test_edge_writer_http.mjs")
       copy(root, "scripts/quality/verify_remote_backend_readiness.sql")
       copy(root, "scripts/quality/verify_remote_retention_cleanup.sql")
       copy(root, "scripts/quality/verify_remote_retention_observability.sql")
@@ -213,6 +240,12 @@ class BackendBoundaryGateSelfTest
     end
     development["status"] = "active"
     development["dpa_status"] = "approved"
+    rate_limit = contract["read_contract"]["rate_limit"]
+    rate_limit["state"] = "remote_applied_and_privacy_approved"
+    rate_limit["remote_verification"] = "APPLIED_AND_VERIFIED"
+    rate_limit["security_telemetry_privacy_review"] = "approved"
+    rate_limit["external_rate_limit_alerting_decision"] = "approved"
+    rate_limit["hosted_gateway_identity_verification"] = "approved"
 
     evidence_paths = {
       "environment_activation" => "docs/project/security/evidence/environment-activation-evidence.yaml",

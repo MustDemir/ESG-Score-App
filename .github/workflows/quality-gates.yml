@@ -14,16 +14,10 @@ on:
       - 'scripts/**'
       - '.github/**'
   pull_request:
+    # Ticket binding reads the PR body; body edits must invalidate its result.
+    types: [opened, synchronize, reopened, edited, ready_for_review]
     branches:
       - main
-    paths:
-      - 'README.md'
-      - 'README.de.md'
-      - 'esg_app/**'
-      - 'docs/**'
-      - 'supabase/**'
-      - 'scripts/**'
-      - '.github/**'
   schedule:
     # Monday 05:00 UTC; Dependabot uses the Europe/Berlin timezone separately.
     - cron: '0 5 * * 1'
@@ -88,6 +82,12 @@ jobs:
         with:
           ruby-version: '3.3'
 
+      - name: Validate pull request ticket binding
+        if: github.event_name == 'pull_request'
+        run: |
+          ruby scripts/quality/test_pr_ticket_binding.rb
+          ruby scripts/quality/validate_pr_ticket_binding.rb --event "$GITHUB_EVENT_PATH"
+
       - name: Install OPA
         run: |
           curl --proto '=https' --tlsv1.2 --fail --location --retry 3 --silent --show-error \
@@ -132,6 +132,48 @@ jobs:
             evidence-store/evidence-log.jsonl
             evidence-store/latest-gate-results.json
             docs/project/compliance/source-register.yaml
+
+  compliance-source-watch:
+    name: Compliance source observation
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Ruby for source observation
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        with:
+          ruby-version: '3.3'
+
+      - name: Observe official compliance sources
+        run: ruby scripts/quality/observe_compliance_sources.rb
+
+      - name: Publish manual-review reminder
+        if: always()
+        run: |
+          echo "## Compliance source observation" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f .quality/compliance-horizon/source-observation.json ]; then
+            ruby -rjson -e '
+              report = JSON.parse(File.read(".quality/compliance-horizon/source-observation.json"))
+              puts "Decision: **#{report.fetch("decision")}**  "
+              puts "Automatic approval: **#{report.fetch("automatic_approval")}**  "
+              report.fetch("sources").each do |source|
+                next unless source.fetch("manual_review_required")
+                puts "- `#{source.fetch("id")}`: #{source.fetch("change_signal")}"
+              end
+            ' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "The snapshot is observational only. Any detected or inconclusive source change requires manual legal, claim, and release-impact assessment; it never grants automatic approval." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload source-observation artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: scanfair-compliance-source-observation
+          if-no-files-found: warn
+          path: .quality/compliance-horizon/source-observation.json
 
   supply-chain-gate:
     name: G-SUPPLY-CHAIN dependency and Action security
@@ -256,6 +298,18 @@ jobs:
         id: edge-writer-tests
         run: bash scripts/quality/run_edge_writer_integration_gate.sh
 
+      - name: Exercise real gateway read protection
+        id: public-read-http
+        shell: bash
+        run: |
+          mkdir -p .quality/backend-http
+          node scripts/quality/test_public_read_http.mjs --workdir "$GITHUB_WORKSPACE" | tee .quality/backend-http/public-read.log
+
+      - name: Exercise successful Edge writer and public read
+        id: edge-writer-http
+        shell: bash
+        run: node scripts/quality/test_edge_writer_http.mjs --workdir "$GITHUB_WORKSPACE" | tee .quality/backend-http/edge-writer.log
+
       - name: Publish database gate summary
         if: always()
         run: |
@@ -263,6 +317,8 @@ jobs:
             echo "## G-DATA-RLS"
             echo "Supabase migration replay, pgTAP RLS behavior tests and database lint: **${{ steps.database-tests.outcome }}**"
             echo "Trusted writer contract and local Edge authentication/schema smoke: **${{ steps.edge-writer-tests.outcome }}**"
+            echo "Real gateway role, path and quota tests: **${{ steps.public-read-http.outcome }}**"
+            echo "Successful Edge publication, replay and public read: **${{ steps.edge-writer-http.outcome }}**"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload backend data-path evidence
@@ -271,7 +327,9 @@ jobs:
         with:
           name: scanfair-backend-data-path-evidence
           include-hidden-files: true
-          path: .quality/edge-writer/**
+          path: |
+            .quality/edge-writer/**
+            .quality/backend-http/**
 
   provider-governance-gates:
     name: G-PROVIDER-GOVERNANCE DPA, subprocessors and cost
@@ -304,7 +362,7 @@ jobs:
             cat .quality/provider-governance/report.md >> "$GITHUB_STEP_SUMMARY"
           fi
           if [ -f .quality/gate-definitions/report.json ]; then
-            jq -r '"\n## G-GATE-DEFINITION-QUALITY\n\nDecision: **\(.decision)**  \nDefinitions: **\(.counts.gates)**  \nCanonical: **\(.counts.canonical)**  \nCompatible legacy: **\(.counts.legacy_compatible)**"' \
+            jq -r '"\n## G-GATE-DEFINITION-QUALITY\n\nDecision: **\(.decision)**  \nDefinitions: **\(.counts.gates)**  \nCanonical v2: **\(.counts.canonical_v2)**  \nCanonical v1 compatible: **\(.counts.canonical_v1_compatible)**  \nCompatible legacy: **\(.counts.legacy_compatible)**"' \
               .quality/gate-definitions/report.json >> "$GITHUB_STEP_SUMMARY"
           fi
 

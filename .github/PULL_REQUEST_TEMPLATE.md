@@ -19,6 +19,12 @@ Requirement, Issue oder ADR:
 
 -
 
+Ticket-ID und Parent-TODO:
+
+- Ticket: TKT-NNN-NN
+- Parent: TODO-NNN
+- [ ] Ticket war vor Implementierungsbeginn `ready`
+
 ## Änderungen
 
 -
@@ -59,6 +65,11 @@ Ausgeführte Befehle und Ergebnisse:
 
 -
 
+Risikobasierter Kontrollreview (Gate/CI, Security/Datenfluss, Datenqualitaet
+oder Aktivierung): Audit-Link oder begruendete Nichtanwendbarkeit:
+
+-
+
 ## Evidence und Rollback
 
 Erzeugte oder aktualisierte Evidence:
@@ -81,6 +92,8 @@ Welche Fragen sollen im Review bewusst entschieden werden?
 
 ## Freigabe
 
+- [ ] Ticket-Akzeptanzkriterien mit Evidenz erfüllt
+- [ ] Ticket-Definition-of-Done vollständig
 - [ ] Akzeptanzkriterien erfüllt
 - [ ] Risiken und Grenzen dokumentiert
 - [ ] keine offenen anwendbaren MUST-Findings für die Zielstufe

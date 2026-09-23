@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
-current_week: 2026-W36
-last_updated: 2026-08-31
+current_week: 2026-W39
+last_updated: 2026-09-23
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -14,7 +14,7 @@ roadmap_progress:
       next: complete_with_current_integration
     - id: M2-backend-data-integration
       progress_percent: 90
-      next: deploy_and_verify_retention_observability_then_implement_read_abuse_controls
+      next: repair_postgrest_http_integration_before_privacy_and_remote_activation
     - id: M3-coffee-reference-case
       progress_percent: 45
       next: integrate_contextual_environmental_social_and_governance_factors
@@ -33,9 +33,22 @@ roadmap_progress:
     - id: M8-submission-release
       progress_percent: 0
       next: testflight_submission_and_release_decision
+
+ticket_workflow:
+  schema: scanfair-ticket-v1
+  index: docs/project/tickets/ticket-index.yaml
+  active_ticket: TKT-037-05
+  next_ticket: TKT-038-01
+  todo_037_execution_order:
+    - TKT-037-05
+    - TKT-037-01
+    - TKT-037-02
+    - TKT-037-03
+    - TKT-037-04
+  enforcement: G-PROJECT-CONTROL
   next_work_packages:
     - id: N0-compliance-security-baseline
-      progress_percent: 85
+      progress_percent: 90
     - id: N1-coffee-pilot-products
       progress_percent: 100
     - id: N2-product-commodity-origin-links
@@ -60,10 +73,36 @@ roadmap_progress:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-08-31
+  prepared_at: 2026-09-23
   session_closed_at: null
-  branch: docs/project-status-2026-08-31
-  status: public_readme_restructured_and_validated
+  branch: codex/tkt-037-05-control-assurance
+  status: backend_technical_review_passed_github_evidence_pending_cache_next
+  control_review_2026_09_22:
+    ticket: TKT-040-01
+    report: docs/project/audits/2026-09-22-agent-control-review.md
+    workflow: docs/project/workflows/control-assurance-review.md
+    method: three_scoped_agent_reviews_and_primary_agent_verification
+    resolved_locally: [AR-01, AR-02, AR-03]
+    backend_resolved_locally: [AR-04, AR-05, AR-06, AR-09, AR-10]
+    backend_review_and_ci_pending: true
+    backend_technical_review: docs/project/audits/2026-09-23-backend-abschlussreview.md
+    backend_report: docs/project/audits/2026-09-23-public-read-http-validation.md
+    open_client: [AR-07, AR-08]
+    ticket_tests: 22 tests, 58 assertions PASS
+    pr_binding_tests: 10 tests, 29 assertions PASS
+    ticket_catalog: 7 tickets
+    backend_remote_profile: EXPECTED FAIL; activation and required reviews absent
+    privacy_remote_profile: EXPECTED FAIL; controller, legal, disclosure and rights evidence absent
+    data_license_remote_profile: EXPECTED FAIL; export, correction/deletion and legal evidence absent
+    database_http_execution: 292 assertions PASS; real Edge handler publication and replay PASS; isolated stack only
+    database_replay: 15 migrations; 305 pgTAP assertions; lint PASS
+    development_gates: 33/33 PASS on 2026-09-23
+    pr35_review_followup:
+      threads: 7
+      scope: source-review chronology, self-test fail-closed behavior, terminal-ticket rejection, report contract, and three baseline corrections
+      local_result: targeted regression tests and 33/33 Development gates PASS
+      merge_status: GitHub PR CI and thread resolution pending; no admin bypass
+    next_action: Publish PR-review corrections, rerun PR CI, resolve evidenced threads and merge PR 35 only after all rules pass; privacy and remote remain blocked
   merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/30
   pull_request: null
   git_state:
@@ -83,26 +122,49 @@ session_handoff:
       - c5b61e6 Merge pull request 26 from MustDemir/docs/service-role-remote-evidence
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
-    reason: PR 30 ist mit sechs gruenen GitHub-Actions-Jobs gemergt. Die oeffentliche README ist als englische technische Fallstudie mit deutscher Fassung, App-Screenshot und ausgelagertem Detailstatus neu strukturiert. Stack-, Runtime-, Formel- und Testangaben sind gegen Code und SSOT abgeglichen. Brand Fonts sind lokal gebuendelt und Runtime-Fetching ist deaktiviert. Migration 13, echter Monitorlauf und externe Alarmzustellung bleiben bewusst offen. Das nutzereigene untracked Verzeichnis .claude bleibt unangetastet.
+    reason: |
+      TODO-039 ist als Working-Tree-Aenderung umgesetzt: Gate-Schema v2, acht
+      migrierte Apple-Gates, sieben Horizon-Kontrollen, drei neue lokale Gates,
+      eine baseline-verglichene Quellenbeobachtung und statisch/manuell
+      verifizierte Feature-Deklarationen. Ein unabhängiger Control-Assurance-
+      Review hat die Frist-, Quellen- und Deklarations-Negativfälle geprüft.
+      TODO-038s lokaler Font-Teil ist nachgezogen. Es existiert noch kein
+      Commit oder Push. Qualifizierte Rechts-/Claim-Reviews und die echten
+      externen Release-Evidenzen bleiben bewusst offen.
   latest_validation:
-    executed_at: "2026-08-31T13:25:57Z"
-    validation_scope: Public README restructure, local font privacy hardening, local 30-gate development pipeline, PR 30 GitHub Actions and integrated 2026-08-20 evidence baseline
-    development_quality_gates: 30/30 PASS
+    executed_at: "2026-09-11T06:25:33Z"
+    validation_scope: Full 33-gate development pipeline with ticket schema, DoR/DoD, dependency and PR-binding controls; clean 14-migration database evidence from 2026-09-07 and historical integrated evidence remain retained below
+    development_quality_gates: 33/33 PASS
+    ticket_control_self_tests: 11 tests, 23 assertions PASS
+    pr_ticket_binding_self_tests: 8 tests, 15 assertions PASS
+    ticket_catalog: 5/5 schema-valid and workflow-consistent
+    ticket_pr_ci_integration: CONFIGURED_REAL_PR_RUN_PENDING
+    development_quality_gates_historical: 30/30 PASS on 2026-08-31
+    compliance_horizon_gates: 3/3 PASS in development profile
+    gate_definition_validation: 32 definitions, 11 v2 canonical, 5 v1 compatible, 16 legacy compatible PASS
+    gate_definition_self_tests: 13 assertions PASS
+    compliance_horizon_self_tests: 24 assertions PASS
+    compliance_source_observation_self_tests: 12 assertions PASS
+    capability_declaration_self_tests: 10 assertions PASS
+    capability_declarations: 16/16 feature flags PASS
+    compliance_source_observation_online: 4 unchanged captured markers, 2 detected technical deltas and 4 inconclusive markers; automatic approval false and manual review required
+    strict_source_review_binding: EXPECTED FAIL until six current source signals have signature-bound manual review records
+    apple_catalog_development: 19 requirements, 8 Apple gates, 49 sources PASS
     flutter_tests: 122/122 PASS
     flutter_line_coverage: 84.33 percent
     database_migration_replay: PASS
-    database_validation_executed_at: "2026-08-20T07:34:02Z"
-    database_pgtap: 250/250 PASS
+    database_validation_executed_at: "2026-09-07T08:37:00Z"
+    database_pgtap: 277/277 PASS
     database_lint: PASS
     supply_chain_inventory: 61 Dart packages, 2 iOS plugins, 20 Action references, 0 vulnerabilities
-    local_migrations: 13/13 REPLAYED
+    local_migrations: 14/14 REPLAYED
     retention_cleanup_local: PASS
     retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     retention_migration_remote_dry_run: UP_TO_DATE
     remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
-    remote_migrations: 12/12 RECONCILED
+    remote_migrations: 13/13 RECONCILED
     remote_schema_diff: EMPTY
     remote_database_lint: PASS
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
@@ -116,9 +178,15 @@ session_handoff:
     retention_observability_local: PASS
     retention_observability_verifier_local_dry_run: PASS_WITH_ROLLBACK
     retention_operations_gate_selftests: 9 tests, 22 assertions PASS
-    retention_observability_remote_migration: NOT_APPLIED
-    retention_monitor_scheduled_runs_observed: 0
+    retention_observability_remote_migration: APPLIED_AND_VERIFIED
+    retention_observability_remote_verifier: PASS_WITH_ROLLBACK
+    retention_monitor_scheduled_runs_observed: 4/4 SUCCEEDED
     retention_notification_drill: NOT_RUN
+    public_read_abuse_local_migration: REPLAYED
+    public_read_abuse_pgtap: 27/27 PASS
+    public_read_abuse_remote_verifier: PASS_WITH_ROLLBACK_ONLY
+    public_read_abuse_remote_migration: NOT_APPLIED
+    public_read_abuse_privacy_review: PENDING
     retention_pr_github_actions_run: 33203141284 six_of_six PASS
     retention_pr_merged: true at 98d2da3
     retention_post_merge_github_actions_run: 32173898928 six_of_six PASS
@@ -132,14 +200,12 @@ session_handoff:
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
     privacy_release_candidate_profile: EXPECTED FAIL pending controller legal App-Privacy and DPIA evidence
-    backend_boundary_gate_self_tests: 18/18 PASS
+    backend_boundary_gate_self_tests: 20/20 PASS
     writer_contract_tests: 12/12 PASS
     edge_wrapper_integration: PASS with automated invalid-secret and cross-actor 401, schema 400, plus controlled 201 publication, idempotent replay and bounded public read
     backend_development_profile: PASS
     backend_remote_profile: EXPECTED FAIL with 8 activation blockers
     backend_release_candidate_profile: EXPECTED FAIL pending release-specific security review
-    gate_definition_validation: PASS for 29 definitions, 5 canonical and 24 compatible legacy
-    gate_definition_self_tests: 11 assertions PASS
     provider_governance_self_tests: 26 assertions PASS
     provider_development_profile: 3/3 PASS
     provider_online_source_markers: 3/3 PASS
@@ -147,6 +213,14 @@ session_handoff:
     ios_simulator_compile_and_privacy_audit: PASS with 3 manifests and 0 violations
     release_candidate_quality_gates: EXPECTED FAIL at G-MASVS, G-CMP-APPLE, G-DATA-LICENSE, G-CLAIM-GOVERNANCE, G-PRIVACY-BOUNDARY and G-BACKEND-BOUNDARY
   completed:
+    - TKT-040-01 bis Review umgesetzt: Ticket-Schema, DoR/DoD-, Abhaengigkeits-, Gate- und PR-Bindungskontrolle mit 19 Selbsttests, 38 Assertions und 33/33 Development-Gates validiert
+    - ADR 0041 und repo-nativen Ticket-Workflow in das bestehende Backlog-, DoR-, DoD- und Gate-Modell integriert; vier ausfuehrbare TODO-037-Tickets mit Schema- und Negativtestkontrolle angelegt
+    - Migration 14 fuer fail-closed Public-Read-Abuse-Schutz nach lokalem Backup sauber replayed; 27/27 spezifische Assertions, 277/277 pgTAP gesamt, DB-Lint und 33/33 Development-Gates bestanden
+    - TODO-039 umgesetzt: kanonisches scanfair-gate-v2, acht migrierte Apple-Gates, regulatorischer Horizon und drei neue lokale Gates
+    - Offizielle Apple-, EU- und deutsche Quellen mit Wirksamkeitsdaten, Feature-Triggern, Nichtanwendbarkeitsgründen und Reviewfristen als SSOT verknuepft
+    - Woechentliche GitHub-Quellenbeobachtung mit manuell zu bewertendem JSON-Artefakt integriert; sie kann nie automatisch Rechts-, Claim- oder Releaseevidenz freigeben
+    - Control-Assurance-Review schliesst Frist-Erzwingung, technische Quellen-Deltas, signaturgebundene strenge Profile und Feature-Deklarationsverifikation mit Negativtests
+    - Lokale Inter- und Instrument-Serif-Fonts aus TODO-038 gegen Runtime-Fetching abgesichert
     - Oeffentliche README von interner Projektdokumentation getrennt; englische Hauptfassung und deutsche Zielleserfassung erstellt
     - Produktnutzen, Differenzierung, Scoring-Grenzen, Methoden, Tech Stack, Quality Evidence und Release-Grenze adressatengerecht verdichtet
     - Detaillierten menschenlesbaren Projektstatus nach docs/project/STATUS.md ausgelagert und mit progress.yaml sowie backlog.yaml verknuepft
@@ -255,15 +329,19 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
+    - Aktuellen Audit vom 22.09.2026 und Ticket-Index lesen; alte Plaene unten sind historischer Kontext
+    - TKT-040-01 Review-Nacharbeit ueber PR und Post-Merge-CI abschliessen
+    - TKT-037-05 API-Hook reparieren und echten HTTP-Pfad in isolierter oder gesicherter lokaler DB pruefen
+    - TKT-038-01 Cache-Frischegrenzen reparieren, dann TKT-037-01 Privacy-Unterlagen fertigstellen
     - Dokumentations- und SSOT-Update validieren, reviewen und mergen
     - Feature-Branch feature/compliance-horizon-2026 vom aktualisierten main erstellen
     - Offizielle Quellenabdeckung und Wirksamkeitsdaten in einem versionierten Coverage-Audit festhalten
     - Kanonisches Gate-Schema erweitern und acht Apple-Legacy-Gates migrieren
     - G-COMPLIANCE-HORIZON, G-REGULATORY-APPLICABILITY und G-UWG-COMPARISON-TRANSPARENCY implementieren
-    - Migration 20260820000100 kontrolliert auf scanfair-dev anwenden und Remote-Verifier ausfuehren
-    - Ersten echten geplanten Retention-Health-Monitorlauf beobachten
     - Least-Privilege-Alarmkanal und Failure-/Recovery-Drill als Betriebsevidenz umsetzen
-    - Public Read-Rate-Limit und Abuse-Negativtests als getrennten TODO-037-Restpunkt umsetzen
+    - Privacy-Freigabe fuer das Public-Read-Rate-Limit einholen; danach
+      Migration 14 kontrolliert remote anwenden und den Linked-Verifier erneut
+      ausfuehren
     - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
   next_session_plan:
     planning_basis: |
@@ -322,7 +400,8 @@ session_handoff:
           - Sieben lokale Migrationen per Remote-Dry-Run reproduzierbar aufgeloest
           - Gate-Metadaten, DPA, Unterauftragsverarbeiter und Kostenkontrolle als vier Gates integriert
           - Development 30/30 und Provider-Online-Marker 3/3 bestanden
-          - Dreizehn Migrationen und 250/250 pgTAP-Tests lokal bestanden
+          - Vierzehn Migrationen und 277/277 pgTAP-Tests lokal bestanden;
+            davon 27/27 fuer den fail-closed Public-Read-Abuse-Schutz
           - Zwoelf Migrationen remote abgeglichen; Migration 13 bleibt deaktiviert
           - Pull Request 30 mit Retention-Observability in main gemergt
         remaining:
@@ -677,6 +756,17 @@ milestones:
       blockiert Remote-Aktivierung bis zu typisierter, SHA-256-gebundener
       Umgebungs-, Security- und Betriebsevidenz.
 
+  - id: M27
+    title: Compliance-Horizon und kanonische Apple-Gates v2
+    date: 2026-09-04
+    phase: phase-1-mvp
+    notes: |
+      ADR 0039 ergänzt einen versions- und capability-gesteuerten
+      Regulierungs-Horizon. Alle acht Apple-Gates nutzen scanfair-gate-v2;
+      drei neue lokale Gates prüfen Quellen-, Anwendbarkeits- und
+      Nachhaltigkeitsvergleichsgrenzen. Die wöchentliche GitHub-Beobachtung
+      erzeugt nur manuellen Review-Input und keine automatische Freigabe.
+
   - id: M08
     title: Apple Developer Program gekauft — TODO-003 done
     date: 2026-05-19
@@ -811,11 +901,53 @@ decisions_made:
   - adr: 0032
     title: Read-only Mobile-Client und vertrauenswuerdiger Server-Writer
     date: 2026-08-11
+  - adr: 0033
+    title: Cache-Frische vom Upstream-Refresh-Budget entkoppeln
+    date: 2026-08-13
+  - adr: 0034
+    title: Keine fabrizierten Saeulenwerte, kein Full-Score aus Teilevidenz
+    date: 2026-08-13
+  - adr: 0035
+    title: Forward-only-Haertung des angewandten Remote-Development-Schemas
+    date: 2026-08-17
+  - adr: 0036
+    title: RPC-only Least Privilege fuer die Hosted-Supabase-Service-Role
+    date: 2026-08-18
+  - adr: 0037
+    title: Begrenztes Retention-Cleanup mit dauerhaften Writer-Watermarks
+    date: 2026-08-18
+  - adr: 0038
+    title: Private Retention-Health-Ueberwachung mit fail-closed Alert-Delivery
+    date: 2026-08-20
+  - adr: 0039
+    title: Compliance-Horizon und kanonisches Gate-Schema v2
+    date: 2026-09-04
 
 # =============================================================================
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W36
+    summary: |
+      TODO-039 operationalisiert die regulatorische Horizon-Pruefung ohne
+      automatisierte Rechtsentscheidung. Die Apple-Gates sind auf das
+      kanonische v2-Kriterienschema migriert; Quellen, Wirksamkeitsdaten,
+      Feature-Trigger und Evidenzgrenzen sind als SSOT verknuepft.
+    done:
+      - scanfair-gate-v2 mit Pflichtklasse, Pipelinewirkung, Anwendbarkeit, Datum, Evidenzstufe, Implementierungsstatus und Negativfall eingefuehrt
+      - Acht Apple-Gates und drei neue lokale Horizon-Gates validiert
+      - Offizielle Apple-, EU- und deutsche Quellen in den Horizon und das Quellenregister aufgenommen
+      - Nicht-flaky GitHub-Quellenbeobachtung mit manuellem Change-Assessment-Artefakt eingerichtet
+      - Lokale Brand-Fonts aus TODO-038 mit deaktiviertem Runtime-Fetching dokumentiert
+    blockers:
+      - Öffentliche Nachhaltigkeitsvergleiche benötigen vor ihrer Wirksamkeit ein qualifiziertes Rechtsreview
+      - Alle später aktivierten KI-, E-Commerce-, UGC-, EUDR- oder Medizinprodukt-Features lösen eigene erneute Bewertungen aus
+      - Release-Evidenz für Privacy, Store-Metadaten, Claims und Submission bleibt offen
+    next_week:
+      - Ersten wöchentlichen Quellen-Snapshot manuell prüfen und relevante Deltas als Requirement, ADR oder No-Impact erfassen
+      - Qualifiziertes Rechtsreview für den öffentlichen Nachhaltigkeitsvergleich vor dessen Wirksamkeit einplanen
+      - Offene Remote-Retention- und Alert-Delivery-Evidenz fortführen
+
   - week: 2026-W34
     summary: |
       Audit-Haertung ueber PR 23 integriert und den tatsaechlichen Zustand des

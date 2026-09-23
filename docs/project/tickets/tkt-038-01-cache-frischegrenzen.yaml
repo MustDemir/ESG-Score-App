@@ -1,0 +1,90 @@
+schema_version: scanfair-ticket-v1
+id: TKT-038-01
+title: Cache-Frischemetadaten und harte Ablaufgrenze im Fallback erzwingen
+summary: Review-Befunde AR-07 und AR-08 mit deterministischen Fake-Uhr-Tests schliessen.
+parent_todo: TODO-038
+ticket_type: feature_code
+dod_task_types: [feature_code]
+priority: P2
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-22
+updated: 2026-09-22
+scope:
+  in:
+    - stale_after als Pflichtfeld samt zeitlicher Konsistenz pruefen
+    - expires_at bis zum Repository mitfuehren und unmittelbar vor staleServed erneut pruefen
+  out:
+    - Keine Remote-Aktivierung und keine Methodikaenderung
+    - Keine Erweiterung der vereinbarten Speicherfristen
+dependencies: []
+links:
+  risks: [RISK-015]
+  decisions: ["0041"]
+  requirements: []
+definition_of_ready:
+  status: ready
+  criteria:
+    - id: DOR-01
+      criterion: Beide Fehlerpfade und Auswirkungen sind dokumentiert.
+      status: satisfied
+      evidence: [docs/project/audits/2026-09-22-agent-control-review.md]
+    - id: DOR-02
+      criterion: Service und Repository sind als Aenderungsumfang bestimmt.
+      status: satisfied
+      evidence: [esg_app/lib/services/supabase_product_cache_service.dart, esg_app/lib/services/product_repository.dart]
+    - id: DOR-03
+      criterion: Bestehende Test-Schnittstellen erlauben eine injizierte Uhr ohne echte Wartezeiten.
+      status: satisfied
+      evidence: [esg_app/test/services/product_repository_test.dart]
+    - id: DOR-04
+      criterion: Owner, Scope und konservativer Fallback sind festgelegt.
+      status: satisfied
+      evidence: [docs/project/tickets/tkt-038-01-cache-frischegrenzen.yaml]
+acceptance_criteria:
+  - id: AC-01
+    criterion: Fehlendes, ungueltiges oder widerspruechliches stale_after erzeugt invalidResponse und wird nie als frisch gewertet.
+    status: pending
+    verification: [Service-Negativtests fuer jede Metadatenvariante]
+    evidence_required: [Flutter-Testprotokoll]
+  - id: AC-02
+    criterion: Bei Ablauf waehrend des OFF-Fallbacks wird kein Cacheprodukt mehr ausgeliefert; der urspruengliche Lookupfehler bleibt erhalten.
+    status: pending
+    verification: [Fake-Uhr-Test mit kontrolliertem Fallback-Future inklusive exakter Ablaufgrenze]
+    evidence_required: [Deterministischer Regressionstest]
+  - id: AC-03
+    criterion: Gueltige frische und noch nicht abgelaufene stale Produkte sowie Circuit Breaker verhalten sich unveraendert.
+    status: pending
+    verification: [Bestehende Service- und Repositorytests ausfuehren]
+    evidence_required: [Gruene Flutter-Suite]
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Die zwei Fehler sind vor der Reparatur reproduziert und danach durch Regressionstests ausgeschlossen.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      criterion: Format, Analyse und Flutter-Tests bestehen.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Review bestaetigt Frischegrenzen und unveraenderte Daten-/Aktivierungsgrenzen.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: PR- und Post-Merge-CI sowie Ticket- und Fortschrittsevidenz sind geschlossen.
+      status: pending
+      evidence: []
+gates:
+  required: [G-PROJECT-CONTROL, G-FLT-FORMAT, G-FLT-ANALYZE, G-FLT-TEST, G-DOC-TRACE, G-DOC-YAML]
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - cd esg_app && flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
+    - bash scripts/quality/run_quality_gates.sh
+evidence: [docs/project/audits/2026-09-22-agent-control-review.md]
+rollback:
+  strategy: Geprueften Client-Stand wiederherstellen; Supabase-Konfiguration bleibt deaktiviert.
+  verification: OFF-Fallback und Datenfrischetests erneut ausfuehren.
+activation_boundary: Cache-Reparatur erteilt keine Backend- oder Privacy-Freigabe.

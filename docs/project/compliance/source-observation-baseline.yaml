@@ -1,0 +1,22 @@
+schema_version: "1.0"
+captured_at: "2026-09-04T15:19:17Z"
+owner: Compliance and release owner
+purpose: |
+  Technischer Ausgangspunkt für die Änderungserkennung offizieller Quellen.
+  Die Signaturen erfassen URL, deklarierte Version, HTTP-Marker und einen
+  begrenzten Inhaltsmarker, sofern der Server ihn bereitstellt. Sie sind weder
+  Rechts-, Claim- noch Release-Freigabe. Nicht erfassbare Inhalte bleiben als
+  inconclusive sichtbar und benötigen die reguläre menschliche Bewertung.
+automatic_approval: prohibited
+
+sources:
+  - {id: APPLE-ARG, state_signature: 523b5ff656ae51f2ab1dd1da2d9a0e61671a8d197b225b1b3d2c95641f9ea4f9, content_marker_status: unavailable}
+  - {id: DE-BFSG, state_signature: 62912ebab780997a20bb4b93183fc789165cb6bc0bd34bdcd48d948795d64336, content_marker_status: captured}
+  - {id: DE-UWG-EMP-CO, state_signature: d376e9a0d3e60703886c4e974ededb9ae6b85da1bdaf26fcb68d234e3cad76e8, content_marker_status: captured}
+  - {id: EC-AIA-ART50-FAQ, state_signature: 076e08f3e7db1e9f9bddff9e5eb0eb837a9d454617a9393d63f7757892fcd5d9, content_marker_status: captured}
+  - {id: EU-AIA-2024-1689, state_signature: 764045ca3c55a695872a78a8e95aac8564c4267190b360ff2739b8fd59d9c35e, content_marker_status: empty_response}
+  - {id: EU-EAA-2019-882, state_signature: 2e315173c3c1e37957faf1e4c7cf3ebc023d7a45df04af60c140f060a62db4fa, content_marker_status: empty_response}
+  - {id: EU-ECGT-2024-825, state_signature: e343e6ab273b683893f32b03bb87b69c20fd293456fd06e1414f4edd96077b3f, content_marker_status: empty_response}
+  - {id: EU-EUDR-2023-1115, state_signature: d9dd1e1d69016c97c464293971feb94bcce57f1d0f6eec8317293e0ea6493af3, content_marker_status: captured}
+  - {id: EU-MDR-2017-745, state_signature: 767813aa13ee3e4f498a0b6a0aaab75f85a2fd8dfb9c9a4a54a4bdcfdb45d328, content_marker_status: empty_response}
+  - {id: MDCG-2019-11-REV1, state_signature: f5f5681e55e5b1760052f60659d9303c631afde6a562113f628f12a987ddadb9, content_marker_status: captured}

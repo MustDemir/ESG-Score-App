@@ -1,26 +1,54 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
 id: G-AS-SUPPORT-IDENTITY
 name: Developer identity, support and legal notice
+title: Developer identity, reachable support and legal notice
+status: active
 dimension: regulatorisch
 lifecycle_phase: deployment
 source_type: mixed
-trigger: Release candidate and every support, contact or legal-identity change
+trigger: [support_change, legal_identity_change, release_candidate, submission]
 automation: HYBRID
+profile_scope: [development, release_candidate, submission]
 policy_checks: [policy_support_identity]
 criteria:
-  - Public HTTPS support URL and reachable support email are current
-  - Users can reach support from inside the app
-  - Provider identity and German legal notice have been reviewed
-evidence_required:
-  - support URL response and App Store Connect metadata
-  - in-app contact screenshot
-  - reviewed legal notice
-decision: manual_review
-enforcement: {development: warn_release_evidence, release_candidate: block, submission: block}
+  - id: ASSI-001
+    statement: A public HTTPS support URL and a reachable support email are declared for the submitted app.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASSI-N01, statement: A release candidate with no HTTPS support URL fails.}
+  - id: ASSI-002
+    statement: Users can reach support from inside the app and the developer identity is legally reviewed for the target market.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASSI-N02, statement: Missing in-app support or identity evidence blocks submission.}
+evidence_required: [support URL response, App Store Connect metadata, in-app contact screenshot, reviewed legal notice]
+artifacts:
+  - {id: ASSI-A01, type: repository_input, path: docs/project/compliance/compliance-manifest.json, required_for: [development, release_candidate, submission]}
+  - {id: ASSI-A02, type: repository_input, path: docs/privacy.md, required_for: [development, release_candidate, submission]}
+  - {id: ASSI-A03, type: generated_evidence, path: .quality/compliance-gate-summary.md, required_for: [development, release_candidate, submission]}
+  - {id: ASSI-A04, type: manual_evidence, path: docs/project/compliance/evidence/support-identity-review.yaml, required_for: [release_candidate, submission]}
+decision:
+  pass: Objective support metadata is valid and strict profiles contain reviewed support and identity evidence.
+  fail: Contact information is missing, unreachable or legally unreviewed when due.
+  manual_review: Developer and release owner review jurisdiction-specific legal identity duties.
+enforcement: {development: warn, release_candidate: block, submission: block}
 owner: Developer and release owner
 audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-SUPPORT-IDENTITY"}
-waiver: {allowed: false, requires: null}
-links:
-  requirements: [R-AS-08]
-  apple_guideline_refs: ["1.5"]
+audit: {validator: scripts/compliance/validate_compliance_catalog.rb, tests: docs/project/policies/apple/policy_gate_groups_test.rego, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-gate-summary.md}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-08], improvements: [IMP-COMP-003], gaps: [GAP-004], risks: [RISK-005], related_adrs: [0021, 0031]}
 sources: [APPLE-ARG, APPLE-ASC-METADATA, DE-DDG]
-notes: URL reachability can be automated; identity and legal sufficiency require human review.
+notes: URL reachability is objective; identity and legal sufficiency require a human review.

@@ -343,11 +343,14 @@ risks:
     description: |
       Technische Retention und kontrollierte Loeschbarkeit des Append-only
       Writer-Audits sind lokal und remote kontrolliert getestet. Zwei echte
-      Cleanup-Laeufe waren erfolgreich; die lokale Health-/Alert-Mechanik ist
-      noch nicht remote angewandt und besitzt noch keinen externen Empfaenger.
-      Die barcode-begrenzten Read-RPCs
-      verhindern Listenabfragen, haben vor einer Runtime-Aktivierung aber noch
-      keinen Edge-basierten Abuse-Schutz.
+      Cleanup-Laeufe sowie vier Health-Monitorlaeufe waren erfolgreich; die
+      private Health-/Alert-Mechanik ist remote angewandt, besitzt aber noch
+      keinen externen Empfaenger.
+      Die barcode-begrenzten Read-RPCs verhindern Listenabfragen. Der
+      PostgREST-Pre-Request-Schutz besitzt lokale SQL-Tests; der Agent-Review
+      vom 22.09.2026 fand jedoch falsche Hook-Grants, einen Pfadvergleich ohne
+      Slash und schreibenden Zaehler in READ ONLY. Er ist vor Reparatur und
+      echtem HTTP-Nachweis nicht aktivierungsreif und remote nicht angewandt.
     mitigation: |
       Indizes, TTL-Cap, private RLS, Trigger-Haertung und direkte Listen-SELECTs
       sind technisch geschlossen. ADR 0035 schuetzt die angewandte
@@ -362,13 +365,48 @@ risks:
       Zwei echte geplante Laeufe vom 19. und 20. August waren erfolgreich und
       ohne Backlog. ADR 0038, Migration 13, 37 pgTAP-Tests und G-RETENTION-OPS
       implementieren lokal private Health-Historie, Alert-Deduplizierung und
-      Recovery. Vor Runtime-Aktivierung folgen Remote-Anwendung, echter
-      Monitorlauf, externe Failure-/Recovery-Alarmierung sowie ein Read-Rate-
-      Limit mit Negativtests. Details: Audits 2026-08-13 bis 2026-08-20.
+      Recovery; Migration 13, vier Monitorlaeufe und der rollback-saubere
+      Lifecycle-Verifier sind remote belegt. Vor Runtime-Aktivierung folgen
+      externe Failure-/Recovery-Alarmierung. Migration 14 implementiert das
+      fail-closed PostgREST-Read-Limit; lokaler Replay, 27/27 spezifische
+      pgTAP-Assertions, insgesamt 277/277 Datenbanktests und DB-Lint bestehen.
+      Der historische rollback-only Linked-Verifier besteht ebenfalls, bildet
+      aber die realen HTTP-Rollen und Transaktionen nicht ab. TKT-037-05
+      schliesst diese Luecke; TKT-038-01 korrigiert Cache-Frischegrenzen. Privacy-Freigabe,
+      kontrollierte Remote-Anwendung und anschließende Linked-Verifikation
+      stehen noch aus. Details: Audits 2026-08-13 bis 2026-09-07 und ADR 0040.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
-    related_decisions: [0032, 0035, 0036, 0037, 0038]
+    related_decisions: [0032, 0035, 0036, 0037, 0038, 0040]
     status: open
     owner: Engineering
     created: 2026-08-13
-    updated: 2026-08-20
+    updated: 2026-09-07
+
+  - id: RISK-016
+    title: Ausfuehrbare Arbeit verliert Scope, Abhaengigkeiten oder Abschlussnachweise
+    likelihood: M
+    impact: M
+    score: 4
+    description: |
+      Ein Backlog-TODO kann mehrere technische, rechtliche und operative
+      Aktionen enthalten. Ohne einzelne kontrollierte Tickets koennen Arbeiten
+      zu frueh beginnen, Teilaufgaben als fertig gelten oder Gate- und
+      Reviewnachweise zwischen Sessions verloren gehen.
+    mitigation: |
+      ADR 0041 ergaenzt repo-native Child-Tickets mit DoR,
+      Akzeptanzkriterien, DoD, Evidenz, Abhaengigkeiten und Gate-Zuordnung.
+      G-PROJECT-CONTROL prueft Schema und Zustandslogik lokal und in CI.
+      GAP-015 bleibt bis zum ersten vollstaendig geschlossenen realen Ticket
+      in_progress.
+    related_todos:
+      - TODO-037
+    related_risks: []
+    related_decisions:
+      - "0009"
+      - "0029"
+      - "0041"
+    status: mitigated
+    owner: Mustafa Demir
+    created: 2026-09-11
+    updated: 2026-09-11

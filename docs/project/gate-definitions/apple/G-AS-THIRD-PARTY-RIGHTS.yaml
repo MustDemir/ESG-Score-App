@@ -1,26 +1,65 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
 id: G-AS-THIRD-PARTY-RIGHTS
 name: Third-party data, SDK and license rights
+title: Third-party SDK, data and license rights
+status: active
 dimension: regulatorisch
 lifecycle_phase: pre-deployment
 source_type: mixed
-trigger: Every dependency, API, dataset or attribution change
+trigger: [dependency_change, api_change, dataset_change, attribution_change, release_candidate, submission]
 automation: HYBRID
+profile_scope: [development, release_candidate, submission]
 policy_checks: [policy_third_party_rights]
 criteria:
-  - Rights to every third-party service, SDK, dataset and asset are documented
-  - Open Food Facts attribution and applicable share-alike obligations are fulfilled
-  - App Store reviewer evidence can demonstrate authorization
-evidence_required:
-  - docs/licenses.md
-  - dependency and data-source inventory
-  - in-app attribution evidence and rights review
-decision: manual_review
-enforcement: {development: block_missing_license_inventory, release_candidate: block, submission: block}
+  - id: ASTR-001
+    statement: Every third-party SDK, dataset and bundled asset has a versioned license or rights inventory.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: ASTR-N01, statement: An unknown dependency or source license fails the inventory check.}
+  - id: ASTR-002
+    statement: Open Food Facts attribution and applicable database, content and image obligations are retained and visible where required.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: mixed
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASTR-N02, statement: A missing attribution or unresolved share-alike boundary blocks release.}
+  - id: ASTR-003
+    statement: App Review evidence demonstrates authorization for the actual submitted dependency and data set.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-06-08
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: ASTR-N03, statement: Missing qualified rights review blocks submission.}
+evidence_required: [docs/licenses.md, dependency and data-source inventory, in-app attribution evidence, rights review]
+artifacts:
+  - {id: ASTR-A01, type: repository_input, path: docs/licenses.md, required_for: [development, release_candidate, submission]}
+  - {id: ASTR-A02, type: repository_input, path: docs/project/data/license-composition-policy.yaml, required_for: [development, release_candidate, submission]}
+  - {id: ASTR-A03, type: generated_evidence, path: .quality/compliance-gate-summary.md, required_for: [development, release_candidate, submission]}
+  - {id: ASTR-A04, type: manual_evidence, path: docs/project/compliance/evidence/third-party-rights-review.yaml, required_for: [release_candidate, submission]}
+decision:
+  pass: Versioned inventories pass and strict profiles contain qualified rights evidence for the submitted scope.
+  fail: A right, attribution, license boundary or applicable human review is missing.
+  manual_review: Dependency and release owner validate actual authorization and public attribution.
+enforcement: {development: block, release_candidate: block, submission: block}
 owner: Dependency and release owner
 audit_trail: {enabled: true, evidence_store_ref: "evidence://apple/G-AS-THIRD-PARTY-RIGHTS"}
-waiver: {allowed: false, requires: null}
-links:
-  requirements: [R-AS-06, R-AS-16]
-  apple_guideline_refs: ["5.2", "5.2.1", "5.2.2"]
-sources: [APPLE-ARG, OFF-LICENSE]
-notes: OFF product data is not treated as personal data merely because it is public.
+audit: {validator: scripts/compliance/validate_compliance_catalog.rb, tests: docs/project/policies/apple/policy_gate_groups_test.rego, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-gate-summary.md}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-06, R-AS-16], improvements: [IMP-COMP-005], gaps: [GAP-003], risks: [RISK-006], related_adrs: [0030]}
+sources: [APPLE-ARG, OFF-LICENSE, ODC-ODBL, CC-BY-SA-3]
+notes: A public source is not automatically personal data; licensing and privacy are controlled in separate gates.

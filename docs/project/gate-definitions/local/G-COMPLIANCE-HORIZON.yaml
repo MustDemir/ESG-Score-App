@@ -1,0 +1,62 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
+id: G-COMPLIANCE-HORIZON
+title: Official-source horizon, effective dates and manual change assessment
+status: active
+dimension: compliance-governance
+lifecycle_phase: definition-and-pull-request
+automation: HYBRID
+owner: Compliance and release owner
+profile_scope: [development, release_candidate, submission]
+trigger: [source_register_change, regulatory_horizon_change, scheduled_source_observation, release_candidate, submission]
+criteria:
+  - id: HZN-GATE-001
+    statement: Each scoped source has an owner, official source reference, effective date, next review date and explicit applicability state.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-09-04
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: HZN-GATE-N01, statement: An unknown source, invalid date or absent applicability state fails.}
+  - id: HZN-GATE-002
+    statement: Source observations can request review but cannot automatically approve legal, scientific or release evidence.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: always
+    effective_date: 2026-09-04
+    verification: AUTO
+    evidence_level: generated
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: HZN-GATE-N02, statement: A control that permits automatic approval fails.}
+  - id: HZN-GATE-003
+    statement: A qualified owner manually assesses changed sources and records the retained evidence reference.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-09-04
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: HZN-GATE-N03, statement: A changed source with no review record blocks strict profiles.}
+artifacts:
+  - {id: HZN-A01, type: repository_input, path: docs/project/compliance/regulatory-horizon.yaml, required_for: [development, release_candidate, submission]}
+  - {id: HZN-A02, type: repository_input, path: docs/project/compliance/source-register.yaml, required_for: [development, release_candidate, submission]}
+  - {id: HZN-A03, type: generated_evidence, path: .quality/compliance-horizon/G-COMPLIANCE-HORIZON.json, required_for: [development, release_candidate, submission]}
+  - {id: HZN-A04, type: repository_input, path: docs/project/compliance/source-observation-review-log.yaml, required_for: [release_candidate, submission]}
+  - {id: HZN-A05, type: generated_evidence, path: .quality/compliance-horizon/release-source-observation.json, required_for: [release_candidate, submission]}
+decision:
+  pass: Source and horizon metadata is current, traceable and explicitly prevents automatic approval.
+  fail: A required source, date, manual-review boundary or applicability state is missing or contradictory.
+  manual_review: Compliance and release owner assesses legal or policy changes before changing a release decision.
+enforcement: {development: block, release_candidate: block, submission: block}
+audit: {validator: scripts/quality/validate_compliance_horizon.rb, tests: scripts/quality/test_compliance_horizon_gate.rb, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-horizon/G-COMPLIANCE-HORIZON.json}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [], improvements: [IMP-PROC-003], gaps: [GAP-011], risks: [RISK-010], related_adrs: [0013, 0021, 0039]}
+sources: [APPLE-ARG, EU-ECGT-2024-825, DE-BFSG, EU-AIA-2024-1689, EU-EUDR-2023-1115, EU-MDR-2017-745]
+notes: |
+  Development remains non-flaky and non-authoritative. Strict profiles create a fresh observation and block until every technical source signal is linked to a later manual review record for the exact signature.

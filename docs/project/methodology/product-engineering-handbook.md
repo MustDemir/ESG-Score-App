@@ -206,7 +206,7 @@ und versionierte Datenverträge.
 | Calculator-Entscheidungsmatrix | 39/39 Fälle | falsche Precedence, Grenzwerte und Imputation |
 | Rego-Policy-Tests | automatisiert grün | fehlerhafte Compliance-Entscheidungen |
 | Validator-Selbsttests | pro kritischem Gate | Gate-Bypässe und falsche Positiventscheidungen |
-| PostgreSQL/pgTAP | 250/250 | RLS-, Constraint-, Writer-, Retention- und Relationship-Fehler |
+| PostgreSQL/pgTAP | 305/305 | RLS-, Constraint-, Writer-, Retention-, Abuse-, Frischegrenz- und Relationship-Fehler |
 | Static/Format | `analyze --fatal-infos`, `dart format` | statische Fehler und Formatdrift |
 | iOS Compile/Privacy Audit | eigener macOS-CI-Job | native Plugin-, Build- und Manifest-Fehler |
 | Physisches iPhone | Scanner, Permissions, A11y und Start geprüft | reale Lifecycle- und Bedienungsfehler |

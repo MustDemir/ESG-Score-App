@@ -1,0 +1,129 @@
+schema_version: scanfair-ticket-v1
+id: TKT-037-04
+title: Externen Retention-Alarmkanal und Zustelldrills umsetzen
+summary: |
+  Least-Privilege-Zustellung fuer Retention-Fehler und Recovery einrichten und
+  Fehler-, Erholungs- sowie Zustellfehlerpfad real nachweisen.
+parent_todo: TODO-037
+ticket_type: operations_readiness
+dod_task_types:
+  - operations_readiness
+  - provider_governance
+priority: P1
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-11
+updated: 2026-09-11
+scope:
+  in:
+    - Alarmziel, verantwortlichen Empfaenger und Reaktionsweg festlegen
+    - Least-Privilege-Delivery mit Secret-, Kosten- und Providergrenze umsetzen
+    - Failure-, Recovery- und Delivery-Failure-Drill real ausfuehren
+  out:
+    - Keine breite oder dauerhafte Supabase-Management-Berechtigung
+    - Keine sensiblen Datensaetze oder vollstaendigen Payloads in Alarmen
+    - Keine Produktionsaktivierung
+dependencies: []
+links:
+  risks:
+    - RISK-009
+    - RISK-015
+  decisions:
+    - "0038"
+    - "0041"
+  requirements: []
+definition_of_ready:
+  status: not_ready
+  criteria:
+    - id: DOR-01
+      criterion: Namentlicher Delivery-Owner und primaerer Empfaenger sind festgelegt.
+      status: pending
+      evidence: []
+    - id: DOR-02
+      criterion: Zielkanal und Eskalationsweg sind entschieden.
+      status: pending
+      evidence: []
+    - id: DOR-03
+      criterion: Provider-, Kosten-, Unterauftragsverarbeiter- und Secret-Grenzen sind bewertet.
+      status: pending
+      evidence: []
+    - id: DOR-04
+      criterion: Health-Historie, Alert-Outbox und Remote-Monitor sind verifiziert.
+      status: satisfied
+      evidence:
+        - docs/project/audits/2026-09-04-retention-observability-remote-verification.md
+        - docs/project/security/retention-observability-contract.yaml
+acceptance_criteria:
+  - id: AC-01
+    criterion: Alarmziel, Owner, Schwellwert, Reaktionszeit und Eskalation sind versioniert.
+    status: pending
+    verification:
+      - Betriebsvertrag und Runbook pruefen
+    evidence_required:
+      - Freigegebener Delivery- und Reaktionsvertrag
+  - id: AC-02
+    criterion: Zustellidentitaet und Secret sind umgebungsgebunden, minimal berechtigt und rotierbar.
+    status: pending
+    verification:
+      - Berechtigungs-, Ablage-, Rotations- und Negativtest ausfuehren
+    evidence_required:
+      - Redigierter Least-Privilege- und Rotationstest
+  - id: AC-03
+    criterion: Kontrollierter Retention-Fehler erzeugt genau eine empfangene Benachrichtigung.
+    status: pending
+    verification:
+      - Failure-Drill mit Zeitstempel und Empfangsbestaetigung ausfuehren
+    evidence_required:
+      - Empfangsnachweis ohne sensible Payload
+  - id: AC-04
+    criterion: Recovery erzeugt eine empfangene Entwarnung und schliesst den Alert-Lifecycle.
+    status: pending
+    verification:
+      - Recovery-Drill nach kontrolliertem Fehler ausfuehren
+    evidence_required:
+      - Recovery-Empfang und geschlossener Alert-Zustand
+  - id: AC-05
+    criterion: Nicht zustellbare Nachrichten werden erkannt, begrenzt wiederholt und eskaliert.
+    status: pending
+    verification:
+      - Delivery-Failure-Negativtest ausfuehren
+    evidence_required:
+      - Fehler-, Retry- und Eskalationsnachweis
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Failure-, Recovery- und Delivery-Failure-Drill sind real bestanden.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      criterion: Runbook, Owner, Reaktionszeit, Secret-Lebenszyklus und Kosten sind dokumentiert.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Alert-Payload ist datensparsam und Privacy-konsistent.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: G-RETENTION-OPS und betroffene Provider-Gates bestehen im Zielprofil.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-RETENTION-OPS
+    - G-PROVIDER-DPA
+    - G-PROVIDER-SUBPROCESSORS
+    - G-COST-CONTROL
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - ruby scripts/quality/validate_retention_operations.rb --profile remote_backend
+    - bash scripts/quality/run_provider_governance_gates.sh
+evidence: []
+rollback:
+  strategy: Delivery deaktivieren, ausstehende Outbox-Eintraege behalten und internen Monitor aktiv lassen.
+  verification: Deaktivierte Zustellung erzeugt keine unkontrollierten Requests; Outbox bleibt nachvollziehbar.
+activation_boundary: Remote-Backend-Profil bleibt bis zu allen drei realen Drills blockiert.

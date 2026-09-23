@@ -1,0 +1,124 @@
+schema_version: scanfair-ticket-v1
+id: TKT-037-02
+title: Migrationen 14 und 15 kontrolliert im Supabase-Development-Projekt anwenden
+summary: |
+  Die lokal validierte Migration nach Privacy-Freigabe und gruenem PR-Stand
+  reproduzierbar auf `scanfair-dev` anwenden, ohne App-Runtime zu aktivieren.
+parent_todo: TODO-037
+ticket_type: supabase_change
+dod_task_types:
+  - supabase_change
+  - provider_governance
+priority: P1
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-09-11
+updated: 2026-09-23
+scope:
+  in:
+    - Vorbedingungen und Remote-Iststand unmittelbar vor Anwendung pruefen
+    - Exakt Migrationen 20260906000100 und 20260923000100 anwenden und Migrationsstatus sichern
+    - Runtime, App-Zugriff und Personendatenverarbeitung deaktiviert lassen
+  out:
+    - Keine Produktionsumgebung
+    - Keine Aktivierung des Flutter-Remote-Backends
+    - Keine weiteren Schema- oder Provideraenderungen
+dependencies:
+  - TKT-037-01
+  - TKT-037-05
+links:
+  risks:
+    - RISK-005
+    - RISK-008
+    - RISK-015
+  decisions:
+    - "0035"
+    - "0040"
+    - "0041"
+  requirements: []
+definition_of_ready:
+  status: not_ready
+  criteria:
+    - id: DOR-01
+      criterion: TKT-037-01 ist mit positiver oder bedingt positiver Privacy-Entscheidung done.
+      status: pending
+      evidence: []
+    - id: DOR-02
+      criterion: Migrationen 14 und 15 sind in main integriert und der verpflichtende PR-Datenbankjob ist inklusive HTTP-Tests gruen.
+      status: pending
+      evidence: []
+    - id: DOR-03
+      criterion: Aktueller Replay, pgTAP, DB-Lint und reale HTTP-Regression aus TKT-037-05 sind gruen.
+      status: pending
+      evidence: []
+    - id: DOR-04
+      criterion: Zielprojekt, Region, Runtime-Deaktivierung und Forward-only-Verfahren sind belegt.
+      status: satisfied
+      evidence:
+        - docs/project/security/eu-supabase-environment-contract.yaml
+        - docs/project/decisions/0035-forward-only-remote-schema-hardening.yaml
+acceptance_criteria:
+  - id: AC-01
+    criterion: Remote-Dry-Run zeigt ausschliesslich die erwarteten Migrationen 14 und 15.
+    status: pending
+    verification:
+      - Linked migration dry-run unmittelbar vor Anwendung ausfuehren
+    evidence_required:
+      - Zeitgestempelter Dry-Run ohne unerwartete Deltas
+  - id: AC-02
+    criterion: Remote-Migrationshistorie enthaelt Migrationen 14 und 15 jeweils genau einmal.
+    status: pending
+    verification:
+      - Linked migration list vor und nach Anwendung vergleichen
+    evidence_required:
+      - Vorher-/Nachher-Nachweis der Migrationsliste
+  - id: AC-03
+    criterion: App-Zugriff, Writer-Runtime und Personendatenverarbeitung bleiben deaktiviert.
+    status: pending
+    verification:
+      - Umgebungsvertrag und Feature-Konfiguration nach Anwendung pruefen
+    evidence_required:
+      - Runtime- und Konfigurationsnachweis
+  - id: AC-04
+    criterion: Bei einem Fehler wird gestoppt, ohne historische Migrationen zu veraendern.
+    status: pending
+    verification:
+      - Forward-only-Recovery und Abbruchentscheidung dokumentieren
+    evidence_required:
+      - Ausfuehrungsprotokoll und gegebenenfalls neue Korrekturmigration
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Alle Remote-Akzeptanzkriterien sind mit Zeitstempel belegt.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      criterion: Migrationen 14 und 15 sind remote jeweils genau einmal angewandt.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Keine unerwartete Runtime- oder Datenaktivierung ist erfolgt.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: TKT-037-03 ist als naechster Verifikationsschritt freigegeben.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-BACKEND-BOUNDARY
+    - G-DATA-RLS
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+    - bash scripts/quality/run_data_database_gate.sh
+    - ruby scripts/quality/validate_backend_boundary.rb --profile development
+evidence: []
+rollback:
+  strategy: Keine historische Migration rueckschreiben; bei Defekt Runtime deaktiviert lassen und eine neue Forward-only-Korrekturmigration erstellen.
+  verification: Remote-Migrationshistorie, Runtime-Flags und Schema-Diff nach Abbruch pruefen.
+activation_boundary: Remote-Anwendung erst nach TKT-037-01 done und gruenem main-/CI-Stand.

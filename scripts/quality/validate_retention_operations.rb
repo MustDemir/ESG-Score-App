@@ -15,6 +15,7 @@ class RetentionOperationsValidator
   MIGRATION_PATH = "supabase/migrations/20260820000100_retention_observability.sql"
   TEST_PATH = "supabase/tests/database/retention_observability.test.sql"
   AUDIT_PATH = "docs/project/audits/2026-08-20-retention-scheduled-run-observation.md"
+  REMOTE_AUDIT_PATH = "docs/project/audits/2026-09-04-retention-observability-remote-verification.md"
   ADR_PATH = "docs/project/decisions/0038-retention-observability-and-alert-delivery.yaml"
   GATE_PATH = "docs/project/gate-definitions/local/G-RETENTION-OPS.yaml"
 
@@ -92,7 +93,7 @@ class RetentionOperationsValidator
 
     expect(@contract, "schema_version", "1.0", label)
     expect(@contract, "status", "accepted_for_local_implementation", label)
-    expect(@contract, "implementation_state", "local_observability_validated_remote_pending", label) if @profile == "development"
+    expect(@contract, "implementation_state", "remote_observability_verified_delivery_pending", label) if @profile == "development"
     expect(@contract, "runtime_state", "disabled", label)
     validate_observation
     validate_monitor
@@ -136,6 +137,14 @@ class RetentionOperationsValidator
     expect(monitor.fetch("tables", {}), "alert_outbox", "private.retention_alert_outbox", "#{label}.tables")
     expect(monitor.fetch("functions", {}), "snapshot", "private.retention_health_snapshot(timestamptz)", "#{label}.functions")
     expect(monitor.fetch("functions", {}), "recorder", "private.record_retention_health(timestamptz)", "#{label}.functions")
+    observation = monitor.fetch("remote_observation", {})
+    require_fields(observation, %w[observed_at_utc successful_scheduled_runs observed_run_dates_utc latest_run_status evidence], "#{label}.remote_observation")
+    unless observation["successful_scheduled_runs"].to_i >= 4 &&
+           Array(observation["observed_run_dates_utc"]).length >= 4 &&
+           observation["latest_run_status"] == "succeeded"
+      violations << "#{label}.remote_observation: four successful scheduled runs are required"
+    end
+    expect(observation, "evidence", REMOTE_AUDIT_PATH, "#{label}.remote_observation")
   end
 
   def validate_detection
@@ -177,16 +186,17 @@ class RetentionOperationsValidator
   def validate_evidence
     evidence = @contract.fetch("implementation_evidence", {})
     expected = {
-      "local_migrations" => "13/13 REPLAYED",
-      "database_tests" => "250/250 PASS",
+      "local_migrations" => "15/15 REPLAYED",
+      "database_tests" => "305/305 PASS",
       "database_lint" => "PASS",
       "remote_verifier_local_dry_run" => "PASS_WITH_ROLLBACK",
-      "remote_migration" => "NOT_APPLIED",
-      "monitor_scheduled_runs_observed" => 0,
+      "remote_migration" => "APPLIED_AND_VERIFIED",
+      "remote_verifier" => "PASS_WITH_ROLLBACK",
+      "monitor_scheduled_runs_observed" => 4,
       "notification_drill" => "NOT_RUN",
     }
     expected.each { |field, value| expect(evidence, field, value, "#{CONTRACT_PATH}: implementation_evidence") } if @profile == "development"
-    required_artifacts = [MIGRATION_PATH, TEST_PATH, ADR_PATH, AUDIT_PATH, "scripts/quality/validate_retention_operations.rb", "scripts/quality/test_retention_operations_gate.rb"]
+    required_artifacts = [MIGRATION_PATH, TEST_PATH, ADR_PATH, AUDIT_PATH, REMOTE_AUDIT_PATH, "scripts/quality/verify_remote_retention_observability.sql", "scripts/quality/validate_retention_operations.rb", "scripts/quality/test_retention_operations_gate.rb"]
     missing = required_artifacts - Array(evidence["artifacts"])
     violations << "#{CONTRACT_PATH}: implementation_evidence.artifacts missing #{missing.join(', ')}" unless missing.empty?
   end
@@ -205,6 +215,7 @@ class RetentionOperationsValidator
       ],
       TEST_PATH => ["plan(37)", "cleanup_latest_run_failed", "cleanup_backlog_persistent_seven_checks", "cron.unschedule"],
       AUDIT_PATH => ["2026-08-19 03:20:00.288", "2026-08-20 03:20:00.244", "zero"],
+      REMOTE_AUDIT_PATH => ["all 13 migrations reconciled", "four successful daily executions", "retained verifier rows", "not_configured_runtime_disabled"],
       ADR_PATH => ["not_configured_runtime_disabled", "SUPABASE-LOG-DRAINS", "G-RETENTION-OPS"],
       GATE_PATH => ["schema_profile: scanfair-gate-v1", "RETOPS-006", "waiver:", "allowed: false"],
     }
@@ -217,7 +228,7 @@ class RetentionOperationsValidator
   end
 
   def validate_strict_profile
-    expect(@contract, "implementation_state", "remote_observability_verified", CONTRACT_PATH)
+    expect(@contract, "implementation_state", "remote_observability_and_delivery_verified", CONTRACT_PATH)
     evidence = @contract.fetch("implementation_evidence", {})
     violations << "#{@profile}: retention observability migration must be remotely applied" unless evidence["remote_migration"] == "APPLIED_AND_VERIFIED"
     violations << "#{@profile}: at least one real scheduled monitor run is required" unless evidence["monitor_scheduled_runs_observed"].to_i >= 1

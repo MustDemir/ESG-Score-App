@@ -1,0 +1,116 @@
+id: 0039
+title: Compliance horizon and canonical gate-schema v2
+date: 2026-09-04
+status: accepted
+deciders: [Mustafa]
+tags: [compliance, governance, policy-as-code, quality-gates, apple, eu, germany, release-readiness]
+
+context: |
+  The existing gate schema preserved seven core gate attributes but could not
+  express whether an individual obligation is applicable, when it becomes
+  effective, which pipeline action it requires, or whether evidence is
+  repository, generated or qualified manual evidence. This made a current
+  development check and a future release obligation look alike.
+
+  ScanFair also needs a repeatable boundary for source changes. HTTP access can
+  indicate that an official page is reachable or changed, but neither a source
+  snapshot nor an automated rule can decide a legal, scientific, claim or
+  release question. The phase-1 app has no AI, e-commerce contract, creator
+  content, EUDR operator/trader role or medical-purpose claim, whereas its
+  public environmental score remains a consumer-facing comparison boundary.
+
+options_considered:
+  - name: Maintain new requirements only in narrative documentation
+    pros: [small immediate implementation cost]
+    cons:
+      - no deterministic check for dates, owners, feature triggers or source references
+      - development and release profiles cannot distinguish current facts from pending qualified evidence
+  - name: Block every observed or future rule in every profile
+    pros: [simple fail-closed interpretation]
+    cons:
+      - blocks local development for explicitly non-applicable capabilities
+      - incorrectly turns source observation into a legal decision
+  - name: Versioned gate schema plus a capability-driven regulatory horizon
+    pros:
+      - retains the seven stable gate attributes while making v2 criteria operationally explicit
+      - blocks only objective, applicable and due MUSTs in the active profile
+      - preserves manual assessment for legal, claim and release decisions
+    cons:
+      - requires compatibility support and maintenance of feature declarations, dates and review evidence
+
+decision: |
+  Adopt `scanfair-gate-v2` as the canonical profile for all new gate
+  definitions. Each v2 criterion declares obligation, pipeline effect,
+  applicability, effective date, verification method, evidence level,
+  implementation status and a reproducible negative case. Existing v1 and
+  legacy definitions remain readable only through explicit compatibility
+  profiles; the eight Apple decision gates are migrated to v2.
+
+  Maintain a regulatory-horizon registry backed exclusively by official source
+  references. It maps effective dates, feature or release triggers, explicit
+  non-applicability rationale, reactivation triggers, owners, review dates and
+  release-evidence status to three gates: source horizon, regulatory
+  applicability and environmental-comparison transparency.
+
+  Run a weekly GitHub source-observation job and retain its JSON artifact. The
+  job compares URL, version marker, HTTP metadata and a bounded content marker
+  with a reviewed technical baseline. Missing or unreadable source content
+  requires manual change assessment and can never approve legal, scientific,
+  claim or release evidence. Review deadlines warn in development and block
+  strict profiles after they are due.
+
+  Verify every shipped feature declaration through either deterministic static
+  indicators or explicit repository evidence for a manual attestation. This
+  makes a false non-applicability assertion testable without pretending that
+  source code alone can determine legal or commercial roles.
+
+rationale: |
+  This gives the local-first MVP deterministic controls for the facts the
+  repository can establish while avoiding premature automated legal judgments.
+  It keeps Phase 1 productive and causes a strict profile to fail only when an
+  applicable, due MUST genuinely lacks required evidence.
+
+implementation:
+  schema: docs/project/gate-definitions/gate-definition-schema.yaml
+  horizon: docs/project/compliance/regulatory-horizon.yaml
+  source_register: docs/project/compliance/source-register.yaml
+  validator: scripts/quality/validate_compliance_horizon.rb
+  observer: scripts/quality/observe_compliance_sources.rb
+  source_observation_baseline: docs/project/compliance/source-observation-baseline.yaml
+  capability_declaration_contract: docs/project/compliance/capability-declaration-contract.yaml
+  capability_validator: scripts/quality/validate_capability_declarations.rb
+  workflow: .github/workflows/quality-gates.yml
+  gates:
+    - G-COMPLIANCE-HORIZON
+    - G-REGULATORY-APPLICABILITY
+    - G-UWG-COMPARISON-TRANSPARENCY
+
+verification:
+  - Gate-schema self tests reject missing v2 obligation metadata.
+  - Horizon self tests reject unknown sources, missing capability flags, automatic approval, missing method evidence, due missing legal review and overdue review dates.
+  - Development validates all three horizon gates while strict profiles fail for applicable due evidence gaps.
+  - The source-observation self test proves that unchanged, changed, missing-baseline and inconclusive states have distinct safe outcomes.
+  - Capability-declaration self tests reject an undeclared AI endpoint, a missing active comparison marker and missing manual-attestation evidence.
+
+consequences:
+  - A source snapshot is review input, not a compliance approval.
+  - Strict profiles create a fresh source report and accept a technical signal only when a later repository review record names its exact signature.
+  - Any future AI, chatbot, UGC, age-restricted creator content, consumer contract, EUDR operator/trader role or medical-purpose claim must change the shipped-binary declaration and re-run the corresponding horizon control.
+  - Public environmental comparisons require transparent method, population and freshness evidence; from the effective date, release profiles also require the qualified review declared in the horizon.
+  - Legal, claim and release owners retain responsibility for qualified evaluations and source-impact records.
+  - The control-assurance review uses OPA policy testing, NIST SSDF and SLSA build-integrity guidance as engineering references; it does not claim certification.
+
+primary_sources:
+  - APPLE-ARG
+  - EU-ECGT-2024-825
+  - DE-BFSG
+  - EU-AIA-2024-1689
+  - EU-EUDR-2023-1115
+  - EU-MDR-2017-745
+  - OPA-POLICY-TESTING
+  - NIST-SSDF-800-218
+  - SLSA-BUILD-LEVELS
+
+supersedes: null
+superseded_by: null
+related: [0013, 0020, 0021, 0029, 0031]

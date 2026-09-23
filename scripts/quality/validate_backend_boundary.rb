@@ -257,7 +257,7 @@ class BackendBoundaryValidator
       "state" => "remote_schema_deployed_runtime_disabled",
       "remote_deployment_evidence" => "docs/project/audits/2026-08-18-remote-deployment-verification.md",
       "writer_contract_tests" => "12/12 PASS",
-      "database_tests" => "250/250 PASS",
+      "database_tests" => "305/305 PASS",
       "flutter_cache_and_fallback_tests" => "15/15 PASS",
     }
     expected.each do |field, value|
@@ -391,6 +391,35 @@ class BackendBoundaryValidator
            read_contract["draft_methodology_visible"] == false
       violations << "#{label}: public read boundary is incomplete"
     end
+    expected_rate_limit = {
+      "enforcement_layer" => "postgrest_pre_request",
+      "enforcement_function" => "public.enforce_public_read_rate_limit()",
+      "protected_rpc_paths" => %w[/rpc/get_fresh_cached_product /rpc/get_published_product_evidence /rpc/get_published_score_snapshot],
+      "allowed_method" => "POST",
+      "requests_per_ip_per_minute" => 30,
+      "client_identity" => "trusted_final_ingress_x_forwarded_for_last_address",
+      "missing_or_invalid_identity" => "reject_403",
+      "rejected_request" => "reject_429_with_retry_after_60_seconds",
+      "raw_ip_storage" => "prohibited",
+      "stored_subject" => "sha256_pseudonym_only",
+      "storage_schema" => "private.public_read_rate_windows",
+      "retention" => "one_hour_expiry_bounded_five_minute_cleanup_no_hard_deletion_sla",
+    }
+    unless read_contract["rate_limit"].is_a?(Hash) &&
+           expected_rate_limit.all? { |field, value| read_contract["rate_limit"][field] == value } &&
+           %w[locally_verified_remote_apply_pending_privacy remote_applied_and_privacy_approved].include?(read_contract.dig("rate_limit", "state")) &&
+           %w[not_applied APPLIED_AND_VERIFIED].include?(read_contract.dig("rate_limit", "remote_verification")) &&
+           %w[pending approved].include?(read_contract.dig("rate_limit", "security_telemetry_privacy_review")) &&
+           %w[pending approved].include?(read_contract.dig("rate_limit", "external_rate_limit_alerting_decision")) &&
+           read_contract.dig("rate_limit", "cleanup_job") == {
+             "name" => "scanfair-public-read-rate-cleanup",
+             "schedule_utc" => "*/5 * * * *",
+             "command" => "select private.cleanup_public_read_rate_windows();",
+             "execution_database" => "postgres",
+             "execution_role" => "postgres",
+           }
+      violations << "#{label}: public read rate-limit contract is incomplete or inconsistent"
+    end
 
     audit = @environment.fetch("audit_contract", {})
     required_audit_fields = %w[request_id idempotency_key actor_type action source_id target_record input_sha256 outcome status_code started_at completed_at correlation_id]
@@ -488,6 +517,8 @@ class BackendBoundaryValidator
       reject_writer_audit_mutation
       record_writer_upstream_health
       run_retention_cleanup
+      enforce_public_read_rate_limit
+      public_read_rate_windows
       cron.schedule
     ]
     required_migration_markers.each do |marker|
@@ -589,6 +620,36 @@ class BackendBoundaryValidator
         cleanup_backlog_persistent_seven_checks
         cron.unschedule
       ],
+      "supabase/migrations/20260906000100_public_read_abuse_protection.sql" => %w[
+        public_read_rate_windows
+        enforce_public_read_rate_limit
+        pgrst.db_pre_request
+        public_read_rate_limit_exceeded
+        scanfair-public-read-rate-cleanup
+      ],
+      "supabase/tests/database/public_read_abuse_protection.test.sql" => %w[
+        plan(53)
+        missing\ client\ identity\ fails\ closed
+        thirty-first\ public\ read\ is\ rate\ limited
+        never\ the\ raw\ IP
+      ],
+      "supabase/migrations/20260923000100_public_read_api_integration.sql" => %w[
+        /rpc/get_fresh_cached_product
+        /rpc/get_published_product_evidence
+        /rpc/get_published_score_snapshot
+        volatile
+        'headers'
+      ],
+      "scripts/quality/test_public_read_http.mjs" => %w[
+        forged\ forwarding\ prefix
+        alias\ cannot\ bypass\ exhausted\ quota
+        rate\ fixtures\ cleaned\ up
+      ],
+      "scripts/quality/test_edge_writer_http.mjs" => %w[
+        duplicate_existing
+        actual_deno_handler
+        restoreCounters
+      ],
       "scripts/quality/verify_remote_retention_observability.sql" => %w[
         retention\ cron\ identity\ verification\ failed
         controlled\ failure\ was\ not\ detected
@@ -618,6 +679,8 @@ class BackendBoundaryValidator
       ".github/workflows/quality-gates.yml" => %w[
         edge-writer-tests
         run_edge_writer_integration_gate.sh
+        test_public_read_http.mjs
+        test_edge_writer_http.mjs
         scanfair-backend-data-path-evidence
       ],
     }
@@ -649,6 +712,14 @@ class BackendBoundaryValidator
 
     unless enabled && @environment["implementation_state"] == "deployed_to_eu_development"
       violations << "#{@profile}: remote backend must be enabled and deployed to EU development"
+    end
+    rate_limit = @environment.dig("read_contract", "rate_limit") || {}
+    unless rate_limit["state"] == "remote_applied_and_privacy_approved" &&
+           rate_limit["remote_verification"] == "APPLIED_AND_VERIFIED" &&
+           rate_limit["security_telemetry_privacy_review"] == "approved" &&
+           rate_limit["external_rate_limit_alerting_decision"] == "approved" &&
+           rate_limit["hosted_gateway_identity_verification"] == "approved"
+      violations << "#{@profile}: public read rate limit must be remotely verified and privacy-approved"
     end
     development = Array(@environment["environments"]).find do |environment|
       environment["id"] == "development"

@@ -1,0 +1,19 @@
+schema_version: scanfair-ticket-index-v1
+last_updated: 2026-09-23
+owner: Mustafa Demir
+policy:
+  backlog_is_portfolio_ssot: true
+  ticket_required_before_state_change: true
+  maximum_active: 1
+  ready_required_before_in_progress: true
+  done_requires_acceptance_dod_evidence_and_gates: true
+active_ticket: TKT-037-05
+next_ticket: TKT-038-01
+execution_order:
+  - TKT-040-01
+  - TKT-037-05
+  - TKT-038-01
+  - TKT-037-01
+  - TKT-037-02
+  - TKT-037-03
+  - TKT-037-04

@@ -147,10 +147,10 @@ are intentionally outside this mobile project.
 
 | Evidence | Verified result |
 | --- | ---: |
-| Local development gates | 30/30 PASS |
+| Local development gates | 33/33 PASS |
 | Flutter tests | 122/122 PASS |
 | Flutter line coverage | 84.33% |
-| Local database replay and pgTAP | 13 migrations, 250/250 PASS |
+| Local database replay and pgTAP | 15 migrations, 305/305 PASS |
 | Supply-chain inventory | 61 Dart packages, 2 iOS plugins, 20 pinned Action references, 0 known vulnerabilities |
 | Pull Request 30 GitHub Actions | 6/6 jobs PASS |
 
@@ -197,8 +197,8 @@ the [Delivery Operating Model](docs/project/delivery-operating-model.md) and the
 evidence-first data model, coffee reference path, accessibility hardening,
 local/CI quality system and a reconciled Frankfurt development schema.
 
-**In progress:** remote retention observability, read-abuse protection,
-qualified DPA/licence/privacy reviews and the 2026 compliance horizon update.
+**In progress:** external retention-alert delivery, privacy-reviewed remote
+activation of read-abuse protection, and qualified DPA/licence/privacy reviews.
 
 **Next product-data milestones:** WRI Aqueduct environmental context, ILAB
 social/commodity-country risk, GLEIF/BRIS legal-entity mapping, methodology

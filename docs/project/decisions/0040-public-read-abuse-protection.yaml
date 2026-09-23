@@ -1,0 +1,89 @@
+id: 0040
+title: Fail-closed public-read abuse protection in the PostgREST pre-request path
+date: 2026-09-06
+status: accepted_for_local_implementation
+deciders: [Mustafa]
+tags: [backend, security, availability, privacy, supabase, postgrest, rate-limit]
+
+context: |
+  The public cache, evidence and score APIs are limited to explicit,
+  barcode-bound RPCs, but a hostile client can still enumerate candidate
+  barcodes or exhaust the shared project quota by repeatedly calling them.
+  The Flutter adapter uses POST for its RPC request. The backend stays disabled
+  and the development environment permits no runtime personal-data path.
+
+options_considered:
+  - name: Keep bounded RPCs without a request-rate control
+    pros: [no additional persistence or configuration]
+    cons: [does not limit repeated barcode enumeration or quota exhaustion]
+  - name: Edge Function with external Redis rate-limit provider
+    pros: [distributed counters and provider-specific dashboards]
+    cons:
+      - introduces a further provider, secret, potential cost and subprocessor review
+      - is unnecessary for the currently direct PostgREST RPC architecture
+  - name: PostgREST pre-request function with a private one-minute IP bucket
+    pros:
+      - protects every direct invocation of the three public RPCs before SQL execution
+      - retains no raw IP address and requires no app secret or additional provider
+      - can reject a missing identity, non-POST route or excess request fail-closed
+    cons:
+      - a hashed IP remains pseudonymous security telemetry and needs privacy review before runtime
+      - the five-minute cleanup job and configuration must be verified after remote application
+
+decision: |
+  Add migration 14 and its forward-only correction 15 with a `pgrst.db_pre_request` function. It accepts only
+  POST calls to the three public read RPC paths, reads the gateway-provided
+  final trusted ingress peer from X-Forwarded-For, and atomically limits each IP pseudonym to
+  30 requests per minute. Missing or invalid identity is rejected with 403;
+  a non-POST attempt is rejected with 405; excess requests return 429 with a
+  60-second Retry-After value. The private counter table persists only a
+  SHA-256 IP pseudonym, request count and one-hour expiry. A postgres-owned
+  private cleanup job runs every five minutes.
+
+  No raw IP, client identifier, request payload or response is written by the
+  control. The runtime remains disabled. Applying migrations 14 and 15 remotely and
+  routing app traffic through it requires a security-telemetry privacy review,
+  a linked verification run and an explicit decision on external rate-limit
+  alerting. This ADR does not approve the processing of personal data.
+
+amendment_2026_09_23: |
+  TKT-037-05 corrects the original first-address assumption: caller-supplied
+  forwarded prefixes bypassed the local Kong limiter after role/path repair.
+  Only the final peer appended by a trusted ingress is accepted; the hosted
+  proxy chain and distinct-client mapping require separate verification.
+  The original 27 SQL assertions did not prove real PostgREST integration.
+  Migration 15 also corrects role grants, writable POST transactions and
+  custom error details. One-hour expiry is not a physical deletion guarantee:
+  five-minute scheduling, the 10,000-row batch and outages affect retention.
+
+rationale: |
+  This uses the protection point of the existing public Data API, cannot be
+  bypassed by changing the Flutter client, and keeps the current provider and
+  secret boundary unchanged. It is stronger and more directly enforceable than
+  a client-only throttle while avoiding an unapproved external rate-limit
+  service.
+
+implementation:
+  migration: supabase/migrations/20260906000100_public_read_abuse_protection.sql
+  correction_migration: supabase/migrations/20260923000100_public_read_api_integration.sql
+  tests: supabase/tests/database/public_read_abuse_protection.test.sql
+  environment_contract: docs/project/security/eu-supabase-environment-contract.yaml
+  local_state: 15_migrations_replayed_303_pgtap_and_292_http_assertions_passed
+  current_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
+  remote_state: not_applied_runtime_disabled
+  transient_verification: docs/project/audits/2026-09-06-public-read-abuse-protection-validation.md
+
+consequences:
+  - Direct cache-table, evidence-table and score-table enumeration remain denied by grants and RLS.
+  - The three public RPCs are protected even when called outside the mobile app.
+  - A proxy or platform change that does not provide the documented client IP causes public read requests to fail closed.
+  - Security telemetry is pseudonymous rather than anonymous; runtime activation is blocked until the applicable privacy decision.
+  - An external Redis or gateway can be considered later only through a separate provider, cost, secret and subprocessor review.
+
+primary_sources:
+  - SUPABASE-API-SECURITY
+  - SUPABASE-EDGE-FUNCTIONS
+
+supersedes: null
+superseded_by: null
+related: [0002, 0032, 0035, 0036, 0037, 0038]

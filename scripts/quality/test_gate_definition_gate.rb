@@ -18,6 +18,12 @@ class GateDefinitionSelfTest
     with_fixture do |root|
       check = validator(root)
       assert(check.run, "repository fixture should pass: #{check.violations.join('; ')}")
+      assert(check.report.dig("counts", "canonical_v2").is_a?(Integer), "report must expose canonical_v2 count")
+      workflow = File.read(File.join(root, ".github/workflows/quality-gates.yml"), encoding: "UTF-8")
+      assert(workflow.include?(".counts.canonical_v2"), "CI summary must read canonical_v2 count")
+      assert(workflow.include?(".counts.canonical_v1_compatible"), "CI summary must read canonical_v1_compatible count")
+      refute_legacy_consumer = !workflow.match?(/\.counts\.canonical(?!_)/)
+      assert(refute_legacy_consumer, "CI summary must not read the removed canonical count")
     end
 
     mutate_gate("G-PROVIDER-DPA", ->(gate) { gate.delete("criteria") }) do |check|
@@ -54,6 +60,13 @@ class GateDefinitionSelfTest
       assert(includes?(check, "repository input does not exist"), "failure should identify missing artifact")
     end
 
+    mutate_gate("G-AS-CAMERA", lambda do |gate|
+      gate["criteria"].first.delete("obligation")
+    end) do |check|
+      assert(!check.run, "v2 gate must reject a missing obligation class")
+      assert(includes?(check, "missing obligation"), "v2 failure should identify the missing obligation")
+    end
+
     if @failures.empty?
       puts "Gate definition self-tests PASS: #{@assertions} assertions"
       true
@@ -81,7 +94,8 @@ class GateDefinitionSelfTest
 
   def mutate_gate(id, mutation)
     with_fixture do |root|
-      relative = "docs/project/gate-definitions/local/#{id}.yaml"
+      directory = id.start_with?("G-AS-") ? "apple" : "local"
+      relative = "docs/project/gate-definitions/#{directory}/#{id}.yaml"
       path = File.join(root, relative)
       gate = YAML.safe_load(File.read(path), permitted_classes: [Date], aliases: true)
       mutation.call(gate)
@@ -93,8 +107,9 @@ class GateDefinitionSelfTest
   def with_fixture
     Dir.mktmpdir("scanfair-gate-definitions-") do |root|
       %w[
-        docs/project
+        docs
         scripts
+        esg_app
         supabase/migrations/20260820000100_retention_observability.sql
         supabase/tests/database/retention_observability.test.sql
         .github/workflows/quality-gates.yml

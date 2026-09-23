@@ -1,8 +1,8 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-20
+last_reviewed: 2026-09-04
 owner: Engineering
 status: accepted_for_local_implementation
-implementation_state: local_observability_validated_remote_pending
+implementation_state: remote_observability_verified_delivery_pending
 runtime_state: disabled
 
 purpose: |
@@ -38,6 +38,12 @@ health_monitor:
     snapshot: private.retention_health_snapshot(timestamptz)
     recorder: private.record_retention_health(timestamptz)
   forbidden_roles: [anon, authenticated, service_role]
+  remote_observation:
+    observed_at_utc: 2026-09-04T15:49:00Z
+    successful_scheduled_runs: 4
+    observed_run_dates_utc: [2026-09-01, 2026-09-02, 2026-09-03, 2026-09-04]
+    latest_run_status: succeeded
+    evidence: docs/project/audits/2026-09-04-retention-observability-remote-verification.md
 
 detection_contract:
   critical:
@@ -83,11 +89,11 @@ external_delivery:
 
 profiles:
   development:
-    expected_state: local_observability_validated_remote_pending
+    expected_state: remote_observability_verified_delivery_pending
     runtime_must_be_disabled: true
     external_delivery_must_be_unconfigured: true
   remote_backend:
-    expected_state: remote_observability_verified
+    expected_state: remote_observability_and_delivery_verified
     scheduled_monitor_run_required: true
     external_delivery_required: true
     notification_drill_required: true
@@ -96,24 +102,26 @@ profiles:
     independent_operations_review_required: true
 
 implementation_evidence:
-  local_migrations: 13/13 REPLAYED
-  database_tests: 250/250 PASS
+  local_migrations: 15/15 REPLAYED
+  database_tests: 305/305 PASS
+  local_revalidation: docs/project/audits/2026-09-23-public-read-http-validation.md
   database_lint: PASS
   remote_verifier_local_dry_run: PASS_WITH_ROLLBACK
-  remote_migration: NOT_APPLIED
-  monitor_scheduled_runs_observed: 0
+  remote_migration: APPLIED_AND_VERIFIED
+  remote_verifier: PASS_WITH_ROLLBACK
+  monitor_scheduled_runs_observed: 4
   notification_drill: NOT_RUN
   artifacts:
     - supabase/migrations/20260820000100_retention_observability.sql
     - supabase/tests/database/retention_observability.test.sql
     - docs/project/decisions/0038-retention-observability-and-alert-delivery.yaml
     - docs/project/audits/2026-08-20-retention-scheduled-run-observation.md
+    - docs/project/audits/2026-09-04-retention-observability-remote-verification.md
+    - scripts/quality/verify_remote_retention_observability.sql
     - scripts/quality/validate_retention_operations.rb
     - scripts/quality/test_retention_operations_gate.rb
 
 remote_activation_blocks:
-  - retention_observability_migration_not_applied
-  - scheduled_health_monitor_run_not_observed
   - external_alert_delivery_not_configured
   - failure_and_recovery_notification_drill_missing
   - independent_operational_readiness_review_missing

@@ -1,0 +1,96 @@
+schema_version: scanfair-ticket-v1
+id: TKT-000-00
+title: Kurzer Titel
+summary: Klarer Nutzen und erwartetes Ergebnis
+parent_todo: TODO-000
+ticket_type: documentation
+dod_task_types:
+  - documentation
+priority: P2
+status: planned
+owner: Engineering
+decision_owner: Mustafa Demir
+created: 2026-01-01
+updated: 2026-01-01
+scope:
+  in:
+    - Konkreter Liefergegenstand
+  out:
+    - Ausdruecklich nicht enthaltene Arbeit
+dependencies: []
+links:
+  risks: []
+  decisions: []
+  requirements: []
+definition_of_ready:
+  status: not_ready
+  criteria:
+    - id: DOR-01
+      criterion: Ziel, Scope und Nutzen sind klar.
+      status: pending
+      evidence: []
+    - id: DOR-02
+      criterion: Abhaengigkeiten und betroffene Risiken sind geklaert.
+      status: pending
+      evidence: []
+    - id: DOR-03
+      criterion: Owner und Entscheidungsverantwortung sind benannt.
+      status: pending
+      evidence: []
+    - id: DOR-04
+      criterion: Erforderliche Tests, Gates und Evidenzen stehen fest.
+      status: pending
+      evidence: []
+acceptance_criteria:
+  - id: AC-01
+    criterion: Ergebnis ist objektiv pruefbar beschrieben.
+    status: pending
+    verification:
+      - Reproduzierbare Pruefung
+    evidence_required:
+      - Versioniertes Artefakt oder Testnachweis
+  - id: AC-02
+    criterion: Fehler- oder Negativfall ist objektiv pruefbar beschrieben.
+    status: pending
+    verification:
+      - Negativtest oder kontrollierte Reviewpruefung
+    evidence_required:
+      - Nachweis des erwarteten Blockierverhaltens
+  - id: AC-03
+    criterion: Dokumentation und tatsaechlicher Zustand stimmen ueberein.
+    status: pending
+    verification:
+      - SSOT- und Implementierungsabgleich
+    evidence_required:
+      - Aktualisierte Status- oder Vertragsartefakte
+definition_of_done:
+  status: not_done
+  criteria:
+    - id: DOD-01
+      criterion: Alle Akzeptanzkriterien sind erfuellt.
+      status: pending
+      evidence: []
+    - id: DOD-02
+      criterion: Relevante Tests und Gates sind gruen.
+      status: pending
+      evidence: []
+    - id: DOD-03
+      criterion: Risiken, Dokumentation und Fortschritt sind aktualisiert.
+      status: pending
+      evidence: []
+    - id: DOD-04
+      criterion: Review, Rollback und Post-Merge-Pruefung sind abgeschlossen.
+      status: pending
+      evidence: []
+gates:
+  required:
+    - G-PROJECT-CONTROL
+    - G-DOC-TRACE
+    - G-DOC-YAML
+  commands:
+    - ruby scripts/quality/validate_tickets.rb
+evidence: []
+rollback:
+  strategy: Aenderung rueckgaengig machen oder sicher deaktivieren.
+  verification: Rueckfallweg pruefen und dokumentieren.
+activation_boundary: Keine Aktivierung ohne erfuellte Akzeptanzkriterien und DoD.

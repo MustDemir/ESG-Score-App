@@ -1,8 +1,8 @@
 # ScanFair Delivery Operating Model
 
 Status: verbindlicher Arbeitsrahmen
-Version: 1.0
-Stand: 2026-07-28
+Version: 1.2
+Stand: 2026-09-22
 Owner: Mustafa Demir
 
 ## 1. Ziel
@@ -35,6 +35,8 @@ belastbare Evidenz vorzuhalten.
    Releaseentscheidungen bleiben menschlich verantwortet.
 8. **Small reversible changes:** Branches und Pull Requests bleiben
    thematisch fokussiert und rollback-faehig.
+9. **Ticket before change:** Jede ausfuehrbare Aenderung besitzt vor Beginn
+   ein schema-valides Child-Ticket mit DoR, Akzeptanzkriterien, DoD und Gates.
 
 ## 3. Vier Ebenen
 
@@ -45,7 +47,7 @@ geprueft und integriert werden.
 
 Artefakte und Kontrollen:
 
-- Roadmap, Backlog, ADRs und Akzeptanzkriterien
+- Roadmap, Backlog, Child-Tickets, ADRs und Akzeptanzkriterien
 - Lifecycle-Gap-Analyse mit Reifegrad, Owner, Zielprofil und Closure-Evidenz
 - Feature- oder Prozessbranch statt direkter Arbeit auf `main`
 - Pull Request mit Risiko-, Evidenz- und Rollbackangaben
@@ -111,19 +113,32 @@ fachlich und operativ freigegeben; Betrieb und Rueckfallweg sind nachgewiesen.
 ## 4. Standard-Workflow pro Aenderung
 
 1. Ziel, betroffene Ebene und Risiko festlegen.
-2. Requirement, Issue oder ADR referenzieren oder erstellen.
-3. Betroffene Gap-Domaenen und Capability-Trigger klassifizieren.
-4. Akzeptanzkriterien und erforderliche Evidenz definieren.
-5. Fokussierten Branch von aktuellem `main` erstellen.
-6. Kleinsten vertikalen oder prozessualen Schnitt implementieren.
-7. Relevante lokale Tests und Gates ausfuehren.
-8. Pull Request mit Risiko, Evidenz, offenen Punkten und Rollback erstellen.
-9. Verpflichtende GitHub-Checks abwarten.
-10. Nur bei gruener Entscheidung nach `main` mergen.
-11. Post-Merge-CI pruefen und Fortschritt sowie Dokumentation aktualisieren.
+2. Backlog-TODO sowie Requirement oder ADR referenzieren oder erstellen.
+3. Ein ausfuehrbares Child-Ticket unter `docs/project/tickets` anlegen und im
+   Ticket-Index einordnen.
+4. Betroffene Gap-Domaenen und Capability-Trigger klassifizieren.
+5. Ticket-DoR, Scope, Akzeptanzkriterien, Evidenz, Rollback und Gates definieren.
+6. `G-PROJECT-CONTROL` ausfuehren; erst bei `ready` auf `in_progress` setzen.
+7. Fokussierten Branch von aktuellem `main` erstellen und Ticket-ID referenzieren.
+8. Kleinsten vertikalen oder prozessualen Schnitt implementieren.
+9. Relevante lokale Tests und Gates ausfuehren.
+10. Risikobasierten [Kontrollreview](workflows/control-assurance-review.md)
+    durchfuehren; bestaetigte Befunde reparieren oder als Folgetickets mit
+    Aktivierungsgrenze erfassen. Pull Request mit Ticket-ID, Risiko,
+    Review-Evidenz, offenen Punkten und Rollback erstellen.
+11. Verpflichtende GitHub-Checks abwarten.
+12. Nur bei gruener Entscheidung nach `main` mergen.
+13. Post-Merge-CI pruefen, Ticket-DoD schliessen und Fortschritt aktualisieren.
 
 Direkte Pushes auf `main`, unversionierte Produktionsaenderungen und
 undokumentierte Gate-Ausnahmen sind nicht Teil des Standardprozesses.
+
+Ein Ticket ist eine zusammenhaengende ausfuehrbare Aktion, nicht jedes
+einzelne Shell-Kommando. Reine Statusabfragen und lesende Diagnosen benoetigen
+kein Ticket; sobald Code, Konfiguration, Datenbank- oder Governance-Status
+geaendert wird, ist ein Ticket Pflicht. Das Backlog bleibt die
+Prioritaets-SSOT, das Ticket die Ausfuehrungs-SSOT und `progress.yaml` die
+Nachweis-SSOT. Details und Vorlage stehen unter `docs/project/tickets`.
 
 ## 5. Definition of Ready
 
@@ -137,6 +152,8 @@ Eine Aenderung ist bereit fuer die Umsetzung, wenn:
 - erwartete Tests und Gates feststehen.
 - P0-/P1-Luecken, Claim-, Lizenz-, Privacy- und Capability-Trigger bewertet sind.
 - Owner fuer fachliche Entscheidung und technische Umsetzung bekannt sind.
+- Ein schema-valides Ticket im Index steht und alle DoR-Kriterien als
+  `satisfied` oder begruendet `not_applicable` markiert sind.
 
 ## 6. Definition of Done
 
@@ -150,6 +167,8 @@ Eine Aenderung ist fertig, wenn:
 - Risiken, bekannte Grenzen und spaetere Arbeiten dokumentiert sind.
 - Rollback oder sichere Deaktivierung beschrieben ist.
 - der Post-Merge-Stand auf `main` gruen ist.
+- Ticket-Akzeptanzkriterien, DoD, Evidenzen und Gate-Ergebnisse geschlossen
+  sind und der Ticketstatus erst danach `done` ist.
 
 ## 7. Gate-Aufnahmeregel
 

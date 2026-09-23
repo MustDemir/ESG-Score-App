@@ -74,6 +74,51 @@ gate_compliance_catalog() {
   cd "$REPO_ROOT" && COMPLIANCE_PROFILE="${COMPLIANCE_PROFILE:-development}" ruby scripts/compliance/validate_compliance_catalog.rb
 }
 
+gate_compliance_horizon() {
+  local profile="${COMPLIANCE_PROFILE:-development}"
+  if ! cd "$REPO_ROOT" ||
+    ! ruby scripts/quality/test_compliance_horizon_gate.rb ||
+    ! ruby scripts/quality/test_compliance_source_observation.rb; then
+    return 1
+  fi
+
+  if [ "$profile" = "development" ]; then
+    cd "$REPO_ROOT" && ruby scripts/quality/validate_compliance_horizon.rb \
+      --profile "$profile" \
+      --gate horizon \
+      --report .quality/compliance-horizon/G-COMPLIANCE-HORIZON.json
+    return
+  fi
+
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/observe_compliance_sources.rb \
+      --report .quality/compliance-horizon/release-source-observation.json &&
+    ruby scripts/quality/validate_compliance_horizon.rb \
+      --profile "$profile" \
+      --gate horizon \
+      --report .quality/compliance-horizon/G-COMPLIANCE-HORIZON.json \
+      --source-observation-report .quality/compliance-horizon/release-source-observation.json
+}
+
+gate_regulatory_applicability() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_capability_declarations.rb &&
+    ruby scripts/quality/validate_capability_declarations.rb \
+      --report .quality/compliance-horizon/capability-declarations.json &&
+    ruby scripts/quality/validate_compliance_horizon.rb \
+      --profile "${COMPLIANCE_PROFILE:-development}" \
+      --gate regulatory_applicability \
+      --report .quality/compliance-horizon/G-REGULATORY-APPLICABILITY.json
+}
+
+gate_uwg_comparison_transparency() {
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/validate_compliance_horizon.rb \
+      --profile "${COMPLIANCE_PROFILE:-development}" \
+      --gate uwg_comparison_transparency \
+      --report .quality/compliance-horizon/G-UWG-COMPARISON-TRANSPARENCY.json
+}
+
 gate_app_compliance() {
   cd "$REPO_ROOT" && COMPLIANCE_PROFILE="${COMPLIANCE_PROFILE:-development}" bash scripts/compliance/run_gates.sh
 }
@@ -205,7 +250,10 @@ gate_cost_control() {
 }
 
 gate_project_control() {
-  cd "$REPO_ROOT" && ruby scripts/quality/validate_project_control.rb
+  cd "$REPO_ROOT" &&
+    ruby scripts/quality/test_ticket_gate.rb &&
+    ruby scripts/quality/test_pr_ticket_binding.rb &&
+    ruby scripts/quality/validate_project_control.rb
 }
 
 gate_docs_traceability() {
@@ -257,6 +305,9 @@ run_gate "G-FLT-ANALYZE" "Flutter static analysis" gate_flutter_analyze
 run_gate "G-FLT-TEST" "Flutter unit and widget tests" gate_flutter_test
 run_gate "G-FLT-COVERAGE" "Flutter line coverage baseline (60%)" gate_flutter_coverage
 run_gate "G-CMP-SCHEMA" "Compliance catalog schema and cross-link validation" gate_compliance_catalog
+run_gate "G-COMPLIANCE-HORIZON" "Official-source horizon and manual change assessment" gate_compliance_horizon
+run_gate "G-REGULATORY-APPLICABILITY" "Capability-triggered regulatory applicability" gate_regulatory_applicability
+run_gate "G-UWG-COMPARISON-TRANSPARENCY" "Environmental-comparison transparency boundary" gate_uwg_comparison_transparency
 run_gate "G-REG-UNIT" "Rego policy unit tests" gate_rego_unit_tests
 run_gate "G-CMP-APPLE" "Conftest compliance gates with evidence log" gate_app_compliance
 run_gate "G-CMP-EVIDENCE" "Compliance evidence hash-chain verification" gate_evidence_chain
@@ -276,7 +327,7 @@ run_gate "G-GATE-DEFINITION-QUALITY" "Gate schema, semantics and traceability" g
 run_gate "G-PROVIDER-DPA" "Supabase DPA and Frankfurt processing boundary" gate_provider_dpa
 run_gate "G-PROVIDER-SUBPROCESSORS" "Supabase subprocessor inventory and change governance" gate_provider_subprocessors
 run_gate "G-COST-CONTROL" "Supabase plan, quota and paid-change protection" gate_cost_control
-run_gate "G-PROJECT-CONTROL" "Gap, improvement and feature-state traceability" gate_project_control
+run_gate "G-PROJECT-CONTROL" "Ticket, DoR/DoD, gap, improvement and feature-state traceability" gate_project_control
 run_gate "G-DOC-TRACE" "Documentation traceability check" gate_docs_traceability
 run_gate "G-DOC-YAML" "Project YAML syntax check" gate_yaml_syntax
 

@@ -45,6 +45,7 @@ class RetentionOperationsGateTest < Minitest::Test
       RetentionOperationsValidator::MIGRATION_PATH,
       RetentionOperationsValidator::TEST_PATH,
       RetentionOperationsValidator::AUDIT_PATH,
+      RetentionOperationsValidator::REMOTE_AUDIT_PATH,
       RetentionOperationsValidator::ADR_PATH,
       RetentionOperationsValidator::GATE_PATH,
     ]
@@ -98,8 +99,7 @@ class RetentionOperationsGateTest < Minitest::Test
   def test_remote_profile_is_fail_closed
     result, validator = validate("remote_backend")
     refute result
-    assert validator.violations.any? { |item| item.include?("migration must be remotely applied") }
-    assert validator.violations.any? { |item| item.include?("scheduled monitor run") }
+    assert validator.violations.any? { |item| item.include?("implementation_state") }
     assert validator.violations.any? { |item| item.include?("external alert delivery") }
     assert validator.violations.any? { |item| item.include?("notification drill") }
   end

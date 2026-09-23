@@ -1,0 +1,61 @@
+schema_version: "2.0"
+schema_profile: scanfair-gate-v2
+id: G-UWG-COMPARISON-TRANSPARENCY
+title: Environmental-comparison method, scope and qualified review boundary
+status: active
+dimension: legal-claims
+lifecycle_phase: product-and-release
+automation: HYBRID
+owner: Product methodology and legal owner
+profile_scope: [development, release_candidate, submission]
+trigger: [scoring_change, comparison_copy_change, marketing_change, regulatory_horizon_change, release_candidate, submission]
+criteria:
+  - id: UWG-GATE-001
+    statement: A public environmental comparison declares its method, scope, comparison population and source-freshness contract.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: conditional
+    effective_date: 2026-09-27
+    verification: AUTO
+    evidence_level: repository
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: UWG-GATE-N01, statement: A missing method or comparison-scope record fails.}
+  - id: UWG-GATE-002
+    statement: Missing or partial product evidence cannot become a generic environmental superiority claim.
+    obligation: MUST
+    pipeline_effect: block
+    applicability: conditional
+    effective_date: 2026-09-27
+    verification: AUTO
+    evidence_level: mixed
+    implementation_status: implemented
+    severity: BLOCK
+    negative_case: {id: UWG-GATE-N02, statement: A hidden partial result or unsupported comparison fails.}
+  - id: UWG-GATE-003
+    statement: Once due, consumer-facing environmental comparisons require a qualified legal and subject-matter review.
+    obligation: MUST
+    pipeline_effect: manual_review
+    applicability: conditional
+    effective_date: 2026-09-27
+    verification: HYBRID
+    evidence_level: manual
+    implementation_status: pending_review
+    severity: BLOCK
+    negative_case: {id: UWG-GATE-N03, statement: A post-effective-date release without qualified review fails.}
+artifacts:
+  - {id: UWG-A01, type: repository_input, path: docs/project/compliance/regulatory-horizon.yaml, required_for: [development, release_candidate, submission]}
+  - {id: UWG-A02, type: repository_input, path: docs/ESG-SCORING-MODELL-v1.md, required_for: [development, release_candidate, submission]}
+  - {id: UWG-A03, type: generated_evidence, path: .quality/compliance-horizon/G-UWG-COMPARISON-TRANSPARENCY.json, required_for: [development, release_candidate, submission]}
+  - {id: UWG-A04, type: manual_evidence, path: docs/project/compliance/evidence/claims-legal-review.yaml, required_for: [release_candidate, submission]}
+decision:
+  pass: Comparison metadata is complete and strict profiles enforce due qualified review.
+  fail: Method, scope, evidence boundary or due review evidence is missing or misleading.
+  manual_review: Legal and subject-matter owners assess the concrete consumer claim before release.
+enforcement: {development: block, release_candidate: block, submission: block}
+audit: {validator: scripts/quality/validate_compliance_horizon.rb, tests: scripts/quality/test_compliance_horizon_gate.rb, local_runner: scripts/quality/run_quality_gates.sh, ci_workflow: .github/workflows/quality-gates.yml, evidence_output: .quality/compliance-horizon/G-UWG-COMPARISON-TRANSPARENCY.json}
+waiver: {allowed: false, conditions: [], maximum_days: null}
+links: {requirements: [R-AS-27], improvements: [IMP-COMP-004], gaps: [GAP-001, GAP-002], risks: [RISK-003, RISK-007], related_adrs: [0013, 0021, 0031, 0039]}
+sources: [EU-ECGT-2024-825, DE-UWG-EMP-CO, APPLE-ARG, INTERNAL-SCORING]
+notes: |
+  This gate records transparent method boundaries; it is not a legal conclusion that any individual claim is lawful.

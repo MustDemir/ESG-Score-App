@@ -2,6 +2,7 @@
 
 require "date"
 require "yaml"
+require_relative "validate_tickets"
 
 repo_root = File.expand_path("../..", __dir__)
 register_path = File.join(repo_root, "docs/project/improvement-register.yaml")
@@ -444,12 +445,21 @@ else
   end
 end
 
+ticket_validator = TicketControlValidator.new(repo_root: repo_root)
+unless ticket_validator.run
+  ticket_validator.violations.each do |violation|
+    violations << "ticket-control: #{violation}"
+  end
+end
+ticket_count = ticket_validator.tickets.length
+
 if violations.empty?
   puts(
     "Project control traceability OK: " \
     "#{improvements.length} improvements, " \
     "#{execution_order.length} active sequence items, " \
     "#{gap_count} lifecycle gaps, " \
+    "#{ticket_count} executable tickets, " \
     "#{Dir.glob(File.join(features_dir, '*', 'state.yaml')).length} feature states",
   )
   exit 0
