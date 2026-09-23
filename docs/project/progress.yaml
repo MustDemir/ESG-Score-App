@@ -38,7 +38,7 @@ ticket_workflow:
   schema: scanfair-ticket-v1
   index: docs/project/tickets/ticket-index.yaml
   active_ticket: TKT-038-01
-  next_ticket: TKT-037-05
+  next_ticket: TKT-037-01
   todo_037_execution_order:
     - TKT-037-05
     - TKT-037-01
@@ -76,10 +76,10 @@ session_handoff:
   prepared_at: 2026-09-23
   session_closed_at: null
   branch: codex/tkt-038-01-cache-freshness
-  status: backend_done_cache_synchronized_with_main_regular_pr_ci_pending
+  status: backend_done_cache_regular_pr_ci_passed_merge_approval_pending
   delivery_2026_09_23:
     backend_commit: f33f7584e779f450448440042106ac69f7596eca
-    cache_commit: ad84070e359462e7587365ac203576fb5be940b3
+    cache_commit: 8eb0acb735493ff8605bb70e61878633efb887b2
     backend_branch: codex/tkt-037-05-control-assurance
     cache_branch: codex/tkt-038-01-cache-freshness
     backend_pr: https://github.com/MustDemir/ESG-Score-App/pull/35
@@ -87,7 +87,7 @@ session_handoff:
     backend_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35828728604
     cache_implementation_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35828730653
     ci_boundary: Live GitHub results are authoritative; the linked runs refer to the implementation commits, not later handoff-only commits.
-    merge_order: Backend PR first; then retarget cache PR to main and rerun required pull-request checks before merging.
+    merge_order: Backend PR is merged; cache PR now targets main and may merge only after current checks, review resolution and explicit approval.
     automatic_merge: false
     remote_database_changed: false
     excluded_local_files: .codex/ remains untracked and was not pushed
@@ -96,6 +96,8 @@ session_handoff:
     backend_pr_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35837738124
     backend_post_merge_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
     backend_post_merge_result: Attempt 2 PASS after attempt 1 encountered an unrelated local mail-port collision before pgTAP.
+    cache_pr_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35840506169
+    cache_pr_ci_result: All six applicable jobs PASS on synchronized commit 8eb0acb; review follow-up requires a fresh run.
   cache_ci_followup_2026_09_23:
     ticket: TKT-038-01
     failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
@@ -103,7 +105,7 @@ session_handoff:
     repair: Transaction-stable fixture time plus exact-boundary acceptance and one-microsecond-overrun rejection tests.
     local_evidence: docs/project/audits/2026-09-23-cache-frische-validation.md
     local_results: 7 targeted pgTAP tests and all 305 database tests PASS; strict database lint PASS.
-    next: Publish the test correction and rerun GitHub checks; merge approval and post-merge evidence remain required.
+    next: Resolve two documentation review findings, rerun GitHub checks, then obtain merge approval and post-merge evidence.
     production_logic_changed: false
     remote_database_changed: false
   control_review_2026_09_22:
@@ -134,7 +136,7 @@ session_handoff:
       local_result: targeted regression tests and 33/33 Development gates PASS
       merge_status: PR 35 merged as 65b9463 after all threads and checks passed; no admin bypass
       post_merge: Run 35838485511 attempt 2 PASS; attempt 1 had an unrelated local mail-port collision before pgTAP started
-    next_action: Retarget PR 36 to main, run regular PR checks and merge only after approval; privacy and remote remain blocked
+    next_action: Resolve PR 36 review findings, rerun regular checks and merge only after approval; privacy and remote remain blocked
   merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/35
   pull_request: https://github.com/MustDemir/ESG-Score-App/pull/36
   git_state:
@@ -142,6 +144,7 @@ session_handoff:
     pushed: true
     working_tree_clean: false
     commits:
+      - 8eb0acb Merge current main into the cache review with reconciled control evidence
       - ad84070 Cache freshness and expiry repair with regression evidence
       - f33f758 Reviewed backend controls and prepared delivery baseline
       - 98d2da3 Merge pull request 30 from MustDemir/feature/retention-observability
@@ -364,10 +367,8 @@ session_handoff:
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
     - Aktuellen Audit vom 22.09.2026 und Ticket-Index lesen; alte Plaene unten sind historischer Kontext
-    - TKT-040-01 Review-Nacharbeit ueber PR und Post-Merge-CI abschliessen
-    - TKT-037-05 API-Hook reparieren und echten HTTP-Pfad in isolierter oder gesicherter lokaler DB pruefen
-    - TKT-038-01 Cache-Frischegrenzen reparieren, dann TKT-037-01 Privacy-Unterlagen fertigstellen
-    - Dokumentations- und SSOT-Update validieren, reviewen und mergen
+    - TKT-038-01 Review-Nacharbeit abschliessen, ausdrueckliche Merge-Freigabe einholen und Post-Merge-CI pruefen
+    - Danach TKT-037-01 Privacy-Unterlagen fertigstellen
     - Feature-Branch feature/compliance-horizon-2026 vom aktualisierten main erstellen
     - Offizielle Quellenabdeckung und Wirksamkeitsdaten in einem versionierten Coverage-Audit festhalten
     - Kanonisches Gate-Schema erweitern und acht Apple-Legacy-Gates migrieren
@@ -968,11 +969,11 @@ weekly_log:
       - Stabilen Zeitbezug und zwei explizite Sieben-Tage-Grenztests in TKT-038-01 ergaenzt
       - 305 SQL-Tests und strikten DB-Lint in separater Testinstanz erfolgreich ausgefuehrt
     blockers:
-      - Erneuter GitHub-Nachweis und gesonderte Merge-Freigabe sowie Post-Merge-Pruefungen stehen aus
+      - Zwei Dokumentations-Reviewhinweise, gesonderte Merge-Freigabe und Post-Merge-Pruefungen stehen aus
       - Privacy-Entscheidung, Remote-Aktivierung und externer Alarmnachweis bleiben gesperrt
     next_week:
-      - Backend-PR nach Freigabe integrieren und Post-Merge pruefen
-      - Cache-PR danach gegen main erneut pruefen und kontrolliert uebernehmen
+      - Cache-PR-Reviewhinweise schliessen, erneut gegen main pruefen und nach Freigabe kontrolliert uebernehmen
+      - Danach Privacy-Folgeticket TKT-037-01 bearbeiten
 
   - week: 2026-W36
     summary: |
