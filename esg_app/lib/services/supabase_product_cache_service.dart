@@ -13,11 +13,13 @@ class ProductCacheLookup {
   const ProductCacheLookup({
     required this.product,
     required this.isStale,
+    required this.expiresAt,
     this.fetchedAt,
   });
 
   final ScanFairProduct product;
   final bool isStale;
+  final DateTime expiresAt;
   final DateTime? fetchedAt;
 }
 
@@ -217,13 +219,23 @@ class SupabaseProductCacheService implements ProductCache {
 
     final row = Map<String, Object?>.from(rows.single as Map);
     final payload = row['payload'];
-    final fetchedAt = DateTime.tryParse(row['fetched_at']?.toString() ?? '');
-    final staleAfter = DateTime.tryParse(row['stale_after']?.toString() ?? '');
-    final expiresAt = DateTime.tryParse(row['expires_at']?.toString() ?? '');
-    if (payload is! Map || fetchedAt == null || expiresAt == null) {
+    final fetchedAt = _parseTimestamp(row['fetched_at']);
+    final staleAfter = _parseTimestamp(row['stale_after']);
+    final expiresAt = _parseTimestamp(row['expires_at']);
+    if (payload is! Map ||
+        fetchedAt == null ||
+        staleAfter == null ||
+        expiresAt == null) {
       throw const ProductCacheFailure(
         type: ProductCacheFailureType.invalidResponse,
         message: 'Die Cache-Antwort enthaelt nicht alle Pflichtfelder.',
+      );
+    }
+    // Mirror the database freshness contract; malformed metadata is never fresh.
+    if (!staleAfter.isAfter(fetchedAt) || staleAfter.isAfter(expiresAt)) {
+      throw const ProductCacheFailure(
+        type: ProductCacheFailureType.invalidResponse,
+        message: 'Die Frische-Zeitstempel des Caches sind widerspruechlich.',
       );
     }
     final now = _clock().toUtc();
@@ -245,10 +257,11 @@ class SupabaseProductCacheService implements ProductCache {
       );
       // Veraltete Daten werden gekennzeichnet serviert statt verworfen
       // (ADR 0033).
-      final isStale = staleAfter != null && !now.isBefore(staleAfter.toUtc());
+      final isStale = !now.isBefore(staleAfter);
       return ProductCacheLookup(
         product: product,
         isStale: isStale,
+        expiresAt: expiresAt,
         fetchedAt: fetchedAt.toUtc(),
       );
     } on ProductCacheFailure {
@@ -260,6 +273,46 @@ class SupabaseProductCacheService implements ProductCache {
         cause: error,
       );
     }
+  }
+
+  static final _timestampPattern = RegExp(
+    r'^(\d{4})-(\d{2})-(\d{2})[Tt ](\d{2}):(\d{2}):(\d{2})(?:\.\d{1,6})?(?:[zZ]|[+-](\d{2}):(\d{2}))$',
+  );
+
+  static DateTime? _parseTimestamp(Object? value) {
+    if (value is! String) return null;
+    final match = _timestampPattern.firstMatch(value);
+    if (match == null) return null;
+    final parts = List.generate(
+      6,
+      (index) => int.parse(match.group(index + 1)!),
+    );
+    // DateTime.tryParse normalizes invalid dates (e.g. day 44). Reject that
+    // normalization, and require the explicit timezone emitted by PostgREST.
+    final wall = DateTime.utc(
+      parts[0],
+      parts[1],
+      parts[2],
+      parts[3],
+      parts[4],
+      parts[5],
+    );
+    final normalized = [
+      wall.year,
+      wall.month,
+      wall.day,
+      wall.hour,
+      wall.minute,
+      wall.second,
+    ];
+    for (var index = 0; index < parts.length; index++) {
+      if (parts[index] != normalized[index]) return null;
+    }
+    if (match.group(7) != null &&
+        (int.parse(match.group(7)!) > 23 || int.parse(match.group(8)!) > 59)) {
+      return null;
+    }
+    return DateTime.tryParse(value)?.toUtc();
   }
 
   Future<_BoundedCacheResponse> _request(

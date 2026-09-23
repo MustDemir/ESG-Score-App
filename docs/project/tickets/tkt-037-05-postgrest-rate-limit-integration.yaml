@@ -8,7 +8,7 @@ parent_todo: TODO-037
 ticket_type: supabase_change
 dod_task_types: [supabase_change, provider_governance]
 priority: P1
-status: review
+status: parked
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-22
@@ -113,4 +113,4 @@ evidence:
 rollback:
   strategy: Lokale Aenderung isoliert reviewen; Remote bleibt deaktiviert. Bereits angewandte Migrationen nur durch neue Korrekturmigration ergaenzen.
   verification: Migrationshistorie und deaktivierte Runtime pruefen; vor lokalem Reset vorhandene Daten sichern oder isolierte Testinstanz nutzen.
-activation_boundary: Keine Remote-Anwendung bis HTTP-Nachweis, Privacy-Entscheidung und anschliessendem Migrations-Ticket.
+activation_boundary: Keine Remote-Anwendung bis HTTP-Nachweis, Privacy-Entscheidung und anschliessendem Migrations-Ticket. Technischer Abschlussreview bestanden; fuer die unabhaengige Cache-Reparatur geparkt, PR-/Post-Merge-Nachweis bleibt offen.

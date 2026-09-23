@@ -1059,9 +1059,9 @@ todos:
     remaining_parts:
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
-      - TKT-037-05 behebt vor Privacy-Review die Hook-Rechte, Pfadpruefung und
-        PostgREST-Transaktionsart; echte HTTP-Tests ergaenzen die SQL-Tests
-      - Migration 14 nur nach Privacy-Review kontrolliert remote anwenden und
+      - TKT-037-05 ist lokal technisch reviewt mit 303 SQL- und 292 HTTP-Pruefungen;
+        PR-/Post-Merge-Nachweis vor Privacy-Review schliessen
+      - Migrationen 14 und 15 nur nach Privacy-Review kontrolliert remote anwenden und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
     updated: 2026-09-07
@@ -1103,6 +1103,9 @@ todos:
       - Inter und Instrument Serif als lokale OFL-Assets gebuendelt; der
         Runtime-Fetch von Google Fonts ist in main.dart deaktiviert und per
         Widget-Test abgesichert
+      - TKT-038-01 repariert lokal AR-07/08 mit strikten Frischemetadaten und
+        erneuter Ablaufpruefung nach Fallback; 42 fokussierte Tests PASS,
+        technischer Review erfolgt, PR-/Post-Merge-Evidenz bleibt offen
     remaining_parts:
       - Lokaler On-Device-Produktcache mit Stale-Kennzeichnung
       - Response-code gegen angefragten Barcode verifizieren

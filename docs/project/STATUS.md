@@ -22,7 +22,7 @@ hat drei PostgREST-Integrationsprobleme und zwei Cache-Frischefehler gefunden.
 Die Backend-Probleme und zwei weitere HTTP-Befunde sind lokal repariert und
 in [TKT-037-05 nachgewiesen](audits/2026-09-23-public-read-http-validation.md).
 Der separate technische Review ist dokumentiert; PR-/Post-Merge-Evidenz fehlt noch.
-Die zwei Cache-Frischefehler bleiben in TKT-038-01 offen. Lokale HTTP-Evidenz
+Die zwei Cache-Frischefehler sind in [TKT-038-01 lokal repariert und reviewt](audits/2026-09-23-cache-frische-validation.md), ebenfalls noch ohne PR-/Post-Merge-Abschluss. Lokale HTTP-Evidenz
 ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 
 ## Validierte Baseline
@@ -32,7 +32,7 @@ ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 | Development Quality Gates | 33/33 PASS, 23. September 2026; keine Release-Freigabe |
 | TODO-039 Kontrollpaket | 3/3 neue Horizon-Gates, 32 Gate-Definitionen (11 v2 kanonisch), Frist- und Quellen-Durchsetzung sowie zugehörige Selbsttests PASS, 4. September 2026 |
 | Ticket-Arbeitsmodell | 7 Tickets; 31 Selbsttests mit 85 Assertions PASS; N/A-/Evidenz-/Datumsfehler korrigiert, PR-Body-Edit-Trigger ergaenzt; echter PR-/Post-Merge-Nachweis offen |
-| Flutter | 122/122 Tests PASS, 84,33 % Line Coverage |
+| Flutter | 144/144 Tests PASS, 84,74 % Line Coverage; 42 Cache-/Repositorytests PASS |
 | Datenbank lokal | 15/15 Migrationen replayed, 303/303 pgTAP PASS, DB-Lint PASS; isolierter Neuaufbau am 23.09. |
 | Datenbank remote | 13/13 freigegebene Migrationen abgeglichen, Schema-Diff leer, DB-Lint PASS |
 | Retention Cleanup remote | Zwei geplante Läufe erfolgreich, keine offenen Cleanup-Zeilen |

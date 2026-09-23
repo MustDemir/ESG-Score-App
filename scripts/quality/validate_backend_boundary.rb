@@ -258,7 +258,7 @@ class BackendBoundaryValidator
       "remote_deployment_evidence" => "docs/project/audits/2026-08-18-remote-deployment-verification.md",
       "writer_contract_tests" => "12/12 PASS",
       "database_tests" => "303/303 PASS",
-      "flutter_cache_and_fallback_tests" => "15/15 PASS",
+      "flutter_cache_and_fallback_tests" => "42/42 PASS",
     }
     expected.each do |field, value|
       unless evidence[field] == value
