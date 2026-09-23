@@ -74,9 +74,9 @@ ticket_workflow:
 
 session_handoff:
   prepared_at: 2026-09-23
-  session_closed_at: null
+  session_closed_at: "2026-09-23T13:07:26+02:00"
   branch: codex/tkt-038-01-closeout
-  status: backend_and_cache_done_privacy_ticket_next
+  status: session_closed_resume_with_tkt_037_01_privacy_evidence
   delivery_2026_09_23:
     backend_commit: f33f7584e779f450448440042106ac69f7596eca
     cache_commit: 00cdc41dc307a53f84eda9cfb7382d7c199b0a01
@@ -101,6 +101,13 @@ session_handoff:
     cache_merge_commit: 8c88b3a8295d79aab26425a657fd758c19ca4ca4
     cache_post_merge_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35842444594
     cache_post_merge_result: All six applicable jobs PASS; no remote deployment or database change.
+    cache_closeout_commit: f2278de
+    cache_closeout_branch: codex/tkt-038-01-closeout
+    cache_closeout_publication: |
+      Evidence is committed and pushed but intentionally not opened as a
+      standalone PR: the PR-binding gate rejects terminal tickets by design.
+      Carry this closure with the next active TKT-037-01 PR; do not bypass
+      the control with a direct push to main.
   cache_ci_followup_2026_09_23:
     ticket: TKT-038-01
     failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
@@ -147,6 +154,7 @@ session_handoff:
     pushed: true
     working_tree_clean: false
     commits:
+      - f2278de Record cache post-merge closure for controlled successor handoff
       - 8c88b3a Merge pull request 36 with cache freshness repair
       - 00cdc41 Reconcile completed backend handoff after cache review
       - 8eb0acb Merge current main into the cache review with reconciled control evidence
@@ -165,22 +173,21 @@ session_handoff:
       - a59a494 docs: record service role remote verification
       - 83ee6f4 Merge pull request 25 from MustDemir/feature/service-role-least-privilege
     reason: |
-      TODO-039 ist als Working-Tree-Aenderung umgesetzt: Gate-Schema v2, acht
-      migrierte Apple-Gates, sieben Horizon-Kontrollen, drei neue lokale Gates,
-      eine baseline-verglichene Quellenbeobachtung und statisch/manuell
-      verifizierte Feature-Deklarationen. Ein unabhängiger Control-Assurance-
-      Review hat die Frist-, Quellen- und Deklarations-Negativfälle geprüft.
-      TODO-038s lokaler Font-Teil ist nachgezogen. Es existiert noch kein
-      Commit oder Push. Qualifizierte Rechts-/Claim-Reviews und die echten
-      externen Release-Evidenzen bleiben bewusst offen.
+      Backend-PR 35 und Cache-PR 36 sind nach technischen Reviews, behobenen
+      Review-Hinweisen und vollstaendig gruenen PR-/Post-Merge-Laeufen in main.
+      TKT-038-01 ist technisch und fachlich geschlossen; der maschinenlesbare
+      Abschluss liegt als f2278de auf dem gepushten Closeout-Branch. Ein
+      eigenstaendiger PR waere wegen der beabsichtigten Terminal-Ticket-Sperre
+      unzulaessig. Der naechste TKT-037-01-PR muss diesen Abschluss mitnehmen.
+      Remote-Datenbank, Runtime und App-Aktivierung blieben unveraendert.
   latest_validation:
-    executed_at: "2026-09-11T06:25:33Z"
-    validation_scope: Full 33-gate development pipeline with ticket schema, DoR/DoD, dependency and PR-binding controls; clean 14-migration database evidence from 2026-09-07 and historical integrated evidence remain retained below
+    executed_at: "2026-09-23T13:05:00+02:00"
+    validation_scope: Full 33-gate development pipeline on the TKT-038-01 closeout state after successful PR and post-merge CI; no remote activation
     development_quality_gates: 33/33 PASS
-    ticket_control_self_tests: 11 tests, 23 assertions PASS
-    pr_ticket_binding_self_tests: 8 tests, 15 assertions PASS
-    ticket_catalog: 5/5 schema-valid and workflow-consistent
-    ticket_pr_ci_integration: CONFIGURED_REAL_PR_RUN_PENDING
+    ticket_control_self_tests: 22 tests, 58 assertions PASS
+    pr_ticket_binding_self_tests: 10 tests, 29 assertions PASS
+    ticket_catalog: 7/7 schema-valid and workflow-consistent
+    ticket_pr_ci_integration: PR 35 and PR 36 plus both post-merge runs PASS
     development_quality_gates_historical: 30/30 PASS on 2026-08-31
     compliance_horizon_gates: 3/3 PASS in development profile
     gate_definition_validation: 32 definitions, 11 v2 canonical, 5 v1 compatible, 16 legacy compatible PASS
@@ -192,14 +199,14 @@ session_handoff:
     compliance_source_observation_online: 4 unchanged captured markers, 2 detected technical deltas and 4 inconclusive markers; automatic approval false and manual review required
     strict_source_review_binding: EXPECTED FAIL until six current source signals have signature-bound manual review records
     apple_catalog_development: 19 requirements, 8 Apple gates, 49 sources PASS
-    flutter_tests: 122/122 PASS
-    flutter_line_coverage: 84.33 percent
+    flutter_tests: 144/144 PASS
+    flutter_line_coverage: 84.74 percent
     database_migration_replay: PASS
     database_validation_executed_at: "2026-09-07T08:37:00Z"
-    database_pgtap: 277/277 PASS
+    database_pgtap: 305/305 PASS
     database_lint: PASS
     supply_chain_inventory: 61 Dart packages, 2 iOS plugins, 20 Action references, 0 vulnerabilities
-    local_migrations: 14/14 REPLAYED
+    local_migrations: 15/15 REPLAYED
     retention_cleanup_local: PASS
     retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     retention_migration_remote_dry_run: UP_TO_DATE
@@ -371,17 +378,13 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Aktuellen Audit vom 22.09.2026 und Ticket-Index lesen; alte Plaene unten sind historischer Kontext
-    - TKT-037-01 Privacy-Unterlagen vorbereiten und qualifizierte menschliche Entscheidung einholen
-    - Feature-Branch feature/compliance-horizon-2026 vom aktualisierten main erstellen
-    - Offizielle Quellenabdeckung und Wirksamkeitsdaten in einem versionierten Coverage-Audit festhalten
-    - Kanonisches Gate-Schema erweitern und acht Apple-Legacy-Gates migrieren
-    - G-COMPLIANCE-HORIZON, G-REGULATORY-APPLICABILITY und G-UWG-COMPARISON-TRANSPARENCY implementieren
-    - Least-Privilege-Alarmkanal und Failure-/Recovery-Drill als Betriebsevidenz umsetzen
-    - Privacy-Freigabe fuer das Public-Read-Rate-Limit einholen; danach
-      Migration 14 kontrolliert remote anwenden und den Linked-Verifier erneut
-      ausfuehren
-    - Danach DPA-/Subprocessor-Owner-Evidenz und unabhaengige Backend-Reviews vorbereiten
+    - Auf Branch codex/tkt-038-01-closeout am aktuellen Branch-HEAD starten; f2278de ist der fachliche Closeout und der Folgecommit enthaelt diesen Session-Handoff
+    - TKT-037-01 als naechstes Ticket aktivieren; sein erster PR nimmt den geprueften TKT-038-01-Abschluss mit
+    - Privacy-Unterlagen fuer pseudonymisierte IP-Rate-Limit-Daten vorbereiten und qualifizierte menschliche Entscheidung einholen
+    - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
+    - Danach TKT-037-02 bis TKT-037-04 fuer Remote-Anwendung, Verifier und externen Alarmkanal abarbeiten
+    - README.md und README.de.md nach kanonischer Uebernahme des Closeouts um PR 36 und den Post-Merge-Abschluss ergaenzen
+    - TODO-032 fuer die Node-20-Action abarbeiten; Ubuntu-26-Runnerwechsel vor jeder Aenderung als eigenes Ticket erfassen
   next_session_plan:
     planning_basis: |
       Session-Angaben sind Arbeitssequenzen und keine Kalenderzusage. Externe
