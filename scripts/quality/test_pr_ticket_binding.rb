@@ -52,6 +52,13 @@ class PullRequestTicketBindingValidatorTest < Minitest::Test
     with_fixture("TKT-037-01 TODO-037") { |event, tickets| assert_violation(event, tickets, "status \"planned\" is not reviewable") }
   end
 
+  def test_done_ticket_is_not_reviewable
+    with_fixture("TKT-040-01 TODO-040") do |event, tickets|
+      mutate(File.join(tickets, "tkt-040-01-ticket-workflow-integrieren.yaml")) { |ticket| ticket["status"] = "done" }
+      assert_violation(event, tickets, "status \"done\" is not reviewable")
+    end
+  end
+
   def test_active_ticket_must_match_review_ticket
     with_fixture("TKT-040-01 TODO-040") do |event, tickets|
       mutate(File.join(tickets, "ticket-index.yaml")) { |index| index["active_ticket"] = nil }

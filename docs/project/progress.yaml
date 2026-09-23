@@ -89,15 +89,20 @@ session_handoff:
     backend_report: docs/project/audits/2026-09-23-public-read-http-validation.md
     open_client: [AR-07, AR-08]
     ticket_tests: 22 tests, 58 assertions PASS
-    pr_binding_tests: 9 tests, 27 assertions PASS
+    pr_binding_tests: 10 tests, 29 assertions PASS
     ticket_catalog: 7 tickets
     backend_remote_profile: EXPECTED FAIL; activation and required reviews absent
     privacy_remote_profile: EXPECTED FAIL; controller, legal, disclosure and rights evidence absent
     data_license_remote_profile: EXPECTED FAIL; export, correction/deletion and legal evidence absent
     database_http_execution: 292 assertions PASS; real Edge handler publication and replay PASS; isolated stack only
-    database_replay: 15 migrations; 303 pgTAP assertions; lint PASS
+    database_replay: 15 migrations; 305 pgTAP assertions; lint PASS
     development_gates: 33/33 PASS on 2026-09-23
-    next_action: Separate review and PR evidence for TKT-037-05; TKT-038-01 is next local repair; privacy and remote remain blocked
+    pr35_review_followup:
+      threads: 7
+      scope: source-review chronology, self-test fail-closed behavior, terminal-ticket rejection, report contract, and three baseline corrections
+      local_result: targeted regression tests and 33/33 Development gates PASS
+      merge_status: GitHub PR CI and thread resolution pending; no admin bypass
+    next_action: Publish PR-review corrections, rerun PR CI, resolve evidenced threads and merge PR 35 only after all rules pass; privacy and remote remain blocked
   merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/30
   pull_request: null
   git_state:

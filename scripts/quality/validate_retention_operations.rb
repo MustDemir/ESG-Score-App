@@ -187,7 +187,7 @@ class RetentionOperationsValidator
     evidence = @contract.fetch("implementation_evidence", {})
     expected = {
       "local_migrations" => "15/15 REPLAYED",
-      "database_tests" => "303/303 PASS",
+      "database_tests" => "305/305 PASS",
       "database_lint" => "PASS",
       "remote_verifier_local_dry_run" => "PASS_WITH_ROLLBACK",
       "remote_migration" => "APPLIED_AND_VERIFIED",

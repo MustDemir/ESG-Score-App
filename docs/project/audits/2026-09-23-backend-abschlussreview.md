@@ -93,3 +93,31 @@ Das ist eine begrenzte CI-Nacharbeit unter TKT-037-05, kein neuer Gesamtreview.
 Die frueheren gruenen PR-Ergebnisse gelten fuer `f33f758`; der neue Backend-
 Commit benoetigt seinen eigenen GitHub-Nachweis. Merge-Freigabe und
 Post-Merge-Pruefung bleiben ausstehend.
+
+## Nacharbeit aus dem blockierenden PR-Review
+
+Nach der Umstellung von PR #35 auf „ready for review“ meldeten Codex Review
+und Copilot sieben offene Threads. Die Repository-Regel verlangt deren
+Aufloesung; ein Admin-Bypass wurde nicht verwendet.
+
+| Thread | Korrektur und lokaler Nachweis |
+| --- | --- |
+| Quellenreview gegen frischen Lauf | Die Signatur bindet weiterhin den konkreten beobachteten Zustand. Die Zeitreihenfolge wird nun gegen `observation_generated_at` des zugehoerigen Review-Eintrags geprueft, nicht gegen die Erzeugungszeit jedes spaeteren identischen CI-Laufs. Ein spaeter identischer Lauf bleibt akzeptiert; Review vor Beobachtung scheitert. |
+| Self-Test-Fehler wurde verschluckt | Der Horizon-Runner kehrt nach jedem fehlgeschlagenen Selbsttest sofort mit Fehler zurueck. Ein kontrollierter Negativlauf bestaetigte, dass der Profilvalidator danach nicht mehr ausgefuehrt wird. |
+| Terminales Ticket `done` war PR-faehig | `done` wurde aus den reviewbaren Zustaenden entfernt. Ein neuer Negativtest blockiert die PR-Bindung an ein abgeschlossenes Ticket. |
+| Umbenannter Canonical-Zaehler | Die GitHub-Zusammenfassung liest jetzt `canonical_v2` und `canonical_v1_compatible`. Der Selbsttest prueft beide Konsumenten und verbietet den entfernten Schluessel. |
+| README Englisch | Aktuelle Baseline: 15 Migrationen und 305/305 pgTAP. |
+| README Deutsch | Aktuelle Baseline: 15 Migrationen und 305/305 pgTAP. |
+| Engineering-Handbuch | PostgreSQL-Baseline auf 305/305 samt Frischegrenztest aktualisiert. |
+
+Gezielte lokale Ergebnisse: Horizon **30 Assertions PASS**,
+Quellenbeobachtung **12 Assertions PASS**, PR-Ticketbindung
+**10 Tests / 29 Assertions PASS**, Ticketkontrolle **22 Tests / 58 Assertions
+PASS**, Gate-Definitionen **17 Assertions PASS**. Projektkontrolle,
+Dokumentationsverweise, Bash-Syntax und 150 YAML-Dateien bestanden. Der
+vollstaendige Development-Runner bestand danach mit **33/33 Gates**. Ein
+erster Sandbox-Lauf war wegen fehlender Schreibrechte am installierten
+Flutter-SDK-Cache und gesperrter OSV-Netzwerkauflösung technisch unvollstaendig;
+derselbe Runner lief mit den benoetigten lokalen Zugriffsrechten vollstaendig
+gruen. Der neue Commit benoetigt noch einen frischen GitHub-PR-Lauf; danach
+werden die Threads mit den konkreten Nachweisen beantwortet.

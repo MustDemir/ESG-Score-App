@@ -307,7 +307,7 @@ implementation_evidence:
   validated_on: 2026-09-07
   remote_deployment_evidence: docs/project/audits/2026-08-18-remote-deployment-verification.md
   writer_contract_tests: 12/12 PASS
-  database_tests: 303/303 PASS
+  database_tests: 305/305 PASS
   local_migrations: 15/15 REPLAYED
   local_revalidated_on: 2026-09-23
   remote_migrations: 13/13 RECONCILED

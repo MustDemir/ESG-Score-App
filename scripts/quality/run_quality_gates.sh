@@ -76,9 +76,11 @@ gate_compliance_catalog() {
 
 gate_compliance_horizon() {
   local profile="${COMPLIANCE_PROFILE:-development}"
-  cd "$REPO_ROOT" &&
-    ruby scripts/quality/test_compliance_horizon_gate.rb &&
-    ruby scripts/quality/test_compliance_source_observation.rb
+  if ! cd "$REPO_ROOT" ||
+    ! ruby scripts/quality/test_compliance_horizon_gate.rb ||
+    ! ruby scripts/quality/test_compliance_source_observation.rb; then
+    return 1
+  fi
 
   if [ "$profile" = "development" ]; then
     cd "$REPO_ROOT" && ruby scripts/quality/validate_compliance_horizon.rb \

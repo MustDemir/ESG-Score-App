@@ -175,7 +175,7 @@ class ComplianceHorizonValidator
       end
 
       reviewed_at = parse_timestamp(matching_review["reviewed_at"])
-      observed_at = parse_timestamp(source_report["generated_at"])
+      observed_at = parse_timestamp(matching_review["observation_generated_at"])
       if reviewed_at.nil? || observed_at.nil? || reviewed_at < observed_at
         enforce_profiled_finding("#{source_id}: manual review predates the observed source state")
       end

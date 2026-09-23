@@ -18,6 +18,12 @@ class GateDefinitionSelfTest
     with_fixture do |root|
       check = validator(root)
       assert(check.run, "repository fixture should pass: #{check.violations.join('; ')}")
+      assert(check.report.dig("counts", "canonical_v2").is_a?(Integer), "report must expose canonical_v2 count")
+      workflow = File.read(File.join(root, ".github/workflows/quality-gates.yml"), encoding: "UTF-8")
+      assert(workflow.include?(".counts.canonical_v2"), "CI summary must read canonical_v2 count")
+      assert(workflow.include?(".counts.canonical_v1_compatible"), "CI summary must read canonical_v1_compatible count")
+      refute_legacy_consumer = !workflow.match?(/\.counts\.canonical(?!_)/)
+      assert(refute_legacy_consumer, "CI summary must not read the removed canonical count")
     end
 
     mutate_gate("G-PROVIDER-DPA", ->(gate) { gate.delete("criteria") }) do |check|

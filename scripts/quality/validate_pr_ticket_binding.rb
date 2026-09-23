@@ -8,7 +8,7 @@ require "yaml"
 class PullRequestTicketBindingValidator
   attr_reader :violations
 
-  REVIEWABLE_STATUSES = %w[in_progress draft review done].freeze
+  REVIEWABLE_STATUSES = %w[in_progress draft review].freeze
 
   def initialize(repo_root:, event_path:, tickets_dir: nil)
     @repo_root = repo_root

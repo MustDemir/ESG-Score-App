@@ -362,7 +362,7 @@ jobs:
             cat .quality/provider-governance/report.md >> "$GITHUB_STEP_SUMMARY"
           fi
           if [ -f .quality/gate-definitions/report.json ]; then
-            jq -r '"\n## G-GATE-DEFINITION-QUALITY\n\nDecision: **\(.decision)**  \nDefinitions: **\(.counts.gates)**  \nCanonical: **\(.counts.canonical)**  \nCompatible legacy: **\(.counts.legacy_compatible)**"' \
+            jq -r '"\n## G-GATE-DEFINITION-QUALITY\n\nDecision: **\(.decision)**  \nDefinitions: **\(.counts.gates)**  \nCanonical v2: **\(.counts.canonical_v2)**  \nCanonical v1 compatible: **\(.counts.canonical_v1_compatible)**  \nCompatible legacy: **\(.counts.legacy_compatible)**"' \
               .quality/gate-definitions/report.json >> "$GITHUB_STEP_SUMMARY"
           fi
 
