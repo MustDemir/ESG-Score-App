@@ -76,7 +76,21 @@ session_handoff:
   prepared_at: 2026-09-23
   session_closed_at: null
   branch: codex/tkt-038-01-cache-freshness
-  status: backend_and_cache_technically_reviewed_commit_push_and_github_evidence_pending
+  status: backend_and_cache_review_branches_pushed_post_merge_evidence_pending
+  delivery_2026_09_23:
+    backend_commit: f33f7584e779f450448440042106ac69f7596eca
+    cache_commit: ad84070e359462e7587365ac203576fb5be940b3
+    backend_branch: codex/tkt-037-05-control-assurance
+    cache_branch: codex/tkt-038-01-cache-freshness
+    backend_pr: https://github.com/MustDemir/ESG-Score-App/pull/35
+    cache_pr: https://github.com/MustDemir/ESG-Score-App/pull/36
+    backend_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35828728604
+    cache_implementation_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35828730653
+    ci_boundary: Live GitHub results are authoritative; the linked runs refer to the implementation commits, not later handoff-only commits.
+    merge_order: Backend PR first; then retarget cache PR to main and rerun required pull-request checks before merging.
+    automatic_merge: false
+    remote_database_changed: false
+    excluded_local_files: .codex/ remains untracked and was not pushed
   control_review_2026_09_22:
     ticket: TKT-040-01
     report: docs/project/audits/2026-09-22-agent-control-review.md
@@ -99,14 +113,16 @@ session_handoff:
     database_http_execution: 292 assertions PASS; real Edge handler publication and replay PASS; isolated stack only
     database_replay: 15 migrations; 303 pgTAP assertions; lint PASS
     development_gates: 33/33 PASS on 2026-09-23
-    next_action: Publish reviewed branches and prepare separate PRs; close GitHub and post-merge evidence before ticket completion; privacy and remote remain blocked
-  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/30
-  pull_request: null
+    next_action: Review draft PRs 35 and 36; finish PR and post-merge evidence in dependency order; privacy and remote remain blocked
+  merged_pull_request: https://github.com/MustDemir/ESG-Score-App/pull/31
+  pull_request: https://github.com/MustDemir/ESG-Score-App/pull/36
   git_state:
-    committed: false
-    pushed: false
+    committed: true
+    pushed: true
     working_tree_clean: false
     commits:
+      - ad84070 Cache freshness and expiry repair with regression evidence
+      - f33f758 Reviewed backend controls and prepared delivery baseline
       - 98d2da3 Merge pull request 30 from MustDemir/feature/retention-observability
       - 1b8af83 feat: add retention operations monitoring
       - 262d060 Merge pull request 29 from MustDemir/docs/retention-remote-evidence

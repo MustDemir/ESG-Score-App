@@ -86,7 +86,7 @@ gates:
     - ruby scripts/quality/validate_tickets.rb
     - cd esg_app && flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - bash scripts/quality/run_quality_gates.sh
-evidence: [docs/project/audits/2026-09-22-agent-control-review.md, docs/project/audits/2026-09-23-cache-frische-validation.md]
+evidence: [docs/project/audits/2026-09-22-agent-control-review.md, docs/project/audits/2026-09-23-cache-frische-validation.md, "https://github.com/MustDemir/ESG-Score-App/pull/36"]
 rollback:
   strategy: Geprueften Client-Stand wiederherstellen; Supabase-Konfiguration bleibt deaktiviert.
   verification: OFF-Fallback und Datenfrischetests erneut ausfuehren.

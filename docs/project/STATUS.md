@@ -25,6 +25,13 @@ Der separate technische Review ist dokumentiert; PR-/Post-Merge-Evidenz fehlt no
 Die zwei Cache-Frischefehler sind in [TKT-038-01 lokal repariert und reviewt](audits/2026-09-23-cache-frische-validation.md), ebenfalls noch ohne PR-/Post-Merge-Abschluss. Lokale HTTP-Evidenz
 ersetzt weder Hosted-Gateway-Pruefung noch Privacy-Freigabe.
 
+Die geprueften Implementierungen sind gepusht: zuerst
+[Kontroll-/Backend-PR #35](https://github.com/MustDemir/ESG-Score-App/pull/35),
+darauf aufbauend [Cache-PR #36](https://github.com/MustDemir/ESG-Score-App/pull/36).
+Beide sind Drafts, kein Merge oder Remote-Deployment wurde ausgefuehrt.
+Vor dem Cache-Merge ist nach Integration der Basis das Ziel auf main zu
+setzen und die reguläre PR-CI erneut auszufuehren. Post-Merge-Evidenz bleibt offen.
+
 ## Validierte Baseline
 
 | Bereich | Evidenzstand |
