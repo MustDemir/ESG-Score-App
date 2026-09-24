@@ -75,7 +75,7 @@ ticket_workflow:
 
 session_handoff:
   prepared_at: 2026-09-24
-  session_closed_at: "2026-09-23T13:07:26+02:00"
+  session_closed_at: "2026-09-24T08:53:01+02:00"
   branch: codex/tkt-037-01-reactivate
   status: tkt_037_01_active_review_package_ready_for_qualified_reviewer
   merges_2026_09_24:
@@ -293,7 +293,7 @@ session_handoff:
     evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
-    claims_privacy_gate_self_tests: 26 assertions PASS
+    claims_privacy_gate_self_tests: 38 assertions PASS
     claims_development_profile: PASS
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
@@ -427,12 +427,15 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
-    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
+    - Auf main starten, nachdem PR 39 (Ticket-Reaktivierung, Vorfallbericht, stack.yaml) gemergt ist; PR 39 enthaelt keine Migration
+    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben und auf den Vorfallbericht hinweisen
+    - Remote-Verifikation vorbereiten (TKT-037-03): rollback-only Verifier und Pruefung der Hosted-Proxy-Kette gegen scanfair-dev, erst nach ausdruecklicher Freigabe durch Mustafa
+    - TKT-037-02 formal auf den bereits per Auto-Deploy angewandten Iststand umstellen
+    - Vor jedem Merge mit Migration: als Remote-Deployment bestaetigen lassen (FM-18)
     - Nach positiver Entscheidung README-Schritte 4 bis 7 exakt in dieser Reihenfolge ausfuehren
-    - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
-    - Danach TKT-037-02 bis TKT-037-04 fuer Remote-Anwendung, Verifier und externen Alarmkanal abarbeiten
-    - README.md und README.de.md nach kanonischer Uebernahme des Closeouts um PR 36 und den Post-Merge-Abschluss ergaenzen
+    - App-Traffic zum Backend (SCANFAIR_SUPABASE_URL) erst nach Privacy-Freigabe, Remote-Verifikation und Datenschutztext aktivieren
+    - TKT-037-04 externen Alarmkanal abarbeiten
+    - README.md und README.de.md um PRs 36 bis 39 und den Post-Merge-Stand ergaenzen
     - TODO-032 fuer die Node-20-Action abarbeiten; Ubuntu-26-Runnerwechsel vor jeder Aenderung als eigenes Ticket erfassen
   next_session_plan:
     planning_basis: |
@@ -1025,10 +1028,20 @@ weekly_log:
       - Inventar darf sich seit dem geprueften Commit nur in Freigabefeldern aendern
       - Vergangene Pseudonym-Schluessel koennen unter Advisory-Lock nicht mehr neu entstehen
       - Post-Merge-Lauf 35963681945 mit allen sechs anwendbaren Jobs gruen
+    learnings:
+      - Merge nach main ist in diesem Repo ein Remote-Deployment von Migrationen; Remote-Status muss am Projekt gelesen, nicht aus Doku abgeleitet werden (FM-18)
+      - Automatische Reviews fanden drei echte Freigabe- und Race-Luecken; Gates muessen Inhalte und Zeitgrenzen pruefen, nicht nur Felder (FM-19)
+      - Tests an Stunden- oder Minutengrenzen brauchen einen im selben Statement erfassten Zeitstempel
     blockers:
       - Qualifizierte Datenschutzentscheidung (TKT-037-01 AC-02) steht aus
+      - Migrationen 14 bis 16 sind remote angewandt, aber noch nicht verifiziert
     next_week:
       - Review-Paket uebergeben
+      - Remote-Verifikation TKT-037-03 nach Freigabe
+    also_done:
+      - Remote-Auto-Deploy als Vorfall dokumentiert und alle Remote-Statusangaben korrigiert
+      - stack.yaml je Komponente um Erklaerung, Optionen, Entscheidung und Begruendung ergaenzt
+      - FM-18 und FM-19 in failure-modes.yaml aufgenommen
 
   - week: 2026-W39-session3
     summary: Unkeyed IP-Pseudonym durch HMAC mit stuendlich rotierendem, danach geloeschtem Zufallsschluessel ersetzt (TKT-037-06).

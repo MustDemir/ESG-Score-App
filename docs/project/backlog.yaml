@@ -1073,7 +1073,7 @@ todos:
         einholen und hashgebunden versionieren (TKT-037-01 AC-02)
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
-      - Migrationen 14 bis 16 nur nach Privacy-Review kontrolliert remote anwenden und
+      - Per Auto-Deploy bereits angewandte Migrationen 14 bis 16 formal bestaetigen (TKT-037-02) und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
     updated: 2026-09-24

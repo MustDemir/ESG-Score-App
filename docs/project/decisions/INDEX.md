@@ -4,7 +4,7 @@
 > ADR diese Tabelle aktualisieren. Übernommen aus ai-context-vault-Pattern
 > (entscheidungsregister), siehe [ADR 0009](0009-methodology-adoption.yaml).
 
-Letztes Update: 2026-09-06
+Letztes Update: 2026-09-24 (0040 um `amendment_2026_09_24` ergaenzt: stuendlich rotierendes HMAC-Pseudonym, TKT-037-06)
 
 ## Aktive ADRs
 
