@@ -1,5 +1,5 @@
 schema_version: "1.0"
-last_reviewed: 2026-08-17
+last_reviewed: 2026-09-24
 owner: Mustafa Demir
 status: accepted_for_local_development
 
@@ -61,6 +61,13 @@ reviews:
     status: pending
     reviewer_requirement: qualified_data_protection_counsel
     evidence: null
+  public_read_rate_limit_legal_basis:
+    status: pending
+    reviewer_requirement: qualified_data_protection_counsel
+    required_scope: remote_backend_public_read_rate_limit
+    processing_activity: PRV-008
+    ticket: TKT-037-01
+    evidence: null
   processor_contracts:
     status: not_applicable_remote_disabled
     evidence: null
@@ -77,6 +84,8 @@ evidence_contracts:
     required_fields:
       - schema_version
       - reviewed_at
+      - reviewer_identity
+      - reviewed_commit
       - scope
       - privacy_inventory_sha256
       - document_path
@@ -113,9 +122,13 @@ evidence_contracts:
     evidence_type: dpia_screening
     required_values:
       decision_status: approved
+      decision: dpia_not_required
+      assessed_by_role: qualified_data_protection_counsel
     required_fields:
       - schema_version
       - assessed_at
+      - assessed_by_identity
+      - reviewed_commit
       - assessed_by_role
       - scope
       - decision
@@ -321,6 +334,63 @@ processing_activities:
       - bounded_pg_cron_cleanup_locally_validated
       - durable_non_user_writer_watermark_preserves_replay_integrity
 
+  - id: PRV-008
+    enabled: false
+    data_type: pseudonymous_ip_rate_limit_windows_for_public_read_rpcs
+    data_subject: backend_request_user_including_possible_minors
+    personal_data_assessment: personal_data_pseudonymous_not_anonymous_unkeyed_sha256_of_ip_address
+    source: final_x_forwarded_for_entry_appended_by_trusted_ingress
+    purpose: abuse_enumeration_and_shared_quota_protection_for_three_public_read_rpcs
+    necessity: qualified_review_pending_alternatives_listed_in_tkt_037_01_review_package
+    processing_location: planned_EU_Supabase_private_schema
+    recipients:
+      - planned_Supabase_processor
+    region: EU_region_required_before_activation
+    legal_basis_candidate: GDPR_Art_6_1_f_candidate_requires_LIA
+    legal_basis_status: prohibited_until_review
+    retention: expires_1_hour_after_window_start_cleanup_every_5_minutes_max_10000_rows_per_run_no_hard_bound_on_scheduler_outage_release_blocker
+    deletion: pg_cron_job_scanfair_public_read_rate_cleanup_owned_by_postgres
+    apple_data_type: not_linked_security_telemetry_classification_requires_review
+    linked_to_user: false_no_account_but_same_ip_linkable_across_windows
+    tracking: prohibited
+    transient_fields:
+      - final_x_forwarded_for_entry_parsed_as_inet_within_pre_request_transaction
+    stored_fields:
+      - subject_hash
+      - window_started_at
+      - request_count
+      - expires_at
+    never_stored:
+      - raw_ip_address
+      - earlier_x_forwarded_for_entries
+      - user_agent
+      - request_payload_or_barcode
+      - response_body
+    request_bound: 30_requests_per_pseudonym_per_minute_then_429_retry_after_60_seconds
+    safeguards:
+      - no_raw_ip_storage
+      - private_table_revoked_from_public_anon_authenticated_service_role
+      - security_definer_pre_request_hook_only_writer
+      - fail_closed_403_on_missing_or_invalid_ip
+      - bound_to_post_on_three_explicit_rpc_paths
+      - remote_runtime_disabled
+      - migrations_14_and_15_not_applied_remote
+    residual_risks:
+      - unkeyed_hash_allows_offline_ip_candidate_checks
+      - same_ip_linkable_across_minute_windows_until_deletion
+      - shared_ip_or_nat_can_attribute_several_people_to_one_bucket
+      - hosted_proxy_chain_and_distinct_client_mapping_not_remote_verified
+      - no_hard_physical_deletion_bound_during_cleanup_backlog_or_outage
+      - provider_api_gateway_logs_may_contain_raw_ip_retention_requires_provider_confirmation
+    implementation_refs:
+      decision: docs/project/decisions/0040-public-read-abuse-protection.yaml
+      migrations:
+        - supabase/migrations/20260906000100_public_read_abuse_protection.sql
+        - supabase/migrations/20260923000100_public_read_api_integration.sql
+      database_tests: supabase/tests/database/public_read_abuse_protection.test.sql
+      http_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
+      review_package: docs/project/compliance/review/tkt-037-01/README.md
+
 data_flow_contract:
   current_path:
     - camera_frame_processed_on_device
@@ -358,6 +428,13 @@ retention_contract:
     source_record_watermarks: source_record_lifecycle_one_row_per_record
     personal_access_logs: prohibited
     decision: docs/project/decisions/0037-bounded-retention-cleanup.yaml
+  remote_public_read_rate_windows:
+    activation_status: runtime_disabled_migrations_14_and_15_not_applied_remote
+    processing_activity: PRV-008
+    logical_expiry: 1_hour_after_window_start
+    physical_deletion: next_5_minute_cleanup_run_when_healthy_max_10000_rows_per_run
+    maximum_retention_on_backlog_or_outage: unbounded_release_blocker_pending_qualified_review
+    decision: docs/project/decisions/0040-public-read-abuse-protection.yaml
 
 data_subject_rights:
   current_scanfair_server_records: none
@@ -395,6 +472,13 @@ dpia:
       - innovative_technology_or_organizational_solution
       - processing_preventing_exercise_of_right_or_service
     evidence: null
+  public_read_rate_limit_scope:
+    preliminary_decision: screening_required_before_activation
+    decision_status: pending
+    required_scope: remote_backend_public_read_rate_limit
+    processing_activity: PRV-008
+    ticket: TKT-037-01
+    evidence: null
 
 remote_release_blocks:
   - remote_backend_enabled_without_approved_legal_basis_and_LIA_where_applicable
@@ -402,6 +486,7 @@ remote_release_blocks:
   - unknown_or_unbounded_personal_data_retention
   - rights_or_incident_process_not_tested
   - dpia_screening_missing_or_unapproved
+  - public_read_rate_limit_without_scoped_legal_basis_and_dpia_screening_approval
   - privacy_policy_or_app_store_details_do_not_match_actual_build
   - analytics_tracking_accounts_or_location_enabled_without_separate_activation_control
 

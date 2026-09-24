@@ -326,7 +326,7 @@ class ClaimsPrivacyBoundaryValidator
       end
     end
 
-    expected_ids = %w[PRV-001 PRV-002 PRV-003 PRV-004 PRV-005 PRV-006 PRV-007]
+    expected_ids = %w[PRV-001 PRV-002 PRV-003 PRV-004 PRV-005 PRV-006 PRV-007 PRV-008]
     missing_ids = expected_ids - activities.map { |activity| activity["id"] }
     unless missing_ids.empty?
       violations << "#{label}: missing processing activities #{missing_ids.join(', ')}"
@@ -338,6 +338,15 @@ class ClaimsPrivacyBoundaryValidator
     end
     if @profile == "development" && !network["retention"].to_s.include?("unknown_release_blocker")
       violations << "#{label}: development inventory must expose provider-retention uncertainty"
+    end
+
+    rate_limit = activities.find { |activity| activity["id"] == "PRV-008" } || {}
+    unless rate_limit["personal_data_assessment"].to_s.include?("pseudonymous_not_anonymous")
+      violations << "#{label}: PRV-008 must classify the IP pseudonym as personal data"
+    end
+    unless Array(rate_limit["safeguards"]).include?("no_raw_ip_storage") &&
+           Array(rate_limit["never_stored"]).include?("raw_ip_address")
+      violations << "#{label}: PRV-008 must document that raw IP addresses are never stored"
     end
   end
 
@@ -420,6 +429,18 @@ class ClaimsPrivacyBoundaryValidator
     validate_privacy_review(inventory, "remote_legal_basis", "legal_review", "approved", label)
     validate_privacy_review(inventory, "processor_contracts", "processor_review", "approved", label)
     validate_privacy_review(inventory, "rights_operations", "rights_verification", "verified", label)
+    validate_public_read_rate_limit(inventory, label)
+  end
+
+  # The PostgREST pre-request limiter (PRV-008) runs whenever the remote
+  # backend serves public reads, so its scoped approvals cannot be skipped.
+  def validate_public_read_rate_limit(inventory, label)
+    rate_limit = Array(inventory["processing_activities"]).find { |activity| activity["id"] == "PRV-008" } || {}
+    unless rate_limit["enabled"] == true
+      violations << "#{label}: PRV-008 must be enabled and resolved when the remote backend is enabled"
+    end
+    validate_privacy_review(inventory, "public_read_rate_limit_legal_basis", "legal_review", "approved", label)
+    validate_dpia_evidence(inventory, label, scope_key: "public_read_rate_limit_scope")
   end
 
   def validate_enabled_processing_activities(inventory, label)
@@ -446,28 +467,33 @@ class ClaimsPrivacyBoundaryValidator
       inventory.dig("evidence_contracts", contract_name) || {},
       "#{label}: #{review_name}",
       inventory_relative: label,
+      required_scope: review["required_scope"],
     )
   end
 
-  def validate_dpia_evidence(inventory, label)
-    dpia = inventory.dig("dpia", "remote_or_beta_scope") || {}
+  def validate_dpia_evidence(inventory, label, scope_key: "remote_or_beta_scope")
+    dpia = inventory.dig("dpia", scope_key) || {}
     unless dpia["decision_status"] == "approved"
-      violations << "#{label}: DPIA screening decision is not approved"
+      violations << "#{label}: DPIA screening decision for #{scope_key} is not approved"
     end
     validate_evidence(
       dpia["evidence"],
       inventory.dig("evidence_contracts", "dpia_screening") || {},
-      "#{label}: DPIA screening",
+      "#{label}: DPIA screening #{scope_key}",
       inventory_relative: label,
+      required_scope: dpia["required_scope"],
     )
   end
 
-  def validate_evidence(relative, contract, label, inventory_relative:)
+  def validate_evidence(relative, contract, label, inventory_relative:, required_scope: nil)
     evidence = load_evidence(relative, label)
     return if evidence.empty?
 
     unless evidence["evidence_type"] == contract["evidence_type"]
       violations << "#{label}: evidence_type must be #{contract['evidence_type'].inspect}"
+    end
+    if required_scope && evidence["scope"] != required_scope
+      violations << "#{label}: scope must be #{required_scope.inspect}"
     end
     contract.fetch("required_values", {}).each do |field, expected|
       unless evidence[field] == expected
