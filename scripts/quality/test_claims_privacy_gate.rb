@@ -11,6 +11,9 @@ require_relative "validate_claims_privacy_boundaries"
 
 class BoundaryGateSelfTest
   GATES = %w[claims privacy all].freeze
+  FIXTURE_COMMIT = Digest::SHA1.hexdigest("scanfair-privacy-fixture").freeze
+  LEGAL_OPTIONS = %w[approved approved_with_conditions rejected more_information_required].freeze
+  DPIA_OPTIONS = %w[dpia_not_required dpia_required prior_consultation_to_assess more_information_required].freeze
 
   def initialize(repo_root:, gate:)
     @repo_root = repo_root
@@ -250,6 +253,139 @@ class BoundaryGateSelfTest
       remote = validator(root, "privacy", "remote_backend")
       assert(remote.run, "remote profile should be satisfiable with complete typed evidence: #{remote.violations.join('; ')}")
     end
+
+    test_privacy_scoped_decisions
+  end
+
+  # TKT-037-01: a DPIA-required outcome, a mis-scoped approval or a disabled
+  # rate-limit record must never unlock the remote profile.
+  def test_privacy_scoped_decisions
+    inventory_path = "docs/project/compliance/privacy-data-inventory.yaml"
+
+    with_fixture do |root|
+      prepare_privacy_approval(root)
+      evidence_path = "docs/project/compliance/review/dpia-evidence.yaml"
+      evidence = load_yaml(root, evidence_path)
+      evidence["decision"] = "dpia_required"
+      write_yaml(root, evidence_path, evidence)
+
+      required = validator(root, "privacy", "external_beta")
+      assert(!required.run, "privacy gate should reject an approved status with a dpia_required outcome")
+      assert(
+        required.violations.any? { |entry| entry.include?("decision must be \"dpia_not_required\"") },
+        "privacy gate should explain the blocking DPIA outcome",
+      )
+    end
+
+    with_fixture do |root|
+      prepare_privacy_approval(root, remote_backend: true)
+      evidence_path = "docs/project/compliance/review/rate-limit-legal-evidence.yaml"
+      evidence = load_yaml(root, evidence_path)
+      evidence["scope"] = "remote_backend"
+      write_yaml(root, evidence_path, evidence)
+
+      misscoped = validator(root, "privacy", "remote_backend")
+      assert(!misscoped.run, "privacy gate should reject rate-limit approval evidence with another scope")
+      assert(
+        misscoped.violations.any? { |entry| entry.include?("scope must be \"remote_backend_public_read_rate_limit\"") },
+        "privacy gate should explain the scope mismatch",
+      )
+    end
+
+    with_fixture do |root|
+      prepare_privacy_approval(root, remote_backend: true)
+      inventory = load_yaml(root, inventory_path)
+      inventory["processing_activities"].find { |activity| activity["id"] == "PRV-008" }["enabled"] = false
+      write_yaml(root, inventory_path, inventory)
+
+      disabled = validator(root, "privacy", "remote_backend")
+      assert(!disabled.run, "privacy gate should reject a remote backend whose rate-limit record is disabled")
+      assert(
+        disabled.violations.any? { |entry| entry.include?("PRV-008 must be enabled") },
+        "privacy gate should identify the disabled rate-limit record",
+      )
+    end
+
+    with_fixture do |root|
+      inventory = load_yaml(root, inventory_path)
+      rate_limit = inventory["processing_activities"].find { |activity| activity["id"] == "PRV-008" }
+      rate_limit["never_stored"] = rate_limit["never_stored"] - ["raw_ip_address"]
+      write_yaml(root, inventory_path, inventory)
+
+      raw_ip = validator(root, "privacy", "development")
+      assert(!raw_ip.run, "privacy gate should reject a rate-limit record without the raw-IP storage ban")
+      assert(
+        raw_ip.violations.any? { |entry| entry.include?("raw IP addresses are never stored") },
+        "privacy gate should explain the missing raw-IP storage ban",
+      )
+    end
+
+    # PR 37 review: incomplete or conditional approvals must not pass.
+    legal_evidence = "docs/project/compliance/review/rate-limit-legal-evidence.yaml"
+    {
+      "reviewed_commit" => ["0" * 40, "full, non-zero git commit SHA"],
+      "reviewer_qualification" => ["[QUALIFICATION_OR_EVIDENCE_REFERENCE]", "template placeholder"],
+      "conditions" => [["remote alerting before activation"], "empty list for an unconditional approval"],
+    }.each do |field, (value, message)|
+      with_fixture do |root|
+        prepare_privacy_approval(root, remote_backend: true)
+        evidence = load_yaml(root, legal_evidence)
+        evidence[field] = value
+        write_yaml(root, legal_evidence, evidence)
+        weak = validator(root, "privacy", "remote_backend")
+        assert(!weak.run, "privacy gate should reject #{field} #{value.inspect}")
+        assert(weak.violations.any? { |entry| entry.include?(message) },
+          "privacy gate should explain the #{field} rejection")
+      end
+    end
+
+    with_fixture do |root|
+      prepare_privacy_approval(root, remote_backend: true)
+      document = "docs/project/compliance/review/rate-limit-legal.md"
+      write(root, document, legal_document("rate-limit", "approved_with_conditions"))
+      evidence = load_yaml(root, legal_evidence)
+      evidence["document_sha256"] = digest(root, document)
+      write_yaml(root, legal_evidence, evidence)
+      conditional = validator(root, "privacy", "remote_backend")
+      assert(!conditional.run, "privacy gate should reject evidence that contradicts its signed document")
+      assert(
+        conditional.violations.any? { |entry| entry.include?("document must mark exactly \"approved\"") },
+        "privacy gate should explain the document decision mismatch",
+      )
+    end
+  end
+
+  def decision_document(title, options, checked)
+    lines = options.map { |option| "- `[#{option == checked ? 'x' : ' '}] #{option}`" }
+    "# #{title}\n\n#{lines.join("\n")}\n"
+  end
+
+  def legal_document(scope, checked = "approved")
+    decision_document("Legal review #{scope}", LEGAL_OPTIONS, checked)
+  end
+
+  def dpia_document(scope, checked = "dpia_not_required")
+    decision_document("DPIA screening #{scope}", DPIA_OPTIONS, checked)
+  end
+
+  def dpia_evidence(root, inventory_hash, scope, document_path)
+    {
+      "evidence_type" => "dpia_screening",
+      "decision_status" => "approved",
+      "schema_version" => "1.0",
+      "assessed_at" => "2026-08-11T12:00:00Z",
+      "assessed_by_identity" => "Test Counsel",
+      "assessor_qualification" => "Fachanwalt fuer IT-Recht, Testfixture",
+      "signature_or_approval_reference" => "signed-pdf:test-fixture-002",
+      "assessed_by_role" => "qualified_data_protection_counsel",
+      "reviewed_commit" => FIXTURE_COMMIT,
+      "scope" => scope,
+      "decision" => "dpia_not_required",
+      "criteria" => %w[systematic_monitoring vulnerable_subjects innovative_technology],
+      "privacy_inventory_sha256" => inventory_hash,
+      "document_path" => document_path,
+      "document_sha256" => digest(root, document_path),
+    }
   end
 
   def prepare_privacy_approval(root, remote_backend: false)
@@ -306,20 +442,36 @@ class BoundaryGateSelfTest
         "status" => "verified",
         "evidence" => "docs/project/compliance/review/rights-evidence.yaml",
       }
+      rate_limit = inventory["processing_activities"].find { |activity| activity["id"] == "PRV-008" }
+      rate_limit.merge!(
+        "enabled" => true,
+        "necessity" => "approved_abuse_protection_scope",
+        "processing_location" => "EU_Supabase_private_schema",
+        "region" => "EU_region_confirmed",
+        "legal_basis_status" => "approved",
+        "retention" => "expires_1_hour_with_approved_deletion_bound",
+        "deletion" => "verified_scheduled_cleanup_with_backlog_alarm",
+      )
+      inventory["reviews"]["public_read_rate_limit_legal_basis"]["status"] = "approved"
+      inventory["reviews"]["public_read_rate_limit_legal_basis"]["evidence"] = "docs/project/compliance/review/rate-limit-legal-evidence.yaml"
+      inventory["dpia"]["public_read_rate_limit_scope"]["decision_status"] = "approved"
+      inventory["dpia"]["public_read_rate_limit_scope"]["evidence"] = "docs/project/compliance/review/rate-limit-dpia-evidence.yaml"
     end
 
     privacy_path = File.join(root, "docs/privacy.md")
     privacy_text = File.read(privacy_path).gsub(/Entwurf|Stub/i, "Freigegeben")
     File.write(privacy_path, privacy_text)
 
-    write(root, "docs/project/compliance/review/privacy-legal.md", "Approved direct-lookup legal review\n")
+    write(root, "docs/project/compliance/review/privacy-legal.md", legal_document("direct-lookup"))
     write(root, "docs/project/compliance/review/privacy-disclosure.md", "Approved privacy disclosure\n")
     write(root, "docs/project/compliance/review/app-privacy-details.json", "{\"approved\":true}\n")
-    write(root, "docs/project/compliance/review/dpia-screening.md", "Approved DPIA screening\n")
+    write(root, "docs/project/compliance/review/dpia-screening.md", dpia_document("beta"))
     if remote_backend
-      write(root, "docs/project/compliance/review/remote-legal.md", "Approved remote legal review\n")
+      write(root, "docs/project/compliance/review/remote-legal.md", legal_document("remote"))
       write(root, "docs/project/compliance/review/processor-contract.md", "Approved processor contract review\n")
       write(root, "docs/project/compliance/review/rights-verification.json", "{\"verified\":true}\n")
+      write(root, "docs/project/compliance/review/rate-limit-legal.md", legal_document("rate-limit"))
+      write(root, "docs/project/compliance/review/rate-limit-dpia.md", dpia_document("rate-limit"))
     end
     write_yaml(root, inventory_path, inventory)
     inventory_hash = digest(root, inventory_path)
@@ -327,6 +479,11 @@ class BoundaryGateSelfTest
     base = {
       "schema_version" => "1.0",
       "reviewed_at" => "2026-08-11T12:00:00Z",
+      "reviewer_identity" => "Test Counsel",
+      "reviewer_qualification" => "Fachanwalt fuer IT-Recht, Testfixture",
+      "reviewed_commit" => FIXTURE_COMMIT,
+      "signature_or_approval_reference" => "signed-pdf:test-fixture-001",
+      "conditions" => [],
       "scope" => remote_backend ? "remote_backend" : "external_beta",
       "privacy_inventory_sha256" => inventory_hash,
     }
@@ -371,21 +528,32 @@ class BoundaryGateSelfTest
     write_yaml(
       root,
       "docs/project/compliance/review/dpia-evidence.yaml",
-      {
-        "evidence_type" => "dpia_screening",
-        "decision_status" => "approved",
-        "schema_version" => "1.0",
-        "assessed_at" => "2026-08-11T12:00:00Z",
-        "assessed_by_role" => "qualified_data_protection_counsel",
-        "scope" => "external_beta",
-        "decision" => "dpia_not_required",
-        "criteria" => %w[systematic_monitoring vulnerable_subjects innovative_technology],
-        "privacy_inventory_sha256" => inventory_hash,
-        "document_path" => "docs/project/compliance/review/dpia-screening.md",
-        "document_sha256" => digest(root, "docs/project/compliance/review/dpia-screening.md"),
-      },
+      dpia_evidence(root, inventory_hash, "external_beta", "docs/project/compliance/review/dpia-screening.md"),
     )
     return unless remote_backend
+
+    write_yaml(
+      root,
+      "docs/project/compliance/review/rate-limit-legal-evidence.yaml",
+      base.merge(
+        "evidence_type" => "privacy_legal_review",
+        "decision" => "approved",
+        "reviewer_role" => "qualified_data_protection_counsel",
+        "scope" => "remote_backend_public_read_rate_limit",
+        "document_path" => "docs/project/compliance/review/rate-limit-legal.md",
+        "document_sha256" => digest(root, "docs/project/compliance/review/rate-limit-legal.md"),
+      ),
+    )
+    write_yaml(
+      root,
+      "docs/project/compliance/review/rate-limit-dpia-evidence.yaml",
+      dpia_evidence(
+        root,
+        inventory_hash,
+        "remote_backend_public_read_rate_limit",
+        "docs/project/compliance/review/rate-limit-dpia.md",
+      ),
+    )
 
     write_yaml(
       root,

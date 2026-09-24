@@ -75,7 +75,10 @@ class TicketControlValidatorTest < Minitest::Test
 
   def test_done_without_completion_and_evidence_fails
     with_tickets do |dir|
-      mutate(dir, "tkt-037-01-privacy-pruefung-ip-pseudonyme.yaml") { |ticket| ticket["status"] = "done" }
+      mutate(dir, "tkt-037-01-privacy-pruefung-ip-pseudonyme.yaml") do |ticket|
+        ticket["status"] = "done"
+        ticket["evidence"] = []
+      end
       assert_violation(dir, "done ticket requires completed DoD")
       assert_violation(dir, "done ticket requires evidence")
     end

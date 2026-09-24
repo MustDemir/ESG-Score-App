@@ -6,7 +6,7 @@ parent_todo: TODO-038
 ticket_type: feature_code
 dod_task_types: [feature_code]
 priority: P2
-status: review
+status: done
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-22
@@ -69,7 +69,7 @@ acceptance_criteria:
     verification: [Gezielter pgTAP-Grenztest und vollstaendige Datenbank-Suite in isolierter Testumgebung]
     evidence_required: [SQL-Testprotokoll]
 definition_of_done:
-  status: not_done
+  status: done
   criteria:
     - id: DOD-01
       criterion: Die zwei Fehler sind vor der Reparatur reproduziert und danach durch Regressionstests ausgeschlossen.
@@ -85,16 +85,20 @@ definition_of_done:
       evidence: [docs/project/audits/2026-09-23-cache-frische-validation.md]
     - id: DOD-04
       criterion: PR- und Post-Merge-CI sowie Ticket- und Fortschrittsevidenz sind geschlossen.
-      status: pending
-      evidence: []
+      status: satisfied
+      evidence:
+        - docs/project/audits/2026-09-23-cache-frische-validation.md
+        - https://github.com/MustDemir/ESG-Score-App/pull/36
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35841888268
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35842444594
 gates:
   required: [G-PROJECT-CONTROL, G-FLT-FORMAT, G-FLT-ANALYZE, G-FLT-TEST, G-DOC-TRACE, G-DOC-YAML]
   commands:
     - ruby scripts/quality/validate_tickets.rb
     - cd esg_app && flutter test test/services/supabase_product_cache_service_test.dart test/services/product_repository_test.dart
     - bash scripts/quality/run_quality_gates.sh
-evidence: [docs/project/audits/2026-09-22-agent-control-review.md, docs/project/audits/2026-09-23-cache-frische-validation.md, "https://github.com/MustDemir/ESG-Score-App/pull/36"]
+evidence: [docs/project/audits/2026-09-22-agent-control-review.md, docs/project/audits/2026-09-23-cache-frische-validation.md, "https://github.com/MustDemir/ESG-Score-App/pull/36", "https://github.com/MustDemir/ESG-Score-App/actions/runs/35842444594"]
 rollback:
   strategy: Geprueften Client-Stand wiederherstellen; Supabase-Konfiguration bleibt deaktiviert.
   verification: OFF-Fallback und Datenfrischetests erneut ausfuehren.
-activation_boundary: Cache-Reparatur erteilt keine Backend- oder Privacy-Freigabe.
+activation_boundary: Cache-Reparatur und Integrationsnachweis sind abgeschlossen; sie erteilen keine Backend-, Remote- oder Privacy-Freigabe.

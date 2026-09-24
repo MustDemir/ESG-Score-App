@@ -1,0 +1,32 @@
+# Vorlage: erst nach qualifizierter menschlicher Entscheidung kopieren und
+# finalisieren. decision_status bleibt bis dahin pending.
+schema_version: "1.0"
+evidence_type: dpia_screening
+decision_status: pending
+assessed_at: "YYYY-MM-DDThh:mm:ss+hh:mm"
+assessed_by_identity: "[FULL_NAME]"
+assessed_by_role: qualified_data_protection_counsel
+assessor_qualification: "[QUALIFICATION_OR_EVIDENCE_REFERENCE]"
+scope: remote_backend_public_read_rate_limit
+reviewed_commit: "[FULL_GIT_SHA]"
+decision: more_information_required
+criteria:
+  - systematic_evaluation_or_scoring_of_people
+  - automated_decision_with_legal_or_similar_effect
+  - systematic_monitoring
+  - sensitive_or_highly_personal_data
+  - large_scale_processing
+  - matching_or_combining_personal_datasets
+  - vulnerable_data_subjects_including_children
+  - innovative_technology_or_organizational_solution
+  - processing_preventing_exercise_of_right_or_service
+privacy_inventory_sha256: "[LOWERCASE_SHA256]"
+document_path: docs/project/compliance/review/tkt-037-01/dpia-screening.md
+document_sha256: "[LOWERCASE_SHA256]"
+signature_or_approval_reference: "[REFERENCE]"
+review_triggers:
+  - risk_profile_change
+  - scale_or_population_change
+  - new_data_or_linkability
+  - new_provider_region_or_recipient
+  - retention_or_security_control_change
