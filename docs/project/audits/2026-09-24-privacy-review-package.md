@@ -99,7 +99,7 @@ unveraenderten Migrationsstand.
 ## Nachtrag 2026-09-24: geschluesseltes Pseudonym
 
 Nach diesem Bericht wurde das unkeyed SHA-256-Pseudonym als praktisch umkehrbar
-eingestuft (PRP-08, hoch) und in TKT-037-06 durch ein HMAC mit stuendlich
+eingestuft (PRP-09, hoch) und in TKT-037-06 durch ein HMAC mit stuendlich
 rotierendem, danach geloeschtem Zufallsschluessel ersetzt. Die oben genannten
 Restrisiken zum unkeyed Hash gelten fuer Migration 16 nicht mehr; Inventar,
 Datenfluss und Review-Paket wurden nachgezogen. Details:
