@@ -44,3 +44,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-09-23 | [Cache-Frische Validation](2026-09-23-cache-frische-validation.md) | AR-07/08, negative Metadaten, deterministische Ablaufgrenzen und technischer Nachreview |
 | 2026-09-24 | [Privacy-Review-Paket TKT-037-01](2026-09-24-privacy-review-package.md) | PRV-008-Inventar, scoped Privacy-/DPIA-Freigaben, fail-open DPIA-Entscheidung behoben und Hash-Reihenfolge |
 | 2026-09-24 | [Keyed Rate-Pseudonym Validation](2026-09-24-keyed-rate-pseudonym-validation.md) | Migration 16, stuendlich rotierender HMAC-Schluessel, 330 pgTAP, 292 HTTP-Assertions in isolierter Instanz |
+| 2026-09-24 | [Remote Auto-Deploy Incident](2026-09-24-remote-auto-deploy-incident.md) | Migrationen 14 bis 16 per Supabase-GitHub-Integration vor Privacy-Freigabe angewandt; lesende Remote-Pruefung und Korrektur des Doku-Stands |

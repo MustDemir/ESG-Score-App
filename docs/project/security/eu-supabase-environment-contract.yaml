@@ -146,8 +146,16 @@ read_contract:
   fallback_order: [fresh_remote_cache, direct_Open_Food_Facts, transparent_no_data]
   stale_data_must_be_explicit: true
   rate_limit:
-    state: locally_verified_remote_apply_pending_privacy
-    remote_verification: not_applied
+    state: remote_applied_by_auto_deploy_privacy_pending
+    remote_verification: APPLIED_NOT_VERIFIED
+    remote_apply_record:
+      mechanism: Supabase GitHub integration applies new migrations on every push to main
+      migrations_14_and_15_applied_after: PR 35 merge 65b9463 on 2026-09-23
+      migration_16_applied_after: PR 38 merge f7073cb on 2026-09-24
+      approved_before_apply: false
+      app_traffic: none_app_not_released_and_no_default_supabase_url
+      observed_2026_09_24: hook active, 0 counter rows, 0 key rows, 264 cleanup runs, 0 failures, 0 cached products
+      incident_report: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
     security_telemetry_privacy_review: pending
     external_rate_limit_alerting_decision: pending
     hosted_gateway_identity_verification: pending
@@ -316,7 +324,7 @@ implementation_evidence:
   database_tests: 305/305 PASS
   local_migrations: 15/15 REPLAYED
   local_revalidated_on: 2026-09-23
-  remote_migrations: 13/13 RECONCILED
+  remote_migrations: 16/16 APPLIED (14 to 16 by auto-deploy, not yet verified)
   retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
   remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
   retention_cleanup_remote_verification: PASS
@@ -333,7 +341,7 @@ implementation_evidence:
   edge_writer_success_http: PASS_SYNTHETIC_UPSTREAM_REAL_HANDLER_AND_DATABASE
   public_read_abuse_local_verifier: PASS_WITH_ROLLBACK
   public_read_abuse_remote_verifier: PASS_WITH_ROLLBACK_ONLY
-  public_read_abuse_remote_migration: NOT_APPLIED
+  public_read_abuse_remote_migration: APPLIED_BY_AUTO_DEPLOY_NOT_VERIFIED
   public_read_abuse_privacy_review: PENDING
   remote_schema_diff: EMPTY
   remote_database_lint: PASS

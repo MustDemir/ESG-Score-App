@@ -90,6 +90,12 @@ session_handoff:
     admin_bypass: false
     tkt_037_06: done
     tkt_038_01_closeout_carried: f2278de reached main with PR 37
+  remote_auto_deploy_incident_2026_09_24:
+    report: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
+    finding: Supabase GitHub integration applied migrations 14 and 15 after the PR 35 merge and 16 after the PR 38 merge, before the privacy decision
+    observed: hook active; 0 counter rows; 0 key rows; 264 cleanup runs without failure; 0 cached products
+    impact: no app traffic because the app is unreleased and has no default Supabase URL
+    decision: Mustafa keeps auto-deploy enabled; every merge that contains a migration is confirmed first as a remote deployment
   delivery_2026_09_24_keyed_pseudonym:
     ticket: TKT-037-06
     branch: codex/tkt-037-06-keyed-rate-pseudonym
@@ -256,7 +262,7 @@ session_handoff:
     remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
-    remote_migrations: 13/13 RECONCILED
+    remote_migrations: 16/16 APPLIED (14 to 16 by Supabase GitHub auto-deploy, not yet verified)
     remote_schema_diff: EMPTY
     remote_database_lint: PASS
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
@@ -277,7 +283,7 @@ session_handoff:
     public_read_abuse_local_migration: REPLAYED
     public_read_abuse_pgtap: 27/27 PASS
     public_read_abuse_remote_verifier: PASS_WITH_ROLLBACK_ONLY
-    public_read_abuse_remote_migration: NOT_APPLIED
+    public_read_abuse_remote_migration: APPLIED_BY_AUTO_DEPLOY_NOT_VERIFIED
     public_read_abuse_privacy_review: PENDING
     retention_pr_github_actions_run: 33203141284 six_of_six PASS
     retention_pr_merged: true at 98d2da3

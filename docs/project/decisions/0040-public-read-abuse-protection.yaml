@@ -96,7 +96,8 @@ implementation:
   local_state: 16_migrations_replayed_330_pgtap_and_292_http_assertions_passed
   current_evidence: docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
   previous_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
-  remote_state: not_applied_runtime_disabled
+  remote_state: applied_by_auto_deploy_2026-09-23_and_2026-09-24_unverified_no_app_traffic
+  remote_incident: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
   transient_verification: docs/project/audits/2026-09-06-public-read-abuse-protection-validation.md
 
 consequences:

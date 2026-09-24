@@ -335,7 +335,7 @@ threats:
       - public_read_abuse_protection_pgtap_negative_tests
       - linked_remote_pre_request_verifier_before_runtime_activation
       - privacy_review_for_pseudonymous_security_telemetry
-    implementation_status: transactionally_verified_remote_apply_pending_privacy
+    implementation_status: remote_applied_by_auto_deploy_unverified_privacy_pending
 
 abuse_cases:
   - id: ABUSE-001

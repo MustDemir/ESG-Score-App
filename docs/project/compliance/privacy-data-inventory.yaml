@@ -392,7 +392,7 @@ processing_activities:
       - fail_closed_403_on_missing_or_invalid_ip
       - bound_to_post_on_three_explicit_rpc_paths
       - remote_runtime_disabled
-      - migrations_14_to_16_not_applied_remote
+      - no_app_traffic_app_not_released_and_no_default_supabase_url
     residual_risks:
       - privileged_database_access_during_current_hour_allows_ip_candidate_checks_against_current_rows
       - same_ip_linkable_across_minute_windows_within_one_utc_hour
@@ -451,7 +451,8 @@ retention_contract:
     personal_access_logs: prohibited
     decision: docs/project/decisions/0037-bounded-retention-cleanup.yaml
   remote_public_read_rate_windows:
-    activation_status: runtime_disabled_migrations_14_to_16_not_applied_remote
+    activation_status: migrations_14_to_16_applied_remote_by_auto_deploy_hook_active_no_app_traffic
+    remote_incident: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
     processing_activity: PRV-008
     pseudonym_key_erasure: past_utc_hour_keys_deleted_on_first_request_of_new_hour_or_next_cleanup
     logical_expiry: 1_hour_after_window_start

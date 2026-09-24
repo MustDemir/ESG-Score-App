@@ -4,6 +4,11 @@ title: Migrationen 14 bis 16 kontrolliert im Supabase-Development-Projekt anwend
 summary: |
   Die lokal validierte Migration nach Privacy-Freigabe und gruenem PR-Stand
   reproduzierbar auf `scanfair-dev` anwenden, ohne App-Runtime zu aktivieren.
+  Stand 2026-09-24: Die Supabase-GitHub-Integration hat Migrationen 14 bis 16
+  bereits beim Merge angewandt (Vorfallbericht
+  docs/project/audits/2026-09-24-remote-auto-deploy-incident.md). Dieses Ticket
+  bestaetigt den Iststand daher nachtraeglich und formal, statt erneut
+  anzuwenden; die Vorher-Evidenz fuer AC-01 existiert nicht mehr.
 parent_todo: TODO-037
 ticket_type: supabase_change
 dod_task_types:
