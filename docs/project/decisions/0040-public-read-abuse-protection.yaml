@@ -56,6 +56,27 @@ amendment_2026_09_23: |
   custom error details. One-hour expiry is not a physical deletion guarantee:
   five-minute scheduling, the 10,000-row batch and outages affect retention.
 
+amendment_2026_09_24: |
+  TKT-037-06 replaces the unkeyed SHA-256 subject with an HMAC-SHA-256 keyed
+  by a random 32-byte secret per UTC hour (migration 16). The IPv4 space is
+  small enough that an unkeyed digest with a public prefix can be reversed by
+  exhaustive search in seconds, so it offered little more than raw storage.
+
+  Options considered: a static secret from Supabase Vault or a deployment
+  secret (reversible for the whole lifetime of the secret and needs a secret
+  lifecycle), a daily key derived from a static master (a leaked master
+  re-links every day), and a random hourly key generated in the database and
+  erased after its hour. The last option was chosen because it needs no new
+  secret handling or provider, limits linkability to one hour, and makes stored
+  counters unattributable once the key is deleted.
+
+  The key lives in a private table revoked from every API role. The first
+  request of a new hour creates the key and deletes older keys; the existing
+  five-minute cleanup also deletes them, so erasure does not depend on the
+  scheduler alone. Residual limit: an actor with privileged database access
+  during the current hour can still test IP candidates against current rows.
+  This amendment does not approve the processing of personal data.
+
 rationale: |
   This uses the protection point of the existing public Data API, cannot be
   bypassed by changing the Flutter client, and keeps the current provider and
@@ -66,10 +87,13 @@ rationale: |
 implementation:
   migration: supabase/migrations/20260906000100_public_read_abuse_protection.sql
   correction_migration: supabase/migrations/20260923000100_public_read_api_integration.sql
+  keyed_pseudonym_migration: supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql
   tests: supabase/tests/database/public_read_abuse_protection.test.sql
+  keyed_pseudonym_tests: supabase/tests/database/public_read_keyed_pseudonym.test.sql
   environment_contract: docs/project/security/eu-supabase-environment-contract.yaml
-  local_state: 15_migrations_replayed_303_pgtap_and_292_http_assertions_passed
-  current_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
+  local_state: 16_migrations_replayed_330_pgtap_and_292_http_assertions_passed
+  current_evidence: docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
+  previous_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
   remote_state: not_applied_runtime_disabled
   transient_verification: docs/project/audits/2026-09-06-public-read-abuse-protection-validation.md
 

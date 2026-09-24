@@ -275,11 +275,15 @@ select set_config('request.headers', '{"x-forwarded-for":"203.0.113.101, 192.0.2
 select lives_ok($$select public.enforce_public_read_rate_limit()$$,
   'changing an untrusted forwarded prefix does not change the trusted peer');
 reset role;
+-- Resolve the keyed pseudonym with the key of the window's own hour (TKT-037-06).
 select is(
-  (select request_count from private.public_read_rate_windows
-   where subject_hash = encode(extensions.digest(
-     convert_to('scanfair-public-read-rate-v1|' || '192.0.2.10'::inet::text, 'UTF8'),
-     'sha256'), 'hex')),
+  (select windows.request_count
+   from private.public_read_rate_windows as windows
+   join private.public_read_rate_keys as keys
+     on keys.key_epoch = floor(extract(epoch from windows.window_started_at) / 3600)::bigint
+   where windows.subject_hash = encode(extensions.hmac(
+     convert_to('scanfair-public-read-rate-v2|' || '192.0.2.10'::inet::text, 'UTF8'),
+     keys.secret, 'sha256'), 'hex')),
   2, 'spoofed forwarded prefixes share one trusted-peer rate bucket');
 
 -- Expiration and physical removal are distinct; batch backlog survives one run.

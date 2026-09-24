@@ -401,7 +401,7 @@ class BackendBoundaryValidator
       "missing_or_invalid_identity" => "reject_403",
       "rejected_request" => "reject_429_with_retry_after_60_seconds",
       "raw_ip_storage" => "prohibited",
-      "stored_subject" => "sha256_pseudonym_only",
+      "stored_subject" => "hmac_sha256_hourly_rotating_key_pseudonym_only",
       "storage_schema" => "private.public_read_rate_windows",
       "retention" => "one_hour_expiry_bounded_five_minute_cleanup_no_hard_deletion_sla",
     }
@@ -411,6 +411,13 @@ class BackendBoundaryValidator
            %w[not_applied APPLIED_AND_VERIFIED].include?(read_contract.dig("rate_limit", "remote_verification")) &&
            %w[pending approved].include?(read_contract.dig("rate_limit", "security_telemetry_privacy_review")) &&
            %w[pending approved].include?(read_contract.dig("rate_limit", "external_rate_limit_alerting_decision")) &&
+           read_contract.dig("rate_limit", "key_rotation") == {
+             "key_storage" => "private.public_read_rate_keys",
+             "key_bytes" => 32,
+             "rotation" => "utc_hour",
+             "erasure" => "first_request_of_new_hour_and_five_minute_cleanup",
+             "derivation_function" => "private.public_read_rate_subject(inet,timestamptz)",
+           } &&
            read_contract.dig("rate_limit", "cleanup_job") == {
              "name" => "scanfair-public-read-rate-cleanup",
              "schedule_utc" => "*/5 * * * *",
@@ -519,6 +526,7 @@ class BackendBoundaryValidator
       run_retention_cleanup
       enforce_public_read_rate_limit
       public_read_rate_windows
+      public_read_rate_keys
       cron.schedule
     ]
     required_migration_markers.each do |marker|
@@ -639,6 +647,19 @@ class BackendBoundaryValidator
         /rpc/get_published_score_snapshot
         volatile
         'headers'
+      ],
+      "supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql" => %w[
+        public_read_rate_keys
+        public_read_rate_subject
+        extensions.hmac
+        gen_random_bytes(32)
+        key_epoch\ <\ v_key_epoch
+      ],
+      "supabase/tests/database/public_read_keyed_pseudonym.test.sql" => %w[
+        plan(25)
+        the\ same\ IP\ receives\ an\ unlinkable\ pseudonym\ in\ the\ next\ hour
+        an\ erased\ key\ cannot\ be\ reproduced\ for\ its\ past\ hour
+        scheduled\ cleanup\ erases\ keys\ of\ past\ hours\ without\ public\ traffic
       ],
       "scripts/quality/test_public_read_http.mjs" => %w[
         forged\ forwarding\ prefix

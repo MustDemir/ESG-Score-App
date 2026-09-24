@@ -1,4 +1,4 @@
--- Controlled SQL verifier for migrations 14 + 15. All fixtures roll back.
+-- Controlled SQL verifier for migrations 14 to 16. All fixtures roll back.
 -- Complements, but does not replace, the real HTTP integration gate.
 begin read only;
 select set_config('request.path', '/rpc/get_fresh_cached_product', true);
@@ -48,6 +48,12 @@ begin
     if has_table_privilege(v_role, 'private.public_read_rate_windows', 'SELECT,INSERT,UPDATE,DELETE') then
       raise exception 'rate-window table exposed to %', v_role;
     end if;
+    if has_table_privilege(v_role, 'private.public_read_rate_keys', 'SELECT,INSERT,UPDATE,DELETE') then
+      raise exception 'rate-key table exposed to %', v_role;
+    end if;
+    if has_function_privilege(v_role, 'private.public_read_rate_subject(inet,timestamptz)', 'EXECUTE') then
+      raise exception 'pseudonym derivation exposed to %', v_role;
+    end if;
   end loop;
   foreach v_function in array array[
     'public.get_fresh_cached_product(text,text)',
@@ -62,10 +68,9 @@ end;
 $$;
 
 -- Only reserved documentation-address fixture rows are touched, then restored.
+-- The keyed pseudonym of the current hour is derived inside this transaction.
 delete from private.public_read_rate_windows
-where subject_hash = encode(extensions.digest(
-  convert_to('scanfair-public-read-rate-v1|' || '198.51.100.44'::inet::text, 'UTF8'),
-  'sha256'), 'hex');
+where subject_hash = private.public_read_rate_subject('198.51.100.44'::inet, clock_timestamp());
 select set_config('request.path', '/rpc/get_fresh_cached_product', true);
 select set_config('request.method', 'POST', true);
 select set_config('request.headers', '{"x-forwarded-for":"203.0.113.99, 198.51.100.44"}', true);
@@ -98,9 +103,7 @@ declare
   v_count integer;
 begin
   select request_count into v_count from private.public_read_rate_windows
-  where subject_hash = encode(extensions.digest(
-    convert_to('scanfair-public-read-rate-v1|' || '198.51.100.44'::inet::text, 'UTF8'),
-    'sha256'), 'hex')
+  where subject_hash = private.public_read_rate_subject('198.51.100.44'::inet, clock_timestamp())
     and window_started_at = date_trunc('minute', clock_timestamp());
   if v_count is distinct from 30 then
     raise exception 'expected counter 30, found %', v_count;
