@@ -53,6 +53,7 @@ migriert. Die Testinstanz lief auf eigenen Ports (API 55321, DB 55322).
 | Rollback-only Remote-Verifier gegen die Testinstanz | PASS, keine Zaehler-Fixtures verblieben |
 | Backend-Gate-Selbsttests | 24 Assertions PASS (vorher 22) |
 | Development Quality Pipeline | 33/33 PASS, 144/144 Flutter-Tests, Coverage 84,74 % |
+| PR 38 und Post-Merge-Lauf 35963681945 | alle sechs anwendbaren Jobs PASS; Merge `f7073cb` ohne Admin-Bypass |
 
 ## Was die Tests belegen
 

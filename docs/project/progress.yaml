@@ -37,8 +37,8 @@ roadmap_progress:
 ticket_workflow:
   schema: scanfair-ticket-v1
   index: docs/project/tickets/ticket-index.yaml
-  active_ticket: TKT-037-06
-  next_ticket: TKT-037-06
+  active_ticket: TKT-037-01
+  next_ticket: TKT-037-01
   todo_037_execution_order:
     - TKT-037-05
     - TKT-037-06
@@ -76,8 +76,20 @@ ticket_workflow:
 session_handoff:
   prepared_at: 2026-09-24
   session_closed_at: "2026-09-23T13:07:26+02:00"
-  branch: codex/tkt-037-06-keyed-rate-pseudonym
-  status: tkt_037_06_keyed_pseudonym_implemented_tkt_037_01_parked_until_merge
+  branch: codex/tkt-037-01-reactivate
+  status: tkt_037_01_active_review_package_ready_for_qualified_reviewer
+  merges_2026_09_24:
+    pr_37: https://github.com/MustDemir/ESG-Score-App/pull/37
+    pr_37_merge_commit: 62bcdae580887b93ba5ad5b9068e60d9cfd32a28
+    pr_37_review_fix: 243b9ba rejects incomplete or conditional approval evidence
+    pr_38: https://github.com/MustDemir/ESG-Score-App/pull/38
+    pr_38_merge_commit: f7073cbd2f1a3ed260e3f59a262e3ed9012a40e2
+    pr_38_review_fixes: 8be8766 stale-hour key recreation, 91d6c33 resolvable reviewed commit and inventory diff whitelist
+    post_merge_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35963681945
+    post_merge_result: All six applicable jobs PASS on f7073cb
+    admin_bypass: false
+    tkt_037_06: done
+    tkt_038_01_closeout_carried: f2278de reached main with PR 37
   delivery_2026_09_24_keyed_pseudonym:
     ticket: TKT-037-06
     branch: codex/tkt-037-06-keyed-rate-pseudonym
@@ -138,7 +150,7 @@ session_handoff:
       Evidence is committed and pushed but intentionally not opened as a
       standalone PR: the PR-binding gate rejects terminal tickets by design.
       Carry this closure with the next active TKT-037-01 PR; do not bypass
-      the control with a direct push to main.
+      the control with a direct push to main. Carried by PR 37 (merge 62bcdae).
   cache_ci_followup_2026_09_23:
     ticket: TKT-038-01
     failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
@@ -409,8 +421,7 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - PR 37 (TKT-037-01) und danach den gestapelten TKT-037-06-PR reviewen und mergen
-    - Nach dem Merge TKT-037-06 abschliessen, TKT-037-01 reaktivieren (DOR-05) und das Review-Paket uebergeben
+    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
     - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
     - Nach positiver Entscheidung README-Schritte 4 bis 7 exakt in dieser Reihenfolge ausfuehren
     - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
@@ -1001,6 +1012,18 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W39-session4
+    summary: PRs 37 und 38 nach behobenen Codex-Reviewbefunden gemergt; TKT-037-06 abgeschlossen und TKT-037-01 reaktiviert.
+    done:
+      - Freigabe-Evidenz verlangt Qualifikation, Signatur, aufloesbaren Commit, leere Bedingungen und passende angekreuzte Entscheidung
+      - Inventar darf sich seit dem geprueften Commit nur in Freigabefeldern aendern
+      - Vergangene Pseudonym-Schluessel koennen unter Advisory-Lock nicht mehr neu entstehen
+      - Post-Merge-Lauf 35963681945 mit allen sechs anwendbaren Jobs gruen
+    blockers:
+      - Qualifizierte Datenschutzentscheidung (TKT-037-01 AC-02) steht aus
+    next_week:
+      - Review-Paket uebergeben
+
   - week: 2026-W39-session3
     summary: Unkeyed IP-Pseudonym durch HMAC mit stuendlich rotierendem, danach geloeschtem Zufallsschluessel ersetzt (TKT-037-06).
     done:

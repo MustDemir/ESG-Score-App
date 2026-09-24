@@ -7,8 +7,8 @@ policy:
   maximum_active: 1
   ready_required_before_in_progress: true
   done_requires_acceptance_dod_evidence_and_gates: true
-active_ticket: TKT-037-06
-next_ticket: TKT-037-06
+active_ticket: TKT-037-01
+next_ticket: TKT-037-01
 execution_order:
   - TKT-040-01
   - TKT-037-05
