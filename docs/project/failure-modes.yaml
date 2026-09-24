@@ -263,6 +263,41 @@ failure_modes:
     source: docs/project/audits/2026-08-13-technical-risk-audit.md (F-01, F-07, F-09)
     created: 2026-08-13
 
+  - id: FM-18
+    category: deployment
+    title: "Merge nach main deployt Datenbank-Migrationen unbemerkt remote"
+    frequency: medium
+    severity: high
+    symptoms:
+      - Doku und Tickets sagen "remote nicht angewandt", migration list --linked zeigt sie remote
+      - Check "Supabase Preview" laeuft auf main-Pushes erfolgreich
+      - Aktivierungsgrenzen (Privacy-Freigabe vor Remote-Anwendung) werden durch einen Merge umgangen
+    our_defense:
+      - Jeden Merge mit neuer oder geaenderter Migration vorab ausdruecklich als Remote-Deployment bestaetigen
+      - Nach jedem solchen Merge supabase migration list --linked pruefen und den Iststand dokumentieren
+      - Remote-Status nie aus Doku ableiten, sondern lesend am Projekt verifizieren
+    related: [RISK-005, RISK-015, TKT-037-02]
+    source: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
+    created: 2026-09-24
+
+  - id: FM-19
+    category: compliance
+    title: "Freigabe-Gate prueft nur Vorhandensein statt Inhalt der Evidenz"
+    frequency: medium
+    severity: high
+    symptoms:
+      - Evidenz mit Platzhaltern, Null-Commit oder offenen Bedingungen passiert das strenge Profil
+      - Status approved im YAML widerspricht dem angekreuzten Ergebnis im gehashten Dokument
+      - Aenderungen nach dem geprueften Commit bleiben ohne neue Bestaetigung gueltig
+    our_defense:
+      - Pflichtwerte (decision, Rolle) statt nur Pflichtfelder pruefen
+      - Commit per git aufloesen und erlaubte Inventar-Aenderungen seitdem auf Freigabefelder begrenzen
+      - Angekreuzte Entscheidung im gehashten Dokument gegen die Evidenz pruefen
+      - Fuer jede Freigabebedingung einen Negativtest schreiben
+    related: [RISK-005, TKT-037-01]
+    source: docs/project/audits/2026-09-24-privacy-review-package.md (PRP-02, PRP-08, PRP-10)
+    created: 2026-09-24
+
 # =============================================================================
 # REVIEW-RHYTHMUS
 # =============================================================================

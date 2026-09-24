@@ -37,8 +37,8 @@ roadmap_progress:
 ticket_workflow:
   schema: scanfair-ticket-v1
   index: docs/project/tickets/ticket-index.yaml
-  active_ticket: TKT-037-06
-  next_ticket: TKT-037-06
+  active_ticket: TKT-037-01
+  next_ticket: TKT-037-01
   todo_037_execution_order:
     - TKT-037-05
     - TKT-037-06
@@ -75,9 +75,27 @@ ticket_workflow:
 
 session_handoff:
   prepared_at: 2026-09-24
-  session_closed_at: "2026-09-23T13:07:26+02:00"
-  branch: codex/tkt-037-06-keyed-rate-pseudonym
-  status: tkt_037_06_keyed_pseudonym_implemented_tkt_037_01_parked_until_merge
+  session_closed_at: "2026-09-24T08:53:01+02:00"
+  branch: codex/tkt-037-01-reactivate
+  status: tkt_037_01_active_review_package_ready_for_qualified_reviewer
+  merges_2026_09_24:
+    pr_37: https://github.com/MustDemir/ESG-Score-App/pull/37
+    pr_37_merge_commit: 62bcdae580887b93ba5ad5b9068e60d9cfd32a28
+    pr_37_review_fix: 243b9ba rejects incomplete or conditional approval evidence
+    pr_38: https://github.com/MustDemir/ESG-Score-App/pull/38
+    pr_38_merge_commit: f7073cbd2f1a3ed260e3f59a262e3ed9012a40e2
+    pr_38_review_fixes: 8be8766 stale-hour key recreation, 91d6c33 resolvable reviewed commit and inventory diff whitelist
+    post_merge_ci: https://github.com/MustDemir/ESG-Score-App/actions/runs/35963681945
+    post_merge_result: All six applicable jobs PASS on f7073cb
+    admin_bypass: false
+    tkt_037_06: done
+    tkt_038_01_closeout_carried: f2278de reached main with PR 37
+  remote_auto_deploy_incident_2026_09_24:
+    report: docs/project/audits/2026-09-24-remote-auto-deploy-incident.md
+    finding: Supabase GitHub integration applied migrations 14 and 15 after the PR 35 merge and 16 after the PR 38 merge, before the privacy decision
+    observed: hook active; 0 counter rows; 0 key rows; 264 cleanup runs without failure; 0 cached products
+    impact: no app traffic because the app is unreleased and has no default Supabase URL
+    decision: Mustafa keeps auto-deploy enabled; every merge that contains a migration is confirmed first as a remote deployment
   delivery_2026_09_24_keyed_pseudonym:
     ticket: TKT-037-06
     branch: codex/tkt-037-06-keyed-rate-pseudonym
@@ -138,7 +156,7 @@ session_handoff:
       Evidence is committed and pushed but intentionally not opened as a
       standalone PR: the PR-binding gate rejects terminal tickets by design.
       Carry this closure with the next active TKT-037-01 PR; do not bypass
-      the control with a direct push to main.
+      the control with a direct push to main. Carried by PR 37 (merge 62bcdae).
   cache_ci_followup_2026_09_23:
     ticket: TKT-038-01
     failed_run: https://github.com/MustDemir/ESG-Score-App/actions/runs/35829050967
@@ -244,7 +262,7 @@ session_handoff:
     remote_pg_cron: INSTALLED_1.6.4_JOB_ACTIVE
     remote_migration_10: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     remote_migration_11: APPLIED_AND_TRANSACTIONALLY_VERIFIED
-    remote_migrations: 13/13 RECONCILED
+    remote_migrations: 16/16 APPLIED (14 to 16 by Supabase GitHub auto-deploy, not yet verified)
     remote_schema_diff: EMPTY
     remote_database_lint: PASS
     remote_pgtap: NOT_AVAILABLE_ON_HOSTED_PROJECT
@@ -265,7 +283,7 @@ session_handoff:
     public_read_abuse_local_migration: REPLAYED
     public_read_abuse_pgtap: 27/27 PASS
     public_read_abuse_remote_verifier: PASS_WITH_ROLLBACK_ONLY
-    public_read_abuse_remote_migration: NOT_APPLIED
+    public_read_abuse_remote_migration: APPLIED_BY_AUTO_DEPLOY_NOT_VERIFIED
     public_read_abuse_privacy_review: PENDING
     retention_pr_github_actions_run: 33203141284 six_of_six PASS
     retention_pr_merged: true at 98d2da3
@@ -275,7 +293,7 @@ session_handoff:
     evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
-    claims_privacy_gate_self_tests: 26 assertions PASS
+    claims_privacy_gate_self_tests: 38 assertions PASS
     claims_development_profile: PASS
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
@@ -409,13 +427,15 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - PR 37 (TKT-037-01) und danach den gestapelten TKT-037-06-PR reviewen und mergen
-    - Nach dem Merge TKT-037-06 abschliessen, TKT-037-01 reaktivieren (DOR-05) und das Review-Paket uebergeben
-    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
+    - Auf main starten, nachdem PR 39 (Ticket-Reaktivierung, Vorfallbericht, stack.yaml) gemergt ist; PR 39 enthaelt keine Migration
+    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben und auf den Vorfallbericht hinweisen
+    - Remote-Verifikation vorbereiten (TKT-037-03): rollback-only Verifier und Pruefung der Hosted-Proxy-Kette gegen scanfair-dev, erst nach ausdruecklicher Freigabe durch Mustafa
+    - TKT-037-02 formal auf den bereits per Auto-Deploy angewandten Iststand umstellen
+    - Vor jedem Merge mit Migration: als Remote-Deployment bestaetigen lassen (FM-18)
     - Nach positiver Entscheidung README-Schritte 4 bis 7 exakt in dieser Reihenfolge ausfuehren
-    - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
-    - Danach TKT-037-02 bis TKT-037-04 fuer Remote-Anwendung, Verifier und externen Alarmkanal abarbeiten
-    - README.md und README.de.md nach kanonischer Uebernahme des Closeouts um PR 36 und den Post-Merge-Abschluss ergaenzen
+    - App-Traffic zum Backend (SCANFAIR_SUPABASE_URL) erst nach Privacy-Freigabe, Remote-Verifikation und Datenschutztext aktivieren
+    - TKT-037-04 externen Alarmkanal abarbeiten
+    - README.md und README.de.md um PRs 36 bis 39 und den Post-Merge-Stand ergaenzen
     - TODO-032 fuer die Node-20-Action abarbeiten; Ubuntu-26-Runnerwechsel vor jeder Aenderung als eigenes Ticket erfassen
   next_session_plan:
     planning_basis: |
@@ -1001,6 +1021,28 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W39-session4
+    summary: PRs 37 und 38 nach behobenen Codex-Reviewbefunden gemergt; TKT-037-06 abgeschlossen und TKT-037-01 reaktiviert.
+    done:
+      - Freigabe-Evidenz verlangt Qualifikation, Signatur, aufloesbaren Commit, leere Bedingungen und passende angekreuzte Entscheidung
+      - Inventar darf sich seit dem geprueften Commit nur in Freigabefeldern aendern
+      - Vergangene Pseudonym-Schluessel koennen unter Advisory-Lock nicht mehr neu entstehen
+      - Post-Merge-Lauf 35963681945 mit allen sechs anwendbaren Jobs gruen
+    learnings:
+      - Merge nach main ist in diesem Repo ein Remote-Deployment von Migrationen; Remote-Status muss am Projekt gelesen, nicht aus Doku abgeleitet werden (FM-18)
+      - Automatische Reviews fanden drei echte Freigabe- und Race-Luecken; Gates muessen Inhalte und Zeitgrenzen pruefen, nicht nur Felder (FM-19)
+      - Tests an Stunden- oder Minutengrenzen brauchen einen im selben Statement erfassten Zeitstempel
+    blockers:
+      - Qualifizierte Datenschutzentscheidung (TKT-037-01 AC-02) steht aus
+      - Migrationen 14 bis 16 sind remote angewandt, aber noch nicht verifiziert
+    next_week:
+      - Review-Paket uebergeben
+      - Remote-Verifikation TKT-037-03 nach Freigabe
+    also_done:
+      - Remote-Auto-Deploy als Vorfall dokumentiert und alle Remote-Statusangaben korrigiert
+      - stack.yaml je Komponente um Erklaerung, Optionen, Entscheidung und Begruendung ergaenzt
+      - FM-18 und FM-19 in failure-modes.yaml aufgenommen
+
   - week: 2026-W39-session3
     summary: Unkeyed IP-Pseudonym durch HMAC mit stuendlich rotierendem, danach geloeschtem Zufallsschluessel ersetzt (TKT-037-06).
     done:

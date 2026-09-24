@@ -1066,12 +1066,14 @@ todos:
       - TKT-037-06 ersetzt das umkehrbare unkeyed IP-Pseudonym durch ein HMAC mit
         stuendlich rotierendem, danach geloeschtem Schluessel (Migration 16;
         330/330 pgTAP, 292 HTTP-Assertions in isolierter Instanz)
+      - PR 37 und PR 38 nach behobenen Review-Befunden gemergt; Post-Merge-Lauf
+        35963681945 vollstaendig gruen; TKT-037-06 abgeschlossen
     remaining_parts:
       - Qualifizierte menschliche Privacy- und DPIA-Entscheidung fuer PRV-008
         einholen und hashgebunden versionieren (TKT-037-01 AC-02)
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
-      - Migrationen 14 bis 16 nur nach Privacy-Review kontrolliert remote anwenden und
+      - Per Auto-Deploy bereits angewandte Migrationen 14 bis 16 formal bestaetigen (TKT-037-02) und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
     updated: 2026-09-24

@@ -105,6 +105,14 @@ aktivierungsbereiten Stand, oder sie bestaetigt ihn nach der Aenderung erneut.
 
 ## Bekannte Vorbedingungen und Blocker
 
+- **Wichtig fuer die pruefende Person:** Die Migrationen 14 bis 16 wurden durch
+  die Supabase-GitHub-Integration beim Merge am 23. und 24.09.2026 bereits auf
+  das Development-Projekt `scanfair-dev` angewandt, also vor dieser
+  Entscheidung. Der Hook ist dort aktiv. Die App ist nicht veroeffentlicht und
+  ruft das Backend standardmaessig nicht auf; am 24.09. lagen 0 Zaehler- und
+  0 Schluesselzeilen vor. Details:
+  `../../../audits/2026-09-24-remote-auto-deploy-incident.md`.
+
 - Die gespeicherte Kennung ist ein HMAC-SHA-256 mit einem zufaelligen
   32-Byte-Schluessel je UTC-Stunde (Migration 16, TKT-037-06). Dieselbe IP ist
   nur innerhalb einer Stunde verknuepfbar. Schluessel vergangener Stunden

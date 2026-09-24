@@ -1,27 +1,117 @@
-last_updated: 2026-08-31
+last_updated: 2026-09-24
 
 # Tech-Stack-Inventar. Bei Versions-Update hier ändern.
 # Bei großen Wechseln: ADR schreiben.
+#
+# Jede Komponente hat einen Block `decision` mit:
+#   explanation – was die Komponente im Projekt tut (einfach erklärt)
+#   options     – welche Alternativen ernsthaft geprüft wurden
+#   chosen      – was wir gewählt haben
+#   why         – warum, mit Verweis auf die ADR als Quelle der Wahrheit
+# Die ADRs in docs/project/decisions/ bleiben verbindlich; dieser Abschnitt ist
+# die kompakte Übersicht und darf ihnen nicht widersprechen.
 
 frontend:
   framework: Flutter
   version: 3.44.0
   language: Dart
   language_version: 3.12.0
+  decision:
+    explanation: >-
+      Flutter baut aus einer einzigen Dart-Codebasis die App für iOS und später
+      Android. Alle Bildschirme (Start, Scan, Ergebnis, Details) sind
+      Flutter-Widgets.
+    options:
+      - option: Flutter (Dart)
+        summary: eine Codebasis, schnelles Hot Reload, bewährtes Barcode-Plugin; Dart muss gelernt werden
+      - option: React Native
+        summary: JavaScript bekannt, aber fragilere native Brücken und weniger zuverlässige Scanner-Bibliotheken
+      - option: Native Swift und Kotlin
+        summary: beste Plattformintegration, aber doppelter Aufwand und zwei Sprachen
+      - option: Capacitor oder Ionic (Web-View)
+        summary: Web-Stack wiederverwendbar, aber schwächere Performance und mühsame Kamera-Integration
+    chosen: Flutter
+    why: >-
+      Für einen Solo-Entwickler entscheidet der Aufwand: eine Codebasis statt
+      zwei. Der Kern der App ist Barcode-Scannen, und dafür gibt es in Flutter
+      ein ausgereiftes Plugin. Dart ist mit Python-Hintergrund gut lernbar.
+    adr: ["0001", "0014"]
   state_management: Flutter-native StatefulWidget + Constructor Injection (ADR 0015)
+  state_management_decision:
+    explanation: >-
+      State-Verwaltung bestimmt, wo die App sich merkt, was gerade angezeigt
+      wird (z. B. geladenes Produkt, Fehlerzustand) und wie Dienste wie das
+      Produkt-Repository in die Widgets gelangen.
+    options:
+      - option: StatefulWidget plus Constructor Injection
+        summary: keine Zusatzbibliothek, leicht nachvollziehbar und testbar
+      - option: Provider mit ChangeNotifier
+        summary: verbreitet, aber zusätzliche Abhängigkeit für einen kleinen MVP
+      - option: Riverpod
+        summary: mächtig und skalierbar, aber mehr Konzepte zu lernen
+    chosen: Flutter-native StatefulWidget mit Constructor Injection
+    why: >-
+      Minimale Abhängigkeiten und gut verständlich für den MVP. Die
+      Abstraktionen ProductRepository und ESGScoreCalculator sind trotzdem
+      isoliert testbar, und ein späterer Wechsel zu Provider oder Riverpod
+      bleibt möglich, ohne Geschäftslogik umzuschreiben.
+    adr: ["0015"]
   key_packages:
     - name: cupertino_icons
       purpose: iOS-nahe Standardsymbole
       version: 1.0.9
+      decision:
+        explanation: Symbolsatz im iOS-Stil für Buttons und Navigation.
+        options: [Material Icons allein, eigene Icon-Grafiken]
+        chosen: cupertino_icons zusätzlich zu Material Icons
+        why: Standardpaket von Flutter; passt zum iOS-first-Fokus ohne eigenen Grafikaufwand.
+        adr: []
     - name: mobile_scanner
       purpose: Barcode-Scanning
       version: 7.3.0
+      decision:
+        explanation: >-
+          Öffnet die iPhone-Kamera und erkennt EAN-8, EAN-13, UPC-A und UPC-E
+          direkt auf dem Gerät. Kamerabilder werden weder gespeichert noch
+          hochgeladen.
+        options:
+          - option: mobile_scanner
+            summary: nutzt die native iOS-Erkennung, BSD-3-Lizenz, aktiv gepflegt
+          - option: qr_code_scanner_plus
+            summary: weniger passend für Produkt-Barcodes und die Plattformanforderungen
+          - option: eigene AVFoundation-Integration per Platform Channel
+            summary: volle Kontrolle, aber viel eigener nativer Code
+        chosen: mobile_scanner 7.3.0
+        why: >-
+          Liefert die nötigen nativen Funktionen ohne eigenes Bilderkennungssystem,
+          die Lizenz passt, und der Scanner bleibt als Widget gekapselt und testbar.
+        adr: ["0017"]
     - name: google_fonts
       purpose: lokal gebuendelte Inter- und Instrument-Serif-Assets verwenden; Runtime-Fetching deaktiviert
       version: 6.3.3
+      decision:
+        explanation: Stellt die Markenschriften der App bereit.
+        options: [Schriften zur Laufzeit von Google laden, Schriften lokal bündeln]
+        chosen: google_fonts mit lokal gebündelten Schriftdateien und deaktiviertem Runtime-Fetching
+        why: >-
+          Ein Laden zur Laufzeit würde bei jedem Start Daten (inklusive IP) an
+          Google senden. Lokal gebündelte Schriften mit SIL-OFL-Lizenznachweis
+          vermeiden diesen Datenfluss; ein Regressionstest sichert das ab.
+        adr: []
+        source: TODO-038 (keine eigene ADR)
     - name: http
       purpose: HTTP-Client für OFF-API
       version: 1.6.0
+      decision:
+        explanation: >-
+          Schickt die Produktabfragen an Open Food Facts und an die begrenzten
+          Lese-Abfragen des eigenen Supabase-Caches.
+        options: [http, dio, supabase_flutter für den Cache]
+        chosen: das schlanke offizielle http-Paket
+        why: >-
+          Reicht für wenige, klar definierte Anfragen mit Timeout, Retry und
+          Fehlerbehandlung. Keine zusätzliche native Abhängigkeit.
+        adr: ["0016", "0032"]
   deliberately_not_used:
     - name: supabase_flutter
       reason: Read-only Cache nutzt begrenzte REST-RPCs ohne neue native Abhängigkeit
@@ -37,19 +127,126 @@ backend:
   database: PostgreSQL
   local_cli_major_version: 17
   state: remote_schema_deployed_runtime_disabled
+  deployment_note: >-
+    Die Supabase-GitHub-Integration wendet neue Migrationen bei jedem Merge
+    nach main auf scanfair-dev an. Ein Merge mit Migration ist deshalb ein
+    Remote-Deployment (Vorfallbericht 2026-09-24).
+  decision:
+    explanation: >-
+      Supabase liefert eine gehostete PostgreSQL-Datenbank mit Zugriffsregeln
+      (Row Level Security), eine automatische API, geplante Jobs (pg_cron) und
+      Edge Functions. Dort liegen später der Produkt-Cache, Evidenzen und
+      Score-Snapshots.
+    options:
+      - option: Supabase in Frankfurt
+        summary: PostgreSQL, Auth und Storage inklusive, EU-Hosting, Free Tier, Self-Hosting als Ausweg
+      - option: Firebase
+        summary: ausgereift, aber US-Anbieter und NoSQL passt schlecht zu strukturierten ESG-Daten
+      - option: eigenes Backend (FastAPI, Postgres, eigene Auth)
+        summary: volle Kontrolle, aber sehr zeitaufwendig und eigene Auth ist ein Sicherheitsrisiko
+      - option: AWS Amplify
+        summary: mächtig, aber komplexer Einstieg, weniger transparente Kosten, US-Anbieter
+    chosen: Supabase mit Region Frankfurt
+    why: >-
+      Beste Kombination aus DSGVO-Nähe durch EU-Hosting, schnellem Start,
+      starkem SQL und Zukunftsfähigkeit (pgvector für eine spätere KI-Phase).
+      Weil es Postgres ist, bleibt ein späterer Umzug möglich.
+    adr: ["0002", "0022", "0035"]
   access:
     mobile: bounded read-only RPCs, aktuell nicht remote aktiviert
     writer: server-only Edge Function mit RPC-only service_role
+    decision:
+      explanation: >-
+        Regelt, wer in die Datenbank schreiben darf. Die App darf nur lesen;
+        geschrieben wird ausschließlich von einem vertrauenswürdigen
+        Server-Prozess.
+      options:
+        - option: App schreibt Cache und Evidenz über RLS
+          summary: wenig Code, aber jede manipulierte App könnte Scores verfälschen
+        - option: App löst einen privilegierten Schreib-Endpunkt aus
+          summary: Cache füllt sich sofort, aber öffentlich auslösbare Schreibrechte
+        - option: nur-lesende App und separater Server-Writer
+          summary: mehr Aufbau, aber Evidenz und Scores sind vor Manipulation geschützt
+      chosen: nur-lesende App, Server-Writer als Edge Function, service_role nur für vier Writer-RPCs
+      why: >-
+        Die Integrität der ESG-Daten ist der Kern des Produkts. Die App-Schlüssel
+        sind öffentlich; deshalb dürfen sie nichts schreiben. Die service_role
+        erhält nur exakt benannte RPCs statt direkter Tabellenrechte.
+      adr: ["0032", "0036"]
+  public_read_protection:
+    status: migrations_14_to_16_applied_remote_by_auto_deploy_unverified_privacy_pending
+    decision:
+      explanation: >-
+        Schützt die drei öffentlichen Lese-Abfragen vor Bots und Überlastung:
+        höchstens 30 Anfragen pro Minute und IP-Adresse. Die IP wird nicht
+        gespeichert, sondern nur als stündlich wechselndes, geschlüsseltes
+        Pseudonym gezählt; der Schlüssel wird nach der Stunde gelöscht.
+      options:
+        - option: kein serverseitiges Limit
+          summary: keine Daten, aber keine Abwehr gegen Enumeration und Kosten
+        - option: Edge Function mit externem Redis-Anbieter
+          summary: verteilte Zähler, aber zusätzlicher Anbieter, Secret und Unterauftragsverarbeiter
+        - option: PostgREST-Pre-Request-Hook mit privatem Minutenzähler
+          summary: greift vor jeder Abfrage, kein neuer Anbieter, aber pseudonyme Sicherheitsdaten
+        - option: Pseudonym als unkeyed SHA-256
+          summary: einfach, aber für IPv4 in Sekunden umkehrbar (ersetzt)
+        - option: Pseudonym mit statischem geheimen Schlüssel
+          summary: nicht umkehrbar ohne Schlüssel, aber dauerhaft verknüpfbar und Secret-Pflege nötig
+        - option: Pseudonym mit stündlich rotierendem, danach gelöschtem Zufallsschlüssel
+          summary: Verknüpfbarkeit maximal eine Stunde, danach nicht mehr zuordenbar
+      chosen: Pre-Request-Hook mit HMAC-SHA-256 unter stündlich rotierendem Schlüssel (Migration 16)
+      why: >-
+        Schützt jeden direkten Aufruf der öffentlichen API, ohne neuen Anbieter.
+        Der rotierende, gelöschte Schlüssel minimiert die Verknüpfbarkeit; eine
+        verspätete Anfrage kann einen gelöschten Schlüssel nicht neu erzeugen.
+        Die Verarbeitung bleibt pseudonym und braucht die qualifizierte
+        Datenschutz-Entscheidung (TKT-037-01) vor echtem App-Traffic.
+      adr: ["0040"]
+  retention:
+    decision:
+      explanation: >-
+        Technische Daten (Rate-Zähler, Cache, Idempotenz, Audit) werden nach
+        festen Fristen automatisch durch geplante pg_cron-Jobs gelöscht und
+        der Zustand privat überwacht.
+      options: [manuelles Löschen, unbegrenzte Aufbewahrung, begrenzte automatische Cleanup-Jobs mit Monitoring]
+      chosen: tägliche und fünfminütige pg_cron-Jobs mit Batch-Grenzen, private Health-Historie und Alert-Outbox
+      why: >-
+        DSGVO-Speicherbegrenzung und Betriebssicherheit ohne manuelle Arbeit;
+        Batch-Grenzen verhindern Lastspitzen. Die externe Alarmzustellung ist
+        noch offen (TKT-037-04).
+      adr: ["0037", "0038"]
   testing:
     - versionierte SQL-Migrationen
     - Row Level Security und Grant-Negativtests
     - pgTAP
     - Datenbank-Lint und Schema-Diff
+  testing_decision:
+    explanation: >-
+      Datenbankregeln werden mit pgTAP-Tests in einer lokalen, wegwerfbaren
+      Supabase-Instanz geprüft, zusätzlich mit echten HTTP-Aufrufen über
+      Gateway und PostgREST.
+    options: [nur manuelle Tests, nur Unit-Tests im App-Code, pgTAP plus HTTP-Integration in isolierter Instanz]
+    chosen: pgTAP, Datenbank-Lint und HTTP-Suite in einer isolierten lokalen Instanz sowie in CI
+    why: >-
+      Sicherheitsregeln (RLS, Grants, Hooks) lassen sich nur in der echten
+      Datenbank verlässlich prüfen. Der Kontrollreview vom 2026-09-22 fand
+      Fehler, die reine SQL-Tests übersehen hatten; erst die HTTP-Suite belegte
+      die Reparatur unter echten Bedingungen.
+    adr: ["0035", "0040"]
   auth:
     status: not_activated
     planned_providers:
       - email
       - apple_sign_in
+    decision:
+      explanation: Anmeldung für ein späteres Nutzerprofil.
+      options: [Supabase Auth mit E-Mail und Sign in with Apple, eigene Auth, keine Konten]
+      chosen: vorerst keine Konten; später Supabase Auth
+      why: >-
+        Der MVP funktioniert ohne Konto und verarbeitet dadurch weniger
+        personenbezogene Daten. Apple verlangt Sign in with Apple, sobald andere
+        Social-Logins angeboten werden.
+      adr: ["0002", "0031"]
   storage:
     status: not_used
     planned_purpose: ggf. User-Avatare in einer spaeteren Phase
@@ -62,6 +259,42 @@ apis:
     rate_limit: "freundlich nutzen, kein hartes Limit"
     license: ODbL 1.0 Datenbank, DbCL 1.0 Inhalte, CC BY-SA 3.0 Bilder
     decision_ref: 0003
+    decision:
+      explanation: >-
+        Offene, von einer Community gepflegte Produktdatenbank. Die App fragt
+        nach einem Scan direkt die API v3 ab und erhält Produktname,
+        Inhaltsstoffe, Eco-Score-Daten und Herkunftshinweise.
+      options:
+        - option: Open Food Facts
+          summary: frei, weltweit, viele Umweltfelder; Lizenzpflichten (ODbL) und Community-Datenqualität
+        - option: GS1 (offizielle Barcode-Datenbank)
+          summary: offizielle Stammdaten, aber kostenpflichtig und ohne Umwelt- oder Nachhaltigkeitsfelder
+        - option: eigene Datenbank aufbauen
+          summary: volle Kontrolle, aber für einen MVP nicht leistbar
+        - option: mehrere Quellen parallel
+          summary: bessere Abdeckung, aber deutlich mehr Integrations- und Lizenzaufwand
+        - option: API v2 statt v3
+          summary: bekannt, aber bereits als veraltet markiert
+      chosen: Open Food Facts API v3 mit tolerantem Mapper und quellengetrennter Lizenzführung
+      why: >-
+        Kostenlos und offen, deckte im Spike 20 von 20 Test-EANs ab. Die neue
+        Integration startet nicht auf einer veralteten API. Lizenzen werden
+        getrennt geführt und in der App angezeigt.
+      adr: ["0003", "0016", "0030"]
+  - name: AGRIBALYSE 3.2
+    purpose: Kategoriebezogene Umwelt-Lebenszyklusdaten, über Open Food Facts bezogen
+    license: Etalab Open Licence 2.0
+    decision:
+      explanation: >-
+        Französische, behördliche Ökobilanz-Datenbank. Liefert zum Beispiel die
+        Klimawirkung pro Produktkategorie.
+      options: [nur Open-Food-Facts-Eco-Score, AGRIBALYSE-Kategoriewerte, eigene Ökobilanzen]
+      chosen: AGRIBALYSE 3.2 als erste autoritative Umweltquelle, bis zur Kalibrierung nicht score-aktiv
+      why: >-
+        Offene Lizenz, anerkannte Methodik. Es sind Kategorie-Näherungen, daher
+        bleiben sie bis zu Normalisierung, Kalibrierung und Fachreview ohne
+        Einfluss auf den Score.
+      adr: ["0024"]
 
 dev_tools:
   - name: Homebrew
@@ -79,6 +312,14 @@ dev_tools:
   - name: OSV-Scanner
     version: 2.4.0
     purpose: Reproduzierbarer Vulnerability-Scan fuer pubspec.lock
+    decision:
+      explanation: Sucht in allen Dart-Abhängigkeiten nach bekannten Sicherheitslücken.
+      options: [nur Dependabot, nur gehosteter Scanner, lokaler und GitHub-Scan kombiniert]
+      chosen: OSV-Scanner lokal und in CI, ergänzt durch Dependabot und GitHub Dependency Review
+      why: >-
+        Reproduzierbar lokal wie in CI, keine stillen Ausnahmen: jede Ausnahme
+        braucht Owner, Grund und läuft nach höchstens 90 Tagen ab.
+      adr: ["0026"]
   - name: Git
     version: bundled mit macOS
     purpose: Versionskontrolle
@@ -90,9 +331,21 @@ dev_tools:
   - name: OPA
     version: 1.14.1
     purpose: Rego-Policy-Tests
+    decision:
+      explanation: >-
+        OPA und Conftest prüfen Regeln (z. B. Apple-Anforderungen) automatisch
+        gegen Projektdateien und schreiben ein fälschungssicheres Evidenz-Log.
+      options: [manuelle Checklisten, eigene Skripte je Regel, Policy-as-Code mit OPA/Rego und Conftest]
+      chosen: OPA/Rego mit Conftest und SHA-256-verketteten Evidenzprotokollen
+      why: >-
+        Regeln sind versioniert, testbar und laufen identisch lokal und in CI;
+        gestufte Profile (Development, Release Candidate, Submission) verhindern,
+        dass fehlende Release-Nachweise die tägliche Entwicklung blockieren.
+      adr: ["0009", "0021", "0039"]
   - name: Conftest
     version: 0.62.0
     purpose: Policy-as-Code-Entscheidungen gegen strukturierte Artefakte
+    decision_ref: siehe OPA (gemeinsame Policy-as-Code-Entscheidung)
 
 ci_cd:
   status: active-local-and-github-actions
@@ -101,9 +354,27 @@ ci_cd:
     - Lokale Bash-Gate-Runner mit Markdown-/JSON-Evidence
     - Dependabot fuer woechentliche pub- und GitHub-Action-Updates
     - GitHub Dependency Review fuer neue PR-Abhaengigkeiten
+    - Supabase-GitHub-Integration (wendet Migrationen beim Merge nach main an)
+  decision:
+    explanation: >-
+      Jede Änderung durchläuft automatisch 33 lokale Qualitäts-Gates und in
+      GitHub sechs Pflicht-Jobs (Tests, iOS-Build, Datenbank, Supply Chain,
+      Secret-Scan) bevor sie in main darf.
+    options:
+      - option: kein CI/CD
+        summary: schnell am Anfang, aber Fehler fallen erst spät auf
+      - option: große Enterprise-Pipeline
+        summary: umfassend, aber für ein Solo-Projekt zu aufwendig
+      - option: minimal von Tag 1, schrittweise ausbauen, ein verbindlicher Workflow
+        summary: früher Nutzen, wächst mit dem Projekt
+    chosen: ein verbindlicher GitHub-Actions-Workflow plus identischer lokaler Gate-Runner
+    why: >-
+      Frühe, automatische Prüfung ersetzt fehlende Teamreviews. Ein einziger
+      Workflow verhindert doppelte oder widersprüchliche Checks.
+    adr: ["0007", "0020", "0041"]
 
 monitoring_logging:
-  status: retention_observability_local_validated_remote_pending
+  status: retention_observability_remote_applied_external_delivery_pending
   implemented:
     - private Retention-Health-Historie
     - deduplizierte Alert-Outbox
@@ -111,6 +382,17 @@ monitoring_logging:
   not_configured:
     - externe Alarmzustellung
     - produktives Mobile-Crash-Reporting
+  decision:
+    explanation: >-
+      Überwacht, ob die Aufräum-Jobs laufen, und legt Alarme in einer privaten
+      Warteschlange ab.
+    options: [kein Monitoring, externes Monitoring-SaaS, private Health-Historie mit späterer Zustellung]
+    chosen: private Health-Historie und Alert-Outbox in der Datenbank; externe Zustellung folgt in TKT-037-04
+    why: >-
+      Kein zusätzlicher Anbieter und keine Personendaten in Alarmen; die
+      Zustellung wird erst nach Kosten- und Provider-Review angebunden.
+      Crash-Reporting ist bewusst nicht aktiv, um keine Nutzerdaten zu erheben.
+    adr: ["0038"]
 
 distribution:
   ios:
@@ -120,6 +402,14 @@ distribution:
   android:
     current: out_of_scope
     planned: spaetere Phase nach iOS
+  decision:
+    explanation: Wie die App zu Nutzern kommt.
+    options: [iOS und Android gleichzeitig, iOS zuerst, Android zuerst]
+    chosen: iOS zuerst, Android in einer späteren Phase
+    why: >-
+      Konzentration auf eine Plattform senkt Test- und Compliance-Aufwand;
+      Flutter hält den späteren Android-Start günstig.
+    adr: ["0014", "0021"]
 
 ai_layer:
   # Erst Phase 2 — aktuell nur Vor-Entscheidung
@@ -138,3 +428,12 @@ ai_layer:
       cons: Teurer, kleinere Modelle
       preferred_for: B2B-Pivot (Krankenkassen, Schulen)
   decision_ref: 0004
+  decision:
+    explanation: Künstliche Intelligenz (z. B. Erklärungen in Alltagssprache) ist für Phase 2 vorgesehen.
+    options: [KI ab Tag 1, KI erst in Phase 2 mit regelbasiertem MVP]
+    chosen: kein KI-Layer in Phase 1; Anbieterwahl erst mit ADR 0019 in Phase 2
+    why: >-
+      Der MVP soll mit nachvollziehbaren, regelbasierten Scores funktionieren.
+      KI brächte zusätzliche Kosten, Datenschutz- und Aussage-Risiken, bevor
+      die Datenbasis kalibriert ist.
+    adr: ["0004", "0005"]

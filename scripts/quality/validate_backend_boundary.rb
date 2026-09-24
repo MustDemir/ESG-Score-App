@@ -407,8 +407,10 @@ class BackendBoundaryValidator
     }
     unless read_contract["rate_limit"].is_a?(Hash) &&
            expected_rate_limit.all? { |field, value| read_contract["rate_limit"][field] == value } &&
-           %w[locally_verified_remote_apply_pending_privacy remote_applied_and_privacy_approved].include?(read_contract.dig("rate_limit", "state")) &&
-           %w[not_applied APPLIED_AND_VERIFIED].include?(read_contract.dig("rate_limit", "remote_verification")) &&
+           # remote_applied_by_auto_deploy_privacy_pending records the real state
+           # after the Supabase GitHub integration applied migrations on merge.
+           %w[locally_verified_remote_apply_pending_privacy remote_applied_by_auto_deploy_privacy_pending remote_applied_and_privacy_approved].include?(read_contract.dig("rate_limit", "state")) &&
+           %w[not_applied APPLIED_NOT_VERIFIED APPLIED_AND_VERIFIED].include?(read_contract.dig("rate_limit", "remote_verification")) &&
            %w[pending approved].include?(read_contract.dig("rate_limit", "security_telemetry_privacy_review")) &&
            %w[pending approved].include?(read_contract.dig("rate_limit", "external_rate_limit_alerting_decision")) &&
            read_contract.dig("rate_limit", "key_rotation") == {

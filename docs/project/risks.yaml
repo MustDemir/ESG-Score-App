@@ -381,13 +381,16 @@ risks:
       schliesst diese Luecke; TKT-038-01 korrigiert Cache-Frischegrenzen. Privacy-Freigabe,
       kontrollierte Remote-Anwendung und anschließende Linked-Verifikation
       stehen noch aus. Details: Audits 2026-08-13 bis 2026-09-07 und ADR 0040.
+      Seit 23./24.09.2026 sind Migrationen 14 bis 16 per Supabase-GitHub-
+      Auto-Deploy remote angewandt, aber nicht verifiziert (Vorfallbericht
+      2026-09-24); App-Traffic gibt es nicht, weil die App unveroeffentlicht ist.
     related_todos: [TODO-004, TODO-037]
     related_risks: [RISK-008, RISK-009]
     related_decisions: [0032, 0035, 0036, 0037, 0038, 0040]
     status: open
     owner: Engineering
     created: 2026-08-13
-    updated: 2026-09-07
+    updated: 2026-09-24
 
   - id: RISK-016
     title: Ausfuehrbare Arbeit verliert Scope, Abhaengigkeiten oder Abschlussnachweise

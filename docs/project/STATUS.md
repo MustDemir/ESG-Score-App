@@ -53,7 +53,7 @@ Post-Merge-Nachweis stehen im
 | Ticket-Arbeitsmodell | 7 Tickets; 32 Selbsttests mit 87 Assertions PASS; terminale Tickets werden in offenen PRs abgewiesen; Backend- und Cache-PR-/Post-Merge-Nachweise geschlossen |
 | Flutter | 144/144 Tests PASS, 84,74 % Line Coverage; 42 Cache-/Repositorytests PASS |
 | Datenbank lokal | 15/15 Migrationen replayed, 305/305 pgTAP PASS, DB-Lint PASS; isolierter Neuaufbau am 23.09. |
-| Datenbank remote | 13/13 freigegebene Migrationen abgeglichen, Schema-Diff leer, DB-Lint PASS |
+| Datenbank remote | 16/16 Migrationen angewandt; 14 bis 16 per Auto-Deploy beim Merge, noch nicht remote verifiziert (siehe Vorfallbericht 2026-09-24) |
 | Retention Cleanup remote | Zwei geplante Läufe erfolgreich, keine offenen Cleanup-Zeilen |
 | Retention Observability | Migration 13, vier echte Monitorläufe und kontrollierter Failure-/Recovery-Lifecycle remote belegt; externe Zustellung offen |
 | Public-Read-Abuse-Schutz | 53/53 pgTAP, 292 HTTP-Assertions und erfolgreicher Edge-Writer-/Read-Rundlauf PASS; Migration 15 korrigiert Integration und Header-Spoofing. Remote unveraendert |
@@ -112,10 +112,9 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 
 Backend- und Cache-Reparatur sind abgeschlossen. TKT-037-06 ersetzt das
 umkehrbare IP-Pseudonym durch ein HMAC mit stuendlich rotierendem, danach
-geloeschtem Schluessel (Migration 16). TKT-037-01 ist bis dahin geparkt; das
-Privacy-Review-Paket unter `compliance/review/tkt-037-01/` beschreibt bereits
-das neue Verfahren und wartet danach auf die qualifizierte menschliche
-Entscheidung. Danach folgen kontrolliert
+geloeschtem Schluessel (Migration 16, PR 38). TKT-037-01 ist wieder aktiv; das
+Privacy-Review-Paket unter `compliance/review/tkt-037-01/` ist bereit fuer die
+qualifizierte menschliche Entscheidung. Danach folgen kontrolliert
 TKT-037-02 bis TKT-037-04. Die fachlichen Quellen-/Review-Aufgaben unten
 bleiben offen. Docker muss fuer den echten lokalen API-/DB-Test laufen.
 

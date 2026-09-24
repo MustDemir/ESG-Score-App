@@ -81,7 +81,12 @@ flowchart LR
 
 The limiter protects the three public read RPCs from enumeration and quota
 exhaustion. It is defined by migrations 14 to 16 and ADR 0040, validated
-locally by 78 pgTAP and 292 HTTP assertions, and **not applied remotely**.
+locally by 78 pgTAP and 292 HTTP assertions. **The Supabase GitHub integration
+applied migrations 14 to 16 to `scanfair-dev` when their pull requests were
+merged (23 and 24 September 2026), before the privacy decision.** The hook is
+active there, but the app is not released and does not call the backend by
+default; on 24 September the counter and key tables were empty. See the
+[incident report](../audits/2026-09-24-remote-auto-deploy-incident.md).
 
 - Only the final `X-Forwarded-For` entry appended by the trusted ingress is
   used. It is processed transiently and never written to a table.

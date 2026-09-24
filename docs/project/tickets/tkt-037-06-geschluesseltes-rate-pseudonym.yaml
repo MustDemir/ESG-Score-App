@@ -10,7 +10,7 @@ parent_todo: TODO-037
 ticket_type: supabase_change
 dod_task_types: [supabase_change, provider_governance]
 priority: P1
-status: in_progress
+status: done
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-24
@@ -103,7 +103,7 @@ acceptance_criteria:
     verification: [G-BACKEND-BOUNDARY und G-PRIVACY-BOUNDARY im Development-Profil]
     evidence_required: [Aktualisierte Vertrags- und Inventarartefakte]
 definition_of_done:
-  status: not_done
+  status: done
   criteria:
     - id: DOD-01
       criterion: Alle Akzeptanzkriterien sind erfuellt.
@@ -112,8 +112,11 @@ definition_of_done:
         - docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
     - id: DOD-02
       criterion: Relevante Tests und Gates sind gruen.
-      status: pending
-      evidence: []
+      status: satisfied
+      evidence:
+        - docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
+        - https://github.com/MustDemir/ESG-Score-App/pull/38
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35963681945
     - id: DOD-03
       criterion: Risiken, Dokumentation und Fortschritt sind aktualisiert.
       status: satisfied
@@ -137,6 +140,8 @@ gates:
     - node scripts/quality/test_public_read_http.mjs --workdir DISPOSABLE_STACK
 evidence:
   - docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
+  - https://github.com/MustDemir/ESG-Score-App/pull/38
+  - https://github.com/MustDemir/ESG-Score-App/actions/runs/35963681945
   - supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql
   - supabase/tests/database/public_read_keyed_pseudonym.test.sql
 rollback:

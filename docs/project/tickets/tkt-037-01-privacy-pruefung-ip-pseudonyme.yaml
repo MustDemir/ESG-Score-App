@@ -10,7 +10,7 @@ dod_task_types:
   - documentation
   - provider_governance
 priority: P1
-status: parked
+status: in_progress
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-11
@@ -39,7 +39,7 @@ links:
     - R-DSGVO-01
     - R-DSGVO-07
 definition_of_ready:
-  status: not_ready
+  status: ready
   criteria:
     - id: DOR-01
       criterion: Datenfluss und technische Schutzfunktion sind versioniert.
@@ -66,8 +66,11 @@ definition_of_ready:
         - https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
     - id: DOR-05
       criterion: TKT-037-06 ist done; das Review-Paket beschreibt das geschluesselte, rotierende Pseudonym.
-      status: pending
-      evidence: []
+      status: satisfied
+      evidence:
+        - docs/project/tickets/tkt-037-06-geschluesseltes-rate-pseudonym.yaml
+        - docs/project/compliance/review/tkt-037-01/README.md
+        - https://github.com/MustDemir/ESG-Score-App/actions/runs/35963681945
 acceptance_criteria:
   - id: AC-01
     criterion: |
@@ -154,6 +157,7 @@ gates:
     - ruby scripts/quality/validate_backend_boundary.rb --profile development
 evidence:
   - docs/project/compliance/review/tkt-037-01/README.md
+  - https://github.com/MustDemir/ESG-Score-App/pull/37
   - docs/project/audits/2026-09-24-privacy-review-package.md
 rollback:
   strategy: Negative oder unklare Entscheidung behaelt Remote-Runtime deaktiviert und verhindert Remote-Anwendung von Migrationen 14 und 15.
