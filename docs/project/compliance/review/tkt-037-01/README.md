@@ -89,15 +89,19 @@ Hashes neu zu bilden und die Entscheidung gegebenenfalls erneut zu bestaetigen.
 
 Der Inventar-Hash, den die pruefende Person in Abschnitt 2 festhaelt, gehoert
 zum Stand **vor** Schritt 5. Der finale Hash in der Evidenzdatei weicht davon
-ab. Zulaessig ist das nur, wenn sich das Inventar zwischen `reviewed_commit`
-und dem finalen Stand ausschliesslich in den vier Feldern aus Schritt 5
-unterscheidet:
+ab. Das Gate erzwingt die Grenze: `reviewed_commit` muss im Repository
+aufloesbar sein, und das Inventar darf sich seit diesem Commit nur in
+`last_reviewed` sowie in `status`/`evidence` bzw. `decision_status`/`evidence`
+der Review- und DPIA-Eintraege unterscheiden. Pruefen laesst sich das vorab mit:
 
 ```sh
 git diff <reviewed_commit> -- docs/project/compliance/privacy-data-inventory.yaml
 ```
 
-Jede weitere Abweichung erfordert eine erneute Bestaetigung.
+Jede weitere Abweichung erfordert eine erneute Bestaetigung. Das gilt auch fuer
+spaetere Aktivierungsschritte wie `PRV-008.enabled` oder
+`remote_backend_enabled`: Entweder prueft die Person bereits den
+aktivierungsbereiten Stand, oder sie bestaetigt ihn nach der Aenderung erneut.
 
 ## Bekannte Vorbedingungen und Blocker
 
