@@ -42,3 +42,4 @@ what was inaccurate and records the corrected assessment.
 | 2026-09-23 | [Public-Read HTTP Validation](2026-09-23-public-read-http-validation.md) | Migration 15, echte Gateway-Quoten und erfolgreicher Edge-/Datenbank-Rundlauf in isolierter Instanz |
 | 2026-09-23 | [Backend-Abschlussreview](2026-09-23-backend-abschlussreview.md) | Separater technischer Pruefdurchgang, erneute Laufzeittests und explizite Hosted-/Privacy-Grenzen |
 | 2026-09-23 | [Cache-Frische Validation](2026-09-23-cache-frische-validation.md) | AR-07/08, negative Metadaten, deterministische Ablaufgrenzen und technischer Nachreview |
+| 2026-09-24 | [Privacy-Review-Paket TKT-037-01](2026-09-24-privacy-review-package.md) | PRV-008-Inventar, scoped Privacy-/DPIA-Freigaben, fail-open DPIA-Entscheidung behoben und Hash-Reihenfolge |

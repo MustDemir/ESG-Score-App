@@ -1,0 +1,23 @@
+# Vorlage: erst nach vollstaendig positivem, menschlichem Review kopieren und
+# finalisieren. Dieser pending-Status darf kein Gate entsperren.
+schema_version: "1.0"
+evidence_type: privacy_legal_review
+decision: pending
+reviewed_at: "YYYY-MM-DDThh:mm:ss+hh:mm"
+reviewer_identity: "[FULL_NAME]"
+reviewer_role: qualified_data_protection_counsel
+reviewer_qualification: "[QUALIFICATION_OR_EVIDENCE_REFERENCE]"
+scope: remote_backend_public_read_rate_limit
+reviewed_commit: "[FULL_GIT_SHA]"
+privacy_inventory_sha256: "[LOWERCASE_SHA256]"
+document_path: docs/project/compliance/review/tkt-037-01/privacy-legal-review.md
+document_sha256: "[LOWERCASE_SHA256]"
+signature_or_approval_reference: "[REFERENCE]"
+conditions: []
+review_triggers:
+  - purpose_or_legal_basis_change
+  - data_or_recipient_change
+  - hash_or_keying_change
+  - retention_or_cleanup_change
+  - hosted_ingress_or_region_change
+  - affected_population_change

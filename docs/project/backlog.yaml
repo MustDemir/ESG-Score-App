@@ -1059,13 +1059,18 @@ todos:
       - TKT-037-05 mit 305/305 pgTAP-Tests, 292 HTTP-Assertions und allen
         lokalen Gates abgeschlossen; PR 35 gemergt und Post-Merge-Lauf
         35838485511 im zweiten Versuch vollständig bestanden
+      - TKT-037-01 aktiviert; Privacy-Review-Paket mit PRV-008, getrennten
+        Privacy-/DPIA-Freigaben fuer den Rate-Limit-Scope und fail-closed
+        DPIA-Entscheidungspruefung vorbereitet (26 Gate-Assertions)
     remaining_parts:
+      - Qualifizierte menschliche Privacy- und DPIA-Entscheidung fuer PRV-008
+        einholen und hashgebunden versionieren (TKT-037-01 AC-02)
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
       - Migrationen 14 und 15 nur nach Privacy-Review kontrolliert remote anwenden und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
-    updated: 2026-09-23
+    updated: 2026-09-24
     created: 2026-08-13
 
   - id: TODO-038

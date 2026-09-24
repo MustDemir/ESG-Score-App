@@ -1,6 +1,6 @@
 # ScanFair Projektstatus
 
-Stand: 23. September 2026
+Stand: 24. September 2026
 Phase: Phase 1, lokal validierter iOS-MVP  
 Verbindliche Source of Truth: [`progress.yaml`](progress.yaml) und
 [`backlog.yaml`](backlog.yaml)
@@ -110,8 +110,10 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 
 ### Aktuelle Ausführungsreihenfolge
 
-Backend- und Cache-Reparatur sind abgeschlossen. Der vorrangige Pfad beginnt
-jetzt mit TKT-037-01 Privacy-Pruefung und fuehrt danach kontrolliert ueber
+Backend- und Cache-Reparatur sind abgeschlossen. TKT-037-01 ist aktiv: Das
+Privacy-Review-Paket unter `compliance/review/tkt-037-01/` ist technisch
+vollstaendig (PRV-008, scoped Freigaben, fail-closed DPIA-Pruefung) und wartet
+auf die qualifizierte menschliche Entscheidung. Danach folgen kontrolliert
 TKT-037-02 bis TKT-037-04. Die fachlichen Quellen-/Review-Aufgaben unten
 bleiben offen. Docker muss fuer den echten lokalen API-/DB-Test laufen.
 

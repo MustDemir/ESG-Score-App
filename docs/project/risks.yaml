@@ -120,13 +120,17 @@ risks:
       DPA-/Subprocessor-Owner-Freigabe, qualifiziertem Rechts-/DPIA-Review,
       App Privacy, Retention,
       Betroffenenrechten, Löschung und Incident-Prozess blockiert.
-    related_todos: [TODO-008]
+      Die pseudonyme IP-Rate-Limit-Verarbeitung ist seit 24.09.2026 als
+      PRV-008 inventarisiert; eigene, scope-gebundene Privacy- und
+      DPIA-Freigaben sind im Remote-Profil Pflicht, und eine andere
+      DPIA-Entscheidung als dpia_not_required entsperrt kein Gate (TKT-037-01).
+    related_todos: [TODO-008, TODO-037]
     related_gaps: [GAP-004]
     related_improvements: [IMP-COMP-006]
     status: open
     owner: Mustafa
     created: 2026-05-19
-    updated: 2026-08-12
+    updated: 2026-09-24
 
   - id: RISK-006
     title: ODbL-Kompositionspflichten kollidieren mit weiteren Datenquellen

@@ -1,7 +1,7 @@
 project: ESG-Score-App
 current_phase: phase-1-mvp
 current_week: 2026-W39
-last_updated: 2026-09-23
+last_updated: 2026-09-24
 
 # Completion is measured against milestone acceptance criteria, not elapsed
 # time. Values move in five-percent increments and need repository evidence.
@@ -37,7 +37,7 @@ roadmap_progress:
 ticket_workflow:
   schema: scanfair-ticket-v1
   index: docs/project/tickets/ticket-index.yaml
-  active_ticket: null
+  active_ticket: TKT-037-01
   next_ticket: TKT-037-01
   todo_037_execution_order:
     - TKT-037-05
@@ -73,10 +73,23 @@ ticket_workflow:
     - activate_additional_sources_only_after_mapping_license_and_claim_review
 
 session_handoff:
-  prepared_at: 2026-09-23
+  prepared_at: 2026-09-24
   session_closed_at: "2026-09-23T13:07:26+02:00"
-  branch: codex/tkt-038-01-closeout
-  status: session_closed_resume_with_tkt_037_01_privacy_evidence
+  branch: codex/tkt-037-01-privacy-evidence
+  status: tkt_037_01_active_review_package_ready_awaiting_qualified_decision
+  delivery_2026_09_24:
+    ticket: TKT-037-01
+    branch: codex/tkt-037-01-privacy-evidence
+    base_commit: d9cb5ee
+    report: docs/project/audits/2026-09-24-privacy-review-package.md
+    review_package: docs/project/compliance/review/tkt-037-01/README.md
+    carries_tkt_038_01_closeout: f2278de
+    findings_resolved: [PRP-01, PRP-02, PRP-03, PRP-04, PRP-05, PRP-06, PRP-07]
+    acceptance: AC-01, AC-03 and AC-04 satisfied; AC-02 qualified human decision pending
+    privacy_gate_self_tests: 26 assertions PASS
+    development_quality_gates: 33/33 PASS
+    remote_database_changed: false
+    next_action: Hand the package to a qualified data protection reviewer; keep migrations 14 and 15 and the remote runtime blocked until approved and dpia_not_required are both recorded
   delivery_2026_09_23:
     backend_commit: f33f7584e779f450448440042106ac69f7596eca
     cache_commit: 00cdc41dc307a53f84eda9cfb7382d7c199b0a01
@@ -181,8 +194,8 @@ session_handoff:
       unzulaessig. Der naechste TKT-037-01-PR muss diesen Abschluss mitnehmen.
       Remote-Datenbank, Runtime und App-Aktivierung blieben unveraendert.
   latest_validation:
-    executed_at: "2026-09-23T13:05:00+02:00"
-    validation_scope: Full 33-gate development pipeline on the TKT-038-01 closeout state after successful PR and post-merge CI; no remote activation
+    executed_at: "2026-09-24T07:26:30+02:00"
+    validation_scope: Full 33-gate development pipeline on the TKT-037-01 privacy review package; no SQL, runtime or remote change
     development_quality_gates: 33/33 PASS
     ticket_control_self_tests: 22 tests, 58 assertions PASS
     pr_ticket_binding_self_tests: 10 tests, 29 assertions PASS
@@ -244,7 +257,7 @@ session_handoff:
     evidence_pr_github_actions_run: 32130239043 six_of_six PASS
     data_license_gate_self_tests: 8/8 PASS with 31 assertions
     data_license_remote_profile: EXPECTED FAIL with 8 activation blockers
-    claims_privacy_gate_self_tests: 18/18 PASS
+    claims_privacy_gate_self_tests: 26 assertions PASS
     claims_development_profile: PASS
     privacy_development_profile: PASS
     claims_release_candidate_profile: EXPECTED FAIL pending calibration and qualified reviews
@@ -378,9 +391,9 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Auf Branch codex/tkt-038-01-closeout am aktuellen Branch-HEAD starten; f2278de ist der fachliche Closeout und der Folgecommit enthaelt diesen Session-Handoff
-    - TKT-037-01 als naechstes Ticket aktivieren; sein erster PR nimmt den geprueften TKT-038-01-Abschluss mit
-    - Privacy-Unterlagen fuer pseudonymisierte IP-Rate-Limit-Daten vorbereiten und qualifizierte menschliche Entscheidung einholen
+    - Auf Branch codex/tkt-037-01-privacy-evidence starten; der PR nimmt den TKT-038-01-Closeout f2278de mit
+    - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
+    - Nach positiver Entscheidung README-Schritte 4 bis 7 exakt in dieser Reihenfolge ausfuehren
     - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
     - Danach TKT-037-02 bis TKT-037-04 fuer Remote-Anwendung, Verifier und externen Alarmkanal abarbeiten
     - README.md und README.de.md nach kanonischer Uebernahme des Closeouts um PR 36 und den Post-Merge-Abschluss ergaenzen
@@ -969,6 +982,18 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W39-session2
+    summary: TKT-037-01 aktiviert und das Privacy-Review-Paket fuer die pseudonyme IP-Rate-Limit-Verarbeitung pruefbereit gemacht.
+    done:
+      - PRV-008 und getrennte Aufbewahrungsangaben im Privacy-Inventar sowie eigener Datenfluss ergaenzt
+      - Fail-open im DPIA-Gate geschlossen; nur dpia_not_required kann noch entsperren
+      - Scope-gebundene Privacy- und DPIA-Freigaben fuer den Rate-Limiter mit Negativtests eingefuehrt
+      - Hash-Reihenfolge und Pfade im Review-Paket korrigiert; 33/33 Development-Gates PASS
+    blockers:
+      - Qualifizierte menschliche Datenschutzentscheidung (AC-02) steht aus
+    next_week:
+      - Review-Paket uebergeben und Entscheidung hashgebunden einpflegen
+
   - week: 2026-W39
     summary: Gezielte CI-Nacharbeit an der SQL-Frischefixture nach lokalem Backend- und Cache-Abschlussreview.
     done:
