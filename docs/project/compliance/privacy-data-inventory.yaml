@@ -85,12 +85,18 @@ evidence_contracts:
       - schema_version
       - reviewed_at
       - reviewer_identity
+      - reviewer_qualification
       - reviewed_commit
       - scope
       - privacy_inventory_sha256
       - document_path
       - document_sha256
+      - signature_or_approval_reference
     digest_fields: [privacy_inventory_sha256, document_sha256]
+    commit_fields: [reviewed_commit]
+    empty_fields: [conditions]
+    document_decision_options: [approved, approved_with_conditions, rejected, more_information_required]
+    required_document_decision: approved
   privacy_disclosure_review:
     evidence_type: privacy_disclosure_review
     required_values:
@@ -128,6 +134,7 @@ evidence_contracts:
       - schema_version
       - assessed_at
       - assessed_by_identity
+      - assessor_qualification
       - reviewed_commit
       - assessed_by_role
       - scope
@@ -136,7 +143,11 @@ evidence_contracts:
       - privacy_inventory_sha256
       - document_path
       - document_sha256
+      - signature_or_approval_reference
     digest_fields: [privacy_inventory_sha256, document_sha256]
+    commit_fields: [reviewed_commit]
+    document_decision_options: [dpia_not_required, dpia_required, prior_consultation_to_assess, more_information_required]
+    required_document_decision: dpia_not_required
   processor_review:
     evidence_type: processor_contract_review
     required_values:
