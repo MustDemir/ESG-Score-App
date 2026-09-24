@@ -50,6 +50,19 @@ begin
   where keys.key_epoch = v_key_epoch;
 
   if v_secret is null then
+    -- Serialize key creation with erasure (here and in cleanup). Checked under
+    -- the lock, a request from an hour that has already ended can never
+    -- recreate its retired key, even if it was delayed across the boundary.
+    perform pg_catalog.pg_advisory_xact_lock(7310371037);
+    if v_key_epoch < pg_catalog.floor(extract(epoch from clock_timestamp()) / 3600)::bigint
+       or exists (
+         select 1 from private.public_read_rate_keys as keys
+         where keys.key_epoch > v_key_epoch
+       ) then
+      raise exception 'public read rate key epoch has already ended'
+        using errcode = '22023';
+    end if;
+
     insert into private.public_read_rate_keys (key_epoch, secret)
     values (v_key_epoch, extensions.gen_random_bytes(32))
     on conflict (key_epoch) do nothing;
@@ -209,6 +222,7 @@ begin
       using errcode = '22023';
   end if;
 
+  perform pg_catalog.pg_advisory_xact_lock(7310371037);
   delete from private.public_read_rate_keys
   where key_epoch < pg_catalog.floor(extract(epoch from p_now) / 3600)::bigint;
 

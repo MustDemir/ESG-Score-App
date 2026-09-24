@@ -31,6 +31,7 @@ verknuepft alle Tage).
 | --- | --- |
 | Migration `20260924000100_public_read_keyed_pseudonym.sql` | Schluesseltabelle mit RLS und Revoke; `private.public_read_rate_subject(inet, timestamptz)`; Hook nutzt einen gemeinsamen Zeitstempel fuer Minutenfenster und Schluesselstunde; Cleanup loescht vergangene Schluessel; bestehende v1-Zaehler werden entfernt |
 | Schluessel-Loeschung | beim ersten Request einer neuen Stunde und in jedem Fuenf-Minuten-Cleanup |
+| Stale-Hour-Schutz (PR-38-Review, P2) | Schluesselerzeugung und -loeschung laufen unter einem gemeinsamen Advisory-Lock; eine Anfrage aus einer bereits beendeten Stunde erzeugt ihren Schluessel nie neu, sondern wird abgewiesen |
 | Uhrschutz | Ableitung mit einem Zeitpunkt mehr als fuenf Minuten in der Zukunft wird abgewiesen, damit kein aktueller Schluessel vorzeitig geloescht wird |
 | Tests | `public_read_keyed_pseudonym.test.sql` (25 Assertions, feste Zeitpunkte); bestehender Spoofing-Test loest den Wert ueber den Schluessel der Fensterstunde auf |
 | Remote-Verifier | `verify_public_read_abuse_protection.sql` leitet den Wert ueber die private Funktion ab und prueft Rechte auf Schluesseltabelle und Funktion |

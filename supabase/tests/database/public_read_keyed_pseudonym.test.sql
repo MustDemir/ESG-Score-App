@@ -4,15 +4,11 @@ create extension if not exists pgtap with schema extensions;
 
 select plan(25);
 
--- TKT-037-06: keyed, hourly rotating IP pseudonym. Fixed timestamps in the
--- past keep every assertion independent of wall-clock hour boundaries.
+-- TKT-037-06: keyed, hourly rotating IP pseudonym. Each derivation captures
+-- its timestamp in the same statement, so assertions stay bound to one key
+-- hour even if the wall clock crosses an hour boundary during the suite.
 delete from private.public_read_rate_windows;
 delete from private.public_read_rate_keys;
-
-create temporary table keyed_clock on commit drop as
-select
-  date_trunc('hour', transaction_timestamp()) - interval '2 hours' as hour_start,
-  floor(extract(epoch from date_trunc('hour', transaction_timestamp()) - interval '2 hours') / 3600)::bigint as key_epoch;
 
 select has_table('private', 'public_read_rate_keys', 'private rate-key table exists');
 select is(
@@ -37,53 +33,65 @@ select is(has_function_privilege('authenticated', 'private.public_read_rate_subj
 select is(has_function_privilege('service_role', 'private.public_read_rate_subject(inet,timestamptz)', 'EXECUTE'),
   false, 'service_role cannot derive pseudonyms directly');
 
-create temporary table keyed_first_hour on commit drop as
-select private.public_read_rate_subject('198.51.100.20'::inet, hour_start + interval '10 minutes') as subject
-from keyed_clock;
+-- A key of the previous hour exists before the first request of this hour.
+create temporary table keyed_previous on commit drop as
+select
+  floor(extract(epoch from clock_timestamp()) / 3600)::bigint - 1 as key_epoch,
+  extensions.gen_random_bytes(32) as secret;
+insert into private.public_read_rate_keys (key_epoch, secret)
+select key_epoch, secret from keyed_previous;
 
-select matches((select subject from keyed_first_hour), '^[a-f0-9]{64}$',
+create temporary table keyed_now on commit drop as
+select
+  clock_moment.ts,
+  floor(extract(epoch from clock_moment.ts) / 3600)::bigint as key_epoch,
+  private.public_read_rate_subject('198.51.100.20'::inet, clock_moment.ts) as subject
+from (select clock_timestamp() as ts) as clock_moment;
+
+select matches((select subject from keyed_now), '^[a-f0-9]{64}$',
   'keyed pseudonym is a fixed-length hex value');
 select is(
   (select count(*)::integer from private.public_read_rate_keys as keys
-   join keyed_clock on keys.key_epoch = keyed_clock.key_epoch
+   join keyed_now on keys.key_epoch = keyed_now.key_epoch
    where octet_length(keys.secret) = 32),
   1,
   'first request of an hour creates exactly one 32-byte key'
 );
 select is(
-  (select subject from keyed_first_hour),
+  (select subject from keyed_now),
   (select encode(extensions.hmac(
      convert_to('scanfair-public-read-rate-v2|' || '198.51.100.20'::inet::text, 'UTF8'),
      keys.secret, 'sha256'), 'hex')
    from private.public_read_rate_keys as keys
-   join keyed_clock on keys.key_epoch = keyed_clock.key_epoch),
+   join keyed_now on keys.key_epoch = keyed_now.key_epoch),
   'pseudonym is the HMAC-SHA-256 of the IP under the hourly key'
 );
 select isnt(
-  (select subject from keyed_first_hour),
+  (select subject from keyed_now),
   encode(extensions.digest(
     convert_to('scanfair-public-read-rate-v1|' || '198.51.100.20'::inet::text, 'UTF8'), 'sha256'), 'hex'),
   'pseudonym no longer equals the reversible unkeyed v1 digest'
 );
 select is(
-  (select private.public_read_rate_subject('198.51.100.20'::inet, hour_start + interval '59 minutes') from keyed_clock),
-  (select subject from keyed_first_hour),
+  (select private.public_read_rate_subject('198.51.100.20'::inet, ts) from keyed_now),
+  (select subject from keyed_now),
   'the same IP keeps one pseudonym within its hour'
 );
 select isnt(
-  (select private.public_read_rate_subject('198.51.100.21'::inet, hour_start + interval '10 minutes') from keyed_clock),
-  (select subject from keyed_first_hour),
+  (select private.public_read_rate_subject('198.51.100.21'::inet, ts) from keyed_now),
+  (select subject from keyed_now),
   'different IPs receive different pseudonyms'
 );
-
 select isnt(
-  (select private.public_read_rate_subject('198.51.100.20'::inet, hour_start + interval '61 minutes') from keyed_clock),
-  (select subject from keyed_first_hour),
+  (select subject from keyed_now),
+  (select encode(extensions.hmac(
+     convert_to('scanfair-public-read-rate-v2|' || '198.51.100.20'::inet::text, 'UTF8'),
+     secret, 'sha256'), 'hex') from keyed_previous),
   'the same IP receives an unlinkable pseudonym in the next hour'
 );
 select is(
   (select count(*)::integer from private.public_read_rate_keys as keys
-   join keyed_clock on keys.key_epoch = keyed_clock.key_epoch),
+   join keyed_previous on keys.key_epoch = keyed_previous.key_epoch),
   0,
   'the first request of a new hour erases the previous key'
 );
@@ -92,9 +100,9 @@ select is(
   1,
   'only the key of the current hour remains'
 );
-select isnt(
-  (select private.public_read_rate_subject('198.51.100.20'::inet, hour_start + interval '10 minutes') from keyed_clock),
-  (select subject from keyed_first_hour),
+select throws_ok(
+  $$ select private.public_read_rate_subject('198.51.100.20'::inet, ts - interval '1 hour') from keyed_now $$,
+  '22023', 'public read rate key epoch has already ended',
   'an erased key cannot be reproduced for its past hour'
 );
 

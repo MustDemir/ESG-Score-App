@@ -73,7 +73,9 @@ amendment_2026_09_24: |
   The key lives in a private table revoked from every API role. The first
   request of a new hour creates the key and deletes older keys; the existing
   five-minute cleanup also deletes them, so erasure does not depend on the
-  scheduler alone. Residual limit: an actor with privileged database access
+  scheduler alone. Key creation and erasure share one advisory lock, and a
+  request whose hour has already ended can never recreate its retired key.
+  Residual limit: an actor with privileged database access
   during the current hour can still test IP candidates against current rows.
   This amendment does not approve the processing of personal data.
 
