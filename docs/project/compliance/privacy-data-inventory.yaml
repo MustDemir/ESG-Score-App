@@ -349,7 +349,7 @@ processing_activities:
     enabled: false
     data_type: pseudonymous_ip_rate_limit_windows_for_public_read_rpcs
     data_subject: backend_request_user_including_possible_minors
-    personal_data_assessment: personal_data_pseudonymous_not_anonymous_unkeyed_sha256_of_ip_address
+    personal_data_assessment: personal_data_pseudonymous_not_anonymous_hmac_sha256_with_hourly_rotating_key
     source: final_x_forwarded_for_entry_appended_by_trusted_ingress
     purpose: abuse_enumeration_and_shared_quota_protection_for_three_public_read_rpcs
     necessity: qualified_review_pending_alternatives_listed_in_tkt_037_01_review_package
@@ -362,7 +362,7 @@ processing_activities:
     retention: expires_1_hour_after_window_start_cleanup_every_5_minutes_max_10000_rows_per_run_no_hard_bound_on_scheduler_outage_release_blocker
     deletion: pg_cron_job_scanfair_public_read_rate_cleanup_owned_by_postgres
     apple_data_type: not_linked_security_telemetry_classification_requires_review
-    linked_to_user: false_no_account_but_same_ip_linkable_across_windows
+    linked_to_user: false_no_account_same_ip_linkable_only_within_one_utc_hour
     tracking: prohibited
     transient_fields:
       - final_x_forwarded_for_entry_parsed_as_inet_within_pre_request_transaction
@@ -371,6 +371,10 @@ processing_activities:
       - window_started_at
       - request_count
       - expires_at
+    key_material:
+      storage: private.public_read_rate_keys
+      content: random_32_byte_secret_per_utc_hour_generated_in_database
+      erasure: first_request_of_new_hour_or_next_five_minute_cleanup
     never_stored:
       - raw_ip_address
       - earlier_x_forwarded_for_entries
@@ -382,13 +386,17 @@ processing_activities:
       - no_raw_ip_storage
       - private_table_revoked_from_public_anon_authenticated_service_role
       - security_definer_pre_request_hook_only_writer
+      - hmac_sha256_with_random_hourly_key_instead_of_unkeyed_digest
+      - past_hour_keys_erased_so_older_counters_cannot_be_attributed_to_an_ip
+      - key_table_and_derivation_function_revoked_from_all_api_roles
       - fail_closed_403_on_missing_or_invalid_ip
       - bound_to_post_on_three_explicit_rpc_paths
       - remote_runtime_disabled
-      - migrations_14_and_15_not_applied_remote
+      - migrations_14_to_16_not_applied_remote
     residual_risks:
-      - unkeyed_hash_allows_offline_ip_candidate_checks
-      - same_ip_linkable_across_minute_windows_until_deletion
+      - privileged_database_access_during_current_hour_allows_ip_candidate_checks_against_current_rows
+      - same_ip_linkable_across_minute_windows_within_one_utc_hour
+      - key_erasure_depends_on_traffic_or_cleanup_job_no_hard_upper_bound_on_outage
       - shared_ip_or_nat_can_attribute_several_people_to_one_bucket
       - hosted_proxy_chain_and_distinct_client_mapping_not_remote_verified
       - no_hard_physical_deletion_bound_during_cleanup_backlog_or_outage
@@ -398,7 +406,10 @@ processing_activities:
       migrations:
         - supabase/migrations/20260906000100_public_read_abuse_protection.sql
         - supabase/migrations/20260923000100_public_read_api_integration.sql
-      database_tests: supabase/tests/database/public_read_abuse_protection.test.sql
+        - supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql
+      database_tests:
+        - supabase/tests/database/public_read_abuse_protection.test.sql
+        - supabase/tests/database/public_read_keyed_pseudonym.test.sql
       http_evidence: docs/project/audits/2026-09-23-public-read-http-validation.md
       review_package: docs/project/compliance/review/tkt-037-01/README.md
 
@@ -440,8 +451,9 @@ retention_contract:
     personal_access_logs: prohibited
     decision: docs/project/decisions/0037-bounded-retention-cleanup.yaml
   remote_public_read_rate_windows:
-    activation_status: runtime_disabled_migrations_14_and_15_not_applied_remote
+    activation_status: runtime_disabled_migrations_14_to_16_not_applied_remote
     processing_activity: PRV-008
+    pseudonym_key_erasure: past_utc_hour_keys_deleted_on_first_request_of_new_hour_or_next_cleanup
     logical_expiry: 1_hour_after_window_start
     physical_deletion: next_5_minute_cleanup_run_when_healthy_max_10000_rows_per_run
     maximum_retention_on_backlog_or_outage: unbounded_release_blocker_pending_qualified_review

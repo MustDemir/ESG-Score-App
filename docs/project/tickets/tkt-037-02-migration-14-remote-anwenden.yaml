@@ -1,6 +1,6 @@
 schema_version: scanfair-ticket-v1
 id: TKT-037-02
-title: Migrationen 14 und 15 kontrolliert im Supabase-Development-Projekt anwenden
+title: Migrationen 14 bis 16 kontrolliert im Supabase-Development-Projekt anwenden
 summary: |
   Die lokal validierte Migration nach Privacy-Freigabe und gruenem PR-Stand
   reproduzierbar auf `scanfair-dev` anwenden, ohne App-Runtime zu aktivieren.
@@ -14,7 +14,7 @@ status: planned
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-11
-updated: 2026-09-23
+updated: 2026-09-24
 scope:
   in:
     - Vorbedingungen und Remote-Iststand unmittelbar vor Anwendung pruefen
@@ -45,7 +45,7 @@ definition_of_ready:
       status: pending
       evidence: []
     - id: DOR-02
-      criterion: Migrationen 14 und 15 sind in main integriert und der verpflichtende PR-Datenbankjob ist inklusive HTTP-Tests gruen.
+      criterion: Migrationen 14 bis 16 sind in main integriert und der verpflichtende PR-Datenbankjob ist inklusive HTTP-Tests gruen.
       status: pending
       evidence: []
     - id: DOR-03
@@ -60,14 +60,14 @@ definition_of_ready:
         - docs/project/decisions/0035-forward-only-remote-schema-hardening.yaml
 acceptance_criteria:
   - id: AC-01
-    criterion: Remote-Dry-Run zeigt ausschliesslich die erwarteten Migrationen 14 und 15.
+    criterion: Remote-Dry-Run zeigt ausschliesslich die erwarteten Migrationen 14 bis 16.
     status: pending
     verification:
       - Linked migration dry-run unmittelbar vor Anwendung ausfuehren
     evidence_required:
       - Zeitgestempelter Dry-Run ohne unerwartete Deltas
   - id: AC-02
-    criterion: Remote-Migrationshistorie enthaelt Migrationen 14 und 15 jeweils genau einmal.
+    criterion: Remote-Migrationshistorie enthaelt Migrationen 14 bis 16 jeweils genau einmal.
     status: pending
     verification:
       - Linked migration list vor und nach Anwendung vergleichen
@@ -95,7 +95,7 @@ definition_of_done:
       status: pending
       evidence: []
     - id: DOD-02
-      criterion: Migrationen 14 und 15 sind remote jeweils genau einmal angewandt.
+      criterion: Migrationen 14 bis 16 sind remote jeweils genau einmal angewandt.
       status: pending
       evidence: []
     - id: DOD-03

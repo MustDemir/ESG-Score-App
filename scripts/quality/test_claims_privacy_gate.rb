@@ -3,6 +3,7 @@
 require "date"
 require "digest"
 require "fileutils"
+require "open3"
 require "optparse"
 require "tmpdir"
 require "yaml"
@@ -341,6 +342,40 @@ class BoundaryGateSelfTest
 
     with_fixture do |root|
       prepare_privacy_approval(root, remote_backend: true)
+      evidence = load_yaml(root, legal_evidence)
+      evidence["reviewed_commit"] = FIXTURE_COMMIT
+      write_yaml(root, legal_evidence, evidence)
+      unknown = validator(root, "privacy", "remote_backend")
+      assert(!unknown.run, "privacy gate should reject an unresolvable reviewed commit")
+      assert(unknown.violations.any? { |entry| entry.include?("is not a resolvable commit") },
+        "privacy gate should explain the unresolvable reviewed commit")
+    end
+
+    with_fixture do |root|
+      prepare_privacy_approval(root, remote_backend: true)
+      inventory = load_yaml(root, inventory_path)
+      inventory["processing_activities"].find { |activity| activity["id"] == "PRV-008" }["retention"] =
+        "expires_24_hours_after_window_start"
+      write_yaml(root, inventory_path, inventory)
+      inventory_hash = digest(root, inventory_path)
+      Dir.glob(File.join(root, "docs/project/compliance/review/*-evidence.yaml")).each do |file|
+        relative = file.delete_prefix("#{root}/")
+        evidence = load_yaml(root, relative)
+        next unless evidence.key?("privacy_inventory_sha256")
+
+        evidence["privacy_inventory_sha256"] = inventory_hash
+        write_yaml(root, relative, evidence)
+      end
+      drifted = validator(root, "privacy", "remote_backend")
+      assert(!drifted.run, "privacy gate should reject processing changes after the reviewed commit")
+      assert(
+        drifted.violations.any? { |entry| entry.include?("changed outside approval fields") && entry.include?("retention") },
+        "privacy gate should name the unreviewed inventory change",
+      )
+    end
+
+    with_fixture do |root|
+      prepare_privacy_approval(root, remote_backend: true)
       document = "docs/project/compliance/review/rate-limit-legal.md"
       write(root, document, legal_document("rate-limit", "approved_with_conditions"))
       evidence = load_yaml(root, legal_evidence)
@@ -368,6 +403,16 @@ class BoundaryGateSelfTest
     decision_document("DPIA screening #{scope}", DPIA_OPTIONS, checked)
   end
 
+  def commit_fixture(root)
+    git = ["git", "-C", root, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+           "-c", "commit.gpgsign=false", "-c", "core.hooksPath=/dev/null"]
+    [%w[init -q], %w[add -A], %w[commit -q -m reviewed-fixture]].each do |args|
+      _output, status = Open3.capture2e(*git, *args)
+      raise "fixture git #{args.first} failed" unless status.success?
+    end
+    Open3.capture2(*git, "rev-parse", "HEAD").first.strip
+  end
+
   def dpia_evidence(root, inventory_hash, scope, document_path)
     {
       "evidence_type" => "dpia_screening",
@@ -378,7 +423,7 @@ class BoundaryGateSelfTest
       "assessor_qualification" => "Fachanwalt fuer IT-Recht, Testfixture",
       "signature_or_approval_reference" => "signed-pdf:test-fixture-002",
       "assessed_by_role" => "qualified_data_protection_counsel",
-      "reviewed_commit" => FIXTURE_COMMIT,
+      "reviewed_commit" => @reviewed_commit,
       "scope" => scope,
       "decision" => "dpia_not_required",
       "criteria" => %w[systematic_monitoring vulnerable_subjects innovative_technology],
@@ -473,6 +518,14 @@ class BoundaryGateSelfTest
       write(root, "docs/project/compliance/review/rate-limit-legal.md", legal_document("rate-limit"))
       write(root, "docs/project/compliance/review/rate-limit-dpia.md", dpia_document("rate-limit"))
     end
+    # The reviewer sees the complete inventory except the approval outcome;
+    # only review/DPIA status and evidence fields change after that commit.
+    pristine = load_yaml(root, inventory_path)
+    reviewed = Marshal.load(Marshal.dump(inventory))
+    %w[reviews dpia].each { |section| reviewed[section] = pristine[section] }
+    write_yaml(root, inventory_path, reviewed)
+    @reviewed_commit = commit_fixture(root)
+
     write_yaml(root, inventory_path, inventory)
     inventory_hash = digest(root, inventory_path)
 
@@ -481,7 +534,7 @@ class BoundaryGateSelfTest
       "reviewed_at" => "2026-08-11T12:00:00Z",
       "reviewer_identity" => "Test Counsel",
       "reviewer_qualification" => "Fachanwalt fuer IT-Recht, Testfixture",
-      "reviewed_commit" => FIXTURE_COMMIT,
+      "reviewed_commit" => @reviewed_commit,
       "signature_or_approval_reference" => "signed-pdf:test-fixture-001",
       "conditions" => [],
       "scope" => remote_backend ? "remote_backend" : "external_beta",

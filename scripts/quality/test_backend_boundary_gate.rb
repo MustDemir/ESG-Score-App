@@ -101,6 +101,20 @@ class BackendBoundaryGateSelfTest
       )
     end
 
+    # TKT-037-06: an unkeyed or non-rotating pseudonym must not pass silently.
+    with_fixture do |root|
+      contract_path = "docs/project/security/eu-supabase-environment-contract.yaml"
+      contract = load_yaml(root, contract_path)
+      contract["read_contract"]["rate_limit"]["key_rotation"]["rotation"] = "never"
+      write_yaml(root, contract_path, contract)
+      check = validator(root, "development")
+      assert(!check.run, "gate must reject a non-rotating pseudonym key")
+      assert(
+        check.violations.any? { |entry| entry.include?("public read rate-limit contract") },
+        "key-rotation failure should identify the public read contract",
+      )
+    end
+
     with_fixture do |root|
       blocked = validator(root, "remote_backend")
       assert(!blocked.run, "remote profile must reject a contract-only environment")

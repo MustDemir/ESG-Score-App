@@ -3,6 +3,7 @@
 require "date"
 require "digest"
 require "json"
+require "open3"
 require "optparse"
 require "set"
 require "yaml"
@@ -15,6 +16,10 @@ class ClaimsPrivacyBoundaryValidator
   # Template placeholders such as "[FULL_NAME]", "[EINTRAGEN]" or "YYYY-MM-DD".
   EVIDENCE_PLACEHOLDER_PATTERN = /\[[A-Z0-9_ \/-]+\]|YYYY|EINTRAGEN/.freeze
   CHECKED_DOCUMENT_OPTION_PATTERN = /`\[[xX]\] ([a-z_]+)`/.freeze
+  # Only the approval outcome may change between the reviewed commit and the
+  # evidence; any other inventory change needs a renewed human confirmation.
+  POST_REVIEW_INVENTORY_PATH_PATTERN =
+    /\A(last_reviewed|reviews\.[^.]+\.(status|evidence)|dpia\.[^.]+\.(decision_status|evidence))\z/.freeze
   UNRESOLVED_PROCESSING_MARKERS = %w[
     missing
     pending
@@ -523,6 +528,42 @@ class ClaimsPrivacyBoundaryValidator
     end
   end
 
+  def validate_reviewed_inventory(evidence, contract, label, inventory_relative)
+    Array(contract["commit_fields"]).each do |field|
+      commit = evidence[field].to_s
+      next unless commit.match?(GIT_COMMIT_PATTERN) && commit.delete("0") != ""
+
+      reviewed_text, _error, status = Open3.capture3(
+        "git", "-C", @repo_root, "show", "#{commit}:#{inventory_relative}",
+      )
+      unless status.success?
+        violations << "#{label}: #{field} #{commit} is not a resolvable commit containing #{inventory_relative}"
+        next
+      end
+
+      reviewed = YAML.safe_load(reviewed_text, permitted_classes: [Date], aliases: true)
+      current = YAML.safe_load(File.read(path(inventory_relative), encoding: "UTF-8"), permitted_classes: [Date], aliases: true)
+      changed = changed_paths(reviewed, current).reject { |entry| entry.match?(POST_REVIEW_INVENTORY_PATH_PATTERN) }
+      next if changed.empty?
+
+      violations << "#{label}: inventory changed outside approval fields since #{field}: #{changed.first(5).join(', ')}"
+    end
+  rescue Errno::ENOENT
+    violations << "#{label}: git is required to verify the reviewed commit"
+  end
+
+  def changed_paths(before, after, prefix = nil)
+    if before.is_a?(Hash) && after.is_a?(Hash)
+      (before.keys | after.keys).flat_map do |key|
+        changed_paths(before[key], after[key], [prefix, key].compact.join("."))
+      end
+    elsif before.is_a?(Array) && after.is_a?(Array) && before.length == after.length
+      before.each_index.flat_map { |index| changed_paths(before[index], after[index], "#{prefix}[#{index}]") }
+    else
+      before == after ? [] : [prefix.to_s]
+    end
+  end
+
   def validate_evidence(relative, contract, label, inventory_relative:, required_scope: nil)
     evidence = load_evidence(relative, label)
     return if evidence.empty?
@@ -540,6 +581,7 @@ class ClaimsPrivacyBoundaryValidator
     end
     require_fields(evidence, Array(contract["required_fields"]), label)
     validate_evidence_integrity(evidence, contract, label)
+    validate_reviewed_inventory(evidence, contract, label, inventory_relative)
     Array(contract["digest_fields"]).each do |field|
       unless evidence[field].to_s.match?(SHA256_PATTERN)
         violations << "#{label}: #{field} must be a lowercase SHA-256"

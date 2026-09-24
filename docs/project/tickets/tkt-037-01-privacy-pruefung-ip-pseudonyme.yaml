@@ -10,7 +10,7 @@ dod_task_types:
   - documentation
   - provider_governance
 priority: P1
-status: in_progress
+status: parked
 owner: Engineering
 decision_owner: Mustafa Demir
 created: 2026-09-11
@@ -26,6 +26,7 @@ scope:
     - Keine Verarbeitung echter App-Nutzerdaten
 dependencies:
   - TKT-037-05
+  - TKT-037-06
 links:
   risks:
     - RISK-005
@@ -38,7 +39,7 @@ links:
     - R-DSGVO-01
     - R-DSGVO-07
 definition_of_ready:
-  status: ready
+  status: not_ready
   criteria:
     - id: DOR-01
       criterion: Datenfluss und technische Schutzfunktion sind versioniert.
@@ -63,6 +64,10 @@ definition_of_ready:
         - docs/project/tickets/tkt-037-05-postgrest-rate-limit-integration.yaml
         - docs/project/audits/2026-09-23-backend-abschlussreview.md
         - https://github.com/MustDemir/ESG-Score-App/actions/runs/35838485511
+    - id: DOR-05
+      criterion: TKT-037-06 ist done; das Review-Paket beschreibt das geschluesselte, rotierende Pseudonym.
+      status: pending
+      evidence: []
 acceptance_criteria:
   - id: AC-01
     criterion: |

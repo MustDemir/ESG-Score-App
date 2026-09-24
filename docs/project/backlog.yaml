@@ -991,6 +991,7 @@ todos:
       - TKT-037-03
       - TKT-037-04
       - TKT-037-05
+      - TKT-037-06
     source: docs/project/audits/2026-08-13-technical-risk-audit.md
     completed_parts:
       - Migration 20260813000100_backend_hardening mit 23 neuen pgTAP-Assertions
@@ -1062,12 +1063,15 @@ todos:
       - TKT-037-01 aktiviert; Privacy-Review-Paket mit PRV-008, getrennten
         Privacy-/DPIA-Freigaben fuer den Rate-Limit-Scope und fail-closed
         DPIA-Entscheidungspruefung vorbereitet (26 Gate-Assertions)
+      - TKT-037-06 ersetzt das umkehrbare unkeyed IP-Pseudonym durch ein HMAC mit
+        stuendlich rotierendem, danach geloeschtem Schluessel (Migration 16;
+        330/330 pgTAP, 292 HTTP-Assertions in isolierter Instanz)
     remaining_parts:
       - Qualifizierte menschliche Privacy- und DPIA-Entscheidung fuer PRV-008
         einholen und hashgebunden versionieren (TKT-037-01 AC-02)
       - Least-Privilege-Alarmkanal mit Owner, Secret-Lebenszyklus, Kosten-/Provider-
         Review sowie echtem Failure-/Recovery- und Delivery-Failure-Drill umsetzen
-      - Migrationen 14 und 15 nur nach Privacy-Review kontrolliert remote anwenden und
+      - Migrationen 14 bis 16 nur nach Privacy-Review kontrolliert remote anwenden und
         den Linked-Verifier erneut ausfuehren
       - Historische Migrationen nicht veraendern
     updated: 2026-09-24

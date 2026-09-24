@@ -32,6 +32,7 @@ haben. Fuer jedes Dokument sind Pfad, Version/Commit und SHA-256 einzutragen.
 | HTTP-/Retention-Nachweis vom 23.09.2026 | `[EINTRAGEN]` | `[EINTRAGEN]` | `[ja/nein]` |
 | Migration 14 | `[EINTRAGEN]` | `[EINTRAGEN]` | `[ja/nein]` |
 | Migration 15 | `[EINTRAGEN]` | `[EINTRAGEN]` | `[ja/nein]` |
+| Migration 16 (geschluesseltes Pseudonym) | `[EINTRAGEN]` | `[EINTRAGEN]` | `[ja/nein]` |
 
 ## 3. Technischer Sachverhalt zur Bestaetigung
 
@@ -42,19 +43,24 @@ IP-Adresse wird nicht in der Rate-Limit-Tabelle gespeichert.
 
 Gespeichert werden in `private.public_read_rate_windows`:
 
-- `subject_hash`: 64-stelliges SHA-256-Pseudonym aus dem oeffentlichen
-  konstanten Praefix `scanfair-public-read-rate-v1|` und der normalisierten IP;
+- `subject_hash`: 64-stelliges HMAC-SHA-256 der normalisierten IP unter einem
+  zufaelligen 32-Byte-Schluessel der jeweiligen UTC-Stunde;
 - `window_started_at`: Beginn des Minutenfensters;
 - `request_count`: Anzahl der Anfragen im Minutenfenster;
 - `expires_at`: exakt eine Stunde nach Beginn des Minutenfensters.
 
-Die Tabelle ist fuer `public`, `anon`, `authenticated` und `service_role`
-gesperrt. Ein `security definer`-Hook schreibt den Zaehler. Ein als `postgres`
+Die Schluessel liegen in `private.public_read_rate_keys` und verlassen die
+Datenbank nie. Zaehler- und Schluesseltabelle sowie die Ableitungsfunktion sind
+fuer `public`, `anon`, `authenticated` und `service_role` gesperrt. Ein
+`security definer`-Hook schreibt den Zaehler. Ein als `postgres`
 laufender Cronjob loescht alle fuenf Minuten hoechstens 10.000 abgelaufene
 Zeilen. Bei Scheduler-Ausfall oder Rueckstau existiert keine harte maximale
-physische Loeschfrist. Der Hash ist nicht geheim geschluesselt; IP-Kandidaten
-koennen offline geprueft und gleiche Adressen ueber Minutenfenster verknuepft
-werden. Deshalb ist der Datensatz als pseudonym, nicht anonym, zu behandeln.
+physische Loeschfrist. Schluessel vergangener Stunden loescht der erste Request
+einer neuen Stunde oder der naechste Cleanup-Lauf; danach sind die
+verbleibenden Zaehlerzeilen keiner IP mehr zuordenbar. Dieselbe IP ist nur
+innerhalb einer Stunde verknuepfbar. Waehrend der laufenden Stunde kann ein
+privilegierter Datenbankzugriff IP-Kandidaten gegen aktuelle Zeilen pruefen.
+Deshalb ist der Datensatz als pseudonym, nicht anonym, zu behandeln.
 Unabhaengig von dieser Tabelle koennen API-Gateway-Logs des Providers rohe
 IP-Adressen enthalten; deren Aufbewahrung ist noch nicht vom Provider
 bestaetigt. Die maschinenlesbare Beschreibung ist `PRV-008` im
@@ -107,10 +113,11 @@ ausreicht:
 | Kein serverseitiges Rate Limit | `[EINTRAGEN]` | `[EINTRAGEN]` |
 | Nur fluechtiger/In-Memory-Zaehler | `[EINTRAGEN]` | `[EINTRAGEN]` |
 | Kuerzere Speicher-/Ablauffrist | `[EINTRAGEN]` | `[EINTRAGEN]` |
-| Geheimnisgebundener HMAC statt unkeyed SHA-256 | `[EINTRAGEN]` | `[EINTRAGEN]` |
-| Regelmaessig rotierender geheimer Schluessel | `[EINTRAGEN]` | `[EINTRAGEN]` |
+| Unkeyed SHA-256 (Migrationen 14/15, ersetzt) | `[EINTRAGEN]` | `[EINTRAGEN]` |
+| Statischer geheimer Schluessel (Vault/Deployment-Secret) | `[EINTRAGEN]` | `[EINTRAGEN]` |
+| Kuerzere Rotation als eine Stunde | `[EINTRAGEN]` | `[EINTRAGEN]` |
 | Provider-/Gateway-Limiter ohne eigene Persistenz | `[EINTRAGEN]` | `[EINTRAGEN]` |
-| Aktuelle Architektur | `[EINTRAGEN]` | `[EINTRAGEN]` |
+| Aktuelle Architektur: HMAC mit stuendlich rotierendem, geloeschtem Zufallsschluessel | `[EINTRAGEN]` | `[EINTRAGEN]` |
 
 Abschliessende Bewertung von Datenminimierung, Zugriff, Verkettbarkeit,
 Missbrauchsrisiko und Verhaeltnismaessigkeit: `[EINTRAGEN]`
@@ -154,7 +161,7 @@ Bewertung der bestehenden Massnahmen nach Art. 25 und 32 DSGVO:
 - private Tabelle und entzogene Rollenrechte: `[EINTRAGEN]`
 - fail-closed bei fehlender/ungueltiger Identitaet: `[EINTRAGEN]`
 - Bindung an drei explizite RPC-Pfade und POST: `[EINTRAGEN]`
-- Pseudonymisierung ohne geheimen Schluessel: `[EINTRAGEN]`
+- HMAC-Pseudonymisierung mit stuendlich rotierendem und geloeschtem Schluessel: `[EINTRAGEN]`
 - Cleanup, Monitoring und Stoerungsbehandlung: `[EINTRAGEN]`
 - Hosted-Ingress-Vertrauensgrenze: `[EINTRAGEN]`
 - verbleibendes Reidentifikations-/Kollusionsrisiko: `[EINTRAGEN]`

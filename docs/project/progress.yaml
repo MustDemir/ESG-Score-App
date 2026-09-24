@@ -37,10 +37,11 @@ roadmap_progress:
 ticket_workflow:
   schema: scanfair-ticket-v1
   index: docs/project/tickets/ticket-index.yaml
-  active_ticket: TKT-037-01
-  next_ticket: TKT-037-01
+  active_ticket: TKT-037-06
+  next_ticket: TKT-037-06
   todo_037_execution_order:
     - TKT-037-05
+    - TKT-037-06
     - TKT-037-01
     - TKT-037-02
     - TKT-037-03
@@ -75,8 +76,25 @@ ticket_workflow:
 session_handoff:
   prepared_at: 2026-09-24
   session_closed_at: "2026-09-23T13:07:26+02:00"
-  branch: codex/tkt-037-01-privacy-evidence
-  status: tkt_037_01_active_review_package_ready_awaiting_qualified_decision
+  branch: codex/tkt-037-06-keyed-rate-pseudonym
+  status: tkt_037_06_keyed_pseudonym_implemented_tkt_037_01_parked_until_merge
+  delivery_2026_09_24_keyed_pseudonym:
+    ticket: TKT-037-06
+    branch: codex/tkt-037-06-keyed-rate-pseudonym
+    stacked_on: codex/tkt-037-01-privacy-evidence (PR 37)
+    decision: docs/project/decisions/0040-public-read-abuse-protection.yaml amendment_2026_09_24
+    migration: supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql
+    report: docs/project/audits/2026-09-24-keyed-rate-pseudonym-validation.md
+    isolated_stack: scanfair-http-review-20260924
+    database_replay: 16/16 migrations
+    database_pgtap: 330/330 PASS including 25 keyed-pseudonym assertions
+    database_lint: PASS
+    public_read_http: 292 assertions PASS
+    remote_verifier_rollback_only: PASS against isolated stack
+    backend_gate_self_tests: 24 assertions PASS
+    scanfair_local_reset: false
+    remote_database_changed: false
+    next_action: Review and merge PR 37, then this PR; afterwards reactivate TKT-037-01 and hand over the updated review package
   delivery_2026_09_24:
     ticket: TKT-037-01
     branch: codex/tkt-037-01-privacy-evidence
@@ -216,10 +234,10 @@ session_handoff:
     flutter_line_coverage: 84.74 percent
     database_migration_replay: PASS
     database_validation_executed_at: "2026-09-07T08:37:00Z"
-    database_pgtap: 305/305 PASS
+    database_pgtap: 330/330 PASS (isolated stack, 2026-09-24)
     database_lint: PASS
     supply_chain_inventory: 61 Dart packages, 2 iOS plugins, 20 Action references, 0 vulnerabilities
-    local_migrations: 15/15 REPLAYED
+    local_migrations: 16/16 REPLAYED (isolated stack, 2026-09-24)
     retention_cleanup_local: PASS
     retention_migration_remote: APPLIED_AND_TRANSACTIONALLY_VERIFIED
     retention_migration_remote_dry_run: UP_TO_DATE
@@ -391,7 +409,8 @@ session_handoff:
     - Risiken, Improvements, Definition of Done und Primärquellen gegen die Gap-Analyse synchronisiert
     - G-PROJECT-CONTROL validiert 16 Improvements und 14 Lifecycle-Gaps
   next_session_start:
-    - Auf Branch codex/tkt-037-01-privacy-evidence starten; der PR nimmt den TKT-038-01-Closeout f2278de mit
+    - PR 37 (TKT-037-01) und danach den gestapelten TKT-037-06-PR reviewen und mergen
+    - Nach dem Merge TKT-037-06 abschliessen, TKT-037-01 reaktivieren (DOR-05) und das Review-Paket uebergeben
     - Review-Paket docs/project/compliance/review/tkt-037-01/ an eine qualifizierte Person fuer Datenschutzrecht uebergeben
     - Nach positiver Entscheidung README-Schritte 4 bis 7 exakt in dieser Reihenfolge ausfuehren
     - Migrationen 14 und 15 sowie Remote-Runtime bis zu dieser Entscheidung unveraendert blockiert lassen
@@ -982,6 +1001,17 @@ decisions_made:
 # WEEKLY_LOG — neueste Woche oben
 # =============================================================================
 weekly_log:
+  - week: 2026-W39-session3
+    summary: Unkeyed IP-Pseudonym durch HMAC mit stuendlich rotierendem, danach geloeschtem Zufallsschluessel ersetzt (TKT-037-06).
+    done:
+      - ADR-0040-Ergaenzung und Forward-only-Migration 16 mit privater Schluesseltabelle
+      - 25 neue pgTAP-Assertions mit festen Zeitpunkten; 330/330 pgTAP und 292 HTTP-Assertions in isolierter Instanz
+      - Remote-Verifier, Umgebungsvertrag, Backend-Gate, PRV-008, Datenfluss und Review-Paket nachgezogen
+    blockers:
+      - Qualifizierte Datenschutzentscheidung (TKT-037-01 AC-02) steht weiter aus
+    next_week:
+      - PRs 37 und TKT-037-06 mergen, danach Review-Paket uebergeben
+
   - week: 2026-W39-session2
     summary: TKT-037-01 aktiviert und das Privacy-Review-Paket fuer die pseudonyme IP-Rate-Limit-Verarbeitung pruefbereit gemacht.
     done:

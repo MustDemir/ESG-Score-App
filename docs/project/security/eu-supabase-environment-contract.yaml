@@ -164,13 +164,19 @@ read_contract:
     missing_or_invalid_identity: reject_403
     rejected_request: reject_429_with_retry_after_60_seconds
     raw_ip_storage: prohibited
-    stored_subject: sha256_pseudonym_only
+    stored_subject: hmac_sha256_hourly_rotating_key_pseudonym_only
     storage_schema: private.public_read_rate_windows
     retention: one_hour_expiry_bounded_five_minute_cleanup_no_hard_deletion_sla
     expiry_seconds: 3600
     cleanup_batch_limit: 10000
     deletion_boundary: Under healthy scheduling and no backlog, cleanup occurs at the next five-minute run; backlog and outages extend physical retention without a guaranteed upper bound.
-    hash_boundary: Unkeyed SHA-256 with public constant prefix permits offline IP-candidate checking and correlation across minute windows; not anonymization.
+    hash_boundary: HMAC-SHA-256 under a random 32-byte key per UTC hour (migration 16). Linkability is limited to one hour; after key erasure stored counters can no longer be attributed to an IP. Privileged database access during the current hour can still test IP candidates; not anonymization.
+    key_rotation:
+      key_storage: private.public_read_rate_keys
+      key_bytes: 32
+      rotation: utc_hour
+      erasure: first_request_of_new_hour_and_five_minute_cleanup
+      derivation_function: private.public_read_rate_subject(inet,timestamptz)
     cleanup_job:
       name: scanfair-public-read-rate-cleanup
       schedule_utc: "*/5 * * * *"

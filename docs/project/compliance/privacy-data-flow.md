@@ -68,26 +68,35 @@ contracts. Enabling a remote backend changes the applicable gate profile.
 flowchart LR
   A["ScanFair iOS app or any HTTP client"] -->|POST to one of three read RPCs| I["Trusted ingress"]
   I -->|appends observed peer to X-Forwarded-For| P["PostgREST pre-request hook"]
-  P -->|final entry parsed as inet, transaction only| H["SHA-256 with public prefix"]
+  P -->|final entry parsed as inet, transaction only| H["HMAC-SHA-256 with hourly random key"]
+  K["private.public_read_rate_keys, one key per UTC hour"] --> H
   H -->|subject_hash, window, count, expiry| T["private.public_read_rate_windows"]
   P -->|over 30 per minute: 429| A
   P -->|missing or invalid IP: 403| A
   T -->|expires 1 hour after window start| C["pg_cron cleanup every 5 minutes, max 10,000 rows"]
+  C -->|erases keys of past hours| K
 
   P -. raw IP storage prohibited .-> T
 ```
 
 The limiter protects the three public read RPCs from enumeration and quota
-exhaustion. It is defined by migrations 14 and 15 and ADR 0040, validated
-locally by 53 pgTAP and 292 HTTP assertions, and **not applied remotely**.
+exhaustion. It is defined by migrations 14 to 16 and ADR 0040, validated
+locally by 78 pgTAP and 292 HTTP assertions, and **not applied remotely**.
 
 - Only the final `X-Forwarded-For` entry appended by the trusted ingress is
   used. It is processed transiently and never written to a table.
-- The stored `subject_hash` is an unkeyed SHA-256 value with a public, constant
-  prefix. It is pseudonymous, not anonymous: IP candidates can be checked
-  offline and the same address is linkable across minute windows.
-- The table is revoked from `public`, `anon`, `authenticated` and
-  `service_role`; only the security-definer hook writes to it.
+- The stored `subject_hash` is an HMAC-SHA-256 under a random 32-byte key that
+  is generated in the database for each UTC hour and never leaves the private
+  schema. The same address is linkable only within that hour; the next hour
+  yields a different, unlinkable value.
+- Keys of past hours are erased by the first request of a new hour and by the
+  five-minute cleanup. After erasure, remaining counter rows can no longer be
+  attributed to an IP address. During the current hour, an actor with
+  privileged database access could still test IP candidates, so the data stays
+  pseudonymous, not anonymous.
+- The counter and key tables and the derivation function are revoked from
+  `public`, `anon`, `authenticated` and `service_role`; only the
+  security-definer hook writes to them.
 - Logical expiry is one hour. Physical deletion happens in the next healthy
   five-minute cleanup run; a scheduler outage or a backlog above 10,000 rows
   per run has no hard upper bound yet.

@@ -48,6 +48,7 @@ Gates gebunden sind.
 | PRP-05 | niedrig | Zwei Migrationspfade in der README zeigten eine Verzeichnisebene zu hoch ins Leere. | Pfade korrigiert, pgTAP-Datei ergaenzt. |
 | PRP-06 | niedrig | `reviewed_commit` und Reviewer-Identitaet standen in den Vorlagen, wurden vom Gate aber nicht verlangt. | Als Pflichtfelder in `legal_review` und `dpia_screening` aufgenommen. |
 | PRP-08 | hoch | PR-Review (Codex): Evidenz mit Platzhaltern, Null-Commit, fehlender Qualifikation/Signatur, offenen `conditions` oder einem im Dokument angekreuzten `approved_with_conditions` haette das `remote_backend`-Profil passiert. | Vertraege verlangen Qualifikation und Signaturreferenz, echte 40-stellige Commit-SHA, leere `conditions` und genau die geforderte angekreuzte Entscheidung im gehashten Dokument; Platzhalter werden abgelehnt; acht neue Assertions. |
+| PRP-10 | hoch | PR-38-Review (Codex): `reviewed_commit` wurde nur formal geprueft; eine veraltete Freigabe haette nach unreviewten Inventar-Aenderungen weiter gegolten. | Der Commit muss per `git show` aufloesbar sein; das Inventar darf sich seitdem nur in `last_reviewed` und den Status-/Evidenzfeldern der Reviews und DPIA-Eintraege unterscheiden; Fixture bindet an einen echten Commit; zwei neue Negativtests. |
 | PRP-07 | niedrig | Moegliche rohe IP-Adressen in API-Gateway-Logs des Providers waren nicht als Restrisiko genannt. | In `PRV-008.residual_risks`, Datenfluss sowie Review- und DPIA-Vorlage aufgenommen. |
 
 Zusaetzlich gilt: Ist das Remote-Backend aktiviert, muss `PRV-008` ebenfalls
@@ -58,7 +59,7 @@ auf Raw-IP-Speicherung und die Einstufung als pseudonym dokumentieren.
 
 | Pruefung | Ergebnis |
 | --- | --- |
-| `test_claims_privacy_gate.rb` | 34 Assertions PASS (vorher 18; 16 neue Assertions inklusive PRP-08) |
+| `test_claims_privacy_gate.rb` | 38 Assertions PASS (vorher 18; 20 neue Assertions inklusive PRP-08 und PRP-10) |
 | G-PRIVACY-BOUNDARY `development` | PASS |
 | G-PRIVACY-BOUNDARY `external_beta` | EXPECTED FAIL, fehlende qualifizierte Reviews |
 | G-PRIVACY-BOUNDARY `remote_backend` | EXPECTED FAIL, u.a. `PRV-008 must be enabled`, `public_read_rate_limit_legal_basis status must be approved`, `DPIA screening decision for public_read_rate_limit_scope is not approved` |
@@ -95,3 +96,13 @@ unveraenderten Migrationsstand.
 - AC-04 erfuellt: fehlende Freigaben blockieren `remote_backend` in
   G-PRIVACY-BOUNDARY und G-BACKEND-BOUNDARY; jede Entscheidung ausser
   `approved` bzw. `dpia_not_required` wird abgelehnt.
+
+## Nachtrag 2026-09-24: geschluesseltes Pseudonym
+
+Nach diesem Bericht wurde das unkeyed SHA-256-Pseudonym als praktisch umkehrbar
+eingestuft (PRP-09, hoch) und in TKT-037-06 durch ein HMAC mit stuendlich
+rotierendem, danach geloeschtem Zufallsschluessel ersetzt. Die oben genannten
+Restrisiken zum unkeyed Hash gelten fuer Migration 16 nicht mehr; Inventar,
+Datenfluss und Review-Paket wurden nachgezogen. Details:
+[2026-09-24-keyed-rate-pseudonym-validation.md](2026-09-24-keyed-rate-pseudonym-validation.md).
+TKT-037-01 ist bis zum Abschluss von TKT-037-06 geparkt.
