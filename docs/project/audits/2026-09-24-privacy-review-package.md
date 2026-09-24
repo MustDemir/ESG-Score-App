@@ -47,6 +47,7 @@ Gates gebunden sind.
 | PRP-04 | mittel | README liess Hashes vor der Inventar-Aenderung bilden; die Evidenz waere danach nie hash-gleich gewesen. | Reihenfolge korrigiert und Abgrenzung zwischen dem vom Reviewer gesehenen und dem finalen Inventar-Hash per `git diff` dokumentiert. |
 | PRP-05 | niedrig | Zwei Migrationspfade in der README zeigten eine Verzeichnisebene zu hoch ins Leere. | Pfade korrigiert, pgTAP-Datei ergaenzt. |
 | PRP-06 | niedrig | `reviewed_commit` und Reviewer-Identitaet standen in den Vorlagen, wurden vom Gate aber nicht verlangt. | Als Pflichtfelder in `legal_review` und `dpia_screening` aufgenommen. |
+| PRP-08 | hoch | PR-Review (Codex): Evidenz mit Platzhaltern, Null-Commit, fehlender Qualifikation/Signatur, offenen `conditions` oder einem im Dokument angekreuzten `approved_with_conditions` haette das `remote_backend`-Profil passiert. | Vertraege verlangen Qualifikation und Signaturreferenz, echte 40-stellige Commit-SHA, leere `conditions` und genau die geforderte angekreuzte Entscheidung im gehashten Dokument; Platzhalter werden abgelehnt; acht neue Assertions. |
 | PRP-07 | niedrig | Moegliche rohe IP-Adressen in API-Gateway-Logs des Providers waren nicht als Restrisiko genannt. | In `PRV-008.residual_risks`, Datenfluss sowie Review- und DPIA-Vorlage aufgenommen. |
 
 Zusaetzlich gilt: Ist das Remote-Backend aktiviert, muss `PRV-008` ebenfalls
@@ -57,7 +58,7 @@ auf Raw-IP-Speicherung und die Einstufung als pseudonym dokumentieren.
 
 | Pruefung | Ergebnis |
 | --- | --- |
-| `test_claims_privacy_gate.rb` | 26 Assertions PASS (vorher 18; 8 neue Assertions) |
+| `test_claims_privacy_gate.rb` | 34 Assertions PASS (vorher 18; 16 neue Assertions inklusive PRP-08) |
 | G-PRIVACY-BOUNDARY `development` | PASS |
 | G-PRIVACY-BOUNDARY `external_beta` | EXPECTED FAIL, fehlende qualifizierte Reviews |
 | G-PRIVACY-BOUNDARY `remote_backend` | EXPECTED FAIL, u.a. `PRV-008 must be enabled`, `public_read_rate_limit_legal_basis status must be approved`, `DPIA screening decision for public_read_rate_limit_scope is not approved` |

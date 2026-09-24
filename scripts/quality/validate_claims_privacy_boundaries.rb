@@ -11,6 +11,10 @@ class ClaimsPrivacyBoundaryValidator
   PROFILES = %w[development external_beta remote_backend release_candidate].freeze
   GATES = %w[claims privacy all].freeze
   SHA256_PATTERN = /\A[0-9a-f]{64}\z/.freeze
+  GIT_COMMIT_PATTERN = /\A[0-9a-f]{40}\z/.freeze
+  # Template placeholders such as "[FULL_NAME]", "[EINTRAGEN]" or "YYYY-MM-DD".
+  EVIDENCE_PLACEHOLDER_PATTERN = /\[[A-Z0-9_ \/-]+\]|YYYY|EINTRAGEN/.freeze
+  CHECKED_DOCUMENT_OPTION_PATTERN = /`\[[xX]\] ([a-z_]+)`/.freeze
   UNRESOLVED_PROCESSING_MARKERS = %w[
     missing
     pending
@@ -485,6 +489,40 @@ class ClaimsPrivacyBoundaryValidator
     )
   end
 
+  # A qualified approval must be complete and unconditional: no template
+  # placeholders, a real commit, no open conditions, and the signed document
+  # itself must mark exactly the decision the evidence file claims.
+  def validate_evidence_integrity(evidence, contract, label)
+    evidence.each do |field, value|
+      next unless value.is_a?(String) && value.match?(EVIDENCE_PLACEHOLDER_PATTERN)
+
+      violations << "#{label}: #{field} still contains a template placeholder"
+    end
+    Array(contract["commit_fields"]).each do |field|
+      commit = evidence[field].to_s
+      unless commit.match?(GIT_COMMIT_PATTERN) && commit.delete("0") != ""
+        violations << "#{label}: #{field} must be a full, non-zero git commit SHA"
+      end
+    end
+    Array(contract["empty_fields"]).each do |field|
+      unless evidence.key?(field) && evidence[field].is_a?(Array) && evidence[field].empty?
+        violations << "#{label}: #{field} must be an empty list for an unconditional approval"
+      end
+    end
+
+    options = Array(contract["document_decision_options"])
+    return if options.empty?
+
+    document = safe_repo_path(evidence["document_path"], label)
+    return unless document && File.file?(document)
+
+    checked = File.read(document, encoding: "UTF-8").scan(CHECKED_DOCUMENT_OPTION_PATTERN).flatten & options
+    expected = contract["required_document_decision"]
+    unless checked == [expected]
+      violations << "#{label}: document must mark exactly #{expected.inspect}, found #{checked.inspect}"
+    end
+  end
+
   def validate_evidence(relative, contract, label, inventory_relative:, required_scope: nil)
     evidence = load_evidence(relative, label)
     return if evidence.empty?
@@ -501,6 +539,7 @@ class ClaimsPrivacyBoundaryValidator
       end
     end
     require_fields(evidence, Array(contract["required_fields"]), label)
+    validate_evidence_integrity(evidence, contract, label)
     Array(contract["digest_fields"]).each do |field|
       unless evidence[field].to_s.match?(SHA256_PATTERN)
         violations << "#{label}: #{field} must be a lowercase SHA-256"

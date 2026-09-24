@@ -49,7 +49,12 @@ den Pruefumfang und erzeugen **keine** automatische Rechtsfreigabe.
    jede andere DPIA-Entscheidung als `dpia_not_required` ab.
 6. **Erst nach Schritt 5** die SHA-256-Werte bilden (siehe unten) und in Kopien
    der beiden Evidenzvorlagen eintragen. Wer vorher hasht, bekommt einen
-   Hash-Mismatch, weil Schritt 5 das Inventar veraendert.
+   Hash-Mismatch, weil Schritt 5 das Inventar veraendert. Das Gate lehnt
+   Evidenz ab, wenn ein Platzhalter (`[...]`, `YYYY`) stehen bleibt,
+   `reviewed_commit` kein vollstaendiger Git-SHA ist, Qualifikation oder
+   Signaturreferenz fehlen, `conditions` nicht leer ist oder im gehashten
+   Dokument nicht genau `[x] approved` bzw. `[x] dpia_not_required`
+   angekreuzt ist.
 7. Danach die Development- und strengen Privacy-/Backend-Gates ausfuehren. Die
    Migrationen 14 bis 16 sowie die Remote-Runtime bleiben bis zu einem
    vollstaendigen positiven Ergebnis unveraendert blockiert. Das
