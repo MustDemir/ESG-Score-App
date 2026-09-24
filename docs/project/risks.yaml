@@ -124,6 +124,8 @@ risks:
       PRV-008 inventarisiert; eigene, scope-gebundene Privacy- und
       DPIA-Freigaben sind im Remote-Profil Pflicht, und eine andere
       DPIA-Entscheidung als dpia_not_required entsperrt kein Gate (TKT-037-01).
+      Das Pseudonym ist ein HMAC mit stuendlich rotierendem, danach
+      geloeschtem Schluessel statt eines umkehrbaren unkeyed Hash (TKT-037-06).
     related_todos: [TODO-008, TODO-037]
     related_gaps: [GAP-004]
     related_improvements: [IMP-COMP-006]

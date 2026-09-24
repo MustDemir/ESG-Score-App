@@ -110,10 +110,12 @@ N8  Kalibrierung und Expertenreview       [--------------------]   0%
 
 ### Aktuelle Ausführungsreihenfolge
 
-Backend- und Cache-Reparatur sind abgeschlossen. TKT-037-01 ist aktiv: Das
-Privacy-Review-Paket unter `compliance/review/tkt-037-01/` ist technisch
-vollstaendig (PRV-008, scoped Freigaben, fail-closed DPIA-Pruefung) und wartet
-auf die qualifizierte menschliche Entscheidung. Danach folgen kontrolliert
+Backend- und Cache-Reparatur sind abgeschlossen. TKT-037-06 ersetzt das
+umkehrbare IP-Pseudonym durch ein HMAC mit stuendlich rotierendem, danach
+geloeschtem Schluessel (Migration 16). TKT-037-01 ist bis dahin geparkt; das
+Privacy-Review-Paket unter `compliance/review/tkt-037-01/` beschreibt bereits
+das neue Verfahren und wartet danach auf die qualifizierte menschliche
+Entscheidung. Danach folgen kontrolliert
 TKT-037-02 bis TKT-037-04. Die fachlichen Quellen-/Review-Aufgaben unten
 bleiben offen. Docker muss fuer den echten lokalen API-/DB-Test laufen.
 

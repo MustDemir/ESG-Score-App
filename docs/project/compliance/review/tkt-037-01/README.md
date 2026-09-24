@@ -20,7 +20,9 @@ den Pruefumfang und erzeugen **keine** automatische Rechtsfreigabe.
    - `../../../audits/2026-09-23-public-read-http-validation.md`
    - `../../../../../supabase/migrations/20260906000100_public_read_abuse_protection.sql`
    - `../../../../../supabase/migrations/20260923000100_public_read_api_integration.sql`
+   - `../../../../../supabase/migrations/20260924000100_public_read_keyed_pseudonym.sql`
    - `../../../../../supabase/tests/database/public_read_abuse_protection.test.sql`
+   - `../../../../../supabase/tests/database/public_read_keyed_pseudonym.test.sql`
 
    Die Verarbeitung ist im Inventar als `PRV-008` beschrieben; Aufbewahrung
    und Loeschung stehen zusaetzlich unter
@@ -49,7 +51,7 @@ den Pruefumfang und erzeugen **keine** automatische Rechtsfreigabe.
    der beiden Evidenzvorlagen eintragen. Wer vorher hasht, bekommt einen
    Hash-Mismatch, weil Schritt 5 das Inventar veraendert.
 7. Danach die Development- und strengen Privacy-/Backend-Gates ausfuehren. Die
-   Migrationen 14 und 15 sowie die Remote-Runtime bleiben bis zu einem
+   Migrationen 14 bis 16 sowie die Remote-Runtime bleiben bis zu einem
    vollstaendigen positiven Ergebnis unveraendert blockiert. Das
    `remote_backend`-Profil verlangt zusaetzlich, dass `PRV-008` aktiviert und
    ohne offene Marker (`pending`, `release_blocker`, …) beschrieben ist.
@@ -94,9 +96,13 @@ Jede weitere Abweichung erfordert eine erneute Bestaetigung.
 
 ## Bekannte Vorbedingungen und Blocker
 
-- Die gespeicherte Kennung ist ein unkeyed SHA-256-Pseudonym mit oeffentlichem
-  konstantem Praefix; sie ist nicht anonym und erlaubt Offline-Pruefungen von
-  IP-Kandidaten sowie Verknuepfung ueber Minutenfenster.
+- Die gespeicherte Kennung ist ein HMAC-SHA-256 mit einem zufaelligen
+  32-Byte-Schluessel je UTC-Stunde (Migration 16, TKT-037-06). Dieselbe IP ist
+  nur innerhalb einer Stunde verknuepfbar. Schluessel vergangener Stunden
+  werden beim ersten Request der neuen Stunde oder im naechsten Cleanup
+  geloescht; danach sind die Zaehlerzeilen keiner IP mehr zuordenbar. Waehrend
+  der laufenden Stunde kann ein privilegierter Datenbankzugriff IP-Kandidaten
+  pruefen; die Daten bleiben daher pseudonym, nicht anonym.
 - `expires_at` liegt eine Stunde nach Fensterbeginn. Physische Loeschung erfolgt
   durch einen Fuenf-Minuten-Cronjob mit maximal 10.000 Zeilen je Lauf. Bei
   Rueckstau oder Ausfall besteht derzeit keine garantierte maximale

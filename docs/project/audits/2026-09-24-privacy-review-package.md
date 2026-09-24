@@ -94,3 +94,13 @@ unveraenderten Migrationsstand.
 - AC-04 erfuellt: fehlende Freigaben blockieren `remote_backend` in
   G-PRIVACY-BOUNDARY und G-BACKEND-BOUNDARY; jede Entscheidung ausser
   `approved` bzw. `dpia_not_required` wird abgelehnt.
+
+## Nachtrag 2026-09-24: geschluesseltes Pseudonym
+
+Nach diesem Bericht wurde das unkeyed SHA-256-Pseudonym als praktisch umkehrbar
+eingestuft (PRP-08, hoch) und in TKT-037-06 durch ein HMAC mit stuendlich
+rotierendem, danach geloeschtem Zufallsschluessel ersetzt. Die oben genannten
+Restrisiken zum unkeyed Hash gelten fuer Migration 16 nicht mehr; Inventar,
+Datenfluss und Review-Paket wurden nachgezogen. Details:
+[2026-09-24-keyed-rate-pseudonym-validation.md](2026-09-24-keyed-rate-pseudonym-validation.md).
+TKT-037-01 ist bis zum Abschluss von TKT-037-06 geparkt.

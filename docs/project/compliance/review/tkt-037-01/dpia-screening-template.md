@@ -20,11 +20,11 @@
 ## 2. Verarbeitung in Kurzform
 
 Kurzzeitige Verarbeitung der vom letzten vertrauten Ingress beobachteten
-IP-Adresse, Bildung eines unkeyed SHA-256-Pseudonyms mit oeffentlichem
-Praefix, minutenweiser Zaehler fuer maximal 30 Anfragen und geplante Loeschung
-ab einer Stunde ueber einen begrenzten Fuenf-Minuten-Cleanup. Keine rohe IP in
-der Zaehler-Tabelle, aber Offline-Pruefbarkeit von IP-Kandidaten und
-Verknuepfbarkeit gleicher Adressen ueber Fenster. Keine Nutzerkonten,
+IP-Adresse, Bildung eines HMAC-SHA-256-Pseudonyms mit zufaelligem, stuendlich
+rotierendem und danach geloeschtem Schluessel, minutenweiser Zaehler fuer
+maximal 30 Anfragen und geplante Loeschung ab einer Stunde ueber einen
+begrenzten Fuenf-Minuten-Cleanup. Keine rohe IP in der Zaehler-Tabelle;
+Verknuepfbarkeit gleicher Adressen nur innerhalb einer Stunde. Keine Nutzerkonten,
 Standortdaten, besonderen Datenkategorien oder Entscheidungen ueber Personen im
 gebundenen Scope.
 
@@ -59,8 +59,10 @@ Bewertung der Anzahl und Kombination zutreffender Kriterien: `[EINTRAGEN]`
 
 Mindestens zu bewerten:
 
-- Offline-Pruefung moeglicher IP-Adressen gegen den unkeyed Hash;
-- Verkettung gleicher IPs ueber Minutenfenster;
+- Pruefung moeglicher IP-Adressen bei privilegiertem Datenbankzugriff in der
+  laufenden Stunde;
+- Verkettung gleicher IPs ueber Minutenfenster innerhalb einer Stunde;
+- verzoegerte Schluessel-Loeschung bei fehlendem Traffic und Cleanup-Ausfall;
 - gemeinsame IPs/NAT und fehlerhafte Zuordnung mehrerer Personen;
 - Umgehung oder Fehlklassifikation durch die Hosted-Proxy-Kette;
 - Blockierung legitimer Anfragen durch 403/429;
